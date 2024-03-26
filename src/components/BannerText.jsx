@@ -50,7 +50,7 @@ const TextBox = styled.div`
 
 const BannerText = () => {
   return (
-    <MainBox>
+    <MainBox id="highlights">
       <TextBox>WE MAKE FILMS & DRAMA. SOMETIMES WE WIN AWARDS</TextBox>
     </MainBox>
   );

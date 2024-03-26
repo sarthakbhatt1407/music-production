@@ -87,19 +87,11 @@ function WebNav({ mode, toggleColorMode }) {
             <img src={logo} style={logoStyle} alt="logo of sitemark" />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <MenuItem
-                onClick={() => scrollToSection("services")}
+                onClick={() => scrollToSection("overview")}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography variant="body2" color="text.primary" style={{}}>
-                  Services
-                </Typography>
-              </MenuItem>
-              <MenuItem
-                onClick={() => scrollToSection("testimonials")}
-                sx={{ py: "6px", px: "12px" }}
-              >
-                <Typography variant="body2" color="text.primary" style={{}}>
-                  Testimonials
+                  Overview
                 </Typography>
               </MenuItem>
               <MenuItem
@@ -110,6 +102,15 @@ function WebNav({ mode, toggleColorMode }) {
                   Highlights
                 </Typography>
               </MenuItem>
+              <MenuItem
+                onClick={() => scrollToSection("services")}
+                sx={{ py: "6px", px: "12px" }}
+              >
+                <Typography variant="body2" color="text.primary" style={{}}>
+                  Services
+                </Typography>
+              </MenuItem>
+
               <MenuItem
                 onClick={() => scrollToSection("pricing")}
                 sx={{ py: "6px", px: "12px" }}
@@ -171,14 +172,14 @@ function WebNav({ mode, toggleColorMode }) {
                     flexGrow: 1,
                   }}
                 ></Box>
-                <MenuItem onClick={() => scrollToSection("features")}>
-                  Features
-                </MenuItem>
-                <MenuItem onClick={() => scrollToSection("testimonials")}>
-                  Testimonials
+                <MenuItem onClick={() => scrollToSection("overview")}>
+                  Overview
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("highlights")}>
                   Highlights
+                </MenuItem>
+                <MenuItem onClick={() => scrollToSection("services")}>
+                  Services
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("pricing")}>
                   Pricing

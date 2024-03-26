@@ -63,7 +63,7 @@ const TextBox = styled.div`
 
 const SectionHeading = () => {
   return (
-    <MainBox>
+    <MainBox id="overview">
       <TextBox>
         <span data-aos="zoom-in" data-aos-delay="700">
           stunning homepage collection
