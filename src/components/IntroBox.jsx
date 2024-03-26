@@ -89,7 +89,6 @@ const Para = styled.span`
   @media only screen and (min-width: 351px) and (max-width: 549px) {
     font-size: 1.05rem;
     margin-top: -4rem;
-    background-color: rgba(0, 0, 0, 0.7);
   }
   @media only screen and (min-width: 550px) and (max-width: 800px) {
     font-size: 1.5rem;
@@ -145,8 +144,8 @@ const IntroBox = () => {
     <MainBox intro={intro}>
       <TextBox>
         <div>
-          <h1 data-aos="fade-up">Nm </h1>
-          <h2 data-aos="fade-down">Digital</h2>
+          <h1 data-aos="fade-up">Rivaz </h1>
+          <h2 data-aos="fade-down">Films</h2>
         </div>
         <div>
           <Para data-aos="fade-right">a mordern solution</Para>

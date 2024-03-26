@@ -7,9 +7,10 @@ import { Check } from "@mui/icons-material";
 
 const MainBox = styled.div`
   display: flex;
-  width: 80%;
+  width: 90%;
   margin: 0 auto;
   gap: 2rem;
+  overflow-x: hidden;
   flex-wrap: wrap;
 `;
 
@@ -39,6 +40,14 @@ const ServiceBox = styled.div`
       transform: scale(1.1);
     }
     cursor: pointer;
+  }
+  @media only screen and (min-width: 0px) and (max-width: 350px) {
+    width: 90%;
+  }
+  @media only screen and (min-width: 351px) and (max-width: 549px) {
+    width: 90%;
+  }
+  @media only screen and (min-width: 550px) and (max-width: 900px) {
   }
 `;
 const PointsBox = styled.div`
