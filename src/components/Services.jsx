@@ -12,6 +12,7 @@ const MainBox = styled.div`
   gap: 2rem;
   overflow-x: hidden;
   flex-wrap: wrap;
+  padding: 1rem;
 `;
 
 const ServiceBox = styled.div`
@@ -35,7 +36,7 @@ const ServiceBox = styled.div`
   }
 
   &:hover {
-    box-shadow: 0.1rem 0.1rem 0.6rem #00000066;
+    box-shadow: 0.1rem 0.1rem 0.6rem #00000059;
     img {
       transform: scale(1.1);
     }

@@ -143,7 +143,7 @@ function WebNav({ mode, toggleColorMode }) {
               component="a"
               target="_blank"
             >
-              Sign up
+              Sign in
             </Button>
           </Box>
           <Box sx={{ display: { sm: "", md: "none" } }}>
