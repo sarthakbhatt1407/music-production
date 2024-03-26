@@ -17,7 +17,7 @@ const logoStyle = {
 
   height: "auto",
   cursor: "pointer",
-  margin: " 0 2rem",
+  margin: " 0  2rem 0 0",
 };
 
 function WebNav({ mode, toggleColorMode }) {
@@ -152,7 +152,7 @@ function WebNav({ mode, toggleColorMode }) {
               onClick={toggleDrawer(true)}
               sx={{ minWidth: "30px", p: "4px" }}
             >
-              <Reorder style={{ color: "white" }} />
+              <Reorder style={{ color: "black" }} />
             </Button>
             <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
               <Box

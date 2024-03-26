@@ -3,7 +3,7 @@ import styled from "styled-components";
 import intro from "../assets/images/intro.jpg";
 
 const MainBox = styled.div`
-  height: 100vh;
+  height: 92vh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -22,7 +22,7 @@ const MainBox = styled.div`
     background-repeat: no-repeat;
     background-size: cover;
     z-index: -1;
-    opacity: 0.9;
+    opacity: 1;
   }
 `;
 const TextBox = styled.div`
@@ -51,6 +51,30 @@ const TextBox = styled.div`
       font-size: 7rem;
     }
   }
+  @media only screen and (min-width: 0px) and (max-width: 549px) {
+    div {
+      width: 100%;
+      gap: 0.5rem;
+      h1 {
+        font-size: 4rem;
+      }
+      h2 {
+        font-size: 4rem;
+      }
+    }
+  }
+  @media only screen and (min-width: 550px) and (max-width: 800px) {
+    div {
+      width: 100%;
+      gap: 0.5rem;
+      h1 {
+        font-size: 4.5rem;
+      }
+      h2 {
+        font-size: 4.5rem;
+      }
+    }
+  }
 `;
 
 const Para = styled.span`
@@ -58,6 +82,19 @@ const Para = styled.span`
   font-size: 2rem;
   text-transform: uppercase;
   letter-spacing: 0.1rem;
+  @media only screen and (min-width: 0px) and (max-width: 350px) {
+    font-size: 0.8rem;
+    margin-top: -4rem;
+  }
+  @media only screen and (min-width: 351px) and (max-width: 549px) {
+    font-size: 1.05rem;
+    margin-top: -4rem;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  @media only screen and (min-width: 550px) and (max-width: 800px) {
+    font-size: 1.5rem;
+    margin-top: -5rem;
+  }
 `;
 const BtnBox = styled.div`
   button {
@@ -116,7 +153,7 @@ const IntroBox = () => {
           <Para data-aos="fade-left">for video production</Para>
         </div>
         <BtnBox>
-          <button>view more</button>
+          <button data-aos="fade-up">view more</button>
         </BtnBox>
       </TextBox>
     </MainBox>
