@@ -7,7 +7,8 @@ const MainBox = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: 4rem 0;
+  padding: 3rem 0;
+  overflow-x: hidden;
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     padding: 3rem 0;
   }
@@ -19,6 +20,7 @@ const MainBox = styled.div`
   }
 `;
 
+// WE MAKE FILMS & DRAMA. SOMETIMES WE WIN AWARDS
 const TextBox = styled.div`
   display: flex;
   gap: 0.5rem;

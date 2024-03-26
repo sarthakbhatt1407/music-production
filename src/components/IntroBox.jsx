@@ -3,7 +3,7 @@ import styled from "styled-components";
 import intro from "../assets/images/intro.jpg";
 
 const MainBox = styled.div`
-  height: 92vh;
+  height: 98vh;
   width: 100%;
   display: flex;
   justify-content: center;

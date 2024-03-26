@@ -87,11 +87,11 @@ function WebNav({ mode, toggleColorMode }) {
             <img src={logo} style={logoStyle} alt="logo of sitemark" />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <MenuItem
-                onClick={() => scrollToSection("features")}
+                onClick={() => scrollToSection("services")}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography variant="body2" color="text.primary" style={{}}>
-                  Features
+                  Services
                 </Typography>
               </MenuItem>
               <MenuItem

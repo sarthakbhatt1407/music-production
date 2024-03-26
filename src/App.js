@@ -9,7 +9,7 @@ const App = () => {
   useEffect(() => {
     AOS.init({
       once: true,
-      duration: 1000,
+      duration: 800,
     });
     const aosRefresh = setInterval(() => {
       AOS.refresh();
