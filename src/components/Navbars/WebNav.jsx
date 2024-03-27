@@ -17,17 +17,18 @@ const logoStyle = {
 
   height: "auto",
   cursor: "pointer",
-  margin: " 0  2rem 0 2rem",
+  margin: " 0  4rem 0 2rem",
 };
 
 function WebNav({ mode, toggleColorMode }) {
   const [open, setOpen] = React.useState(false);
-
+  const [active, setActive] = React.useState("");
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
   const scrollToSection = (sectionId) => {
+    setActive(sectionId);
     const sectionElement = document.getElementById(sectionId);
     const offset = 128;
     if (sectionElement) {
@@ -90,7 +91,22 @@ function WebNav({ mode, toggleColorMode }) {
                 onClick={() => scrollToSection("overview")}
                 sx={{ py: "6px", px: "12px" }}
               >
-                <Typography variant="body2" color="text.primary" style={{}}>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "overview" ? "#D81902" : "",
+                    fontSize: "1rem",
+                    borderBottom:
+                      active === "overview" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "overview" ? "scale(1.1)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
                   Overview
                 </Typography>
               </MenuItem>
@@ -98,7 +114,22 @@ function WebNav({ mode, toggleColorMode }) {
                 onClick={() => scrollToSection("highlights")}
                 sx={{ py: "6px", px: "12px" }}
               >
-                <Typography variant="body2" color="text.primary" style={{}}>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "highlights" ? "#D81902" : "",
+                    fontSize: "1rem",
+                    borderBottom:
+                      active === "highlights" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "highlights" ? "scale(1.1)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
                   Highlights
                 </Typography>
               </MenuItem>
@@ -106,24 +137,90 @@ function WebNav({ mode, toggleColorMode }) {
                 onClick={() => scrollToSection("services")}
                 sx={{ py: "6px", px: "12px" }}
               >
-                <Typography variant="body2" color="text.primary" style={{}}>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "services" ? "#D81902" : "",
+                    fontSize: "1rem",
+                    borderBottom:
+                      active === "services" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "services" ? "scale(1.1)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
                   Services
                 </Typography>
               </MenuItem>
-
               <MenuItem
-                onClick={() => scrollToSection("pricing")}
+                onClick={() => scrollToSection("portfolio")}
                 sx={{ py: "6px", px: "12px" }}
               >
-                <Typography variant="body2" color="text.primary" style={{}}>
-                  Pricing
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "portfolio" ? "#D81902" : "",
+                    fontSize: "1rem",
+                    borderBottom:
+                      active === "portfolio" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "portfolio" ? "scale(1.1)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
+                  Portfolio
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => scrollToSection("contact-us")}
+                sx={{ py: "6px", px: "12px" }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "contact-us" ? "#D81902" : "",
+                    fontSize: "1rem",
+                    borderBottom:
+                      active === "contact-us" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "contact-us" ? "scale(1.1)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
+                  Contact Us
                 </Typography>
               </MenuItem>
               <MenuItem
                 onClick={() => scrollToSection("faq")}
                 sx={{ py: "6px", px: "12px" }}
               >
-                <Typography variant="body2" color="text.primary" style={{}}>
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "faq" ? "#D81902" : "",
+                    fontSize: "1rem",
+                    borderBottom:
+                      active === "faq" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform: active === "faq" ? "scale(1.1)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                  }}
+                >
                   FAQ
                 </Typography>
               </MenuItem>
@@ -181,8 +278,11 @@ function WebNav({ mode, toggleColorMode }) {
                 <MenuItem onClick={() => scrollToSection("services")}>
                   Services
                 </MenuItem>
-                <MenuItem onClick={() => scrollToSection("pricing")}>
-                  Pricing
+                <MenuItem onClick={() => scrollToSection("portfolio")}>
+                  Portfolio
+                </MenuItem>
+                <MenuItem onClick={() => scrollToSection("contact-us")}>
+                  Contact Us
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("faq")}>FAQ</MenuItem>
                 <Divider />
