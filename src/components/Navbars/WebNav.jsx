@@ -9,7 +9,7 @@ import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
-import logo from "../../assets/images/logo/logo.png";
+import logo from "../../assets/images/logo/logo.webp";
 import { Reorder } from "@mui/icons-material";
 
 function WebNav({ mode, toggleColorMode }) {
@@ -22,7 +22,7 @@ function WebNav({ mode, toggleColorMode }) {
 
   const logoStyle = {
     width: "6rem",
-
+    height: "6rem",
     height: "auto",
     cursor: "pointer",
     margin: w < 901 ? " 0  4rem 0 1rem" : " 0  4rem 0 2rem",

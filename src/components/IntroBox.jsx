@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import intro from "../assets/images/intro.jpg";
+import intro from "../assets/images/intro.webp";
 
 const MainBox = styled.div`
   height: 98vh;
