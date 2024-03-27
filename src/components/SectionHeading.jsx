@@ -65,7 +65,7 @@ const SectionHeading = () => {
   return (
     <MainBox id="overview">
       <TextBox>
-        <span data-aos="zoom-in" data-aos-delay="700">
+        <span data-aos="zoom-in" data-aos-delay="200">
           stunning homepage collection
         </span>
       </TextBox>

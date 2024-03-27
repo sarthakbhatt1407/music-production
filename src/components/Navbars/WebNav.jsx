@@ -97,13 +97,13 @@ function WebNav({ mode, toggleColorMode }) {
                   color="text.primary"
                   style={{
                     color: active === "overview" ? "#D81902" : "",
-                    fontSize: "1rem",
+                    fontSize: "1.05rem",
                     borderBottom:
                       active === "overview" ? "1px dashed #d817026d" : "none",
                     letterSpacing: "0.08rem",
                     transition: "all .5s",
                     transform:
-                      active === "overview" ? "scale(1.1)" : "scale(1)",
+                      active === "overview" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
                   }}
@@ -120,13 +120,13 @@ function WebNav({ mode, toggleColorMode }) {
                   color="text.primary"
                   style={{
                     color: active === "highlights" ? "#D81902" : "",
-                    fontSize: "1rem",
+                    fontSize: "1.05rem",
                     borderBottom:
                       active === "highlights" ? "1px dashed #d817026d" : "none",
                     letterSpacing: "0.08rem",
                     transition: "all .5s",
                     transform:
-                      active === "highlights" ? "scale(1.1)" : "scale(1)",
+                      active === "highlights" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
                   }}
@@ -143,13 +143,13 @@ function WebNav({ mode, toggleColorMode }) {
                   color="text.primary"
                   style={{
                     color: active === "services" ? "#D81902" : "",
-                    fontSize: "1rem",
+                    fontSize: "1.05rem",
                     borderBottom:
                       active === "services" ? "1px dashed #d817026d" : "none",
                     letterSpacing: "0.08rem",
                     transition: "all .5s",
                     transform:
-                      active === "services" ? "scale(1.1)" : "scale(1)",
+                      active === "services" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
                   }}
@@ -166,13 +166,13 @@ function WebNav({ mode, toggleColorMode }) {
                   color="text.primary"
                   style={{
                     color: active === "portfolio" ? "#D81902" : "",
-                    fontSize: "1rem",
+                    fontSize: "1.05rem",
                     borderBottom:
                       active === "portfolio" ? "1px dashed #d817026d" : "none",
                     letterSpacing: "0.08rem",
                     transition: "all .5s",
                     transform:
-                      active === "portfolio" ? "scale(1.1)" : "scale(1)",
+                      active === "portfolio" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
                   }}
@@ -189,13 +189,13 @@ function WebNav({ mode, toggleColorMode }) {
                   color="text.primary"
                   style={{
                     color: active === "contact-us" ? "#D81902" : "",
-                    fontSize: "1rem",
+                    fontSize: "1.05rem",
                     borderBottom:
                       active === "contact-us" ? "1px dashed #d817026d" : "none",
                     letterSpacing: "0.08rem",
                     transition: "all .5s",
                     transform:
-                      active === "contact-us" ? "scale(1.1)" : "scale(1)",
+                      active === "contact-us" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
                   }}
@@ -212,12 +212,12 @@ function WebNav({ mode, toggleColorMode }) {
                   color="text.primary"
                   style={{
                     color: active === "faq" ? "#D81902" : "",
-                    fontSize: "1rem",
+                    fontSize: "1.05rem",
                     borderBottom:
                       active === "faq" ? "1px dashed #d817026d" : "none",
                     letterSpacing: "0.08rem",
                     transition: "all .5s",
-                    transform: active === "faq" ? "scale(1.1)" : "scale(1)",
+                    transform: active === "faq" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
                   }}
