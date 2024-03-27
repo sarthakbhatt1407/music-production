@@ -156,7 +156,7 @@ const IntroBox = () => {
     <MainBox intro={intro}>
       <TextBox>
         <div>
-          <h1 data-aos="fade-up">Rivaz </h1>
+          <h1 data-aos="fade-up">Rivaaz </h1>
           <h2 data-aos="fade-down">Films</h2>
         </div>
         <div>

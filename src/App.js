@@ -11,11 +11,11 @@ const App = () => {
       once: true,
       duration: 800,
     });
-    const aosRefresh = setInterval(() => {
-      AOS.refresh();
-    }, 500);
+    // const aosRefresh = setInterval(() => {
+    //   AOS.refresh();
+    // }, 500);
     return () => {
-      clearInterval(aosRefresh);
+      // clearInterval(aosRefresh);
     };
   }, []);
 

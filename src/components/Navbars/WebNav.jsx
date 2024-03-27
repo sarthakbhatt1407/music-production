@@ -9,7 +9,7 @@ import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
-import logo from "../../assets/images/logo/logo-white.png";
+import logo from "../../assets/images/logo/logo.png";
 import { Reorder } from "@mui/icons-material";
 
 const logoStyle = {
@@ -17,7 +17,7 @@ const logoStyle = {
 
   height: "auto",
   cursor: "pointer",
-  margin: " 0  2rem 0 0",
+  margin: " 0  2rem 0 2rem",
 };
 
 function WebNav({ mode, toggleColorMode }) {
@@ -52,7 +52,7 @@ function WebNav({ mode, toggleColorMode }) {
         mt: 2,
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Toolbar
           variant="regular"
           sx={(theme) => ({
@@ -63,7 +63,7 @@ function WebNav({ mode, toggleColorMode }) {
             borderRadius: "999px",
             bgcolor:
               theme.palette.mode === "light"
-                ? "rgba(255, 255, 255, 0.735)"
+                ? "rgba(255, 255, 255, 0.832)"
                 : "rgba(0, 0, 0, 0.4)",
             backdropFilter: "blur(24px)",
             maxHeight: 40,
