@@ -22,8 +22,8 @@ function WebNav({ mode, toggleColorMode }) {
 
   const logoStyle = {
     width: "6rem",
-    height: "6rem",
-    height: "auto",
+    height: "3rem",
+
     cursor: "pointer",
     margin: w < 901 ? " 0  4rem 0 1rem" : " 0  4rem 0 2rem",
   };

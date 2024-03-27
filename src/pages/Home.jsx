@@ -5,6 +5,7 @@ import OurWork from "../components/OurWork";
 import BannerText from "../components/BannerText";
 import SevicesHeading from "../components/SevicesHeading";
 import Services from "../components/Services";
+import Faq from "../components/Faq";
 
 const Home = () => {
   return (
@@ -13,8 +14,10 @@ const Home = () => {
       <SectionHeading />
       <OurWork />
       <BannerText />
-      <SevicesHeading />
+      <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
       <Services />
+      <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />
+      <Faq />
       <div>!!</div>
       <div>!!</div>
     </div>
