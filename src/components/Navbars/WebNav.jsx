@@ -12,19 +12,20 @@ import Drawer from "@mui/material/Drawer";
 import logo from "../../assets/images/logo/logo.png";
 import { Reorder } from "@mui/icons-material";
 
-const logoStyle = {
-  width: "6rem",
-
-  height: "auto",
-  cursor: "pointer",
-  margin: " 0  4rem 0 2rem",
-};
-
 function WebNav({ mode, toggleColorMode }) {
   const [open, setOpen] = React.useState(false);
   const [active, setActive] = React.useState("");
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
+  };
+  const w = window.screen.width;
+
+  const logoStyle = {
+    width: "6rem",
+
+    height: "auto",
+    cursor: "pointer",
+    margin: w < 901 ? " 0  4rem 0 1rem" : " 0  4rem 0 2rem",
   };
 
   const scrollToSection = (sectionId) => {
@@ -61,7 +62,7 @@ function WebNav({ mode, toggleColorMode }) {
             alignItems: "center",
             justifyContent: "space-between",
             flexShrink: 0,
-            borderRadius: "999px",
+            borderRadius: "10px",
             bgcolor:
               theme.palette.mode === "light"
                 ? "rgba(255, 255, 255, 0.832)"
