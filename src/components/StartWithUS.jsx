@@ -14,6 +14,17 @@ const MainDiv = styled.div`
   padding: 2rem 1rem;
   height: 80vh;
   /* background-color: red; */
+  overflow-x: hidden;
+  @media only screen and (min-width: 0px) and (max-width: 350px) {
+    grid-template-columns: 1fr;
+  }
+  @media only screen and (min-width: 351px) and (max-width: 549px) {
+    grid-template-columns: 1fr;
+    grid-gap: 0;
+  }
+  @media only screen and (min-width: 550px) and (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const LeftDiv = styled.div`
@@ -22,6 +33,19 @@ const LeftDiv = styled.div`
   border-radius: 0.4rem;
   overflow: hidden;
   height: 100%;
+  @media only screen and (min-width: 0px) and (max-width: 350px) {
+    flex-direction: row;
+  }
+  @media only screen and (min-width: 351px) and (max-width: 549px) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    overflow-x: hidden;
+    height: 30vh;
+  }
+  @media only screen and (min-width: 550px) and (max-width: 800px) {
+    flex-direction: row;
+  }
 `;
 
 const LeftDivTextBox = styled.div`
@@ -49,6 +73,23 @@ const LeftDivTextBox = styled.div`
     font-size: 0.9rem;
     color: #a7a7a7;
   }
+  @media only screen and (min-width: 0px) and (max-width: 350px) {
+    width: 100%;
+  }
+  @media only screen and (min-width: 351px) and (max-width: 549px) {
+    height: 100%;
+    span {
+      display: none;
+    }
+    padding: 0.2rem 0rem;
+    align-items: center;
+    h2 {
+      font-size: 1.2rem;
+    }
+  }
+  @media only screen and (min-width: 550px) and (max-width: 800px) {
+    width: 100%;
+  }
 `;
 
 const RightDiv = styled.div`
@@ -61,6 +102,15 @@ const RightDiv = styled.div`
     width: 30rem;
   }
   height: 100%;
+  @media only screen and (min-width: 0px) and (max-width: 350px) {
+  }
+  @media only screen and (min-width: 351px) and (max-width: 549px) {
+    img {
+      width: 20rem;
+    }
+  }
+  @media only screen and (min-width: 550px) and (max-width: 800px) {
+  }
 `;
 
 const StartWithUS = () => {

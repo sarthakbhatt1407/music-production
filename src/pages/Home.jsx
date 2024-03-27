@@ -18,7 +18,7 @@ const Home = () => {
       <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
       <Services />
       <SevicesHeading
-        data={{ para: "start with us", heading: "How Does It Work?" }}
+        data={{ para: "start with us", heading: "Start Journey" }}
       />
       <StartWithUS />
       <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />

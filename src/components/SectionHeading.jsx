@@ -71,7 +71,7 @@ const SectionHeading = () => {
         </span>
       </TextBox>
       <TextBox>
-        <h2 data-aos="fade-up">Record, </h2>
+        <h2 data-aos="fade-up">Upload, </h2>
         <h2 data-aos="fade-down">Edit, </h2>
         <h2 data-aos="fade-up">Release!</h2>
       </TextBox>
