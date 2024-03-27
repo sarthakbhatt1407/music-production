@@ -34,6 +34,7 @@ const TextBox = styled.div`
     font-size: 3.5rem;
     margin-top: -0.1rem;
     letter-spacing: 0.1rem;
+    text-transform: uppercase;
   }
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     span {
@@ -70,9 +71,9 @@ const SectionHeading = () => {
         </span>
       </TextBox>
       <TextBox>
-        <h2 data-aos="fade-up">LIGHTS, </h2>
-        <h2 data-aos="fade-down">CAMERA, </h2>
-        <h2 data-aos="fade-up">ACTION!</h2>
+        <h2 data-aos="fade-up">Record, </h2>
+        <h2 data-aos="fade-down">Edit, </h2>
+        <h2 data-aos="fade-up">Release!</h2>
       </TextBox>
     </MainBox>
   );

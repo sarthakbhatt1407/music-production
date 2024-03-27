@@ -26,7 +26,7 @@ const ani = keyframes`
 const TextBox = styled.div`
   text-align: right;
   color: #000000b4;
-
+  text-transform: uppercase;
   /* animation properties */
   -moz-transform: translateX(-100%);
   -webkit-transform: translateX(-100%);
@@ -35,23 +35,26 @@ const TextBox = styled.div`
   -webkit-animation: ${ani} 10s linear infinite;
   animation: ${ani} 10s linear infinite;
   font-size: 3rem;
+  width: 90vw;
   @media only screen and (min-width: 0px) and (max-width: 350px) {
-    width: 190vw;
+    width: 250vw;
   }
   @media only screen and (min-width: 351px) and (max-width: 549px) {
     font-size: 2.2rem;
-    width: 190vw;
+    width: 250vw;
   }
   @media only screen and (min-width: 550px) and (max-width: 1200px) {
     font-size: 2.6rem;
-    width: 190vw;
+    width: 250vw;
   }
 `;
 
 const BannerText = () => {
   return (
     <MainBox id="highlights">
-      <TextBox>WE MAKE FILMS & DRAMA. SOMETIMES WE WIN AWARDS</TextBox>
+      <TextBox>
+        maximize your music's reach and earnings with riwaaz films
+      </TextBox>
     </MainBox>
   );
 };

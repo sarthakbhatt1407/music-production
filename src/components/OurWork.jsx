@@ -91,10 +91,10 @@ const OurWork = () => {
       </LeftDiv>
       <RightDiv data-aos="fade-left">
         <p style={{ textJustify: "inter-word", textAlign: "justify" }}>
-          Filmmaking is the process by which a motion picture is produced.
-          Filmmaking involves a number of complex & discrete stages, starting
-          with an initial story. Our business is one of the largest of its kind
-          as an video agency for this good service.
+          Audio distribution is the process of delivering audio content from a
+          source to multiple receivers. It can be achieved through various
+          methods, including wired and wireless systems. Audio distribution
+          allows your content to reach a wide audience.
         </p>
       </RightDiv>
     </MainDiv>

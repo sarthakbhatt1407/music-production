@@ -6,6 +6,7 @@ import BannerText from "../components/BannerText";
 import SevicesHeading from "../components/SevicesHeading";
 import Services from "../components/Services";
 import Faq from "../components/Faq";
+import StartWithUS from "../components/StartWithUS";
 
 const Home = () => {
   return (
@@ -16,6 +17,10 @@ const Home = () => {
       <BannerText />
       <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
       <Services />
+      <SevicesHeading
+        data={{ para: "start with us", heading: "How Does It Work?" }}
+      />
+      <StartWithUS />
       <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />
       <Faq />
       <div>!!</div>

@@ -67,7 +67,7 @@ const Services = () => {
   const data = [
     {
       key: 1,
-      heading: "Video Production",
+      heading: "Music Distribution",
       img: editing,
       para: "Filmmaking is the process by which a motion picture is produced.",
       points: [
@@ -79,7 +79,7 @@ const Services = () => {
     },
     {
       key: 2,
-      heading: "Creative Directions",
+      heading: "Video Distribution",
       img: direction,
       para: "Filmmaking is the process by which a motion picture is produced.",
       points: [
@@ -91,7 +91,7 @@ const Services = () => {
     },
     {
       key: 3,
-      heading: "Promos & Commercial",
+      heading: "Music Publishing",
       img: film,
       para: "Filmmaking is the process by which a motion picture is produced.",
       points: [
