@@ -39,7 +39,6 @@ const FormBox = styled.div`
   /* background-color: red; */
   gap: 1rem;
   @media only screen and (min-width: 0px) and (max-width: 850px) {
-    align-items: center;
     border-bottom: 1px dashed #d918036b;
     padding-bottom: 2rem;
   }
@@ -160,6 +159,9 @@ const Btn = styled.button`
     font-weight: 500;
     will-change: transform;
   }
+  @media only screen and (min-width: 0px) and (max-width: 850px) {
+    margin: 0 auto;
+  }
 `;
 
 const ContactsUs = () => {
@@ -209,17 +211,24 @@ const ContactsUs = () => {
   };
 
   const onSubmitHandler = () => {
-    if (inpField.name.length < 1) {
-      setNameErr(true);
-    }
-    if (inpField.phone.length !== 10) {
-      setPhoneErr(true);
-    }
-    if (!validateEmail(inpField.email)) {
-      setEmailErr(true);
-    }
-    if (inpField.message.length < 6) {
-      setMessage(true);
+    if (
+      inpField.name.length < 1 ||
+      inpField.phone.length !== 10 ||
+      !validateEmail(inpField.email) ||
+      inpField.message.length < 6
+    ) {
+      if (inpField.name.length < 1) {
+        setNameErr(true);
+      }
+      if (inpField.phone.length !== 10) {
+        setPhoneErr(true);
+      }
+      if (!validateEmail(inpField.email)) {
+        setEmailErr(true);
+      }
+      if (inpField.message.length < 6) {
+        setMessage(true);
+      }
       return;
     }
     setInpField(defaultField);
