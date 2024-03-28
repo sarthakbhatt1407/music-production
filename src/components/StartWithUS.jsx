@@ -39,7 +39,7 @@ const LeftDiv = styled.div`
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
-    overflow-x: hidden;
+    overflow: hidden;
     height: 30vh;
     margin-bottom: -2rem;
   }
