@@ -53,7 +53,7 @@ const BannerText = () => {
   return (
     <MainBox id="highlights">
       <TextBox>
-        maximize your music's reach and earnings with riwaaz films
+        maximize your music's reach and earnings with rivaaz films
       </TextBox>
     </MainBox>
   );
