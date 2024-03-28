@@ -86,7 +86,12 @@ function WebNav({ mode, toggleColorMode }) {
               px: 0,
             }}
           >
-            <img src={logo} style={logoStyle} alt="logo of sitemark" />
+            <img
+              src={logo}
+              onClick={() => scrollToSection("intro")}
+              style={logoStyle}
+              alt="logo of sitemark"
+            />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <MenuItem
                 onClick={() => scrollToSection("overview")}

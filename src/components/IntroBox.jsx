@@ -188,7 +188,7 @@ const scrollToSection = (sectionId) => {
 };
 const IntroBox = () => {
   return (
-    <MainBox intro={intro} introMobile={introMobile}>
+    <MainBox id="intro" intro={intro} introMobile={introMobile}>
       <TextBox>
         <div>
           <h1 data-aos="fade-up">Rivaaz </h1>
