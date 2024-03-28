@@ -106,34 +106,13 @@ function WebNav({ mode, toggleColorMode }) {
                       active === "overview" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
                   }}
                 >
                   Overview
                 </Typography>
               </MenuItem>
-              <MenuItem
-                onClick={() => scrollToSection("highlights")}
-                sx={{ py: "6px", px: "12px" }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  style={{
-                    color: active === "highlights" ? "#D81902" : "",
-                    fontSize: "1.05rem",
-                    borderBottom:
-                      active === "highlights" ? "1px dashed #d817026d" : "none",
-                    letterSpacing: "0.08rem",
-                    transition: "all .5s",
-                    transform:
-                      active === "highlights" ? "scale(1.05)" : "scale(1)",
-                    marginRight: "0.7rem",
-                    backfaceVisibility: "hidden",
-                  }}
-                >
-                  Highlights
-                </Typography>
-              </MenuItem>
+
               <MenuItem
                 onClick={() => scrollToSection("services")}
                 sx={{ py: "6px", px: "12px" }}
@@ -152,9 +131,36 @@ function WebNav({ mode, toggleColorMode }) {
                       active === "services" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
                   }}
                 >
                   Services
+                </Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => scrollToSection("startwithus")}
+                sx={{ py: "6px", px: "12px" }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "startwithus" ? "#D81902" : "",
+                    fontSize: "1.05rem",
+                    borderBottom:
+                      active === "startwithus"
+                        ? "1px dashed #d817026d"
+                        : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "startwithus" ? "scale(1.05)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  Start with us
                 </Typography>
               </MenuItem>
               <MenuItem
@@ -175,6 +181,7 @@ function WebNav({ mode, toggleColorMode }) {
                       active === "portfolio" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
                   }}
                 >
                   Portfolio
@@ -198,6 +205,7 @@ function WebNav({ mode, toggleColorMode }) {
                       active === "contact-us" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
                   }}
                 >
                   Contact Us
@@ -220,6 +228,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transform: active === "faq" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
                     backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
                   }}
                 >
                   FAQ
@@ -273,11 +282,12 @@ function WebNav({ mode, toggleColorMode }) {
                 <MenuItem onClick={() => scrollToSection("overview")}>
                   Overview
                 </MenuItem>
-                <MenuItem onClick={() => scrollToSection("highlights")}>
-                  Highlights
-                </MenuItem>
+
                 <MenuItem onClick={() => scrollToSection("services")}>
                   Services
+                </MenuItem>
+                <MenuItem onClick={() => scrollToSection("startwithus")}>
+                  Start With Us
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("portfolio")}>
                   Portfolio

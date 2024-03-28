@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import intro from "../assets/images/intro.webp";
+import intro from "../assets/images/intro.jpg";
+import introMobile from "../assets/images/introMobile.jpg";
 
 const MainBox = styled.div`
   height: 98vh;
@@ -23,6 +24,22 @@ const MainBox = styled.div`
     background-size: cover;
     z-index: -1;
     opacity: 1;
+    filter: blur(3px);
+    @media only screen and (min-width: 0px) and (max-width: 549px) {
+      background: url(${(props) => props.introMobile});
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 110%;
+      height: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      z-index: -1;
+      opacity: 1;
+      filter: blur(3px);
+    }
   }
 `;
 const TextBox = styled.div`
@@ -31,30 +48,38 @@ const TextBox = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.01);
-  padding: 2rem 0;
-  height: 40%;
+  color: black;
+  padding: 2rem 4rem;
+  height: 30%;
   opacity: 1;
+  gap: 1rem;
   div {
+    width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: start;
+    height: 100%;
     align-items: center;
     gap: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.1rem;
+    padding: 2rem 0;
     h1 {
-      font-size: 7rem;
+      font-size: 8rem;
       text-align: center;
     }
     h2 {
-      font-size: 7rem;
+      font-size: 8rem;
+      color: #d91903;
     }
   }
   @media only screen and (min-width: 0px) and (max-width: 549px) {
+    margin-bottom: 2rem;
     div {
       width: 100%;
       gap: 0.5rem;
+      justify-content: center;
+      padding: 0;
+
       h1 {
         font-size: 4rem;
       }
@@ -79,16 +104,22 @@ const TextBox = styled.div`
 
 const Para = styled.span`
   margin-top: -8rem;
-  font-size: 2rem;
-  text-transform: uppercase;
+  font-size: 1.8rem;
+  text-transform: capitalize;
   letter-spacing: 0.1rem;
+  color: black;
+  &:last-child {
+    color: #d91903;
+  }
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     font-size: 0.8rem;
     margin-top: -4rem;
   }
   @media only screen and (min-width: 351px) and (max-width: 549px) {
-    font-size: 1.05rem;
-    margin-top: -4rem;
+    font-size: 1.3rem;
+    margin-top: -5rem;
+    letter-spacing: 0;
+    font-weight: bold;
   }
   @media only screen and (min-width: 550px) and (max-width: 800px) {
     font-size: 1.5rem;
@@ -97,10 +128,11 @@ const Para = styled.span`
 `;
 const BtnBox = styled.div`
   button {
-    border: 2px solid white;
+    font-weight: bold;
+    border: 2px solid #828181;
     background-color: transparent;
-
-    color: white;
+    margin-top: -5rem;
+    color: black;
     overflow: hidden;
     padding: 0.7rem 2rem;
     position: relative;
@@ -110,9 +142,9 @@ const BtnBox = styled.div`
     z-index: 0;
     text-transform: uppercase;
     letter-spacing: 0.15rem;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     &::after {
-      background-color: white;
+      background-color: #d61a07;
 
       content: "";
       display: block;
@@ -132,10 +164,13 @@ const BtnBox = styled.div`
     }
     &:hover {
       border: 2px solid transparent;
-      color: black;
+      color: white;
       transform: scale(1.05);
       font-weight: 500;
       will-change: transform;
+    }
+    @media only screen and (min-width: 0px) and (max-width: 549px) {
+      margin: 0;
     }
   }
 `;
@@ -153,16 +188,17 @@ const scrollToSection = (sectionId) => {
 };
 const IntroBox = () => {
   return (
-    <MainBox intro={intro}>
+    <MainBox intro={intro} introMobile={introMobile}>
       <TextBox>
         <div>
           <h1 data-aos="fade-up">Rivaaz </h1>
           <h2 data-aos="fade-down">Films</h2>
         </div>
         <div>
-          <Para data-aos="fade-right">a mordern solution</Para>
-          <Para data-aos="fade-left">for video production</Para>
+          <Para data-aos="fade-right">a mordern solution for</Para>
+          <Para data-aos="fade-left">music production</Para>
         </div>
+
         <BtnBox>
           <button
             data-aos="fade-up"

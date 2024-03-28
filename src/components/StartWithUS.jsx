@@ -4,6 +4,7 @@ import signup from "../assets/images/signup.png";
 import music from "../assets/images/music.png";
 import dis from "../assets/images/dis.png";
 import earn from "../assets/images/earn.png";
+import { keyframes } from "@emotion/react";
 
 const MainDiv = styled.div`
   display: grid;
@@ -13,7 +14,6 @@ const MainDiv = styled.div`
   grid-gap: 3rem;
   padding: 2rem 1rem;
   height: 80vh;
-  /* background-color: red; */
   overflow-x: hidden;
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     grid-template-columns: 1fr;
@@ -31,7 +31,6 @@ const LeftDiv = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 0.4rem;
-  overflow: hidden;
   height: 100%;
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     flex-direction: row;
@@ -42,6 +41,7 @@ const LeftDiv = styled.div`
     gap: 1rem;
     overflow-x: hidden;
     height: 30vh;
+    margin-bottom: -2rem;
   }
   @media only screen and (min-width: 550px) and (max-width: 800px) {
     flex-direction: row;
@@ -78,6 +78,7 @@ const LeftDivTextBox = styled.div`
   }
   @media only screen and (min-width: 351px) and (max-width: 549px) {
     height: 100%;
+
     span {
       display: none;
     }
@@ -91,6 +92,14 @@ const LeftDivTextBox = styled.div`
     width: 100%;
   }
 `;
+const Ani = keyframes`
+0%{
+  transform: scale(0.7);
+}
+100%{
+  transform: scale(1);
+}
+`;
 
 const RightDiv = styled.div`
   border: 1px solid #eee;
@@ -98,8 +107,10 @@ const RightDiv = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 0.4rem;
+
   img {
     width: 30rem;
+    animation: ${Ani} 0.8s;
   }
   height: 100%;
   @media only screen and (min-width: 0px) and (max-width: 350px) {
@@ -120,15 +131,15 @@ const StartWithUS = () => {
   };
   return (
     <MainDiv>
-      <LeftDiv>
+      <LeftDiv id="startwithus" data-aos="fade-right">
         <LeftDivTextBox
           onClick={activeHandler.bind(this, "1")}
           style={{
-            transform: active == 1 ? "scale(1.02)" : "scale(1)",
-            backgroundColor: active == 1 ? "#434343" : "#2a2a2a",
+            transform: active === "1" ? "scale(1.05)" : "scale(1)",
+            backgroundColor: active === "1" ? "#434343" : "#2a2a2a",
           }}
         >
-          <h2 style={{ color: active == "1" ? "#ff500a" : "white" }}>
+          <h2 style={{ color: active === "1" ? "#ff500a" : "white" }}>
             Register with us
           </h2>
           <span>Begin your musical journey with Rivaaz Films.</span>
@@ -137,11 +148,11 @@ const StartWithUS = () => {
         <LeftDivTextBox
           onClick={activeHandler.bind(this, "2")}
           style={{
-            transform: active == 2 ? "scale(1.02)" : "scale(1)",
-            backgroundColor: active == 2 ? "#434343" : "#2a2a2a",
+            transform: active === "2" ? "scale(1.05)" : "scale(1)",
+            backgroundColor: active === "2" ? "#434343" : "#2a2a2a",
           }}
         >
-          <h2 style={{ color: active == "2" ? "#ff500a" : "white" }}>
+          <h2 style={{ color: active === "2" ? "#ff500a" : "white" }}>
             Upload Your Music
           </h2>
           <span> Share your tracks, albums, or singles effortlessly</span>
@@ -150,11 +161,11 @@ const StartWithUS = () => {
         <LeftDivTextBox
           onClick={activeHandler.bind(this, "3")}
           style={{
-            transform: active == 3 ? "scale(1.02)" : "scale(1)",
-            backgroundColor: active == 3 ? "#434343" : "#2a2a2a",
+            transform: active === "3" ? "scale(1.05)" : "scale(1)",
+            backgroundColor: active === "3" ? "#434343" : "#2a2a2a",
           }}
         >
-          <h2 style={{ color: active == "3" ? "#ff500a" : "white" }}>
+          <h2 style={{ color: active === "3" ? "#ff500a" : "white" }}>
             Distribute Worldwide
           </h2>
           <span>
@@ -166,11 +177,12 @@ const StartWithUS = () => {
         <LeftDivTextBox
           onClick={activeHandler.bind(this, "4")}
           style={{
-            transform: active == 4 ? "scale(1.02)" : "scale(1)",
-            backgroundColor: active == 4 ? "#434343" : "#2a2a2a",
+            transform: active === "4" ? "scale(1.05)" : "scale(1)",
+
+            backgroundColor: active === "4" ? "#434343" : "#2a2a2a",
           }}
         >
-          <h2 style={{ color: active == "4" ? "#ff500a" : "white" }}>
+          <h2 style={{ color: active === "4" ? "#ff500a" : "white" }}>
             Receive Earnings
           </h2>
           <span>
@@ -180,10 +192,10 @@ const StartWithUS = () => {
         </LeftDivTextBox>
       </LeftDiv>
       <RightDiv>
-        {active == 1 && <img src={signup} alt="" data-aos="zoom-in" />}
-        {active == 2 && <img src={music} alt="" data-aos="zoom-in" />}
-        {active == 3 && <img src={dis} alt="" data-aos="zoom-in" />}
-        {active == 4 && <img src={earn} alt="" data-aos="zoom-in" />}
+        {active === "1" && <img src={signup} alt="" />}
+        {active === "2" && <img src={music} alt="" />}
+        {active === "3" && <img src={dis} alt="" />}
+        {active === "4" && <img src={earn} alt="" />}
       </RightDiv>
     </MainDiv>
   );
