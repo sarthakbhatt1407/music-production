@@ -9,7 +9,7 @@ const OuterBox = styled.div`
 
 const MainBox = styled.div`
   width: 85%;
-  height: 50vh;
+  height: 40vh;
   margin: auto;
   position: relative;
   overflow: hidden;
@@ -19,7 +19,7 @@ const MainBox = styled.div`
   }
 
   @media only screen and (min-width: 251px) and (max-width: 949px) {
-    height: 60vh;
+    height: 38vh;
     width: 95%;
   }
 `;
