@@ -18,6 +18,7 @@ const MainDiv = styled.div`
   grid-template-columns: 1fr;
   grid-gap: 1rem;
   background-color: #f7f7f7a7;
+  margin-top: 2rem;
   @media only screen and (min-width: 351px) and (max-width: 950px) {
     margin-top: 6rem;
   }
@@ -140,7 +141,7 @@ const Footer = () => {
             <Link>
               <Instagram
                 style={{
-                  color: "#f06925",
+                  color: "#F77D41",
                 }}
               />
             </Link>

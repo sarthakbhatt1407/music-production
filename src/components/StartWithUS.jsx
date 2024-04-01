@@ -109,10 +109,12 @@ const RightDiv = styled.div`
     width: 30rem;
     animation: ${Ani} 0.8s;
   }
-  height: 40vh;
+  height: 100%;
   @media only screen and (min-width: 0px) and (max-width: 350px) {
+    height: 40vh;
   }
   @media only screen and (min-width: 351px) and (max-width: 549px) {
+    height: 40vh;
     img {
       width: 20rem;
     }

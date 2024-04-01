@@ -43,7 +43,7 @@ const ImgBox = styled.div`
 const ReviewBox = styled.div`
   border-radius: 0.4rem;
   /* background-color: #f4f4f4; */
-  box-shadow: 0.1rem 0.1rem 0.6rem #eee;
+  box-shadow: 0.1rem 0.1rem 0.6rem #eeeeee6b;
   height: fit-content;
   padding: 2rem 1rem;
   span {
