@@ -10,7 +10,9 @@ const MainDiv = styled.div`
   margin: 0 auto;
   height: 70vh;
   display: grid;
+  overflow-x: hidden;
   grid-template-columns: 2fr 1fr;
+  height: fit-content;
   &::before {
     content: "";
     background: url(${(props) => props.ready});
