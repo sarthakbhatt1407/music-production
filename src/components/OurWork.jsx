@@ -91,10 +91,11 @@ const OurWork = () => {
       </LeftDiv>
       <RightDiv data-aos="fade-left">
         <p style={{ textJustify: "inter-word", textAlign: "justify" }}>
-          Audio distribution is the process of delivering audio content from a
-          source to multiple receivers. It can be achieved through various
-          methods, including wired and wireless systems. Audio distribution
-          allows your content to reach a wide audience.
+          Are you a music producer? Collaborate with us! Let us administer your
+          music on all digital platforms. When it comes to trusting a partner
+          with your business prospects, there is no better way than to speak to
+          someone in person and ensure that you are dealing with the right
+          people that can help you group.{" "}
         </p>
       </RightDiv>
     </MainDiv>

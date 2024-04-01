@@ -5,9 +5,11 @@ import OurWork from "../components/OurWork";
 import BannerText from "../components/BannerText";
 import SevicesHeading from "../components/SevicesHeading";
 import Services from "../components/Services";
-import Faq from "../components/Faq";
+// import Faq from "../components/Faq";
 import StartWithUS from "../components/StartWithUS";
 import ContactsUs from "../components/ContactsUs";
+import ReadyToLaunch from "../components/ReadyToLaunch";
+import Footer from "../components/Footer";
 
 const Home = () => {
   return (
@@ -18,17 +20,16 @@ const Home = () => {
       <BannerText />
       <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
       <Services />
+      <SevicesHeading data={{ para: "Get in touch", heading: "Contact Us" }} />
+      <ContactsUs />{" "}
       <SevicesHeading
         data={{ para: "start with us", heading: "Start Journey" }}
       />
       <StartWithUS />
-      <SevicesHeading data={{ para: "Get in touch", heading: "Contact Us" }} />
-      <ContactsUs />
-      <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />
-      <Faq />
-
-      <div>!!</div>
-      <div>!!</div>
+      <ReadyToLaunch />
+      {/* <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />
+      <Faq /> */}
+      <Footer />
     </div>
   );
 };

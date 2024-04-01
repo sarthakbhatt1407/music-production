@@ -10,6 +10,14 @@ import styled from "styled-components";
 const MainDiv = styled.div`
   width: 80%;
   margin: 0 auto;
+
+  div {
+    border: none;
+    margin: 0.5rem 0;
+    /* box-shadow: 0.1rem 0.1rem 0.6r#e1e0e0eee; */
+    box-shadow: none;
+  }
+
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     width: 95%;
   }

@@ -21,8 +21,8 @@ function WebNav({ mode, toggleColorMode }) {
   const w = window.screen.width;
 
   const logoStyle = {
-    width: "6rem",
-    height: "3rem",
+    width: "5.8rem",
+    height: "2.1rem",
 
     cursor: "pointer",
     margin: w < 901 ? " 0  4rem 0 1rem" : " 0  4rem 0 2rem",
@@ -117,7 +117,6 @@ function WebNav({ mode, toggleColorMode }) {
                   Overview
                 </Typography>
               </MenuItem>
-
               <MenuItem
                 onClick={() => scrollToSection("services")}
                 sx={{ py: "6px", px: "12px" }}
@@ -140,32 +139,6 @@ function WebNav({ mode, toggleColorMode }) {
                   }}
                 >
                   Services
-                </Typography>
-              </MenuItem>
-              <MenuItem
-                onClick={() => scrollToSection("startwithus")}
-                sx={{ py: "6px", px: "12px" }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  style={{
-                    color: active === "startwithus" ? "#D81902" : "",
-                    fontSize: "1.05rem",
-                    borderBottom:
-                      active === "startwithus"
-                        ? "1px dashed #d817026d"
-                        : "none",
-                    letterSpacing: "0.08rem",
-                    transition: "all .5s",
-                    transform:
-                      active === "startwithus" ? "scale(1.05)" : "scale(1)",
-                    marginRight: "0.7rem",
-                    backfaceVisibility: "hidden",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  Start with us
                 </Typography>
               </MenuItem>
               <MenuItem
@@ -215,8 +188,34 @@ function WebNav({ mode, toggleColorMode }) {
                 >
                   Contact Us
                 </Typography>
-              </MenuItem>
+              </MenuItem>{" "}
               <MenuItem
+                onClick={() => scrollToSection("startwithus")}
+                sx={{ py: "6px", px: "12px" }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "startwithus" ? "#D81902" : "",
+                    fontSize: "1.05rem",
+                    borderBottom:
+                      active === "startwithus"
+                        ? "1px dashed #d817026d"
+                        : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "startwithus" ? "scale(1.05)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  Start with us
+                </Typography>
+              </MenuItem>
+              {/* <MenuItem
                 onClick={() => scrollToSection("faq")}
                 sx={{ py: "6px", px: "12px" }}
               >
@@ -238,7 +237,7 @@ function WebNav({ mode, toggleColorMode }) {
                 >
                   FAQ
                 </Typography>
-              </MenuItem>
+              </MenuItem> */}
             </Box>
           </Box>
           <Box
@@ -254,6 +253,11 @@ function WebNav({ mode, toggleColorMode }) {
               size="small"
               component="a"
               target="_blank"
+              style={{
+                backgroundColor: "#ff4800",
+                letterSpacing: "0.09rem",
+                color: "white",
+              }}
             >
               Sign in
             </Button>
@@ -287,20 +291,19 @@ function WebNav({ mode, toggleColorMode }) {
                 <MenuItem onClick={() => scrollToSection("overview")}>
                   Overview
                 </MenuItem>
-
                 <MenuItem onClick={() => scrollToSection("services")}>
                   Services
-                </MenuItem>
-                <MenuItem onClick={() => scrollToSection("startwithus")}>
-                  Start With Us
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("portfolio")}>
                   Portfolio
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("contact-us")}>
                   Contact Us
+                </MenuItem>{" "}
+                <MenuItem onClick={() => scrollToSection("startwithus")}>
+                  Start With Us
                 </MenuItem>
-                <MenuItem onClick={() => scrollToSection("faq")}>FAQ</MenuItem>
+                {/* <MenuItem onClick={() => scrollToSection("faq")}>FAQ</MenuItem> */}
                 <Divider />
                 <MenuItem>
                   <Button
@@ -309,6 +312,11 @@ function WebNav({ mode, toggleColorMode }) {
                     component="a"
                     target="_blank"
                     sx={{ width: "100%" }}
+                    style={{
+                      backgroundColor: "#ff4800",
+                      letterSpacing: "0.09rem",
+                      color: "white",
+                    }}
                   >
                     Sign up
                   </Button>
@@ -320,6 +328,11 @@ function WebNav({ mode, toggleColorMode }) {
                     component="a"
                     target="_blank"
                     sx={{ width: "100%" }}
+                    style={{
+                      backgroundColor: "#ff4800",
+                      letterSpacing: "0.09rem",
+                      color: "white",
+                    }}
                   >
                     Sign in
                   </Button>

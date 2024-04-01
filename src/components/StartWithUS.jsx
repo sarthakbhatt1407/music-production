@@ -21,9 +21,12 @@ const MainDiv = styled.div`
   @media only screen and (min-width: 351px) and (max-width: 549px) {
     grid-template-columns: 1fr;
     grid-gap: 0;
+    height: fit-content;
   }
   @media only screen and (min-width: 550px) and (max-width: 800px) {
     grid-template-columns: 1fr;
+    grid-gap: 0;
+    height: fit-content;
   }
 `;
 
@@ -35,16 +38,13 @@ const LeftDiv = styled.div`
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     flex-direction: row;
   }
-  @media only screen and (min-width: 351px) and (max-width: 549px) {
+  @media only screen and (min-width: 351px) and (max-width: 950px) {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
     overflow: hidden;
     height: 30vh;
     margin-bottom: -2rem;
-  }
-  @media only screen and (min-width: 550px) and (max-width: 800px) {
-    flex-direction: row;
   }
 `;
 
@@ -76,7 +76,7 @@ const LeftDivTextBox = styled.div`
   @media only screen and (min-width: 0px) and (max-width: 350px) {
     width: 100%;
   }
-  @media only screen and (min-width: 351px) and (max-width: 549px) {
+  @media only screen and (min-width: 351px) and (max-width: 950px) {
     height: 100%;
 
     span {
@@ -87,9 +87,6 @@ const LeftDivTextBox = styled.div`
     h2 {
       font-size: 1.2rem;
     }
-  }
-  @media only screen and (min-width: 550px) and (max-width: 800px) {
-    width: 100%;
   }
 `;
 const Ani = keyframes`
