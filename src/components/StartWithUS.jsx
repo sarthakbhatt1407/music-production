@@ -20,7 +20,7 @@ const MainDiv = styled.div`
   }
   @media only screen and (min-width: 351px) and (max-width: 549px) {
     grid-template-columns: 1fr;
-    grid-gap: 0;
+    grid-gap: 3rem;
     height: fit-content;
   }
   @media only screen and (min-width: 550px) and (max-width: 800px) {
