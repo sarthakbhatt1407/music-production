@@ -195,8 +195,8 @@ const IntroBox = () => {
           <h2 data-aos="fade-down">Films</h2>
         </div>
         <div>
-          <Para data-aos="fade-right">A Great Way to Maximize your</Para>
-          <Para data-aos="fade-left">Music Revenue</Para>
+          <Para data-aos="fade-right">a mordern solution for</Para>
+          <Para data-aos="fade-left">music production</Para>
         </div>
 
         <BtnBox>
