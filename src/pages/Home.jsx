@@ -10,6 +10,7 @@ import StartWithUS from "../components/StartWithUS";
 import ContactsUs from "../components/ContactsUs";
 import ReadyToLaunch from "../components/ReadyToLaunch";
 import Footer from "../components/Footer";
+import Clients from "../components/Clients";
 
 const Home = () => {
   return (
@@ -20,13 +21,15 @@ const Home = () => {
       <BannerText />
       <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
       <Services />
-      <SevicesHeading data={{ para: "Get in touch", heading: "Contact Us" }} />
-      <ContactsUs />{" "}
+      <SevicesHeading data={{ para: "WHAT CLIENT SAYS", heading: "Clients" }} />
+      <Clients />
       <SevicesHeading
         data={{ para: "start with us", heading: "Start Journey" }}
       />
       <StartWithUS />
-      <ReadyToLaunch />
+      <ReadyToLaunch />{" "}
+      <SevicesHeading data={{ para: "Get in touch", heading: "Contact Us" }} />
+      <ContactsUs />
       {/* <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />
       <Faq /> */}
       <Footer />

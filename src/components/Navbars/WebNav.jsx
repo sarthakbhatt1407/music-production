@@ -166,30 +166,6 @@ function WebNav({ mode, toggleColorMode }) {
                 </Typography>
               </MenuItem>
               <MenuItem
-                onClick={() => scrollToSection("contact-us")}
-                sx={{ py: "6px", px: "12px" }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  style={{
-                    color: active === "contact-us" ? "#D81902" : "",
-                    fontSize: "1.05rem",
-                    borderBottom:
-                      active === "contact-us" ? "1px dashed #d817026d" : "none",
-                    letterSpacing: "0.08rem",
-                    transition: "all .5s",
-                    transform:
-                      active === "contact-us" ? "scale(1.05)" : "scale(1)",
-                    marginRight: "0.7rem",
-                    backfaceVisibility: "hidden",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  Contact Us
-                </Typography>
-              </MenuItem>{" "}
-              <MenuItem
                 onClick={() => scrollToSection("startwithus")}
                 sx={{ py: "6px", px: "12px" }}
               >
@@ -214,7 +190,31 @@ function WebNav({ mode, toggleColorMode }) {
                 >
                   Start with us
                 </Typography>
-              </MenuItem>
+              </MenuItem>{" "}
+              <MenuItem
+                onClick={() => scrollToSection("contact-us")}
+                sx={{ py: "6px", px: "12px" }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.primary"
+                  style={{
+                    color: active === "contact-us" ? "#D81902" : "",
+                    fontSize: "1.05rem",
+                    borderBottom:
+                      active === "contact-us" ? "1px dashed #d817026d" : "none",
+                    letterSpacing: "0.08rem",
+                    transition: "all .5s",
+                    transform:
+                      active === "contact-us" ? "scale(1.05)" : "scale(1)",
+                    marginRight: "0.7rem",
+                    backfaceVisibility: "hidden",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  Contact Us
+                </Typography>
+              </MenuItem>{" "}
               {/* <MenuItem
                 onClick={() => scrollToSection("faq")}
                 sx={{ py: "6px", px: "12px" }}
@@ -297,12 +297,12 @@ function WebNav({ mode, toggleColorMode }) {
                 <MenuItem onClick={() => scrollToSection("portfolio")}>
                   Portfolio
                 </MenuItem>
-                <MenuItem onClick={() => scrollToSection("contact-us")}>
-                  Contact Us
-                </MenuItem>{" "}
                 <MenuItem onClick={() => scrollToSection("startwithus")}>
                   Start With Us
                 </MenuItem>
+                <MenuItem onClick={() => scrollToSection("contact-us")}>
+                  Contact Us
+                </MenuItem>{" "}
                 {/* <MenuItem onClick={() => scrollToSection("faq")}>FAQ</MenuItem> */}
                 <Divider />
                 <MenuItem>
