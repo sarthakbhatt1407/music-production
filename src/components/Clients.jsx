@@ -130,7 +130,7 @@ const Clients = (props) => {
   });
 
   return (
-    <OuterBox>
+    <OuterBox data-aos="fade-up">
       {/* data-aos="fade-right" */}
       <MainBox>
         <ImgBox className="image">

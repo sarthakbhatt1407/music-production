@@ -13,7 +13,7 @@ const MainDiv = styled.div`
   overflow-x: hidden;
   grid-template-columns: 2fr 1fr;
   height: fit-content;
-  &::before {
+  /* &::before {
     content: "";
     background: url(${(props) => props.ready});
     position: absolute;
@@ -30,7 +30,7 @@ const MainDiv = styled.div`
     @media only screen and (min-width: 0px) and (max-width: 800px) {
       filter: blur(10px);
     }
-  }
+  } */
   @media only screen and (min-width: 0px) and (max-width: 800px) {
     grid-template-columns: 1fr;
     padding-bottom: 5rem;

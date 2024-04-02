@@ -110,6 +110,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transform:
                       active === "overview" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
+                    fontWeight: "550",
                     backfaceVisibility: "hidden",
                     textTransform: "capitalize",
                   }}
@@ -134,6 +135,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transform:
                       active === "services" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
+                    fontWeight: "550",
                     backfaceVisibility: "hidden",
                     textTransform: "capitalize",
                   }}
@@ -158,6 +160,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transform:
                       active === "portfolio" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
+                    fontWeight: "550",
                     backfaceVisibility: "hidden",
                     textTransform: "capitalize",
                   }}
@@ -184,6 +187,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transform:
                       active === "startwithus" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
+                    fontWeight: "550",
                     backfaceVisibility: "hidden",
                     textTransform: "capitalize",
                   }}
@@ -208,6 +212,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transform:
                       active === "contact-us" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
+                    fontWeight: "550",
                     backfaceVisibility: "hidden",
                     textTransform: "capitalize",
                   }}
@@ -231,6 +236,7 @@ function WebNav({ mode, toggleColorMode }) {
                     transition: "all .5s",
                     transform: active === "faq" ? "scale(1.05)" : "scale(1)",
                     marginRight: "0.7rem",
+                              fontWeight: "550",
                     backfaceVisibility: "hidden",
                     textTransform: "capitalize",
                   }}

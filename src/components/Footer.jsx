@@ -95,6 +95,14 @@ const MidDiv = styled.div`
     span {
       cursor: pointer;
       transition: all 0.4s;
+      color: black;
+      a {
+        text-decoration: none;
+        color: black;
+        &:hover {
+          color: #d61c01;
+        }
+      }
       &:hover {
         color: #d61c01;
         transform: scale(1.1);
@@ -197,10 +205,16 @@ const Footer = () => {
             <span style={{ textTransform: "none" }}>
               <Mail /> s@gmail.com
             </span>
+
             <span style={{ textAlign: "center" }}>
-              <LocationCity /> Lorem ipsum dolor sit amet consectetur
-              adipisicing elit. Provident quia nisi totam architecto. Veritatis,
-              aliquid.
+              <Link
+                target="_blank"
+                to={"https://maps.app.goo.gl/UdjjYDiC6edBfuwP6"}
+              >
+                <LocationCity /> Lorem ipsum dolor sit amet consectetur
+                adipisicing elit. Provident quia nisi totam architecto.
+                Veritatis, aliquid.
+              </Link>
             </span>
           </div>
         </MidDiv>
