@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import WebNav from "./components/Navbars/WebNav";
 import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import UserPanel from "./pages/UserPanel";
 
 const App = () => {
   useEffect(() => {
@@ -21,9 +21,10 @@ const App = () => {
 
   return (
     <div>
-      <WebNav />
       <Routes>
         <Route path="/" exact element={<Home />} />
+        <Route path="/user-panel" exact element={<UserPanel />} />
+        <Route path="/user-panel/:page" exact element={<UserPanel />} />
       </Routes>
     </div>
   );
