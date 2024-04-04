@@ -181,8 +181,6 @@ const Form = () => {
   };
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
-  const [img, setImg] = useState(null);
-  const [file, setFile] = useState(null);
 
   const imgProps = {
     beforeUpload: (file) => {
