@@ -6,6 +6,7 @@ const MainDiv = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 80%;
+
   margin: 0 auto;
   overflow-x: hidden;
   @media only screen and (min-width: 0px) and (max-width: 350px) {

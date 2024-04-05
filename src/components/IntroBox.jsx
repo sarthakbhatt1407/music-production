@@ -11,6 +11,7 @@ const MainBox = styled.div`
   align-items: center;
   position: relative;
   overflow: hidden;
+  z-index: 10;
   &::before {
     content: "";
     background: url(${(props) => props.intro});
