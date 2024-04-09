@@ -3,16 +3,19 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UploadOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 
 import { Dropdown, Space } from "antd";
 import random from "../assets/images/random.webp";
 import { Layout, Menu, Button, theme, Avatar } from "antd";
-import { HistoryOutlined } from "@mui/icons-material";
+import { HistoryOutlined, RestoreFromTrashOutlined } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 const { Header, Sider, Content } = Layout;
 
 const DrawerPanel = (props) => {
+  const dispatch = useDispatch();
   const page = props.page;
   const items = [
     {
@@ -27,7 +30,15 @@ const DrawerPanel = (props) => {
       type: "divider",
     },
     {
-      label: "3rd menu item",
+      label: (
+        <span
+          onClick={() => {
+            dispatch({ type: "logout" });
+          }}
+        >
+          Log out
+        </span>
+      ),
       key: "3",
     },
   ];
@@ -35,8 +46,14 @@ const DrawerPanel = (props) => {
     if (page === "home") {
       return ["1"];
     }
-    if (page === "history") {
+    if (page === "upload") {
       return ["2"];
+    }
+    if (page === "history") {
+      return ["3"];
+    }
+    if (page === "deleted") {
+      return ["4"];
     }
   };
 
@@ -50,26 +67,52 @@ const DrawerPanel = (props) => {
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
-          mode="inline"
+          mode="vertical"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: ".6rem",
+            fontSize: "1.1rem",
+          }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
             {
               key: "1",
               icon: (
                 <Link to={"/user-panel/home"}>
+                  <HomeOutlined style={{ transform: "scale(1.1)" }} />
+                </Link>
+              ),
+              label: "Home",
+            },
+            {
+              key: "2",
+              icon: (
+                <Link to={"/user-panel/upload"}>
                   <UploadOutlined style={{ transform: "scale(1.1)" }} />
                 </Link>
               ),
               label: "Upload",
             },
             {
-              key: "2",
+              key: "3",
               icon: (
                 <Link to={"/user-panel/history"}>
                   <HistoryOutlined style={{ transform: "scale(1.1)" }} />
                 </Link>
               ),
               label: "History",
+            },
+            {
+              key: "4",
+              icon: (
+                <Link to={"/user-panel/deleted"}>
+                  <RestoreFromTrashOutlined
+                    style={{ transform: "scale(1.1)" }}
+                  />
+                </Link>
+              ),
+              label: "Deleted",
             },
           ]}
         />

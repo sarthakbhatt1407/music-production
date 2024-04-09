@@ -11,8 +11,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
 import logo from "../../assets/images/logo/logo.webp";
 import { Reorder } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function WebNav({ mode, toggleColorMode }) {
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const [open, setOpen] = React.useState(false);
   const [active, setActive] = React.useState("");
   const toggleDrawer = (newOpen) => () => {
@@ -265,7 +268,22 @@ function WebNav({ mode, toggleColorMode }) {
                 color: "white",
               }}
             >
-              Sign in
+              {!isLoggedIn && (
+                <Link
+                  to={"/login"}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  Sign in
+                </Link>
+              )}
+              {isLoggedIn && (
+                <Link
+                  to={"/user-panel/home"}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  Dashboard
+                </Link>
+              )}
             </Button>
           </Box>
           <Box sx={{ display: { sm: "", md: "none" } }}>
@@ -312,20 +330,28 @@ function WebNav({ mode, toggleColorMode }) {
                 {/* <MenuItem onClick={() => scrollToSection("faq")}>FAQ</MenuItem> */}
                 <Divider />
                 <MenuItem>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    component="a"
-                    target="_blank"
-                    sx={{ width: "100%" }}
-                    style={{
-                      backgroundColor: "#ff4800",
-                      letterSpacing: "0.09rem",
-                      color: "white",
-                    }}
-                  >
-                    Sign up
-                  </Button>
+                  {" "}
+                  {!isLoggedIn && (
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      component="a"
+                      target="_blank"
+                      sx={{ width: "100%" }}
+                      style={{
+                        backgroundColor: "#ff4800",
+                        letterSpacing: "0.09rem",
+                        color: "white",
+                      }}
+                    >
+                      <Link
+                        to={"/register"}
+                        style={{ textDecoration: "none", color: "white" }}
+                      >
+                        Sign up
+                      </Link>
+                    </Button>
+                  )}
                 </MenuItem>
                 <MenuItem>
                   <Button
@@ -340,7 +366,22 @@ function WebNav({ mode, toggleColorMode }) {
                       color: "white",
                     }}
                   >
-                    Sign in
+                    {!isLoggedIn && (
+                      <Link
+                        to={"/login"}
+                        style={{ textDecoration: "none", color: "white" }}
+                      >
+                        Sign in
+                      </Link>
+                    )}
+                    {isLoggedIn && (
+                      <Link
+                        to={"/user-panel/home"}
+                        style={{ textDecoration: "none", color: "white" }}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
                   </Button>
                 </MenuItem>
               </Box>

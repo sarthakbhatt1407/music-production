@@ -4,25 +4,27 @@ import styled from "styled-components";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload } from "antd";
 import MusicLoader from "../Loader/MusicLoader";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
 
 import { notification } from "antd";
 import { useSelector } from "react-redux";
 
+const OuterBox = styled.div`
+  height: 99%;
+  overflow-y: scroll;
+`;
+
 const MainDiv = styled.div`
-  height: 100%;
-  overflow: scroll;
+  height: 99%;
+
   display: flex;
   flex-direction: column;
   gap: 2rem;
   h1 {
     margin: 0;
     text-transform: uppercase;
-  }
-  &::-webkit-scrollbar {
-    display: none;
   }
 `;
 
@@ -165,17 +167,9 @@ const BtnDiv = styled.div`
   }
 `;
 
-const Form = () => {
+const EditOrder = () => {
   const userId = useSelector((state) => state.userId);
 
-  const [api, contextHolderNot] = notification.useNotification({
-    duration: 1.5,
-  });
-  const openNotificationWithIcon = (type) => {
-    api[type]({
-      message: "Fill all require fields.",
-    });
-  };
   const deafaultFields = {
     labelName: "",
     title: "",
@@ -196,10 +190,36 @@ const Form = () => {
     thumbnail: null,
     file: null,
   };
+  const id = useParams().id;
+  const [order, setOrder] = useState(null);
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
   const [isLoading, setIsloading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const fetcher = async () => {
+    setIsloading(true);
+    const res = await fetch(`http://localhost:5000/order/get-order/?id=${id}`);
+    const data = await res.json();
+    console.log(data);
+    setInpFields({ ...data.order, thumbnail: null, file: null });
+    setOrder(data.order);
+    setIsloading(false);
+  };
+
+  useEffect(() => {
+    fetcher();
+    return () => {};
+  }, [id]);
+
+  const [api, contextHolderNot] = notification.useNotification({
+    duration: 1.5,
+  });
+  const openNotificationWithIcon = (type) => {
+    api[type]({
+      message: "Fill all require fields.",
+    });
+  };
+
   const navigate = useNavigate();
   const success = (msg) => {
     messageApi.open({
@@ -438,10 +458,13 @@ const Form = () => {
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
 
-    const res = await fetch(`http://localhost:5000/order/new-order`, {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(
+      `http://localhost:5000/order/update-order/?id=${id}&action=edit`,
+      {
+        method: "PATCH",
+        body: formData,
+      }
+    );
     const data = await res.json();
     console.log(data);
     if (res.ok) {
@@ -456,291 +479,279 @@ const Form = () => {
     setIsloading(false);
   };
   return (
-    <MainDiv>
-      {contextHolderNot}
-      {contextHolder}
-      <Breadcrumb
-        items={[
-          {
-            title: "User Panel",
-          },
-          {
-            title: "Upload",
-          },
-        ]}
-      />
-      <h1>Upload</h1>{" "}
-      <FormBox>
-        {isLoading && <MusicLoader />}
-        <FormSeperator>
-          <h2>Label</h2>
-          <AllInpBox>
-            <LabelInpBox id="1">
-              <Label htmlFor="labelName">
-                label name <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="labelName"
-                id="labelName"
-                placeholder="Label"
-                onChange={onChangeHandler}
-                value={inpFields.labelName}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label>sub-label</Label>
-              <Select name="category" id="category" onChange={getSelectedValue}>
-                <Option defaultValue value={0}>
-                  NA
-                </Option>
-                <Option value={1}>1</Option>
-                <Option value={2}>2</Option>
-                <Option value={3}>3</Option>
-              </Select>
-            </LabelInpBox>
-            {subLabels.length > 0 &&
-              subLabels.map((sbl) => {
-                return (
-                  <LabelInpBox key={sbl.key}>
-                    <Label htmlFor={sbl.id}>{sbl.lbl}</Label>
-                    <Input
-                      type="text"
-                      name={sbl.id}
-                      id={sbl.id}
-                      placeholder="sub-label name"
-                      onChange={onChangeHandler}
-                      value={inpFields[sbl.id]}
-                    />
-                  </LabelInpBox>
-                );
-              })}
-          </AllInpBox>
-        </FormSeperator>
-        <FormSeperator>
-          <h2>Album</h2>
-          <AllInpBox>
-            <LabelInpBox>
-              <Label htmlFor="title">
-                Album title <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="title"
-                id="title"
-                placeholder="title"
-                onChange={onChangeHandler}
-                value={inpFields.title}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="dateOfRelease">
-                Date of release <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <DatePicker onChange={onDateChanger} id="dateOfRelease" />
-            </LabelInpBox>
+    <OuterBox>
+      {order && (
+        <MainDiv>
+          {contextHolderNot}
+          {contextHolder}
+          <Breadcrumb
+            items={[
+              {
+                title: "User Panel",
+              },
+              {
+                title: "History",
+              },
+              {
+                title: "Order Details",
+              },
+              {
+                title: "Edit",
+              },
+            ]}
+          />
+          <h1>Upload</h1>{" "}
+          <FormBox>
+            {isLoading && <MusicLoader />}
+            <FormSeperator>
+              <h2>Label</h2>
+              <AllInpBox>
+                <LabelInpBox id="1">
+                  <Label htmlFor="labelName">
+                    label name <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="labelName"
+                    id="labelName"
+                    placeholder="Label"
+                    onChange={onChangeHandler}
+                    value={inpFields.labelName}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label>sub-label</Label>
+                  <Select
+                    name="category"
+                    id="category"
+                    onChange={getSelectedValue}
+                  >
+                    <Option defaultValue value={0}>
+                      NA
+                    </Option>
+                    <Option value={1}>1</Option>
+                    <Option value={2}>2</Option>
+                    <Option value={3}>3</Option>
+                  </Select>
+                </LabelInpBox>
+                {subLabels.length > 0 &&
+                  subLabels.map((sbl) => {
+                    return (
+                      <LabelInpBox key={sbl.key}>
+                        <Label htmlFor={sbl.id}>{sbl.lbl}</Label>
+                        <Input
+                          type="text"
+                          name={sbl.id}
+                          id={sbl.id}
+                          placeholder="sub-label name"
+                          onChange={onChangeHandler}
+                          value={inpFields[sbl.id]}
+                        />
+                      </LabelInpBox>
+                    );
+                  })}
+              </AllInpBox>
+            </FormSeperator>
+            <FormSeperator>
+              <h2>Album</h2>
+              <AllInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="title">
+                    Album title <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="title"
+                    id="title"
+                    placeholder="title"
+                    onChange={onChangeHandler}
+                    value={inpFields.title}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="dateOfRelease">
+                    Date of release <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <DatePicker onChange={onDateChanger} id="dateOfRelease" />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label>
-                Album type <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Select
-                name="albumType"
-                id="albumType"
-                onChange={(e) => {
-                  const ele = document.querySelector(`#${e.target.id}`);
-                  const value = ele.options[ele.selectedIndex].value;
-                  setInpFields({ ...inpFields, albumType: value });
-                }}
-              >
-                <Option value={"song"}>Song</Option>
-                <Option value={"film"}>film</Option>
-              </Select>
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="language">
-                Album Language <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="language"
-                id="language"
-                onChange={onChangeHandler}
-                value={inpFields.language}
-                placeholder="language"
-              />
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label>
+                    Album type <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="albumType"
+                    id="albumType"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, albumType: value });
+                    }}
+                  >
+                    <Option value={"song"}>Song</Option>
+                    <Option value={"film"}>film</Option>
+                  </Select>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="language">
+                    Album Language <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="language"
+                    id="language"
+                    onChange={onChangeHandler}
+                    value={inpFields.language}
+                    placeholder="language"
+                  />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="description">
-                Album description <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="description"
-                id="description"
-                onChange={onChangeHandler}
-                value={inpFields.description}
-                placeholder="description"
-              />
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="description">
+                    Album description <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="description"
+                    id="description"
+                    onChange={onChangeHandler}
+                    value={inpFields.description}
+                    placeholder="description"
+                  />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="mood">
-                Album mood <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="mood"
-                id="mood"
-                placeholder="mood"
-                onChange={onChangeHandler}
-                value={inpFields.mood}
-              />
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="mood">
+                    Album mood <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="mood"
+                    id="mood"
+                    placeholder="mood"
+                    onChange={onChangeHandler}
+                    value={inpFields.mood}
+                  />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="thumbnail" id="thumbnail">
-                Thumbnail <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Upload
-                method="get"
-                listType="picture"
-                {...imgProps}
-                maxCount={1}
-              >
-                <Button icon={<UploadOutlined />}>Upload image</Button>
-              </Upload>
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="thumbnail" id="thumbnail">
+                    Thumbnail <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Upload
+                    method="get"
+                    listType="picture"
+                    {...imgProps}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />}>Upload image</Button>
+                  </Upload>
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="file" id="file">
-                file <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Upload
-                method="get"
-                listType="picture"
-                {...fileProps}
-                maxCount={1}
-              >
-                <Button icon={<UploadOutlined />}>Upload file</Button>
-              </Upload>
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="file" id="file">
+                    file <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Upload
+                    method="get"
+                    listType="picture"
+                    {...fileProps}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />}>Upload file</Button>
+                  </Upload>
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="lyrics">Album lyrics (optional)</Label>
-              <TxtArea
-                rows="5"
-                id="lyrics"
-                placeholder="lyrics"
-                onChange={onChangeHandler}
-                value={inpFields.lyrics}
-              ></TxtArea>
-            </LabelInpBox>
-          </AllInpBox>
-        </FormSeperator>
-        <FormSeperator>
-          <h2>Artists</h2>
-          <AllInpBox>
-            <LabelInpBox>
-              <Label htmlFor="singer">
-                singer <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="singer"
-                id="singer"
-                placeholder="singer name"
-                onChange={onChangeHandler}
-                value={inpFields.singer}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="composer">
-                composer <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="composer"
-                id="composer"
-                placeholder="composer name"
-                onChange={onChangeHandler}
-                value={inpFields.composer}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="director">
-                director <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="director"
-                id="director"
-                placeholder="director name"
-                onChange={onChangeHandler}
-                value={inpFields.director}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="producer">
-                producer <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="producer"
-                id="producer"
-                placeholder="producer name"
-                onChange={onChangeHandler}
-                value={inpFields.producer}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="starCast">
-                starCast <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="starCast"
-                id="starCast"
-                placeholder=""
-                onChange={onChangeHandler}
-                value={inpFields.starCast}
-              />
-            </LabelInpBox>{" "}
-          </AllInpBox>{" "}
-          <BtnDiv>
-            <button onClick={onSubmitHandler}>Submit</button>
-          </BtnDiv>
-        </FormSeperator>
-      </FormBox>
-    </MainDiv>
+                <LabelInpBox>
+                  <Label htmlFor="lyrics">Album lyrics (optional)</Label>
+                  <TxtArea
+                    rows="5"
+                    id="lyrics"
+                    placeholder="lyrics"
+                    onChange={onChangeHandler}
+                    value={inpFields.lyrics}
+                  ></TxtArea>
+                </LabelInpBox>
+              </AllInpBox>
+            </FormSeperator>
+            <FormSeperator>
+              <h2>Artists</h2>
+              <AllInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="singer">
+                    singer <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="singer"
+                    id="singer"
+                    placeholder="singer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.singer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="composer">
+                    composer <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="composer"
+                    id="composer"
+                    placeholder="composer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.composer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="director">
+                    director <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="director"
+                    id="director"
+                    placeholder="director name"
+                    onChange={onChangeHandler}
+                    value={inpFields.director}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="producer">
+                    producer <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="producer"
+                    id="producer"
+                    placeholder="producer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.producer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="starCast">
+                    starCast <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="starCast"
+                    id="starCast"
+                    placeholder=""
+                    onChange={onChangeHandler}
+                    value={inpFields.starCast}
+                  />
+                </LabelInpBox>{" "}
+              </AllInpBox>{" "}
+              <BtnDiv>
+                <button onClick={onSubmitHandler}>Submit</button>
+              </BtnDiv>
+            </FormSeperator>
+          </FormBox>
+        </MainDiv>
+      )}
+    </OuterBox>
   );
 };
 
-export default Form;
-
-// const orderSchema = mongoose.Schema({
-//     labelName: { type: String, required: true },
-//     subLabel1: { type: String },
-//     subLabel2: { type: String },
-//     subLabel3: { type: String },
-//     title: { type: String, required: true },
-//     dateOfRelease: { type: String, required: true },
-//     albumType: { type: String, required: true },
-//     language: { type: String, required: true },
-//     thumbnail: { type: String, required: true },
-//     orderDateAndTime: { type: String, required: true },
-//     file: { type: String, required: true },
-//     mood: { type: String, required: true },
-//     userId: { type: String, required: true },
-//     description: { type: String, required: true },
-//     singer: { type: String, required: true },
-//     composer: { type: String, required: true },
-//     director: { type: String, required: true },
-//     producer: { type: String, required: true },
-//     starCast: { type: String, required: true },
-//     lyrics: { type: String },
-//     status: { type: String },
-//     remark: { type: String },
-//     deleted: { type: Boolean },
-//   });
+export default EditOrder;

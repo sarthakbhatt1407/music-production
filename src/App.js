@@ -4,13 +4,23 @@ import Home from "./pages/Home";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import UserPanel from "./pages/UserPanel";
+import Login from "./pages/Login";
+import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+
+  const dispatch = useDispatch();
   useEffect(() => {
     AOS.init({
       once: true,
       duration: 650,
     });
+    const localStr = JSON.parse(localStorage.getItem("state"));
+
+    if (localStr) {
+      dispatch({ type: "reload", data: { ...localStr } });
+    }
     // const aosRefresh = setInterval(() => {
     //   AOS.refresh();
     // }, 500);
@@ -23,8 +33,19 @@ const App = () => {
     <div>
       <Routes>
         <Route path="/" exact element={<Home />} />
-        <Route path="/user-panel" exact element={<UserPanel />} />
-        <Route path="/user-panel/:page" exact element={<UserPanel />} />
+        <Route path="/login" exact element={<Login />} />
+        {isLoggedIn && (
+          <>
+            <Route path="/user-panel/:page" exact element={<UserPanel />} />
+            <Route path="/user-panel/order/:id" exact element={<UserPanel />} />
+            <Route
+              path="/user-panel/order/:id/:action"
+              exact
+              element={<UserPanel />}
+            />
+          </>
+        )}{" "}
+        <Route path="*" exact element={<Home />} />
       </Routes>
     </div>
   );
