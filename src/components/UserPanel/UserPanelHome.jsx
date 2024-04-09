@@ -21,6 +21,7 @@ import {
   PieChart,
   Cell,
 } from "recharts";
+
 const MainDiv = styled.div`
   width: 100%;
   height: 100%;
@@ -31,6 +32,9 @@ const MainDiv = styled.div`
   h1 {
     margin: 0.5rem 0;
   }
+  @media only screen and (max-width: 1000px) {
+    padding: 0.5rem 0.2rem;
+  }
 `;
 const ContentDiv = styled.div`
   display: grid;
@@ -38,6 +42,9 @@ const ContentDiv = styled.div`
   gap: 1rem;
 
   height: fit-content;
+  @media only screen and (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const LeftDiv = styled.div`
@@ -60,6 +67,9 @@ const ChartBox = styled.div`
       font-weight: 500;
     }
   }
+  @media only screen and (max-width: 1000px) {
+    padding: 0.5rem 0.2rem;
+  }
 `;
 
 const RightDiv = styled.div`
@@ -72,6 +82,9 @@ const RightDiv = styled.div`
     color: #0000008e;
     font-weight: 500;
     text-align: center;
+  }
+  @media only screen and (max-width: 1000px) {
+    padding: 0.3rem 0.2rem;
   }
 `;
 const Select = styled.select`
@@ -100,6 +113,37 @@ const Option = styled.option`
   font-weight: bold;
   text-transform: capitalize;
 `;
+
+const Table = styled.table`
+  width: 100%;
+  text-transform: capitalize;
+  text-align: center;
+
+  thead {
+    tr {
+      td {
+        font-weight: 600;
+        color: #0000009e;
+        padding: 0.4rem 0;
+        background-color: #f3f3f3;
+      }
+    }
+  }
+  tbody {
+    tr {
+      td {
+        font-size: 1rem;
+        padding: 0.3rem 0;
+        div {
+          width: 1rem;
+          height: 1rem;
+          background-color: red;
+        }
+      }
+    }
+  }
+`;
+
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const UserPanelHome = () => {
@@ -251,29 +295,28 @@ const UserPanelHome = () => {
             </ResponsiveContainer>
           </ChartBox>
           <ChartBox>
-            <h2>Reports</h2>{" "}
-            <ResponsiveContainer width="100%" height={300}>
+            <div style={{ padding: "0 1rem" }}>
+              {" "}
+              <h2>Reports</h2>{" "}
+            </div>
+            <ResponsiveContainer width={"100%"} height={300}>
               <BarChart
                 width={500}
-                height={300}
+                height={400}
                 data={reprotsData}
                 margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
+                  top: 10,
+                  right: 10,
+                  left: 0,
+                  bottom: 0,
                 }}
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="1 1" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                {/* <Bar
-                  dataKey="pv"
-                  fill="#8884d8"
-                  activeBar={<Rectangle fill="pink" stroke="blue" />}
-                /> */}
+
                 <Bar
                   dataKey="hrs"
                   fill="#82ca9d"
@@ -309,6 +352,37 @@ const UserPanelHome = () => {
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
+          <Table>
+            <thead>
+              <tr>
+                <td></td>
+                <td>platform</td>
+                <td>Hours</td>
+              </tr>
+            </thead>
+            <tbody>
+              {reprotsData.map((obj) => {
+                const { name, hrs } = obj;
+                return (
+                  <tr key={name}>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: ".4rem",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      <div></div>
+                    </td>
+                    <td>{name}</td>
+                    <td>{hrs}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
         </RightDiv>
       </ContentDiv>
     </MainDiv>
