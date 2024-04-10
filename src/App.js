@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const isAdmin = useSelector((state) => state.isAdmin);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -34,7 +35,7 @@ const App = () => {
       <Routes>
         <Route path="/" exact element={<Home />} />
         <Route path="/login" exact element={<Login />} />
-        {isLoggedIn && (
+        {isLoggedIn && !isAdmin && (
           <>
             <Route path="/user-panel/:page" exact element={<UserPanel />} />
             <Route path="/user-panel/order/:id" exact element={<UserPanel />} />

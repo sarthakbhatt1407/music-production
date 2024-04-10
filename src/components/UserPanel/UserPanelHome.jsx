@@ -5,6 +5,7 @@ import {
 } from "@mui/icons-material";
 import { Breadcrumb } from "antd";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   AreaChart,
   Area,
@@ -21,8 +22,10 @@ import {
   PieChart,
   Cell,
 } from "recharts";
+import MusicLoader from "../Loader/MusicLoader";
 
 const MainDiv = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
   background-color: #f5f5f5;
@@ -147,82 +150,74 @@ const Table = styled.table`
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const UserPanelHome = () => {
-  const earningData = [
-    {
-      2024: {
-        Jan: 4000,
-        Feb: 0,
-        Mar: 0,
-        Apr: 4545,
-        May: 5545,
-        Jun: 1254,
-        Jul: 1545,
-        Aug: 5454,
-        Sep: 8841,
-        Oct: 8515,
-        Nov: 9656,
-        Dec: 4546,
-      },
-      2025: {
-        Jan: 7635,
-        Feb: 2464,
-        Mar: 2864,
-        Apr: 4545,
-        May: 7546,
-        Jun: 1254,
-        Jul: 1545,
-        Aug: 5454,
-        Sep: 8841,
-        Oct: 8515,
-        Nov: 9656,
-        Dec: 4546,
-      },
-    },
-  ];
-  const reprotsData = [
-    {
-      name: "Amazon",
-      hrs: 2.4,
-    },
-    {
-      name: "Apple Music",
-      hrs: 1,
-    },
-    {
-      name: "Amazon",
-      hrs: 5,
-    },
-    {
-      name: "Youtube",
-      hrs: 20,
-    },
-    {
-      name: "Savan",
-      hrs: 8,
-    },
-    {
-      name: "Savan",
-      hrs: 7,
-    },
-    {
-      name: "Savan",
-      hrs: 8,
-    },
-  ];
-  const [selectedYear, setSelectedYear] = useState(2024);
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    const res = earningData[0][selectedYear];
-    let arr = [];
-    for (const key in res) {
-      const obj = {
-        name: key,
-        amount: res[key],
-      };
-      arr.push(obj);
+  const defaultEarning = {
+    Jan: 0,
+    Feb: 0,
+    Mar: 0,
+    Apr: 0,
+    May: 0,
+    Jun: 0,
+    Jul: 0,
+    Aug: 0,
+    Sep: 0,
+    Oct: 0,
+    Nov: 0,
+    Dec: 0,
+  };
+  const defaultReports = {
+    Amazon: 0,
+    Youtube: 0,
+    "Apple Music": 0,
+    Saavan: 0,
+    Wynk: 0,
+  };
+
+  const [userData, setUserdata] = useState(null);
+  const [earningSelectedYear, setEarningSelectedYear] = useState(2024);
+  const [reportSelectedYear, setReportSelectedYear] = useState(2024);
+  const [earningData, setEarningData] = useState(null);
+  const [reportData, setReportData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const userId = useSelector((state) => state.userId);
+
+  const fecher = async () => {
+    setIsLoading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+    );
+    const data = await res.json();
+    console.log(data);
+    if (res.ok) {
+      setUserdata(data.user);
+
+      // for analytics
+      let resArr = data.user.analytics[0][reportSelectedYear];
+      let arr = [];
+      for (const key in resArr) {
+        const obj = {
+          name: key,
+          hrs: resArr[key],
+        };
+        arr.push(obj);
+      }
+      setReportData(arr);
+      //   for earning
+      resArr = data.user.finacialReport[0][earningSelectedYear];
+      arr = [];
+      for (const key in resArr) {
+        const obj = {
+          name: key,
+          amount: resArr[key],
+        };
+        arr.push(obj);
+      }
+      setEarningData(arr);
+      setIsLoading(false);
     }
-    console.log(arr);
-    setData(arr);
+  };
+
+  useEffect(() => {
+    fecher();
 
     return () => {};
   }, []);
@@ -230,162 +225,208 @@ const UserPanelHome = () => {
   const getSelectedValue = (e) => {
     const ele = document.querySelector(`#${e.target.id}`);
     const value = ele.options[ele.selectedIndex].value;
-    const res = earningData[0][value];
+    setEarningSelectedYear(Number(value));
+    let resArr = userData.finacialReport[0][value];
+    if (!resArr) {
+      resArr = defaultEarning;
+    }
     let arr = [];
-    for (const key in res) {
+    for (const key in resArr) {
       const obj = {
         name: key,
-        amount: res[key],
+        amount: resArr[key],
+      };
+      arr.push(obj);
+    }
+    setEarningData(arr);
+  };
+  const reportsYearChanger = (e) => {
+    const ele = document.querySelector(`#${e.target.id}`);
+    const value = ele.options[ele.selectedIndex].value;
+    console.log(value);
+    setReportSelectedYear(Number(value));
+
+    let resArr = userData.analytics[0][value];
+    if (!resArr) {
+      resArr = defaultReports;
+    }
+    let arr = [];
+    for (const key in resArr) {
+      const obj = {
+        name: key,
+        hrs: resArr[key],
       };
       arr.push(obj);
     }
     console.log(arr);
-    setData(arr);
+    setReportData(arr);
   };
+
   return (
-    <MainDiv>
-      <Breadcrumb
-        items={[
-          {
-            title: "User Panel",
-          },
-          {
-            title: "Home",
-          },
-        ]}
-      />
-      <h1>
-        <span>Overview</span>
-      </h1>
-      <ContentDiv>
-        <LeftDiv>
-          {" "}
-          <ChartBox>
-            <div style={{ padding: "0 1rem" }}>
+    <>
+      <MainDiv>
+        {isLoading && <MusicLoader />}
+        <Breadcrumb
+          items={[
+            {
+              title: "User Panel",
+            },
+            {
+              title: "Home",
+            },
+          ]}
+        />
+        <h1>
+          <span>Overview</span>
+        </h1>{" "}
+        {userData && !isLoading && (
+          <ContentDiv>
+            <LeftDiv>
               {" "}
-              <h2>Earning</h2>{" "}
-              <Select name="category" id="category" onChange={getSelectedValue}>
-                <Option value={2024}>2024</Option>
-                <Option value={2025}>2025</Option>
-              </Select>
-            </div>
-            <ResponsiveContainer width={"100%"} height={300}>
-              <AreaChart
-                width={500}
-                height={400}
-                data={data}
-                margin={{
-                  top: 10,
-                  right: 10,
-                  left: 0,
-                  bottom: 0,
-                }}
-              >
-                <CartesianGrid strokeDasharray="1 1" />
-                <XAxis dataKey="name" style={{ fontSize: ".8rem" }} />
-                <YAxis />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dataKey="amount"
-                  stroke="#8884d8"
-                  fill="#1677FF"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartBox>
-          <ChartBox>
-            <div style={{ padding: "0 1rem" }}>
-              {" "}
-              <h2>Reports</h2>{" "}
-            </div>
-            <ResponsiveContainer width={"100%"} height={300}>
-              <BarChart
-                width={500}
-                height={400}
-                data={reprotsData}
-                margin={{
-                  top: 10,
-                  right: 10,
-                  left: 0,
-                  bottom: 0,
-                }}
-              >
-                <CartesianGrid strokeDasharray="1 1" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-
-                <Bar
-                  dataKey="hrs"
-                  fill="#82ca9d"
-                  activeBar={<Rectangle fill="gold" stroke="purple" />}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartBox>
-        </LeftDiv>
-        <RightDiv>
-          <h2>Reports Summary</h2>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart width={400} height={400}>
-              <Pie
-                dataKey="hrs"
-                isAnimationActive={true}
-                data={reprotsData}
-                cx="50%"
-                cy="50%"
-                outerRadius={120}
-                fill="#8884d8"
-                label
-              >
-                {reprotsData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-          <Table>
-            <thead>
-              <tr>
-                <td></td>
-                <td>platform</td>
-                <td>Hours</td>
-              </tr>
-            </thead>
-            <tbody>
-              {reprotsData.map((obj) => {
-                const { name, hrs } = obj;
-                return (
-                  <tr key={name}>
-                    <td
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: ".4rem",
-                        alignItems: "center",
-                        width: "100%",
+              <ChartBox>
+                <div style={{ padding: "0 1rem" }}>
+                  {" "}
+                  <h2>Earning</h2>{" "}
+                  <Select
+                    name="category"
+                    id="category"
+                    onChange={getSelectedValue}
+                  >
+                    <Option value={2024}>2024</Option>
+                    <Option value={2025}>2025</Option>
+                    <Option value={2026}>2026</Option>
+                  </Select>
+                </div>
+                {earningData && (
+                  <ResponsiveContainer width={"100%"} height={300}>
+                    <AreaChart
+                      width={500}
+                      height={400}
+                      data={earningData}
+                      margin={{
+                        top: 10,
+                        right: 10,
+                        left: 0,
+                        bottom: 0,
                       }}
                     >
-                      <div></div>
-                    </td>
-                    <td>{name}</td>
-                    <td>{hrs}</td>
+                      <CartesianGrid strokeDasharray="1 1" />
+                      <XAxis dataKey="name" style={{ fontSize: ".8rem" }} />
+                      <YAxis />
+                      <Tooltip />
+                      <Area
+                        type="monotone"
+                        dataKey="amount"
+                        stroke="#8884d8"
+                        fill="#1677FF"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
+              </ChartBox>
+              <ChartBox>
+                <div style={{ padding: "0 1rem" }}>
+                  {" "}
+                  <h2>Reports</h2>{" "}
+                  <Select
+                    name="reportsYear"
+                    id="reportsYear"
+                    onChange={reportsYearChanger}
+                  >
+                    <Option value={2024}>2024</Option>
+                    <Option value={2025}>2025</Option>
+                    <Option value={2026}>2026</Option>
+                  </Select>
+                </div>
+                <ResponsiveContainer width={"100%"} height={300}>
+                  <BarChart
+                    width={500}
+                    height={400}
+                    data={reportData}
+                    margin={{
+                      top: 10,
+                      right: 10,
+                      left: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="1 1" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+
+                    <Bar
+                      dataKey="hrs"
+                      fill="#82ca9d"
+                      activeBar={<Rectangle fill="gold" stroke="purple" />}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartBox>
+            </LeftDiv>
+            <RightDiv>
+              <h2>Reports Summary</h2>
+
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart width={400} height={400}>
+                  <Pie
+                    dataKey="hrs"
+                    isAnimationActive={true}
+                    data={reportData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={120}
+                    fill="#8884d8"
+                    label
+                  >
+                    {reportData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <Table>
+                <thead>
+                  <tr>
+                    <td></td>
+                    <td>platform</td>
+                    <td>Hours</td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-        </RightDiv>
-      </ContentDiv>
-    </MainDiv>
+                </thead>
+                <tbody>
+                  {reportData.map((obj) => {
+                    const { name, hrs } = obj;
+                    return (
+                      <tr key={name}>
+                        <td
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: ".4rem",
+                            alignItems: "center",
+                            width: "100%",
+                          }}
+                        >
+                          <div></div>
+                        </td>
+                        <td>{name}</td>
+                        <td>{hrs}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </RightDiv>
+          </ContentDiv>
+        )}
+      </MainDiv>
+    </>
   );
 };
 

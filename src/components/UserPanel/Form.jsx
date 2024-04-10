@@ -438,10 +438,13 @@ const Form = () => {
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
 
-    const res = await fetch(`http://localhost:5000/order/new-order`, {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/order/new-order`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
     const data = await res.json();
     console.log(data);
     if (res.ok) {

@@ -397,6 +397,7 @@ const Login = () => {
     console.log(data);
     if (data.success) {
       setName(data.user.name);
+      setInpFields(defaultFields);
       setState({
         ...state,
         open: true,
@@ -406,7 +407,7 @@ const Login = () => {
       setTimeout(() => {
         dispatch({ type: "log in", data: { ...data } });
         if (!data.user.isAdmin) {
-          navigate("/user-panel/");
+          navigate("/user-panel/home");
         }
       }, 1000);
     }
