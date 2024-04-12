@@ -331,7 +331,7 @@ const OrderDetailsPage = () => {
                     </div>
                   );
                 })}
-              {order.status === "waiting" && (
+              {order.status === "waiting" && order.deleted === false && (
                 <BtnBox>
                   {" "}
                   <Popconfirm

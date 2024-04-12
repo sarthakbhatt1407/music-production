@@ -6,7 +6,10 @@ import { Breadcrumb, Popconfirm } from "antd";
 import { Link } from "react-router-dom";
 import { Empty } from "antd";
 import { useSelector } from "react-redux";
-import { SettingsBackupRestoreOutlined } from "@mui/icons-material";
+import {
+  RemoveRedEyeOutlined,
+  SettingsBackupRestoreOutlined,
+} from "@mui/icons-material";
 const MainBox = styled.div`
   width: 100%;
   height: 100%;
@@ -254,7 +257,7 @@ const DeletedOrders = () => {
                 <td>Language</td>
                 <td>Created</td>
                 <td>Date Of release</td>
-                <td>Restore</td>
+                <td>Action</td>
               </tr>
             </TableHead>{" "}
             <TableBody>
@@ -305,7 +308,13 @@ const DeletedOrders = () => {
                         <Link>
                           <SettingsBackupRestoreOutlined />
                         </Link>
-                      </Popconfirm>
+                      </Popconfirm>{" "}
+                      <Link
+                        to={`/user-panel/order/${id}`}
+                        style={{ marginLeft: ".5rem" }}
+                      >
+                        <RemoveRedEyeOutlined />
+                      </Link>
                     </td>
                   </tr>
                 );
@@ -360,6 +369,15 @@ const DeletedOrders = () => {
                 <TextBox>
                   <span>Created</span>
                   <span>{orderDateAndTime.split("/")[0]}</span>
+                </TextBox>
+                <TextBox>
+                  <span>View</span>
+                  <span>
+                    {" "}
+                    <Link to={`/user-panel/order/${id}`}>
+                      <RemoveRedEyeOutlined />
+                    </Link>
+                  </span>
                 </TextBox>
                 <TextBox>
                   <span>Retsore</span>

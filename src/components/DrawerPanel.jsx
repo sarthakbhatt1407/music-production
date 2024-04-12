@@ -9,7 +9,11 @@ import {
 import { Dropdown, Space } from "antd";
 import random from "../assets/images/random.webp";
 import { Layout, Menu, Button, theme, Avatar } from "antd";
-import { HistoryOutlined, RestoreFromTrashOutlined } from "@mui/icons-material";
+import {
+  AccountCircleOutlined,
+  HistoryOutlined,
+  RestoreFromTrashOutlined,
+} from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 const { Header, Sider, Content } = Layout;
@@ -19,16 +23,13 @@ const DrawerPanel = (props) => {
   const page = props.page;
   const items = [
     {
-      label: "3rd menu item",
+      label: <Link to={"/user-panel/profile"}>My Account</Link>,
       key: "0",
-    },
-    {
-      label: "3rd menu item",
-      key: "1",
     },
     {
       type: "divider",
     },
+
     {
       label: (
         <span
@@ -39,7 +40,7 @@ const DrawerPanel = (props) => {
           Log out
         </span>
       ),
-      key: "3",
+      key: "1",
     },
   ];
   const defaultSelector = (page) => {
@@ -54,6 +55,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "deleted") {
       return ["4"];
+    }
+    if (page === "profile") {
+      return ["5"];
     }
   };
 
@@ -113,6 +117,15 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Deleted",
+            },
+            {
+              key: "5",
+              icon: (
+                <Link to={"/user-panel/profile"}>
+                  <AccountCircleOutlined style={{ transform: "scale(1.1)" }} />
+                </Link>
+              ),
+              label: "My Account",
             },
           ]}
         />
