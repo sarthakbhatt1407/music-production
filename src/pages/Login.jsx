@@ -439,7 +439,7 @@ const Login = () => {
             {/* <img src={logo} alt="" /> */}
             <h1>New here?</h1>
             <p>
-              To get started with your shopping experience, please create an
+              To get started with your music experience, please create an
               account.
             </p>
             <button
@@ -454,7 +454,7 @@ const Login = () => {
             {!showForgot && (
               <>
                 <h2>Log In</h2>
-                <h3>Ready to dive back into your shopping journey?</h3>
+                <h3>Ready to dive back into your music journey?</h3>
                 {emailVer && (
                   <EmailVerificationBox>
                     {isLoading && (
