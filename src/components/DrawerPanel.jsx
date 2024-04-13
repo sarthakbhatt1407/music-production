@@ -85,7 +85,7 @@ const DrawerPanel = (props) => {
         </LogoDiv>
         <Menu
           theme="dark"
-          mode="vertical"
+          mode="inline"
           style={{
             display: "flex",
             flexDirection: "column",
