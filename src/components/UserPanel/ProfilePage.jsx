@@ -101,7 +101,7 @@ const RightDiv = styled.div`
     }
     padding: 1rem;
     p {
-      text-transform: uppercase;
+      text-transform: capitalize;
       border-bottom: 1px solid #e7e7ee;
       font-size: 1.3rem;
       margin: 0.5rem 0;

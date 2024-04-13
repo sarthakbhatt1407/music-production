@@ -23,7 +23,7 @@ const UserPanel = () => {
         {page === "profile" && <ProfilePage />}
         {page === "upload" && <Form />}
         {page === "history" && <History />}
-        {page === "deleted" && <DeletedOrders />}
+        {/* {page === "deleted" && <DeletedOrders />} */}
         {id && !action && <OrderDetailsPage />}
         {action === "edit" && <EditOrder />}
       </DrawerPanel>

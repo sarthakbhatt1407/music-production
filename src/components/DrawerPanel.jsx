@@ -107,17 +107,7 @@ const DrawerPanel = (props) => {
               ),
               label: "History",
             },
-            {
-              key: "4",
-              icon: (
-                <Link to={"/user-panel/deleted"}>
-                  <RestoreFromTrashOutlined
-                    style={{ transform: "scale(1.1)" }}
-                  />
-                </Link>
-              ),
-              label: "Deleted",
-            },
+
             {
               key: "5",
               icon: (
