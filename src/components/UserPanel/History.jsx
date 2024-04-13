@@ -396,7 +396,10 @@ const History = () => {
                 </MobileOrderBox>
               </Link>
             );
-          })}
+          })}{" "}
+        {filteredOrders && filteredOrders.length === 0 && !isLoading && (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
       </MobileBox>
     </MainBox>
   );
