@@ -101,7 +101,7 @@ const DrawerPanel = (props) => {
                   to={"/user-panel/home"}
                   onClick={() => setCollapsed(true)}
                 >
-                  <HomeOutlined style={{ transform: "scale(1.1)" }} />
+                  <HomeOutlined />
                 </Link>
               ),
               label: "Home",
@@ -113,7 +113,7 @@ const DrawerPanel = (props) => {
                   to={"/user-panel/upload"}
                   onClick={() => setCollapsed(true)}
                 >
-                  <UploadOutlined style={{ transform: "scale(1.1)" }} />
+                  <UploadOutlined />
                 </Link>
               ),
               label: "Upload",
@@ -125,7 +125,7 @@ const DrawerPanel = (props) => {
                   to={"/user-panel/history"}
                   onClick={() => setCollapsed(true)}
                 >
-                  <HistoryOutlined style={{ transform: "scale(1.1)" }} />
+                  <HistoryOutlined />
                 </Link>
               ),
               label: "History",
@@ -138,7 +138,7 @@ const DrawerPanel = (props) => {
                   to={"/user-panel/profile"}
                   onClick={() => setCollapsed(true)}
                 >
-                  <AccountCircleOutlined style={{ transform: "scale(1.1)" }} />
+                  <AccountCircleOutlined />
                 </Link>
               ),
               label: "My Account",
