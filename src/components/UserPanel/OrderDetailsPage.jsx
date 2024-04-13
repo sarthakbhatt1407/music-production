@@ -169,7 +169,9 @@ const OrderDetailsPage = () => {
   const navigate = useNavigate();
   const fetcher = async () => {
     setIsloading(true);
-    const res = await fetch(`http://localhost:5000/order/get-order/?id=${id}`);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+    );
     const data = await res.json();
     console.log(data);
     setOrder(data.order);
@@ -200,7 +202,7 @@ const OrderDetailsPage = () => {
   };
   const confirm = async () => {
     const res = await fetch(
-      `http://localhost:5000/order/update-order/?id=${order.id}&action=delete`,
+      `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=delete`,
       {
         method: "PATCH",
       }
@@ -243,14 +245,14 @@ const OrderDetailsPage = () => {
         {!isLoading && order && (
           <>
             <LeftDiv>
-              {/* <img src={`http://localhost:5000/${order.thumbnail}`} alt="" /> */}{" "}
+              {/* <img src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`} alt="" /> */}{" "}
               <Image
                 width={200}
-                src={`http://localhost:5000/${order.thumbnail}`}
+                src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
                 placeholder={
                   <Image
                     preview={false}
-                    src={`http://localhost:5000/${order.thumbnail}`}
+                    src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
                     width={200}
                   />
                 }
@@ -296,7 +298,7 @@ const OrderDetailsPage = () => {
                         <span>{field}</span>
                         <span>
                           <Link
-                            to={`http://localhost:5000/file/download/?filePath=${value}`}
+                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
                             target="_blank"
                           >
                             <DownloadOutlined
@@ -313,7 +315,7 @@ const OrderDetailsPage = () => {
                         <span>{field}</span>
                         <span>
                           <Link
-                            to={`http://localhost:5000/file/download/?filePath=${value}`}
+                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
                             target="_blank"
                           >
                             <DownloadOutlined
