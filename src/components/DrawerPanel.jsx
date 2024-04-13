@@ -16,7 +16,19 @@ import {
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import logo from "../assets/images/logo/ready.png";
+import styled from "@emotion/styled";
 const { Header, Sider, Content } = Layout;
+
+const LogoDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+  img {
+    width: 2rem;
+  }
+`;
 
 const DrawerPanel = (props) => {
   const dispatch = useDispatch();
@@ -68,7 +80,9 @@ const DrawerPanel = (props) => {
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="demo-logo-vertical" />
+        <LogoDiv>
+          <img src={logo} alt="" />
+        </LogoDiv>
         <Menu
           theme="dark"
           mode="vertical"

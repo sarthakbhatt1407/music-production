@@ -18,15 +18,17 @@ const UserPanel = () => {
 
   return (
     <div>
-      <DrawerPanel page={page}>
-        {page === "home" && <UserPanelHome />}
-        {page === "profile" && <ProfilePage />}
-        {page === "upload" && <Form />}
-        {page === "history" && <History />}
-        {/* {page === "deleted" && <DeletedOrders />} */}
-        {id && !action && <OrderDetailsPage />}
-        {action === "edit" && <EditOrder />}
-      </DrawerPanel>
+      <div>
+        <DrawerPanel page={page}>
+          {page === "home" && <UserPanelHome />}
+          {page === "profile" && <ProfilePage />}
+          {page === "upload" && <Form />}
+          {page === "history" && <History />}
+          {/* {page === "deleted" && <DeletedOrders />} */}
+          {id && !action && <OrderDetailsPage />}
+          {action === "edit" && <EditOrder />}
+        </DrawerPanel>{" "}
+      </div>
     </div>
   );
 };
