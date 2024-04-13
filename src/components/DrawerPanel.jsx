@@ -97,7 +97,10 @@ const DrawerPanel = (props) => {
             {
               key: "1",
               icon: (
-                <Link to={"/user-panel/home"}>
+                <Link
+                  to={"/user-panel/home"}
+                  onClick={() => setCollapsed(true)}
+                >
                   <HomeOutlined style={{ transform: "scale(1.1)" }} />
                 </Link>
               ),
@@ -106,7 +109,10 @@ const DrawerPanel = (props) => {
             {
               key: "2",
               icon: (
-                <Link to={"/user-panel/upload"}>
+                <Link
+                  to={"/user-panel/upload"}
+                  onClick={() => setCollapsed(true)}
+                >
                   <UploadOutlined style={{ transform: "scale(1.1)" }} />
                 </Link>
               ),
@@ -115,7 +121,10 @@ const DrawerPanel = (props) => {
             {
               key: "3",
               icon: (
-                <Link to={"/user-panel/history"}>
+                <Link
+                  to={"/user-panel/history"}
+                  onClick={() => setCollapsed(true)}
+                >
                   <HistoryOutlined style={{ transform: "scale(1.1)" }} />
                 </Link>
               ),
@@ -125,7 +134,10 @@ const DrawerPanel = (props) => {
             {
               key: "5",
               icon: (
-                <Link to={"/user-panel/profile"}>
+                <Link
+                  to={"/user-panel/profile"}
+                  onClick={() => setCollapsed(true)}
+                >
                   <AccountCircleOutlined style={{ transform: "scale(1.1)" }} />
                 </Link>
               ),
