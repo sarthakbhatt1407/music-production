@@ -8,6 +8,7 @@ import EditOrder from "../components/UserPanel/EditOrder";
 import DeletedOrders from "../components/UserPanel/DeletedOrders";
 import UserPanelHome from "../components/UserPanel/UserPanelHome";
 import ProfilePage from "../components/UserPanel/ProfilePage";
+import CopyRightPage from "../components/UserPanel/CopyRightPage";
 
 const UserPanel = () => {
   const page = useParams().page;
@@ -24,7 +25,7 @@ const UserPanel = () => {
           {page === "profile" && <ProfilePage />}
           {page === "upload" && <Form />}
           {page === "history" && <History />}
-          {/* {page === "deleted" && <DeletedOrders />} */}
+          {page === "copyright" && <CopyRightPage />}
           {id && !action && <OrderDetailsPage />}
           {action === "edit" && <EditOrder />}
         </DrawerPanel>{" "}

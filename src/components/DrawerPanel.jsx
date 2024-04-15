@@ -11,6 +11,7 @@ import random from "../assets/images/random.webp";
 import { Layout, Menu, Button, theme, Avatar } from "antd";
 import {
   AccountCircleOutlined,
+  Copyright,
   HistoryOutlined,
   RestoreFromTrashOutlined,
 } from "@mui/icons-material";
@@ -65,7 +66,7 @@ const DrawerPanel = (props) => {
     if (page === "history") {
       return ["3"];
     }
-    if (page === "deleted") {
+    if (page === "copyright") {
       return ["4"];
     }
     if (page === "profile") {
@@ -129,6 +130,18 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "History",
+            },
+            {
+              key: "4",
+              icon: (
+                <Link
+                  to={"/user-panel/copyright"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <Copyright />
+                </Link>
+              ),
+              label: "Copyright",
             },
 
             {
