@@ -211,6 +211,7 @@ const DrawerPanel = (props) => {
             minHeight: 280,
             background: "#F5F5F5",
             borderRadius: borderRadiusLG,
+            position: "relative",
           }}
         >
           {props.children}

@@ -339,6 +339,9 @@ const CopyRightPage = () => {
       openNotificationWithIcon("success", data.message);
       setInpFields(defaultF);
     }
+    if (!res.ok) {
+      openNotificationWithIcon("error", data.message);
+    }
     setShowModal(false);
     setRefresher(refresher + 1);
     setIsLoading(false);
@@ -397,13 +400,15 @@ const CopyRightPage = () => {
       />
       <HeaderBox>
         <h1>Copyright</h1>
-        <button
-          onClick={() => {
-            setShowModal(true);
-          }}
-        >
-          Add New Query
-        </button>
+        {!showModal && (
+          <button
+            onClick={() => {
+              setShowModal(true);
+            }}
+          >
+            Add New Query
+          </button>
+        )}
       </HeaderBox>
       <TableBox>
         {isLoading && <MusicLoader />}
