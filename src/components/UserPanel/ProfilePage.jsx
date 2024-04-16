@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Breadcrumb } from "antd";
 import styled from "@emotion/styled";
 import random from "../../assets/images/random.webp";
 import { ContentCopyOutlined } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import MusicLoader from "../Loader/MusicLoader";
 
 const MainDiv = styled.div`
   display: flex;
@@ -131,6 +133,28 @@ const RightDiv = styled.div`
 `;
 
 const ProfilePage = () => {
+  const userId = useSelector((state) => state.userId);
+
+  const [userData, setUserdata] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fecher = async () => {
+    setIsLoading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+    );
+    const data = await res.json();
+    console.log(data);
+    if (res.ok) {
+      setUserdata(data.user);
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    fecher();
+
+    return () => {};
+  }, []);
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
@@ -153,95 +177,98 @@ const ProfilePage = () => {
         ]}
       />
       <h1>My Account</h1>
-      <ContentDiv>
-        <LeftDiv>
-          <img src={random} alt="" />
-          <div>
-            <span>Sarthak Bhatt</span>
-            <span>+91-1234567890</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <span
-              style={{
-                width: "100%",
-                padding: "0.5rem 2rem 0.5rem 0.2rem",
-                margin: "0 0 0 0",
-                textTransform: "none",
-              }}
-            >
-              s@gmail.com
-            </span>
-          </div>
-        </LeftDiv>
-        <RightDiv>
-          <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-            <p>Details</p>
+      {userData && (
+        <ContentDiv>
+          {isLoading && <MusicLoader />}
+          <LeftDiv>
+            <img src={random} alt="" />
             <div>
-              <span>Name</span>
-              <span>Sarthak Bhatt</span>
+              <span>{userData.name}</span>
+              <span>+91-{userData.phone}</span>
             </div>
-            <div>
-              <span>Email</span>
-              <span style={{ textTransform: "none" }}>s@gmail.com</span>
-            </div>
-            <div>
-              <span>Phone</span>
-              <span>+91-1234567890</span>
-            </div>
-            <div>
-              <span>City</span>
-              <span>Dehradun</span>
-            </div>
-            <div>
-              <span>State</span>
-              <span>Uttarakhand</span>
-            </div>
-            <div>
-              <span>Country</span>
-              <span>India</span>
-            </div>
-          </div>
-        </RightDiv>
-        <RightDiv>
-          <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-            <p>Bank</p>
-            <div>
-              <span>Account No.</span>
-              <span>
-                454515454848
-                <ContentCopyOutlined
-                  style={{ cursor: "pointer", transform: "scale(.8)" }}
-                  onClick={copyToClipBoard.bind(this, "454515454848")}
-                />
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+              <span
+                style={{
+                  width: "100%",
+                  padding: "0.5rem 2rem 0.5rem 0.2rem",
+                  margin: "0 0 0 0",
+                  textTransform: "none",
+                }}
+              >
+                {userData.email}
               </span>
             </div>
-            <div>
-              <span>IFSC</span>
-              <span>
-                HDFC00005144
-                <ContentCopyOutlined
-                  style={{ cursor: "pointer", transform: "scale(.8)" }}
-                  onClick={copyToClipBoard.bind(this, "HDFC00005144")}
-                />
-              </span>
+          </LeftDiv>
+          <RightDiv>
+            <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
+              <p>Details</p>
+              <div>
+                <span>Name</span>
+                <span>{userData.name}</span>
+              </div>
+              <div>
+                <span>Email</span>
+                <span style={{ textTransform: "none" }}>{userData.email}</span>
+              </div>
+              <div>
+                <span>Phone</span>
+                <span>+91-{userData.phone}</span>
+              </div>
+              <div>
+                <span>City</span>
+                <span>{userData.city}</span>
+              </div>
+              <div>
+                <span>State</span>
+                <span>{userData.state}</span>
+              </div>
+              <div>
+                <span>Country</span>
+                <span>{userData.country}</span>
+              </div>
             </div>
-            <div>
-              <span>Bank Name</span>
-              <span>HDFC</span>
+          </RightDiv>
+          <RightDiv>
+            <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
+              <p>Bank</p>
+              <div>
+                <span>Account No.</span>
+                <span>
+                  {userData.bankDetails[0].accountNo}
+                  <ContentCopyOutlined
+                    style={{ cursor: "pointer", transform: "scale(.8)" }}
+                    onClick={copyToClipBoard.bind(this, "454515454848")}
+                  />
+                </span>
+              </div>
+              <div>
+                <span>IFSC</span>
+                <span>
+                  {userData.bankDetails[0].ifsc}
+                  <ContentCopyOutlined
+                    style={{ cursor: "pointer", transform: "scale(.8)" }}
+                    onClick={copyToClipBoard.bind(this, "HDFC00005144")}
+                  />
+                </span>
+              </div>
+              <div>
+                <span>Bank Name</span>
+                <span>{userData.bankDetails[0].bankName}</span>
+              </div>
+              <div>
+                <span>UPI</span>
+                <span style={{ textTransform: "none" }}>
+                  {userData.bankDetails[0].upi}
+                  <ContentCopyOutlined
+                    style={{ cursor: "pointer", transform: "scale(.8)" }}
+                    onClick={copyToClipBoard.bind(this, "751649898@paytm")}
+                  />
+                </span>
+              </div>
             </div>
-            <div>
-              <span>UPI</span>
-              <span style={{ textTransform: "none" }}>
-                751649898@paytm
-                <ContentCopyOutlined
-                  style={{ cursor: "pointer", transform: "scale(.8)" }}
-                  onClick={copyToClipBoard.bind(this, "751649898@paytm")}
-                />
-              </span>
-            </div>
-          </div>
-        </RightDiv>
-      </ContentDiv>
+          </RightDiv>
+        </ContentDiv>
+      )}
     </MainDiv>
   );
 };

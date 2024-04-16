@@ -199,8 +199,8 @@ const Form = () => {
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
   const [isLoading, setIsloading] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
   const success = (msg) => {
     messageApi.open({
       type: "success",
