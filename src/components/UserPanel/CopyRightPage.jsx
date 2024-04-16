@@ -261,6 +261,7 @@ const CopyRightPage = () => {
   const [queries, setQueries] = useState(null);
   const [refresher, setRefresher] = useState(0);
   const fetcher = async () => {
+    setIsLoading(true);
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/copyright/get-all-user-query/?userId=${userId}`
     );
@@ -268,6 +269,7 @@ const CopyRightPage = () => {
     console.log(data.cQueries);
     if (res.ok) {
       setQueries(data.cQueries.reverse());
+      setIsLoading(false);
     }
   };
 
