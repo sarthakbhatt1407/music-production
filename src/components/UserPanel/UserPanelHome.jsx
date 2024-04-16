@@ -193,7 +193,7 @@ const UserPanelHome = () => {
       for (const key in resArr) {
         const obj = {
           name: key,
-          hrs: resArr[key],
+          views: resArr[key],
         };
         arr.push(obj);
       }
@@ -251,7 +251,7 @@ const UserPanelHome = () => {
     for (const key in resArr) {
       const obj = {
         name: key,
-        hrs: resArr[key],
+        views: resArr[key],
       };
       arr.push(obj);
     }
@@ -354,7 +354,7 @@ const UserPanelHome = () => {
                     <Legend />
 
                     <Bar
-                      dataKey="hrs"
+                      dataKey="views"
                       fill="#82ca9d"
                       activeBar={<Rectangle fill="gold" stroke="purple" />}
                     />
@@ -368,7 +368,7 @@ const UserPanelHome = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart width={400} height={400}>
                   <Pie
-                    dataKey="hrs"
+                    dataKey="views"
                     isAnimationActive={true}
                     data={reportData}
                     cx="50%"
@@ -393,12 +393,12 @@ const UserPanelHome = () => {
                   <tr>
                     <td></td>
                     <td>platform</td>
-                    <td>Hours</td>
+                    <td>Views</td>
                   </tr>
                 </thead>
                 <tbody>
                   {reportData.map((obj) => {
-                    const { name, hrs } = obj;
+                    const { name, views } = obj;
                     return (
                       <tr key={name}>
                         <td
@@ -413,7 +413,7 @@ const UserPanelHome = () => {
                           <div></div>
                         </td>
                         <td>{name}</td>
-                        <td>{hrs}</td>
+                        <td>{views}</td>
                       </tr>
                     );
                   })}
