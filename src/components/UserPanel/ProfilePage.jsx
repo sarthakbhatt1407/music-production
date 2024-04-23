@@ -356,7 +356,7 @@ const ProfilePage = () => {
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
-
+      openNotificationWithIcon("success", "Copied to clipboard");
       console.log("Content copied to clipboard");
     } catch (err) {
       console.error("Failed to copy: ", err);
@@ -498,7 +498,10 @@ const ProfilePage = () => {
                     {userData.bankDetails[0].accountNo}
                     <ContentCopyOutlined
                       style={{ cursor: "pointer", transform: "scale(.8)" }}
-                      onClick={copyToClipBoard.bind(this, "454515454848")}
+                      onClick={copyToClipBoard.bind(
+                        this,
+                        userData.bankDetails[0].accountNo
+                      )}
                     />
                   </span>
                 </div>
@@ -508,7 +511,10 @@ const ProfilePage = () => {
                     {userData.bankDetails[0].ifsc}
                     <ContentCopyOutlined
                       style={{ cursor: "pointer", transform: "scale(.8)" }}
-                      onClick={copyToClipBoard.bind(this, "HDFC00005144")}
+                      onClick={copyToClipBoard.bind(
+                        this,
+                        userData.bankDetails[0].ifsc
+                      )}
                     />
                   </span>
                 </div>
@@ -522,7 +528,10 @@ const ProfilePage = () => {
                     {userData.bankDetails[0].upi}
                     <ContentCopyOutlined
                       style={{ cursor: "pointer", transform: "scale(.8)" }}
-                      onClick={copyToClipBoard.bind(this, "751649898@paytm")}
+                      onClick={copyToClipBoard.bind(
+                        this,
+                        userData.bankDetails[0].upi
+                      )}
                     />
                   </span>
                 </div>

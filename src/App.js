@@ -6,6 +6,7 @@ import "aos/dist/aos.css";
 import UserPanel from "./pages/UserPanel";
 import Login from "./pages/Login";
 import { useDispatch, useSelector } from "react-redux";
+import AdminPanel from "./pages/AdminPanel";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -45,7 +46,22 @@ const App = () => {
               element={<UserPanel />}
             />
           </>
-        )}{" "}
+        )}
+        {isLoggedIn && isAdmin && (
+          <>
+            <Route path="/admin-panel/:page" exact element={<AdminPanel />} />
+            <Route
+              path="/admin-panel/order/:id"
+              exact
+              element={<AdminPanel />}
+            />
+            <Route
+              path="/admin-panel/:page/:id"
+              exact
+              element={<AdminPanel />}
+            />
+          </>
+        )}
         <Route path="*" exact element={<Home />} />
       </Routes>
     </div>

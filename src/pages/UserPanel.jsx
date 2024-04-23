@@ -5,7 +5,6 @@ import Form from "../components/UserPanel/Form";
 import History from "../components/UserPanel/History";
 import OrderDetailsPage from "../components/UserPanel/OrderDetailsPage";
 import EditOrder from "../components/UserPanel/EditOrder";
-import DeletedOrders from "../components/UserPanel/DeletedOrders";
 import UserPanelHome from "../components/UserPanel/UserPanelHome";
 import ProfilePage from "../components/UserPanel/ProfilePage";
 import CopyRightPage from "../components/UserPanel/CopyRightPage";

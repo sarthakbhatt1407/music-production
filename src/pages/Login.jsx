@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Alert, Snackbar, setRef } from "@mui/material";
 import { useDispatch } from "react-redux";
 import MusicLoader from "../components/Loader/MusicLoader";
@@ -408,6 +408,9 @@ const Login = () => {
         dispatch({ type: "log in", data: { ...data } });
         if (!data.user.isAdmin) {
           navigate("/user-panel/home");
+        }
+        if (data.user.isAdmin) {
+          navigate("/admin-panel/orders");
         }
       }, 1000);
     }

@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function WebNav({ mode, toggleColorMode }) {
+  const isAdmin = useSelector((state) => state.isAdmin);
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const [open, setOpen] = React.useState(false);
   const [active, setActive] = React.useState("");
@@ -276,9 +277,17 @@ function WebNav({ mode, toggleColorMode }) {
                   Sign in
                 </Link>
               )}
-              {isLoggedIn && (
+              {isLoggedIn && !isAdmin && (
                 <Link
                   to={"/user-panel/home"}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {isLoggedIn && isAdmin && (
+                <Link
+                  to={"/admin-panel/orders"}
                   style={{ textDecoration: "none", color: "white" }}
                 >
                   Dashboard
@@ -374,9 +383,17 @@ function WebNav({ mode, toggleColorMode }) {
                         Sign in
                       </Link>
                     )}
-                    {isLoggedIn && (
+                    {isLoggedIn && !isAdmin && (
                       <Link
                         to={"/user-panel/home"}
+                        style={{ textDecoration: "none", color: "white" }}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    {isLoggedIn && isAdmin && (
+                      <Link
+                        to={"/admin-panel/home"}
                         style={{ textDecoration: "none", color: "white" }}
                       >
                         Dashboard
