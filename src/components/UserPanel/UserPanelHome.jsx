@@ -168,10 +168,11 @@ const UserPanelHome = () => {
     Saavan: 0,
     Wynk: 0,
   };
-
+  const date = new Date();
+  const currentYear = date.getFullYear();
   const [userData, setUserdata] = useState(null);
-  const [earningSelectedYear, setEarningSelectedYear] = useState(2024);
-  const [reportSelectedYear, setReportSelectedYear] = useState(2024);
+  const [earningSelectedYear, setEarningSelectedYear] = useState(currentYear);
+  const [reportSelectedYear, setReportSelectedYear] = useState(currentYear);
   const [earningData, setEarningData] = useState(null);
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);

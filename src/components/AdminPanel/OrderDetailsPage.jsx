@@ -502,64 +502,68 @@ const OrderDetailsPage = () => {
                     </div>
                   );
                 })}
-              <div>
-                <span>
-                  {" "}
-                  <Popconfirm
-                    title="Confirm"
-                    description="Do you want to approve?"
-                    onConfirm={confirm}
-                    onOpenChange={() => console.log("open change")}
-                  >
-                    <Link
-                      style={{
-                        backgroundColor: "#a1da6c",
-                        color: "white",
-                        padding: ".4rem .7rem",
-                        gap: ".3rem",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: "48%",
-                        borderRadius: ".5rem",
-                      }}
-                    >
-                      <DoneOutline />
-                      Approve
-                    </Link>
-                  </Popconfirm>
-                </span>
-              </div>
-              <div>
-                <span style={{ backgroundColor: "white" }}>
-                  {" "}
-                  <Popconfirm
-                    title="Confirm"
-                    description="Do you want to reject?"
-                    onConfirm={() => {
-                      setShowModal(true);
-                    }}
-                    onOpenChange={() => console.log("open change")}
-                  >
-                    <Link
-                      style={{
-                        backgroundColor: "#e86464",
-                        color: "white",
-                        padding: ".4rem .7rem",
-                        gap: ".3rem",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: "48%",
-                        borderRadius: ".5rem",
-                      }}
-                    >
-                      <CloseOutlined />
-                      Reject
-                    </Link>
-                  </Popconfirm>
-                </span>
-              </div>
+              {order.status === "waiting" && (
+                <>
+                  <div>
+                    <span>
+                      {" "}
+                      <Popconfirm
+                        title="Confirm"
+                        description="Do you want to approve?"
+                        onConfirm={confirm}
+                        onOpenChange={() => console.log("open change")}
+                      >
+                        <Link
+                          style={{
+                            backgroundColor: "#a1da6c",
+                            color: "white",
+                            padding: ".4rem .7rem",
+                            gap: ".3rem",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "48%",
+                            borderRadius: ".5rem",
+                          }}
+                        >
+                          <DoneOutline />
+                          Approve
+                        </Link>
+                      </Popconfirm>
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ backgroundColor: "white" }}>
+                      {" "}
+                      <Popconfirm
+                        title="Confirm"
+                        description="Do you want to reject?"
+                        onConfirm={() => {
+                          setShowModal(true);
+                        }}
+                        onOpenChange={() => console.log("open change")}
+                      >
+                        <Link
+                          style={{
+                            backgroundColor: "#e86464",
+                            color: "white",
+                            padding: ".4rem .7rem",
+                            gap: ".3rem",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "48%",
+                            borderRadius: ".5rem",
+                          }}
+                        >
+                          <CloseOutlined />
+                          Reject
+                        </Link>
+                      </Popconfirm>
+                    </span>
+                  </div>
+                </>
+              )}
             </RightDiv>
           </>
         )}
