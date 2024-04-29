@@ -198,7 +198,9 @@ const EditOrder = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const fetcher = async () => {
     setIsloading(true);
-    const res = await fetch(`http://localhost:5000/order/get-order/?id=${id}`);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+    );
     const data = await res.json();
     console.log(data);
     setInpFields({ ...data.order, thumbnail: null, file: null });
@@ -459,7 +461,7 @@ const EditOrder = () => {
     formData.append("userId", userId);
 
     const res = await fetch(
-      `http://localhost:5000/order/update-order/?id=${id}&action=edit`,
+      `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${id}&action=edit`,
       {
         method: "PATCH",
         body: formData,
