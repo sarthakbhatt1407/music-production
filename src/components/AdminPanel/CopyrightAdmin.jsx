@@ -5,7 +5,12 @@ import { useSelector } from "react-redux";
 import { notification } from "antd";
 import { message } from "antd";
 import { Empty } from "antd";
-import { DeleteForeverOutlined, InsertLink } from "@mui/icons-material";
+import {
+  CheckCircleOutline,
+  DeleteForeverOutlined,
+  InsertLink,
+  PersonOutline,
+} from "@mui/icons-material";
 import { ClockCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { Popconfirm } from "antd";
@@ -225,7 +230,7 @@ const Input = styled.input`
   }
 `;
 
-const CopyRightPage = () => {
+const CopyrightAdmin = () => {
   let c = 0;
   const defaultF = {
     link: "",
@@ -263,7 +268,7 @@ const CopyRightPage = () => {
   const fetcher = async () => {
     setIsLoading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/get-all-user-query/?userId=${userId}`
+      `${process.env.REACT_APP_BASE_URL}/copyright/get-all-query`
     );
     const data = await res.json();
     console.log(data.cQueries);
@@ -282,7 +287,7 @@ const CopyRightPage = () => {
   const confirm = async (id) => {
     setIsLoading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=delete`,
+      `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=resolved`,
       {
         method: "PATCH",
       }
@@ -352,42 +357,6 @@ const CopyRightPage = () => {
       {" "}
       {contextHolderNot}
       {contextHolder}
-      {showModal && (
-        <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="platform">Platform</Label>
-                <Input
-                  type="text"
-                  id="platform"
-                  onChange={onChangeHandler}
-                  value={inpFields.platform}
-                />
-              </LabelInpBox>
-              <LabelInpBox>
-                <Label htmlFor="link">Link</Label>
-                <Input
-                  type="text"
-                  id="link"
-                  onChange={onChangeHandler}
-                  value={inpFields.link}
-                />
-              </LabelInpBox>
-              <BtnBox>
-                <button onClick={onSubmitHandler}>Submit</button>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
       <Breadcrumb
         items={[
           {
@@ -400,15 +369,6 @@ const CopyRightPage = () => {
       />
       <HeaderBox>
         <h1>Copyright</h1>
-        {!showModal && (
-          <button
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Add New Query
-          </button>
-        )}
       </HeaderBox>
       <TableBox>
         {isLoading && <MusicLoader />}
@@ -419,6 +379,7 @@ const CopyRightPage = () => {
               <td>Platform</td>
               <td>Created</td>
               <td>Status</td>
+              <td>User</td>
               <td>View Content</td>
               <td>Action</td>
             </tr>
@@ -427,7 +388,7 @@ const CopyRightPage = () => {
             {" "}
             {queries &&
               queries.map((q) => {
-                const { platform, created, status, link, id } = q;
+                const { platform, created, status, link, id, userId } = q;
                 if (q.deleted === true) {
                   return;
                 }
@@ -463,27 +424,30 @@ const CopyRightPage = () => {
                       </td>
                     )}
                     <td>
+                      <Link to={`/admin-panel/user-profile/${userId}`}>
+                        <PersonOutline />
+                      </Link>
+                    </td>
+                    <td>
                       <Link to={link} target="_blank">
                         <InsertLink />
                       </Link>
                     </td>
                     <td>
                       <>
-                        {status === "resolved" && <>Resolved</>}
-                        {status !== "resolved" && (
-                          <>
-                            <Popconfirm
-                              title="Confirm"
-                              description="Do you want to delete?"
-                              onConfirm={confirm.bind(this, id)}
-                              onOpenChange={() => console.log("open change")}
-                            >
-                              <Link>
-                                <DeleteForeverOutlined />
-                              </Link>
-                            </Popconfirm>
-                          </>
+                        {status === "pending" && (
+                          <Popconfirm
+                            title="Confirm"
+                            description="Copyright removed?"
+                            onConfirm={confirm.bind(this, id)}
+                            onOpenChange={() => console.log("open change")}
+                          >
+                            <Link>
+                              <CheckCircleOutline />
+                            </Link>
+                          </Popconfirm>
                         )}
+                        {status === "resolved" && <>Resolved</>}
                       </>
                     </td>
                   </tr>
@@ -499,4 +463,4 @@ const CopyRightPage = () => {
   );
 };
 
-export default CopyRightPage;
+export default CopyrightAdmin;

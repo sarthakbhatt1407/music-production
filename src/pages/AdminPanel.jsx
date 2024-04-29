@@ -7,6 +7,7 @@ import PendingWork from "../components/AdminPanel/PendingWork";
 import History from "../components/AdminPanel/History";
 import AllUsers from "../components/AdminPanel/AllUsers";
 import UserProfile from "../components/AdminPanel/UserProfile";
+import CopyrightAdmin from "../components/AdminPanel/CopyrightAdmin";
 
 const AdminPanel = () => {
   const page = useParams().page;
@@ -19,6 +20,7 @@ const AdminPanel = () => {
         {page === "orders" && <Orders />}
         {page === "pending-work" && <PendingWork />}
         {page === "history" && <History />}
+        {page === "copyright" && <CopyrightAdmin />}
         {page === "all-users" && <AllUsers />}
         {page === "user-profile" && <UserProfile />}
         {id && !action && !page && <OrderDetailsPage />}

@@ -292,6 +292,9 @@ const OrderDetailsPage = () => {
                   if (field === "starCast") {
                     field = "star Cast";
                   }
+                  if (field === "remark") {
+                    field = "Rejection Reason";
+                  }
                   if (field === "thumbnail") {
                     return (
                       <div key={id}>
@@ -333,28 +336,34 @@ const OrderDetailsPage = () => {
                     </div>
                   );
                 })}
-              {order.status === "waiting" && order.deleted === false && (
-                <BtnBox>
-                  {" "}
-                  <Popconfirm
-                    title="Confirm"
-                    description="Do you want to delete?"
-                    onConfirm={confirm}
-                    onOpenChange={() => console.log("open change")}
-                  >
-                    <Link>
-                      <DeleteOutlined />
-                      Delete
-                    </Link>
-                  </Popconfirm>
-                  {/* <Link to={`/user-panel/order/${order._id}/edit`}>
+              {(order.status === "waiting" || order.status === "rejected") &&
+                order.deleted === false && (
+                  <BtnBox>
+                    {" "}
+                    <Popconfirm
+                      title="Confirm"
+                      description="Do you want to delete?"
+                      onConfirm={confirm}
+                      onOpenChange={() => console.log("open change")}
+                    >
+                      <Link>
+                        <DeleteOutlined
+                          style={{ backgroundColor: "transparent" }}
+                        />
+                        Delete
+                      </Link>
+                    </Popconfirm>
+                    {/* <Link to={`/user-panel/order/${order._id}/edit`}>
                     <EditOutlined /> Edit
                   </Link> */}
-                  <Link to={`/user-panel/order/${order._id}/edit`}>
-                    <EditOutlined /> Edit
-                  </Link>
-                </BtnBox>
-              )}
+                    <Link to={`/user-panel/order/${order._id}/edit`}>
+                      <EditOutlined
+                        style={{ backgroundColor: "transparent" }}
+                      />{" "}
+                      Edit
+                    </Link>
+                  </BtnBox>
+                )}
             </RightDiv>
           </>
         )}

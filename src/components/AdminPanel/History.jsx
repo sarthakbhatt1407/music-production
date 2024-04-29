@@ -16,6 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Empty } from "antd";
 import { useSelector } from "react-redux";
 import { Done } from "@mui/icons-material";
+
 const MainBox = styled.div`
   width: 100%;
   height: 100%;
@@ -127,6 +128,19 @@ const Input = styled.input`
     box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
   }
 `;
+
+// name: { type: String, required: true },
+// email: { type: String, required: true },
+// phone: { type: Number, required: true },
+// finacialReport: { type: Array, required: true },
+// analytics: { type: Array, required: true },
+// city: { type: String, required: true },
+// state: { type: String, required: true },
+// country: { type: String, required: true },
+// password: { type: String, required: true },
+// userSince: { type: String, required: true },
+// isAdmin: { type: Boolean, required: true },
+// bankDetails: { type: Array, required: true },
 
 const MobileBox = styled.div`
   display: flex;
@@ -275,7 +289,7 @@ const History = () => {
           placeholder="search album"
           onChange={onCHangeHandler}
         />
-      </HeaderBox>{" "}
+      </HeaderBox>
       {isLoading && <MusicLoader />}
       <TableBox>
         {orders && (
