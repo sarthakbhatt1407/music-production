@@ -331,10 +331,7 @@ const History = () => {
                     <td>{sNo}</td>
                     <td style={{ textAlign: "center" }}>
                       <span>
-                        <img
-                          src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                          alt=""
-                        />
+                        <img src={`${thumbnail}`} alt="" />
                         {title}
                       </span>
                     </td>
@@ -422,10 +419,7 @@ const History = () => {
             return (
               <Link>
                 <MobileOrderBox>
-                  <img
-                    src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                    alt=""
-                  />
+                  <img src={`${thumbnail}`} alt="" />
                   <TextBox>
                     <span>Title</span>
                     <span>{title}</span>

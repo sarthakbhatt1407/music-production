@@ -434,7 +434,7 @@ const Form = () => {
     formData.append("subLabel1", inpFields.subLabel1);
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
-    formData.append("thumbnail", inpFields.thumbnail);
+
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
 
@@ -448,14 +448,31 @@ const Form = () => {
     const data = await res.json();
     console.log(data);
     if (res.ok) {
-      success(data.message);
-      setTimeout(() => {
-        navigate("/user-panel/history");
-      }, 1000);
+      const orderId = data.createdOrder._id;
+      const imgFormData = new FormData();
+      imgFormData.append("image", inpFields.thumbnail);
+      imgFormData.append("orderId", orderId);
+      const imgRes = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/add-order-image`,
+        {
+          method: "POST",
+          body: imgFormData,
+        }
+      );
+
+      const imgData = await imgRes.json();
+      console.log(imgData);
+      if (imgRes.ok) {
+        success(imgData.message);
+        setTimeout(() => {
+          navigate("/user-panel/history");
+        }, 1000);
+      }
+      if (!imgRes.ok) {
+        error(imgData.message);
+      }
     }
-    if (!res.ok) {
-      error(data.message);
-    }
+
     setIsloading(false);
   };
   return (

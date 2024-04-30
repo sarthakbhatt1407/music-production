@@ -739,10 +739,7 @@ const UserProfile = () => {
                 return (
                   <Link to={`/admin-panel/order/${id}`}>
                     <MobileOrderBox>
-                      <img
-                        src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                        alt=""
-                      />
+                      <img src={`${thumbnail}`} alt="" />
                       <TextBox>
                         <span>Title</span>
                         <span>{title}</span>
@@ -816,10 +813,7 @@ const UserProfile = () => {
                         <td>{sNo}</td>
                         <td>
                           <span>
-                            <img
-                              src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                              alt=""
-                            />
+                            <img src={`${thumbnail}`} alt="" />
                             {title}
                           </span>
                         </td>

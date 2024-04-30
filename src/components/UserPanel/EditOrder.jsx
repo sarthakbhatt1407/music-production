@@ -456,7 +456,6 @@ const EditOrder = () => {
     formData.append("subLabel1", inpFields.subLabel1);
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
-    formData.append("thumbnail", inpFields.thumbnail);
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
 
@@ -469,16 +468,33 @@ const EditOrder = () => {
     );
     const data = await res.json();
     console.log(data);
+
     if (res.ok) {
-      success(data.message);
-      setTimeout(() => {
-        navigate("/user-panel/history");
-      }, 1000);
+      const imgFormData = new FormData();
+      imgFormData.append("image", inpFields.thumbnail);
+      imgFormData.append("orderId", id);
+      const imgRes = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/add-order-image`,
+        {
+          method: "POST",
+          body: imgFormData,
+        }
+      );
+
+      const imgData = await imgRes.json();
+      console.log(imgData);
+      if (imgRes.ok) {
+        success(data.message);
+        setTimeout(() => {
+          navigate("/user-panel/history");
+        }, 1000);
+      }
+      if (!imgRes.ok) {
+        error(data.message);
+      }
+
+      setIsloading(false);
     }
-    if (!res.ok) {
-      error(data.message);
-    }
-    setIsloading(false);
   };
   return (
     <OuterBox>

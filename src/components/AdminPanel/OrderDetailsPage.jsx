@@ -324,6 +324,7 @@ const OrderDetailsPage = () => {
 
   useEffect(() => {
     fetcher();
+
     return () => {};
   }, [id]);
 
@@ -414,14 +415,14 @@ const OrderDetailsPage = () => {
         {!isLoading && order && (
           <>
             <LeftDiv>
-              {/* <img src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`} alt="" /> */}{" "}
+              {/* <img src={`${order.thumbnail}`} alt="" /> */}{" "}
               <Image
                 width={200}
-                src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
+                src={`${order.thumbnail}`}
                 placeholder={
                   <Image
                     preview={false}
-                    src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
+                    src={`${order.thumbnail}`}
                     width={200}
                   />
                 }
