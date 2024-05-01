@@ -7,7 +7,7 @@ import MusicLoader from "../Loader/MusicLoader";
 import { useNavigate, useParams } from "react-router";
 import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
-
+import { TimePicker } from "antd";
 import { notification } from "antd";
 import { useSelector } from "react-redux";
 
@@ -189,6 +189,10 @@ const EditOrder = () => {
     subLabel3: "",
     thumbnail: null,
     file: null,
+    upc: "",
+    isrc: "",
+    lyricist: "",
+    crbt: "",
   };
   const id = useParams().id;
   const [order, setOrder] = useState(null);
@@ -363,7 +367,7 @@ const EditOrder = () => {
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val });
   };
-
+  const format = "mm:ss";
   const onSubmitHandler = async () => {
     setIsloading(true);
     if (
@@ -385,6 +389,7 @@ const EditOrder = () => {
         const labelName = document.querySelector("#labelName");
         labelName.style.border = "1px solid red";
       }
+
       if (inpFields.title.length === 0) {
         const title = document.querySelector("#title");
         title.style.border = "1px solid red";
@@ -437,6 +442,14 @@ const EditOrder = () => {
       openNotificationWithIcon("error");
       return;
     }
+    if (inpFields.lyricist.length === 0) {
+      const lyricist = document.querySelector("#lyricist");
+      lyricist.style.border = "1px solid red";
+
+      setIsloading(false);
+      openNotificationWithIcon("error");
+      return;
+    }
     console.log("start");
     const formData = new FormData();
 
@@ -453,12 +466,16 @@ const EditOrder = () => {
     formData.append("producer", inpFields.producer);
     formData.append("starCast", inpFields.starCast);
     formData.append("lyrics", inpFields.lyrics);
+    formData.append("upc", inpFields.upc);
+    formData.append("isrc", inpFields.isrc);
+    formData.append("lyricist", inpFields.lyricist);
+    formData.append("crbt", inpFields.crbt);
     formData.append("subLabel1", inpFields.subLabel1);
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
+
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
-
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${id}&action=edit`,
       {
@@ -587,6 +604,17 @@ const EditOrder = () => {
                   />
                 </LabelInpBox>
                 <LabelInpBox>
+                  <Label htmlFor="upc">upc</Label>
+                  <Input
+                    type="text"
+                    name="upc"
+                    id="upc"
+                    onChange={onChangeHandler}
+                    value={inpFields.upc}
+                    placeholder="upc"
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
                   <Label htmlFor="dateOfRelease">
                     Date of release <span style={{ margin: 0 }}>*</span>
                   </Label>
@@ -609,6 +637,18 @@ const EditOrder = () => {
                     <Option value={"song"}>Song</Option>
                     <Option value={"film"}>film</Option>
                   </Select>
+                </LabelInpBox>
+
+                <LabelInpBox>
+                  <Label htmlFor="upc">isrc</Label>
+                  <Input
+                    type="text"
+                    name="isrc"
+                    id="isrc"
+                    onChange={onChangeHandler}
+                    value={inpFields.isrc}
+                    placeholder="isrc"
+                  />
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="language">
@@ -667,6 +707,22 @@ const EditOrder = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
+                  <Label htmlFor="lyrics">Album lyrics (optional)</Label>
+                  <TxtArea
+                    rows="5"
+                    id="lyrics"
+                    placeholder="lyrics"
+                    onChange={onChangeHandler}
+                    value={inpFields.lyrics}
+                  ></TxtArea>
+                </LabelInpBox>
+              </AllInpBox>
+            </FormSeperator>
+
+            <FormSeperator>
+              <h2>CRBT</h2>
+              <AllInpBox>
+                <LabelInpBox>
                   <Label htmlFor="file" id="file">
                     file <span style={{ margin: 0 }}>*</span>
                   </Label>
@@ -681,17 +737,43 @@ const EditOrder = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
-                  <Label htmlFor="lyrics">Album lyrics (optional)</Label>
-                  <TxtArea
-                    rows="5"
-                    id="lyrics"
-                    placeholder="lyrics"
+                  <Label htmlFor="title">title</Label>
+                  <Input
+                    type="text"
+                    name="title"
+                    id="title"
+                    placeholder="title"
+                    disabled
                     onChange={onChangeHandler}
-                    value={inpFields.lyrics}
-                  ></TxtArea>
+                    value={inpFields.title}
+                  />
+                </LabelInpBox>
+
+                <LabelInpBox>
+                  <Label htmlFor="title">Time</Label>
+
+                  <TimePicker.RangePicker
+                    name="crbt"
+                    id="crbt"
+                    format={format}
+                    onChange={(time) => {
+                      let res;
+                      res =
+                        time[0]["$m"] +
+                        "::" +
+                        time[0]["$s"] +
+                        "-" +
+                        time[1]["$m"] +
+                        "::" +
+                        time[1]["$s"];
+                      console.log(res);
+                      setInpFields({ ...inpFields, crbt: res });
+                    }}
+                  />
                 </LabelInpBox>
               </AllInpBox>
             </FormSeperator>
+
             <FormSeperator>
               <h2>Artists</h2>
               <AllInpBox>
@@ -759,7 +841,20 @@ const EditOrder = () => {
                     onChange={onChangeHandler}
                     value={inpFields.starCast}
                   />
-                </LabelInpBox>{" "}
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="lyricist">
+                    lyricist <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="lyricist"
+                    id="lyricist"
+                    placeholder=""
+                    onChange={onChangeHandler}
+                    value={inpFields.lyricist}
+                  />
+                </LabelInpBox>
               </AllInpBox>{" "}
               <BtnDiv>
                 <button onClick={onSubmitHandler}>Submit</button>

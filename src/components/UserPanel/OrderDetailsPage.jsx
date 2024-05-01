@@ -9,6 +9,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
+import { saveAs } from "file-saver";
 const OuterBox = styled.div`
   width: 100%;
   height: 99%;
@@ -300,11 +301,14 @@ const OrderDetailsPage = () => {
                       <div key={id}>
                         <span>{field}</span>
                         <span>
-                          <Link
-                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
-                            target="_blank"
-                          >
+                          <Link>
                             <DownloadOutlined
+                              onClick={() => {
+                                saveAs(
+                                  value,
+                                  `${order.title}_${order.labelName}`
+                                );
+                              }}
                               style={{ transform: "scale(1.5)" }}
                             />
                           </Link>
