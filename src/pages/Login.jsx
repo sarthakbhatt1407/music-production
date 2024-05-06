@@ -5,7 +5,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Alert, Snackbar, setRef } from "@mui/material";
 import { useDispatch } from "react-redux";
 import MusicLoader from "../components/Loader/MusicLoader";
-import Footer from "../components/Footer";
 
 const OuterBox = styled.div`
   background-color: #f7f7f7;

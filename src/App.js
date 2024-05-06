@@ -7,6 +7,7 @@ import UserPanel from "./pages/UserPanel";
 import Login from "./pages/Login";
 import { useDispatch, useSelector } from "react-redux";
 import AdminPanel from "./pages/AdminPanel";
+import Register from "./pages/Register";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -36,6 +37,7 @@ const App = () => {
       <Routes>
         <Route path="/" exact element={<Home />} />
         <Route path="/login" exact element={<Login />} />
+        <Route path="/register" exact element={<Register />} />
         {isLoggedIn && !isAdmin && (
           <>
             <Route path="/user-panel/:page" exact element={<UserPanel />} />
