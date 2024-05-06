@@ -175,7 +175,7 @@ const DrawerPanel = (props) => {
                   <PeopleOutlineOutlined />
                 </Link>
               ),
-              label: "Clients",
+              label: "Labels",
             },
           ]}
         />

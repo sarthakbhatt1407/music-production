@@ -153,13 +153,13 @@ const AllUsers = () => {
             title: "Admin Panel",
           },
           {
-            title: "Clients",
+            title: "Labels",
           },
         ]}
       />
 
       <HeaderBox>
-        <h1>Clients</h1>
+        <h1>Labels</h1>
         <Input
           type="text"
           placeholder="search user"
