@@ -160,7 +160,17 @@ const AllUsers = () => {
 
       <HeaderBox>
         <h1>Clients</h1>
-        <Input type="text" placeholder="search user" />
+        <Input
+          type="text"
+          placeholder="search user"
+          onChange={(e) => {
+            const val = e.target.value.trim().toLowerCase();
+            const arr = users.filter((usr) => {
+              return usr.name.toLowerCase().includes(val);
+            });
+            setFilteredUsers(arr);
+          }}
+        />
       </HeaderBox>
       <TableBox>
         <Table cellSpacing={0}>
