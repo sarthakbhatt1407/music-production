@@ -562,6 +562,7 @@ const UserProfile = () => {
   const [orders, setOrders] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState(null);
   const [modalEarning, setModalEarning] = useState(false);
+  const [modalStream, setModalStream] = useState(false);
 
   const [modalEarningInpFields, setModalEarningInpFields] = useState({
     Jan: 0,
@@ -577,6 +578,20 @@ const UserProfile = () => {
     Nov: 0,
     Dec: 0,
   });
+  const [modalStreamInpFields, setModalStreamInpFields] = useState({
+    Spotify: 0,
+    Wynk: 0,
+    JioSaavn: 0,
+    Amazon: 0,
+    Gaana: 0,
+    YouTube: 0,
+    SoundCloud: 0,
+    Tiktok: 0,
+    Facebook: 0,
+    Hungama: 0,
+    Other: 0,
+  });
+
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
@@ -615,6 +630,7 @@ const UserProfile = () => {
     if (res.ok) {
       setUserdata(data.user);
       setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
+      setModalStreamInpFields(data.user.analytics[0][currentYear]);
       // for analytics
       let resArr = data.user.analytics[0][reportSelectedYear];
       let arr = [];
@@ -699,7 +715,46 @@ const UserProfile = () => {
     ele.style.border = "1px solid #d7d7d7";
     setModalEarningInpFields({ ...modalEarningInpFields, [id]: Number(val) });
   };
+  const modalStraemOnChnage = (e) => {
+    const id = e.target.id;
+    let val = e.target.value;
+    const ele = document.querySelector(`#${id}`);
 
+    ele.style.border = "1px solid #d7d7d7";
+    setModalStreamInpFields({ ...modalStreamInpFields, [id]: Number(val) });
+  };
+
+  const onStreamSubmit = async () => {
+    setIsLoading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/user/add-report`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: id,
+          adminId: userId,
+          report: modalStreamInpFields,
+          year: currentYear,
+        }),
+      }
+    );
+    const data = await res.json();
+
+    console.log(data);
+    if (res.ok) {
+      openNotificationWithIcon("success", data.message);
+      setRefresher((prev) => {
+        return prev + 1;
+      });
+    } else {
+      openNotificationWithIcon("error", data.message);
+    }
+    setIsLoading(false);
+    setModalStream(false);
+  };
   const onSubmit = async () => {
     setIsLoading(true);
     const res = await fetch(
@@ -718,8 +773,7 @@ const UserProfile = () => {
       }
     );
     const data = await res.json();
-    setIsLoading(false);
-    setModalEarning(false);
+
     console.log(data);
     if (res.ok) {
       openNotificationWithIcon("success", data.message);
@@ -729,6 +783,8 @@ const UserProfile = () => {
     } else {
       openNotificationWithIcon("error", data.message);
     }
+    setIsLoading(false);
+    setModalEarning(false);
   };
 
   return (
@@ -871,6 +927,133 @@ const UserProfile = () => {
           </ModalBox>
         </Modal>
       )}
+      {modalStream && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox>
+              <LabelInpBox>
+                <Label htmlFor="Spotify">Spotify</Label>
+                <ModalInput
+                  type="number"
+                  id="Spotify"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Spotify}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Wynk">Wynk</Label>
+                <ModalInput
+                  type="number"
+                  id="Wynk"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Wynk}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="JioSaavn">JioSaavn</Label>
+                <ModalInput
+                  type="number"
+                  id="JioSaavn"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.JioSaavn}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Amazon">Amazon</Label>
+                <ModalInput
+                  type="number"
+                  id="Amazon"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Amazon}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Gaana">Gaana</Label>
+                <ModalInput
+                  type="number"
+                  id="Gaana"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Gaana}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="YouTube">YouTube</Label>
+                <ModalInput
+                  type="number"
+                  id="YouTube"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.YouTube}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="SoundCloud">SoundCloud</Label>
+                <ModalInput
+                  type="number"
+                  id="SoundCloud"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.SoundCloud}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Tiktok">Tiktok</Label>
+                <ModalInput
+                  type="number"
+                  id="Tiktok"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Tiktok}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Facebook">Facebook</Label>
+                <ModalInput
+                  type="number"
+                  id="Facebook"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Facebook}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Hungama">Hungama</Label>
+                <ModalInput
+                  type="number"
+                  id="Hungama"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Hungama}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Other">Other</Label>
+                <ModalInput
+                  type="number"
+                  id="Other"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields.Other}
+                />
+              </LabelInpBox>
+            </ModalFormBox>
+            <BtnBox>
+              <button onClick={onStreamSubmit}>Submit</button>
+              <button
+                onClick={() => {
+                  setModalStream(false);
+                }}
+              >
+                Cancel
+              </button>
+            </BtnBox>
+          </ModalBox>
+        </Modal>
+      )}
       <MainDiv>
         <FloatButton.Group
           open={open}
@@ -886,6 +1069,7 @@ const UserProfile = () => {
         >
           <FloatButton
             onClick={() => {
+              setModalStream(true);
               setOpen(!open);
             }}
             tooltip={<div>Stream Report</div>}
