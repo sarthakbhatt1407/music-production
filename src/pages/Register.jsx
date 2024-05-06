@@ -586,7 +586,6 @@ const Register = () => {
 
       const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {
         method: "POST",
-
         body: formData,
       });
       const resData = await res.json();

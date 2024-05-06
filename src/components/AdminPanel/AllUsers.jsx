@@ -159,7 +159,7 @@ const AllUsers = () => {
       />
 
       <HeaderBox>
-        <h1>History</h1>
+        <h1>Clients</h1>
         <Input type="text" placeholder="search user" />
       </HeaderBox>
       <TableBox>

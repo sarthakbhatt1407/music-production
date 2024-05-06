@@ -303,6 +303,7 @@ const History = () => {
                 <td>Created</td>
                 <td>Date Of release</td>
                 <td>Status</td>
+                <td>View</td>
               </tr>
             </TableHead>{" "}
             <TableBody>
@@ -389,6 +390,11 @@ const History = () => {
                         </div>
                       </td>
                     )}
+                    <td>
+                      <Link to={`/admin-panel/order/${id}`}>
+                        <EyeOutlined />
+                      </Link>
+                    </td>
                   </tr>
                 );
               })}
@@ -439,6 +445,14 @@ const History = () => {
                   <TextBox>
                     <span>album Type</span>
                     <span>{albumType}</span>
+                  </TextBox>
+                  <TextBox>
+                    <span>View</span>
+                    <span>
+                      <Link to={`/admin-panel/order/${id}`}>
+                        <EyeOutlined />
+                      </Link>
+                    </span>
                   </TextBox>
                   <TextBox>
                     <span>Created</span>

@@ -171,7 +171,106 @@ const TextBox = styled.div`
     }
   }
 `;
+
+const Modal = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #00000038;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+`;
+
+const ModalBox = styled.div`
+  background-color: white;
+  width: 30%;
+  height: fit-content;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  z-index: 20;
+
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    width: 90%;
+  }
+`;
+
+const ModalFormBox = styled.div`
+  background-color: white;
+  width: 90%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const BtnBox = styled.div`
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  button {
+    background-color: #1677ff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.09rem;
+    &:last-child {
+      background-color: #bbb9b9;
+    }
+  }
+`;
+const ModalInput = styled.input`
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  outline: none;
+  border: 1px solid #d7d7d7;
+
+  &::placeholder {
+    color: #d4cdcd;
+    letter-spacing: 0.09rem;
+    text-transform: capitalize;
+  }
+  &:focus {
+    border: 1px solid #c0c0c0;
+    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
+  }
+`;
+
+const LabelInpBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 74%;
+  span {
+    color: #ff0000ab;
+    font-size: 0.8rem;
+    margin-left: 0.2rem;
+  }
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    width: 100%;
+  }
+`;
+const Label = styled.label`
+  font-size: 0.9rem;
+  letter-spacing: 0.06rem;
+  color: #9e9e9e;
+  text-transform: capitalize;
+`;
+
 const PendingWork = () => {
+  const [showModal, setShowModal] = useState(false);
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
@@ -198,6 +297,70 @@ const PendingWork = () => {
   const [orders, setOrders] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState(null);
   const [isLoading, setIsloading] = useState(true);
+  const [inpFields, setInpFields] = useState({
+    upc: "",
+    isrc: "",
+    id: "",
+  });
+
+  const onChangeHandler = (e) => {
+    const id = e.target.id;
+    const val = e.target.value;
+    const ele = document.querySelector(`#${id}`);
+
+    ele.style.border = "1px solid #d7d7d7";
+    setInpFields({ ...inpFields, [id]: val.trim() });
+  };
+
+  const onSubmitHandler = async () => {
+    console.log(inpFields);
+
+    if (inpFields.upc.length < 1 || inpFields.isrc.length === 0) {
+      if (inpFields.upc.length === 0) {
+        const upc = document.querySelector("#upc");
+        upc.style.border = "1px solid red";
+      }
+      if (inpFields.isrc.length === 0) {
+        const isrc = document.querySelector("#isrc");
+        isrc.style.border = "1px solid red";
+      }
+
+      openNotificationWithIcon("error", "Fill all require fields.");
+      return;
+    }
+    setIsloading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/order/add-upc-isrc`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          upc: inpFields.upc,
+          isrc: inpFields.isrc,
+          adminId: userId,
+          id: inpFields.id,
+        }),
+      }
+    );
+    const data = await res.json();
+    if (res.ok) {
+      openNotificationWithIcon("success", data.message);
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(null);
+          navigate("/admin-panel/history");
+        }, 500);
+      });
+    } else {
+      openNotificationWithIcon("error", data.message);
+    }
+    console.log(data);
+    setIsloading(false);
+    setShowModal(false);
+  };
+
   let sNo = 0;
   const fetcher = async () => {
     setIsloading(true);
@@ -256,6 +419,43 @@ const PendingWork = () => {
   return (
     <MainBox>
       {" "}
+      {showModal && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox>
+              <LabelInpBox>
+                <Label htmlFor="accountNo">UPC</Label>
+                <ModalInput
+                  type="text"
+                  id="upc"
+                  onChange={onChangeHandler}
+                  value={inpFields.upc}
+                />
+              </LabelInpBox>
+              <LabelInpBox>
+                <Label htmlFor="ifsc">isrc</Label>
+                <ModalInput
+                  type="text"
+                  id="isrc"
+                  onChange={onChangeHandler}
+                  value={inpFields.isrc}
+                />
+              </LabelInpBox>
+
+              <BtnBox>
+                <button onClick={onSubmitHandler}>Submit</button>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </BtnBox>
+            </ModalFormBox>
+          </ModalBox>
+        </Modal>
+      )}
       {contextHolderNot}
       {contextHolder}
       <Breadcrumb
@@ -289,6 +489,7 @@ const PendingWork = () => {
                 <td>Created</td>
                 <td>Date Of release</td>
                 <td>Status</td>
+                <td>View Details</td>
                 <td>Action</td>
               </tr>
             </TableHead>{" "}
@@ -377,10 +578,25 @@ const PendingWork = () => {
                       </td>
                     )}
                     <td>
+                      <Link to={`/admin-panel/order/${id}`}>
+                        <EyeOutlined />
+                      </Link>
+                    </td>
+                    <td>
                       <Popconfirm
                         title="Confirm"
                         description="Album completed?"
-                        onConfirm={confirm.bind(this, id)}
+                        onConfirm={() => {
+                          const order = filteredOrders.find((ord) => {
+                            return ord.id === id;
+                          });
+                          setInpFields({
+                            upc: order.upc,
+                            isrc: order.isrc,
+                            id: order.id,
+                          });
+                          setShowModal(true);
+                        }}
                         onOpenChange={() => console.log("open change")}
                       >
                         <Link>
@@ -444,13 +660,31 @@ const PendingWork = () => {
                     <span>{orderDateAndTime.split("/")[0]}</span>
                   </TextBox>
                   <TextBox>
+                    <span>View</span>
+                    <span>
+                      <Link to={`/admin-panel/order/${id}`}>
+                        <EyeOutlined />
+                      </Link>
+                    </span>
+                  </TextBox>
+                  <TextBox>
                     <span>Completed</span>
                     <span>
                       {" "}
                       <Popconfirm
                         title="Confirm"
                         description="Album completed?"
-                        onConfirm={confirm.bind(this, id)}
+                        onConfirm={() => {
+                          const order = filteredOrders.find((ord) => {
+                            return ord.id === id;
+                          });
+                          setInpFields({
+                            upc: order.upc,
+                            isrc: order.isrc,
+                            id: order.id,
+                          });
+                          setShowModal(true);
+                        }}
                         onOpenChange={() => console.log("open change")}
                       >
                         <Link>
