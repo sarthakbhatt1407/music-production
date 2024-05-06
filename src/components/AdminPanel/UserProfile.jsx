@@ -35,6 +35,7 @@ import random from "../../assets/images/random.webp";
 import {
   ContentCopyOutlined,
   CurrencyRupeeSharp,
+  DownloadOutlined,
   LinkOutlined,
   SmartDisplayOutlined,
 } from "@mui/icons-material";
@@ -42,6 +43,7 @@ import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { notification } from "antd";
 import { message } from "antd";
+import { saveAs } from "file-saver";
 
 const MainDiv = styled.div`
   display: grid;
@@ -88,7 +90,8 @@ const LeftDiv = styled.div`
   border-radius: 0.5rem;
   gap: 1rem;
   img {
-    width: 100%;
+    width: 82%;
+    height: 60%;
     margin: 0 auto;
     border-radius: 0.5rem;
   }
@@ -396,7 +399,6 @@ const TextBox = styled.div`
 const UserProfile = () => {
   const date = new Date();
   const currentYear = date.getFullYear();
-
   const defaultEarning = {
     Jan: 0,
     Feb: 0,
@@ -412,11 +414,17 @@ const UserProfile = () => {
     Dec: 0,
   };
   const defaultReports = {
-    Amazon: 0,
-    Youtube: 0,
-    "Apple Music": 0,
-    Saavan: 0,
+    Spotify: 0,
     Wynk: 0,
+    JioSaavn: 0,
+    Amazon: 0,
+    Gaana: 0,
+    YouTube: 0,
+    SoundCloud: 0,
+    Tiktok: 0,
+    Facebook: 0,
+    Hungama: 0,
+    Other: 0,
   };
   const [earningSelectedYear, setEarningSelectedYear] = useState(currentYear);
   const [reportSelectedYear, setReportSelectedYear] = useState(currentYear);
@@ -627,7 +635,7 @@ const UserProfile = () => {
             <ContentDiv>
               {isLoading && <MusicLoader />}
               <LeftDiv>
-                <img src={random} alt="" />
+                <img src={userData.userPic} alt="" />
                 <div>
                   <span>{userData.name}</span>
                   <span>+91-{userData.phone}</span>
@@ -684,6 +692,16 @@ const UserProfile = () => {
                     <span>Country</span>
                     <span>{userData.country}</span>
                   </div>
+                  <div>
+                    <span>Signature</span>
+                    <span>
+                      <DownloadOutlined
+                        onClick={() => {
+                          saveAs(userData.sign, `${userData.name}_sign`);
+                        }}
+                      />
+                    </span>
+                  </div>
                 </div>
               </RightDiv>
               <RightDiv>
@@ -692,35 +710,60 @@ const UserProfile = () => {
                   <div>
                     <span>Account No.</span>
                     <span>
-                      {userData.bankDetails[0].accountNo}
-                      <ContentCopyOutlined
-                        style={{ cursor: "pointer", transform: "scale(.8)" }}
-                        onClick={copyToClipBoard.bind(this, "454515454848")}
-                      />
+                      {userData.bankDetails[0].accountNo.length === 0
+                        ? "-"
+                        : userData.bankDetails[0].accountNo}
+                      {userData.bankDetails[0].accountNo.length !== 0 && (
+                        <ContentCopyOutlined
+                          style={{ cursor: "pointer", transform: "scale(.8)" }}
+                          onClick={copyToClipBoard.bind(
+                            this,
+                            userData.bankDetails[0].accountNo
+                          )}
+                        />
+                      )}
                     </span>
                   </div>
                   <div>
                     <span>IFSC</span>
                     <span>
-                      {userData.bankDetails[0].ifsc}
-                      <ContentCopyOutlined
-                        style={{ cursor: "pointer", transform: "scale(.8)" }}
-                        onClick={copyToClipBoard.bind(this, "HDFC00005144")}
-                      />
+                      {userData.bankDetails[0].ifsc.length !== 0
+                        ? userData.bankDetails[0].ifsc
+                        : "-"}
+                      {userData.bankDetails[0].ifsc.length !== 0 && (
+                        <ContentCopyOutlined
+                          style={{ cursor: "pointer", transform: "scale(.8)" }}
+                          onClick={copyToClipBoard.bind(
+                            this,
+                            userData.bankDetails[0].ifsc
+                          )}
+                        />
+                      )}
                     </span>
                   </div>
                   <div>
                     <span>Bank Name</span>
-                    <span>{userData.bankDetails[0].bankName}</span>
+                    <span>
+                      {userData.bankDetails[0].bankName.length !== 0
+                        ? userData.bankDetails[0].bankName
+                        : "-"}
+                    </span>
                   </div>
                   <div>
                     <span>UPI</span>
                     <span style={{ textTransform: "none" }}>
-                      {userData.bankDetails[0].upi}
-                      <ContentCopyOutlined
-                        style={{ cursor: "pointer", transform: "scale(.8)" }}
-                        onClick={copyToClipBoard.bind(this, "751649898@paytm")}
-                      />
+                      {userData.bankDetails[0].upi.length !== 0
+                        ? userData.bankDetails[0].upi
+                        : "-"}
+                      {userData.bankDetails[0].upi > 0 && (
+                        <ContentCopyOutlined
+                          style={{ cursor: "pointer", transform: "scale(.8)" }}
+                          onClick={copyToClipBoard.bind(
+                            this,
+                            userData.bankDetails[0].upi
+                          )}
+                        />
+                      )}
                     </span>
                   </div>
                 </div>
@@ -909,9 +952,13 @@ const UserProfile = () => {
                       id="category"
                       onChange={getSelectedValue}
                     >
-                      <Option value={2024}>2024</Option>
-                      <Option value={2025}>2025</Option>
-                      <Option value={2026}>2026</Option>
+                      <Option value={`${currentYear}`}>{currentYear}</Option>
+                      <Option value={`${currentYear - 1}`}>
+                        {currentYear - 1}
+                      </Option>
+                      <Option value={`${currentYear - 2}`}>
+                        {currentYear - 2}
+                      </Option>
                     </Select>
                   </div>
                   {earningData && (
@@ -950,9 +997,13 @@ const UserProfile = () => {
                       id="reportsYear"
                       onChange={reportsYearChanger}
                     >
-                      <Option value={2024}>2024</Option>
-                      <Option value={2025}>2025</Option>
-                      <Option value={2026}>2026</Option>
+                      <Option value={`${currentYear}`}>{currentYear}</Option>
+                      <Option value={`${currentYear - 1}`}>
+                        {currentYear - 1}
+                      </Option>
+                      <Option value={`${currentYear - 2}`}>
+                        {currentYear - 2}
+                      </Option>
                     </Select>
                   </div>
                   <ResponsiveContainer width={"100%"} height={300}>

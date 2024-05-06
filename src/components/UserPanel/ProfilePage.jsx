@@ -51,7 +51,8 @@ const LeftDiv = styled.div`
   border-radius: 0.5rem;
   gap: 1rem;
   img {
-    width: 100%;
+    width: 82%;
+    height: 60%;
     margin: 0 auto;
     border-radius: 0.5rem;
   }
@@ -439,7 +440,7 @@ const ProfilePage = () => {
           <ContentDiv>
             {isLoading && <MusicLoader />}
             <LeftDiv>
-              <img src={random} alt="" />
+              <img src={userData.userPic} alt="" />
               <div>
                 <span>{userData.name}</span>
                 <span>+91-{userData.phone}</span>
@@ -504,44 +505,60 @@ const ProfilePage = () => {
                 <div>
                   <span>Account No.</span>
                   <span>
-                    {userData.bankDetails[0].accountNo}
-                    <ContentCopyOutlined
-                      style={{ cursor: "pointer", transform: "scale(.8)" }}
-                      onClick={copyToClipBoard.bind(
-                        this,
-                        userData.bankDetails[0].accountNo
-                      )}
-                    />
+                    {userData.bankDetails[0].accountNo.length === 0
+                      ? "-"
+                      : userData.bankDetails[0].accountNo}
+                    {userData.bankDetails[0].accountNo.length !== 0 && (
+                      <ContentCopyOutlined
+                        style={{ cursor: "pointer", transform: "scale(.8)" }}
+                        onClick={copyToClipBoard.bind(
+                          this,
+                          userData.bankDetails[0].accountNo
+                        )}
+                      />
+                    )}
                   </span>
                 </div>
                 <div>
                   <span>IFSC</span>
                   <span>
-                    {userData.bankDetails[0].ifsc}
-                    <ContentCopyOutlined
-                      style={{ cursor: "pointer", transform: "scale(.8)" }}
-                      onClick={copyToClipBoard.bind(
-                        this,
-                        userData.bankDetails[0].ifsc
-                      )}
-                    />
+                    {userData.bankDetails[0].ifsc.length !== 0
+                      ? userData.bankDetails[0].ifsc
+                      : "-"}
+                    {userData.bankDetails[0].ifsc.length !== 0 && (
+                      <ContentCopyOutlined
+                        style={{ cursor: "pointer", transform: "scale(.8)" }}
+                        onClick={copyToClipBoard.bind(
+                          this,
+                          userData.bankDetails[0].ifsc
+                        )}
+                      />
+                    )}
                   </span>
                 </div>
                 <div>
                   <span>Bank Name</span>
-                  <span>{userData.bankDetails[0].bankName}</span>
+                  <span>
+                    {userData.bankDetails[0].bankName.length !== 0
+                      ? userData.bankDetails[0].bankName
+                      : "-"}
+                  </span>
                 </div>
                 <div>
                   <span>UPI</span>
                   <span style={{ textTransform: "none" }}>
-                    {userData.bankDetails[0].upi}
-                    <ContentCopyOutlined
-                      style={{ cursor: "pointer", transform: "scale(.8)" }}
-                      onClick={copyToClipBoard.bind(
-                        this,
-                        userData.bankDetails[0].upi
-                      )}
-                    />
+                    {userData.bankDetails[0].upi.length !== 0
+                      ? userData.bankDetails[0].upi
+                      : "-"}
+                    {userData.bankDetails[0].upi > 0 && (
+                      <ContentCopyOutlined
+                        style={{ cursor: "pointer", transform: "scale(.8)" }}
+                        onClick={copyToClipBoard.bind(
+                          this,
+                          userData.bankDetails[0].upi
+                        )}
+                      />
+                    )}
                   </span>
                 </div>
                 <div

@@ -4,6 +4,7 @@ import {
   MenuUnfoldOutlined,
   UploadOutlined,
   HomeOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 
 import { Dropdown, Space } from "antd";
@@ -220,7 +221,10 @@ const DrawerPanel = (props) => {
                 padding: "0 1rem",
               }}
             >
-              <Avatar style={{ transform: "scale(1.3)" }} src={random} />
+              <Avatar
+                style={{ transform: "scale(1.3)" }}
+                icon={<UserOutlined />}
+              />
             </Space>
           </Dropdown>
         </Header>
