@@ -396,7 +396,110 @@ const TextBox = styled.div`
     }
   }
 `;
+const Modal = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #00000038;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+`;
+
+const ModalBox = styled.div`
+  background-color: white;
+  width: 30%;
+  height: fit-content;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  z-index: 20;
+
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    width: 90%;
+  }
+`;
+
+const ModalFormBox = styled.div`
+  background-color: white;
+  width: 90%;
+  height: 80%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const BtnBox = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem 0;
+  justify-content: center;
+  align-items: center;
+  button {
+    background-color: #1677ff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.09rem;
+    &:last-child {
+      background-color: #bbb9b9;
+    }
+  }
+`;
+const ModalInput = styled.input`
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  outline: none;
+  border: 1px solid #d7d7d7;
+
+  &::placeholder {
+    color: #d4cdcd;
+    letter-spacing: 0.09rem;
+    text-transform: capitalize;
+  }
+  &:focus {
+    border: 1px solid #c0c0c0;
+    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
+  }
+`;
+
+const LabelInpBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 74%;
+  span {
+    color: #ff0000ab;
+    font-size: 0.8rem;
+    margin-left: 0.2rem;
+  }
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    width: 100%;
+  }
+`;
+const Label = styled.label`
+  font-size: 0.9rem;
+  letter-spacing: 0.06rem;
+  color: #9e9e9e;
+  text-transform: capitalize;
+`;
+
 const UserProfile = () => {
+  const userId = useSelector((state) => state.userId);
   const date = new Date();
   const currentYear = date.getFullYear();
   const defaultEarning = {
@@ -458,6 +561,22 @@ const UserProfile = () => {
   const [userData, setUserdata] = useState(null);
   const [orders, setOrders] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState(null);
+  const [modalEarning, setModalEarning] = useState(false);
+
+  const [modalEarningInpFields, setModalEarningInpFields] = useState({
+    Jan: 0,
+    Feb: 0,
+    Mar: 0,
+    Apr: 0,
+    May: 0,
+    Jun: 0,
+    Jul: 0,
+    Aug: 0,
+    Sep: 0,
+    Oct: 0,
+    Nov: 0,
+    Dec: 0,
+  });
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
@@ -476,7 +595,7 @@ const UserProfile = () => {
     const data = await res.json();
 
     if (res.ok) {
-      console.log(data.orders.reverse());
+      // console.log(data.orders.reverse());
       setOrders(data.orders.reverse());
       setFilteredOrders(data.orders.reverse());
     } else {
@@ -492,10 +611,10 @@ const UserProfile = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${id}`
     );
     const data = await res.json();
-    console.log(data);
+    // console.log(data);
     if (res.ok) {
       setUserdata(data.user);
-
+      setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
       // for analytics
       let resArr = data.user.analytics[0][reportSelectedYear];
       let arr = [];
@@ -521,12 +640,13 @@ const UserProfile = () => {
       setIsLoading(false);
     }
   };
+  const [refresher, setRefresher] = useState(0);
 
   useEffect(() => {
     userDetailsFetch();
     userOrderFetcher();
     return () => {};
-  }, []);
+  }, [refresher]);
 
   const getSelectedValue = (e) => {
     const ele = document.querySelector(`#${e.target.id}`);
@@ -549,7 +669,7 @@ const UserProfile = () => {
   const reportsYearChanger = (e) => {
     const ele = document.querySelector(`#${e.target.id}`);
     const value = ele.options[ele.selectedIndex].value;
-    console.log(value);
+    // console.log(value);
     setReportSelectedYear(Number(value));
 
     let resArr = userData.analytics[0][value];
@@ -564,409 +684,643 @@ const UserProfile = () => {
       };
       arr.push(obj);
     }
-    console.log(arr);
+    // console.log(arr);
     setReportData(arr);
   };
   const [open, setOpen] = useState(false);
   const onChange = (checked) => {
     setOpen(!open);
   };
+  const modalEarningOnChnage = (e) => {
+    const id = e.target.id;
+    let val = e.target.value;
+    const ele = document.querySelector(`#${id}`);
+
+    ele.style.border = "1px solid #d7d7d7";
+    setModalEarningInpFields({ ...modalEarningInpFields, [id]: Number(val) });
+  };
+
+  const onSubmit = async () => {
+    setIsLoading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/user/add-financial-report`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: id,
+          adminId: userId,
+          report: modalEarningInpFields,
+          year: currentYear,
+        }),
+      }
+    );
+    const data = await res.json();
+    setIsLoading(false);
+    setModalEarning(false);
+    console.log(data);
+    if (res.ok) {
+      openNotificationWithIcon("success", data.message);
+      setRefresher((prev) => {
+        return prev + 1;
+      });
+    } else {
+      openNotificationWithIcon("error", data.message);
+    }
+  };
 
   return (
-    <MainDiv>
-      <FloatButton.Group
-        open={open}
-        onClick={onChange}
-        trigger="click"
-        style={{
-          right: 30,
-          transform: "scale(1.5)",
-          zIndex: 1,
-        }}
-        tooltip={<div>Add Data</div>}
-        icon={<UserAddOutlined />}
-      >
-        <FloatButton
-          onClick={() => {
-            window.open("https://www.whatsapp.com/", "_blank");
-            setOpen(!open);
+    <>
+      {" "}
+      {modalEarning && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox>
+              <LabelInpBox>
+                <Label htmlFor="jan">January</Label>
+                <ModalInput
+                  type="number"
+                  id="Jan"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Jan}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Feb">February</Label>
+                <ModalInput
+                  type="number"
+                  id="Feb"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Feb}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Mar">March</Label>
+                <ModalInput
+                  type="number"
+                  id="Mar"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Mar}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Apr">April</Label>
+                <ModalInput
+                  type="number"
+                  id="Apr"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Apr}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="May">May</Label>
+                <ModalInput
+                  type="number"
+                  id="May"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.May}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Jun">June</Label>
+                <ModalInput
+                  type="number"
+                  id="Jun"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Jun}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Jul">July</Label>
+                <ModalInput
+                  type="number"
+                  id="Jul"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Jul}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Aug">August</Label>
+                <ModalInput
+                  type="number"
+                  id="Aug"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Aug}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Sep">September</Label>
+                <ModalInput
+                  type="number"
+                  id="Sep"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Sep}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Oct">October</Label>
+                <ModalInput
+                  type="number"
+                  id="Oct"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Oct}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Nov">November</Label>
+                <ModalInput
+                  type="number"
+                  id="Nov"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Nov}
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="Dec">December</Label>
+                <ModalInput
+                  type="number"
+                  id="Dec"
+                  onChange={modalEarningOnChnage}
+                  value={modalEarningInpFields.Dec}
+                />
+              </LabelInpBox>
+            </ModalFormBox>
+            <BtnBox>
+              <button onClick={onSubmit}>Submit</button>
+              <button
+                onClick={() => {
+                  setModalEarning(false);
+                }}
+              >
+                Cancel
+              </button>
+            </BtnBox>
+          </ModalBox>
+        </Modal>
+      )}
+      <MainDiv>
+        <FloatButton.Group
+          open={open}
+          onClick={onChange}
+          trigger="click"
+          style={{
+            right: 30,
+            transform: "scale(1.5)",
+            zIndex: 1,
           }}
-          tooltip={<div>Stream Report</div>}
-          icon={
-            <RiseOutlined
-              style={{
-                color: "#2178e9e0",
-              }}
-            />
-          }
-        />
-        <FloatButton
-          style={{}}
-          onClick={() => {
-            window.open("https://www.whatsapp.com/", "_blank");
-            setOpen(!open);
-          }}
-          tooltip={<div>Earnings</div>}
-          icon={
-            <DollarOutlined
-              style={{
-                color: "#50CC5E",
-              }}
-            />
-          }
-        />
-      </FloatButton.Group>
-      {isLoading && <MusicLoader />} {contextHolderNot}
-      {contextHolder}
-      {!isLoading && (
-        <>
-          <Breadcrumb
-            items={[
-              {
-                title: "Admin Panel",
-              },
-              {
-                title: "User Profile",
-              },
-            ]}
+          tooltip={<div>Add Data</div>}
+          icon={<UserAddOutlined />}
+        >
+          <FloatButton
+            onClick={() => {
+              setOpen(!open);
+            }}
+            tooltip={<div>Stream Report</div>}
+            icon={
+              <RiseOutlined
+                style={{
+                  color: "#2178e9e0",
+                }}
+              />
+            }
           />
-          <h1>User</h1>
-          {userData && (
-            <ContentDiv>
-              {isLoading && <MusicLoader />}
-              <LeftDiv>
-                <img src={userData.userPic} alt="" />
-                <div>
-                  <span>{userData.name}</span>
-                  <span>+91-{userData.phone}</span>
-                </div>
-                <div
-                  style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-                >
-                  <span
+          <FloatButton
+            style={{}}
+            onClick={() => {
+              setModalEarning(true);
+              setOpen(!open);
+            }}
+            tooltip={<div>Earnings</div>}
+            icon={
+              <DollarOutlined
+                style={{
+                  color: "#50CC5E",
+                }}
+              />
+            }
+          />
+        </FloatButton.Group>
+        {isLoading && <MusicLoader />} {contextHolderNot}
+        {contextHolder}
+        {!isLoading && (
+          <>
+            <Breadcrumb
+              items={[
+                {
+                  title: "Admin Panel",
+                },
+                {
+                  title: "User Profile",
+                },
+              ]}
+            />
+            <h1>User</h1>
+            {userData && (
+              <ContentDiv>
+                {isLoading && <MusicLoader />}
+                <LeftDiv>
+                  <img src={userData.userPic} alt="" />
+                  <div>
+                    <span>{userData.name}</span>
+                    <span>+91-{userData.phone}</span>
+                  </div>
+                  <div
                     style={{
-                      width: "100%",
-                      padding: "0.5rem 2rem 0.5rem 0.2rem",
-                      margin: "0 0 0 0",
-                      textTransform: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "1rem",
                     }}
                   >
-                    {userData.email}
-                  </span>
-                </div>
-              </LeftDiv>
-              <RightDiv>
-                <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-                  <p>Details</p>
-                  <div>
-                    <span>Label</span>
-                    <span>{userData.name}</span>
-                  </div>
-                  <div>
-                    <span>Email</span>
-                    <span style={{ textTransform: "none" }}>
+                    <span
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem 2rem 0.5rem 0.2rem",
+                        margin: "0 0 0 0",
+                        textTransform: "none",
+                      }}
+                    >
                       {userData.email}
                     </span>
                   </div>
-                  <div>
-                    <span>Phone</span>
-                    <span>+91-{userData.phone}</span>
-                  </div>
-                  <div>
-                    <span>Channel</span>
-                    <span>
-                      <Link to={`${userData.channelUrl}`} target="_blank">
-                        <LinkOutlined />
-                      </Link>
-                    </span>
-                  </div>
-                  <div>
-                    <span>City</span>
-                    <span>{userData.city}</span>
-                  </div>
-                  <div>
-                    <span>State</span>
-                    <span>{userData.state}</span>
-                  </div>
-                  <div>
-                    <span>Country</span>
-                    <span>{userData.country}</span>
-                  </div>
-                  <div>
-                    <span>Signature</span>
-                    <span>
-                      <DownloadOutlined
-                        onClick={() => {
-                          saveAs(userData.sign, `${userData.name}_sign`);
-                        }}
-                      />
-                    </span>
-                  </div>
-                </div>
-              </RightDiv>
-              <RightDiv>
-                <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-                  <p>Bank</p>
-                  <div>
-                    <span>Account No.</span>
-                    <span>
-                      {userData.bankDetails[0].accountNo.length === 0
-                        ? "-"
-                        : userData.bankDetails[0].accountNo}
-                      {userData.bankDetails[0].accountNo.length !== 0 && (
-                        <ContentCopyOutlined
-                          style={{ cursor: "pointer", transform: "scale(.8)" }}
-                          onClick={copyToClipBoard.bind(
-                            this,
-                            userData.bankDetails[0].accountNo
-                          )}
+                </LeftDiv>
+                <RightDiv>
+                  <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
+                    <p>Details</p>
+                    <div>
+                      <span>Label</span>
+                      <span>{userData.name}</span>
+                    </div>
+                    <div>
+                      <span>Email</span>
+                      <span style={{ textTransform: "none" }}>
+                        {userData.email}
+                      </span>
+                    </div>
+                    <div>
+                      <span>Phone</span>
+                      <span>+91-{userData.phone}</span>
+                    </div>
+                    <div>
+                      <span>Channel</span>
+                      <span>
+                        <Link to={`${userData.channelUrl}`} target="_blank">
+                          <LinkOutlined />
+                        </Link>
+                      </span>
+                    </div>
+                    <div>
+                      <span>City</span>
+                      <span>{userData.city}</span>
+                    </div>
+                    <div>
+                      <span>State</span>
+                      <span>{userData.state}</span>
+                    </div>
+                    <div>
+                      <span>Country</span>
+                      <span>{userData.country}</span>
+                    </div>
+                    <div>
+                      <span>Signature</span>
+                      <span>
+                        <DownloadOutlined
+                          onClick={() => {
+                            saveAs(userData.sign, `${userData.name}_sign`);
+                          }}
                         />
-                      )}
-                    </span>
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span>IFSC</span>
-                    <span>
-                      {userData.bankDetails[0].ifsc.length !== 0
-                        ? userData.bankDetails[0].ifsc
-                        : "-"}
-                      {userData.bankDetails[0].ifsc.length !== 0 && (
-                        <ContentCopyOutlined
-                          style={{ cursor: "pointer", transform: "scale(.8)" }}
-                          onClick={copyToClipBoard.bind(
-                            this,
-                            userData.bankDetails[0].ifsc
-                          )}
-                        />
-                      )}
-                    </span>
+                </RightDiv>
+                <RightDiv>
+                  <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
+                    <p>Bank</p>
+                    <div>
+                      <span>Account No.</span>
+                      <span>
+                        {userData.bankDetails[0].accountNo.length === 0
+                          ? "-"
+                          : userData.bankDetails[0].accountNo}
+                        {userData.bankDetails[0].accountNo.length !== 0 && (
+                          <ContentCopyOutlined
+                            style={{
+                              cursor: "pointer",
+                              transform: "scale(.8)",
+                            }}
+                            onClick={copyToClipBoard.bind(
+                              this,
+                              userData.bankDetails[0].accountNo
+                            )}
+                          />
+                        )}
+                      </span>
+                    </div>
+                    <div>
+                      <span>IFSC</span>
+                      <span>
+                        {userData.bankDetails[0].ifsc.length !== 0
+                          ? userData.bankDetails[0].ifsc
+                          : "-"}
+                        {userData.bankDetails[0].ifsc.length !== 0 && (
+                          <ContentCopyOutlined
+                            style={{
+                              cursor: "pointer",
+                              transform: "scale(.8)",
+                            }}
+                            onClick={copyToClipBoard.bind(
+                              this,
+                              userData.bankDetails[0].ifsc
+                            )}
+                          />
+                        )}
+                      </span>
+                    </div>
+                    <div>
+                      <span>Bank Name</span>
+                      <span>
+                        {userData.bankDetails[0].bankName.length !== 0
+                          ? userData.bankDetails[0].bankName
+                          : "-"}
+                      </span>
+                    </div>
+                    <div>
+                      <span>UPI</span>
+                      <span style={{ textTransform: "none" }}>
+                        {userData.bankDetails[0].upi.length !== 0
+                          ? userData.bankDetails[0].upi
+                          : "-"}
+                        {userData.bankDetails[0].upi > 0 && (
+                          <ContentCopyOutlined
+                            style={{
+                              cursor: "pointer",
+                              transform: "scale(.8)",
+                            }}
+                            onClick={copyToClipBoard.bind(
+                              this,
+                              userData.bankDetails[0].upi
+                            )}
+                          />
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <span>Bank Name</span>
-                    <span>
-                      {userData.bankDetails[0].bankName.length !== 0
-                        ? userData.bankDetails[0].bankName
-                        : "-"}
-                    </span>
-                  </div>
-                  <div>
-                    <span>UPI</span>
-                    <span style={{ textTransform: "none" }}>
-                      {userData.bankDetails[0].upi.length !== 0
-                        ? userData.bankDetails[0].upi
-                        : "-"}
-                      {userData.bankDetails[0].upi > 0 && (
-                        <ContentCopyOutlined
-                          style={{ cursor: "pointer", transform: "scale(.8)" }}
-                          onClick={copyToClipBoard.bind(
-                            this,
-                            userData.bankDetails[0].upi
-                          )}
-                        />
-                      )}
-                    </span>
-                  </div>
-                </div>
-              </RightDiv>
-            </ContentDiv>
-          )}
-          <h2>Order History</h2>
-          <MobileBox>
-            {filteredOrders &&
-              filteredOrders.map((order) => {
-                if (order.deleted === true) {
-                  return;
-                }
-                const {
-                  title,
-                  language,
-                  albumType,
-                  status,
-                  dateOfRelease,
-                  orderDateAndTime,
-                  thumbnail,
-                  id,
-                } = order;
-                console.log(thumbnail);
-                return (
-                  <Link to={`/admin-panel/order/${id}`}>
-                    <MobileOrderBox>
-                      <img src={`${thumbnail}`} alt="" />
-                      <TextBox>
-                        <span>Title</span>
-                        <span>{title}</span>
-                      </TextBox>
-                      <TextBox>
-                        <span>status</span>
-                        <span>{status}</span>
-                      </TextBox>
-                      <TextBox>
-                        <span>Date of release</span>
-                        <span>{dateOfRelease}</span>
-                      </TextBox>
-                      <TextBox>
-                        <span>language</span>
-                        <span>{language}</span>
-                      </TextBox>
-                      <TextBox>
-                        <span>album Type</span>
-                        <span>{albumType}</span>
-                      </TextBox>
-                      <TextBox>
-                        <span>Created</span>
-                        <span>{orderDateAndTime.split("/")[0]}</span>
-                      </TextBox>
-                    </MobileOrderBox>
-                  </Link>
-                );
-              })}{" "}
-            {filteredOrders && filteredOrders.length === 0 && !isLoading && (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                </RightDiv>
+              </ContentDiv>
             )}
-          </MobileBox>
-          <TableBox>
-            {orders && (
-              <Table cellSpacing={0}>
-                <TableHead>
-                  <tr>
-                    <td></td>
-                    <td>Album</td>
-                    <td>Album Type</td>
-                    <td>Language</td>
-                    <td>Created</td>
-                    <td>Date Of release</td>
-                    <td>Status</td>
-                    <td>View</td>
-                  </tr>
-                </TableHead>{" "}
-                <TableBody>
-                  {filteredOrders.map((ord) => {
-                    if (ord.deleted === true) {
-                      return;
-                    }
-                    const {
-                      title,
-                      language,
-                      albumType,
-                      status,
-                      dateOfRelease,
-                      orderDateAndTime,
-                      thumbnail,
-                      id,
-                    } = ord;
-                    sNo++;
-                    return (
-                      <tr
-                        key={ord.id}
-                        style={{
-                          backgroundColor: sNo % 2 === 0 ? "#FAFAFC" : "white",
-                        }}
+            <h2>Order History</h2>
+            <MobileBox>
+              {filteredOrders &&
+                filteredOrders.map((order) => {
+                  if (order.deleted === true) {
+                    return;
+                  }
+                  const {
+                    title,
+                    language,
+                    albumType,
+                    status,
+                    dateOfRelease,
+                    orderDateAndTime,
+                    thumbnail,
+                    id,
+                  } = order;
+                  return (
+                    <Link to={`/admin-panel/order/${id}`}>
+                      <MobileOrderBox>
+                        <img src={`${thumbnail}`} alt="" />
+                        <TextBox>
+                          <span>Title</span>
+                          <span>{title}</span>
+                        </TextBox>
+                        <TextBox>
+                          <span>status</span>
+                          <span>{status}</span>
+                        </TextBox>
+                        <TextBox>
+                          <span>Date of release</span>
+                          <span>{dateOfRelease}</span>
+                        </TextBox>
+                        <TextBox>
+                          <span>language</span>
+                          <span>{language}</span>
+                        </TextBox>
+                        <TextBox>
+                          <span>album Type</span>
+                          <span>{albumType}</span>
+                        </TextBox>
+                        <TextBox>
+                          <span>Created</span>
+                          <span>{orderDateAndTime.split("/")[0]}</span>
+                        </TextBox>
+                      </MobileOrderBox>
+                    </Link>
+                  );
+                })}{" "}
+              {filteredOrders && filteredOrders.length === 0 && !isLoading && (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )}
+            </MobileBox>
+            <TableBox>
+              {orders && (
+                <Table cellSpacing={0}>
+                  <TableHead>
+                    <tr>
+                      <td></td>
+                      <td>Album</td>
+                      <td>Album Type</td>
+                      <td>Language</td>
+                      <td>Created</td>
+                      <td>Date Of release</td>
+                      <td>Status</td>
+                      <td>View</td>
+                    </tr>
+                  </TableHead>{" "}
+                  <TableBody>
+                    {filteredOrders.map((ord) => {
+                      if (ord.deleted === true) {
+                        return;
+                      }
+                      const {
+                        title,
+                        language,
+                        albumType,
+                        status,
+                        dateOfRelease,
+                        orderDateAndTime,
+                        thumbnail,
+                        id,
+                      } = ord;
+                      sNo++;
+                      return (
+                        <tr
+                          key={ord.id}
+                          style={{
+                            backgroundColor:
+                              sNo % 2 === 0 ? "#FAFAFC" : "white",
+                          }}
+                        >
+                          <td>{sNo}</td>
+                          <td>
+                            <span>
+                              <img src={`${thumbnail}`} alt="" />
+                              {title}
+                            </span>
+                          </td>
+                          <td>{albumType}</td>
+                          <td>{language}</td>
+                          <td>{orderDateAndTime.split("/")[0]}</td>
+                          <td>{dateOfRelease}</td>
+                          {status === "waiting" && (
+                            <td>
+                              <div
+                                style={{
+                                  backgroundColor: "#FFF2D7",
+                                  color: "#FFBC21",
+                                }}
+                              >
+                                <ClockCircleOutlined /> waiting for approval
+                              </div>
+                            </td>
+                          )}
+                          {status === "processing" && (
+                            <td>
+                              <div
+                                style={{
+                                  backgroundColor: "#D8F2FF",
+                                  color: "#42C3FF",
+                                }}
+                              >
+                                <EditOutlined /> processing
+                              </div>
+                            </td>
+                          )}
+                          {status === "completed" && (
+                            <td>
+                              <div
+                                style={{
+                                  backgroundColor: "#D9EDDB",
+                                  color: "#59BB5A",
+                                }}
+                              >
+                                <CheckCircleTwoTone twoToneColor="#52c41a" />
+                                completed
+                              </div>
+                            </td>
+                          )}
+                          {status === "rejected" && (
+                            <td>
+                              <div
+                                style={{
+                                  backgroundColor: "#e9dede",
+                                  color: "#ff0000",
+                                }}
+                              >
+                                <CloseOutlined />
+                                rejected
+                              </div>
+                            </td>
+                          )}
+                          <td>
+                            <Link to={`/admin-panel/order/${id}`}>
+                              <EyeOutlined />
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+              {filteredOrders && filteredOrders.length === 0 && !isLoading && (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )}
+            </TableBox>
+            <h2>Reports</h2>
+            {userData && !isLoading && (
+              <ReportDiv>
+                <ReportLeftDiv>
+                  {" "}
+                  <ChartBox>
+                    <div style={{ padding: "0 1rem" }}>
+                      {" "}
+                      <h2>Earning</h2>{" "}
+                      <Select
+                        name="category"
+                        id="category"
+                        onChange={getSelectedValue}
                       >
-                        <td>{sNo}</td>
-                        <td>
-                          <span>
-                            <img src={`${thumbnail}`} alt="" />
-                            {title}
-                          </span>
-                        </td>
-                        <td>{albumType}</td>
-                        <td>{language}</td>
-                        <td>{orderDateAndTime.split("/")[0]}</td>
-                        <td>{dateOfRelease}</td>
-                        {status === "waiting" && (
-                          <td>
-                            <div
-                              style={{
-                                backgroundColor: "#FFF2D7",
-                                color: "#FFBC21",
-                              }}
-                            >
-                              <ClockCircleOutlined /> waiting for approval
-                            </div>
-                          </td>
-                        )}
-                        {status === "processing" && (
-                          <td>
-                            <div
-                              style={{
-                                backgroundColor: "#D8F2FF",
-                                color: "#42C3FF",
-                              }}
-                            >
-                              <EditOutlined /> processing
-                            </div>
-                          </td>
-                        )}
-                        {status === "completed" && (
-                          <td>
-                            <div
-                              style={{
-                                backgroundColor: "#D9EDDB",
-                                color: "#59BB5A",
-                              }}
-                            >
-                              <CheckCircleTwoTone twoToneColor="#52c41a" />
-                              completed
-                            </div>
-                          </td>
-                        )}
-                        {status === "rejected" && (
-                          <td>
-                            <div
-                              style={{
-                                backgroundColor: "#e9dede",
-                                color: "#ff0000",
-                              }}
-                            >
-                              <CloseOutlined />
-                              rejected
-                            </div>
-                          </td>
-                        )}
-                        <td>
-                          <Link to={`/admin-panel/order/${id}`}>
-                            <EyeOutlined />
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            )}
-            {filteredOrders && filteredOrders.length === 0 && !isLoading && (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            )}
-          </TableBox>
-          <h2>Reports</h2>
-          {userData && !isLoading && (
-            <ReportDiv>
-              <ReportLeftDiv>
-                {" "}
-                <ChartBox>
-                  <div style={{ padding: "0 1rem" }}>
-                    {" "}
-                    <h2>Earning</h2>{" "}
-                    <Select
-                      name="category"
-                      id="category"
-                      onChange={getSelectedValue}
-                    >
-                      <Option value={`${currentYear}`}>{currentYear}</Option>
-                      <Option value={`${currentYear - 1}`}>
-                        {currentYear - 1}
-                      </Option>
-                      <Option value={`${currentYear - 2}`}>
-                        {currentYear - 2}
-                      </Option>
-                    </Select>
-                  </div>
-                  {earningData && (
+                        <Option value={`${currentYear}`}>{currentYear}</Option>
+                        <Option value={`${currentYear - 1}`}>
+                          {currentYear - 1}
+                        </Option>
+                        <Option value={`${currentYear - 2}`}>
+                          {currentYear - 2}
+                        </Option>
+                      </Select>
+                    </div>
+                    {earningData && (
+                      <ResponsiveContainer width={"100%"} height={300}>
+                        <AreaChart
+                          width={500}
+                          height={400}
+                          data={earningData}
+                          margin={{
+                            top: 10,
+                            right: 10,
+                            left: 0,
+                            bottom: 0,
+                          }}
+                        >
+                          <CartesianGrid strokeDasharray="1 1" />
+                          <XAxis dataKey="name" style={{ fontSize: ".8rem" }} />
+                          <YAxis />
+                          <Tooltip />
+                          <Area
+                            type="monotone"
+                            dataKey="amount"
+                            stroke="#8884d8"
+                            fill="#1677FF"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    )}
+                  </ChartBox>
+                  <ChartBox>
+                    <div style={{ padding: "0 1rem" }}>
+                      {" "}
+                      <h2>Reports</h2>{" "}
+                      <Select
+                        name="reportsYear"
+                        id="reportsYear"
+                        onChange={reportsYearChanger}
+                      >
+                        <Option value={`${currentYear}`}>{currentYear}</Option>
+                        <Option value={`${currentYear - 1}`}>
+                          {currentYear - 1}
+                        </Option>
+                        <Option value={`${currentYear - 2}`}>
+                          {currentYear - 2}
+                        </Option>
+                      </Select>
+                    </div>
                     <ResponsiveContainer width={"100%"} height={300}>
-                      <AreaChart
+                      <BarChart
                         width={500}
                         height={400}
-                        data={earningData}
+                        data={reportData}
                         margin={{
                           top: 10,
                           right: 10,
@@ -975,127 +1329,84 @@ const UserProfile = () => {
                         }}
                       >
                         <CartesianGrid strokeDasharray="1 1" />
-                        <XAxis dataKey="name" style={{ fontSize: ".8rem" }} />
+                        <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Area
-                          type="monotone"
-                          dataKey="amount"
-                          stroke="#8884d8"
-                          fill="#1677FF"
+                        <Legend />
+
+                        <Bar
+                          dataKey="views"
+                          fill="#82ca9d"
+                          activeBar={<Rectangle fill="gold" stroke="purple" />}
                         />
-                      </AreaChart>
+                      </BarChart>
                     </ResponsiveContainer>
-                  )}
-                </ChartBox>
-                <ChartBox>
-                  <div style={{ padding: "0 1rem" }}>
-                    {" "}
-                    <h2>Reports</h2>{" "}
-                    <Select
-                      name="reportsYear"
-                      id="reportsYear"
-                      onChange={reportsYearChanger}
-                    >
-                      <Option value={`${currentYear}`}>{currentYear}</Option>
-                      <Option value={`${currentYear - 1}`}>
-                        {currentYear - 1}
-                      </Option>
-                      <Option value={`${currentYear - 2}`}>
-                        {currentYear - 2}
-                      </Option>
-                    </Select>
-                  </div>
-                  <ResponsiveContainer width={"100%"} height={300}>
-                    <BarChart
-                      width={500}
-                      height={400}
-                      data={reportData}
-                      margin={{
-                        top: 10,
-                        right: 10,
-                        left: 0,
-                        bottom: 0,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="1 1" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
+                  </ChartBox>
+                </ReportLeftDiv>
+                <ReportRightDiv>
+                  <h2>Reports Summary</h2>
 
-                      <Bar
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart width={400} height={400}>
+                      <Pie
                         dataKey="views"
-                        fill="#82ca9d"
-                        activeBar={<Rectangle fill="gold" stroke="purple" />}
-                      />
-                    </BarChart>
+                        isAnimationActive={true}
+                        data={reportData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        fill="#8884d8"
+                        label
+                      >
+                        {reportData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+
+                      <Tooltip />
+                    </PieChart>
                   </ResponsiveContainer>
-                </ChartBox>
-              </ReportLeftDiv>
-              <ReportRightDiv>
-                <h2>Reports Summary</h2>
-
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart width={400} height={400}>
-                    <Pie
-                      dataKey="views"
-                      isAnimationActive={true}
-                      data={reportData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={120}
-                      fill="#8884d8"
-                      label
-                    >
-                      {reportData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <ReportTable>
-                  <thead>
-                    <tr>
-                      <td></td>
-                      <td>platform</td>
-                      <td>Views</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reportData.map((obj) => {
-                      const { name, views } = obj;
-                      return (
-                        <tr key={name}>
-                          <td
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              gap: ".4rem",
-                              alignItems: "center",
-                              width: "100%",
-                            }}
-                          >
-                            <div></div>
-                          </td>
-                          <td>{name}</td>
-                          <td>{views}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </ReportTable>
-              </ReportRightDiv>
-            </ReportDiv>
-          )}
-        </>
-      )}
-    </MainDiv>
+                  <ReportTable>
+                    <thead>
+                      <tr>
+                        <td></td>
+                        <td>platform</td>
+                        <td>Views</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reportData.map((obj) => {
+                        const { name, views } = obj;
+                        return (
+                          <tr key={name}>
+                            <td
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: ".4rem",
+                                alignItems: "center",
+                                width: "100%",
+                              }}
+                            >
+                              <div></div>
+                            </td>
+                            <td>{name}</td>
+                            <td>{views}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </ReportTable>
+                </ReportRightDiv>
+              </ReportDiv>
+            )}
+          </>
+        )}
+      </MainDiv>
+    </>
   );
 };
 
