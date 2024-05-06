@@ -263,7 +263,7 @@ const Form = () => {
       // file.type === "video/quicktime";
 
       if (!isValid) {
-        message.error(`Upload valid audio or video file!`);
+        message.error(`Upload valid audio file!`);
       }
       return isValid || Upload.LIST_IGNORE;
     },
