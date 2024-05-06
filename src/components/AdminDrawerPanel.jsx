@@ -40,7 +40,7 @@ const DrawerPanel = (props) => {
   const page = props.page;
   const items = [
     {
-      label: <Link to={"/user-panel/profile"}>My Account</Link>,
+      label: <Link to={"/admin-panel/all-users"}>Labels</Link>,
       key: "0",
     },
     {
