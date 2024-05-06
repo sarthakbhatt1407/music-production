@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Breadcrumb } from "antd";
 import styled from "@emotion/styled";
 import random from "../../assets/images/random.webp";
-import { ContentCopyOutlined } from "@mui/icons-material";
+import { ContentCopyOutlined, LinkOutlined } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { notification } from "antd";
 import { message } from "antd";
+import { Link } from "react-router-dom";
 
 const MainDiv = styled.div`
   display: flex;
@@ -462,7 +463,7 @@ const ProfilePage = () => {
               <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
                 <p>Details</p>
                 <div>
-                  <span>Name</span>
+                  <span>Label</span>
                   <span>{userData.name}</span>
                 </div>
                 <div>
@@ -474,6 +475,14 @@ const ProfilePage = () => {
                 <div>
                   <span>Phone</span>
                   <span>+91-{userData.phone}</span>
+                </div>
+                <div>
+                  <span>Channel</span>
+                  <span>
+                    <Link to={`${userData.channelUrl}`} target="_blank">
+                      <LinkOutlined />
+                    </Link>
+                  </span>
                 </div>
                 <div>
                   <span>City</span>

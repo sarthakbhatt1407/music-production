@@ -175,8 +175,8 @@ const EditOrder = () => {
     title: "",
     dateOfRelease: "",
     albumType: "song",
-    language: "",
-    mood: "",
+    language: "Hindi",
+    mood: "Romantic",
     description: "",
     singer: "",
     composer: "",
@@ -193,6 +193,7 @@ const EditOrder = () => {
     isrc: "",
     lyricist: "",
     crbt: "",
+    genre: "Classical",
   };
   const id = useParams().id;
   const [order, setOrder] = useState(null);
@@ -473,6 +474,7 @@ const EditOrder = () => {
     formData.append("subLabel1", inpFields.subLabel1);
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
+    formData.append("genre", inpFields.genre);
 
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
@@ -640,6 +642,36 @@ const EditOrder = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
+                  <Label htmlFor="genre">
+                    genre<span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="genre"
+                    id="genre"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      console.log(value);
+                      setInpFields({ ...inpFields, genre: value });
+                    }}
+                  >
+                    <Option value={"Classical"}>Classical</Option>
+                    <Option value={"Hip-Hop/Rap"}>Hip-Hop/Rap</Option>
+                    <Option value={"Devotional"}>Devotional</Option>
+                    <Option value={"Carnatic Classical"}>
+                      Carnatic Classical
+                    </Option>
+                    <Option value={"Ambient / Instrumental"}>
+                      Ambient / Instrumental
+                    </Option>
+                    <Option value={"Film"}>Film</Option>
+                    <Option value={"Pop"}>Pop</Option>
+                    <Option value={"Indie"}>Indie</Option>
+                    <Option value={"Folk"}>Folk</Option>
+                  </Select>
+                </LabelInpBox>
+
+                <LabelInpBox>
                   <Label htmlFor="upc">isrc</Label>
                   <Input
                     type="text"
@@ -654,14 +686,27 @@ const EditOrder = () => {
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>
                   </Label>
-                  <Input
-                    type="text"
+                  <Select
                     name="language"
                     id="language"
-                    onChange={onChangeHandler}
-                    value={inpFields.language}
-                    placeholder="language"
-                  />
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      console.log(value);
+                      setInpFields({ ...inpFields, language: value });
+                    }}
+                  >
+                    <Option value={"Hindi "}>Hindi </Option>
+                    <Option value={"Punjabi"}>Punjabi</Option>
+                    <Option value={"Garhwali"}>Garhwali</Option>
+                    <Option value={"English"}>English</Option>
+                    <Option value={"Nepali"}>Nepali</Option>
+                    <Option value={"Kumauni"}>Kumauni</Option>
+                    <Option value={"Jaunsari"}>Jaunsari</Option>
+                    <Option value={"Himanchali"}>Himanchali</Option>
+                    <Option value={"Haryanvi"}>Haryanvi</Option>
+                    <Option value={"Urdu"}>Urdu</Option>
+                  </Select>
                 </LabelInpBox>
 
                 <LabelInpBox>
@@ -682,14 +727,34 @@ const EditOrder = () => {
                   <Label htmlFor="mood">
                     Album mood <span style={{ margin: 0 }}>*</span>
                   </Label>
-                  <Input
-                    type="text"
+                  <Select
                     name="mood"
                     id="mood"
-                    placeholder="mood"
-                    onChange={onChangeHandler}
-                    value={inpFields.mood}
-                  />
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      console.log(value);
+                      setInpFields({ ...inpFields, mood: value });
+                    }}
+                  >
+                    <Option value={"Romantic"}>Romantic</Option>
+                    <Option value={"Happy"}>Happy</Option>
+                    <Option value={"Sad"}>Sad</Option>
+                    <Option value={"Dance"}>Dance</Option>
+                    <Option value={"Bhangra"}>Bhangra</Option>
+                    <Option value={"Partiotic"}>Partiotic</Option>
+                    <Option value={"Nostalgic"}>Nostalgic</Option>
+                    <Option value={"Inspirational"}>Inspirational</Option>
+                    <Option value={"Enthusiastic"}>Enthusiastic</Option>
+                    <Option value={"Optimistic"}>Optimistic</Option>
+                    <Option value={"Passion"}>Passion</Option>
+                    <Option value={"Pessimistic"}>Pessimistic</Option>
+                    <Option value={"Spiritual"}>Spiritual</Option>
+                    <Option value={"Peppy"}>Peppy</Option>
+                    <Option value={"Philosophical"}>Philosophical</Option>
+                    <Option value={"Mellow"}>Mellow</Option>
+                    <Option value={"Calm"}>Calm</Option>
+                  </Select>
                 </LabelInpBox>
 
                 <LabelInpBox>
@@ -751,22 +816,18 @@ const EditOrder = () => {
 
                 <LabelInpBox>
                   <Label htmlFor="title">Time</Label>
-
-                  <TimePicker.RangePicker
+                  <TimePicker
                     name="crbt"
                     id="crbt"
                     format={format}
                     onChange={(time) => {
+                      if (!time) {
+                        return;
+                      }
                       let res;
-                      res =
-                        time[0]["$m"] +
-                        "::" +
-                        time[0]["$s"] +
-                        "-" +
-                        time[1]["$m"] +
-                        "::" +
-                        time[1]["$s"];
-                      console.log(res);
+                      res = time["$m"] + ":" + time["$s"];
+
+                      // console.log(res);
                       setInpFields({ ...inpFields, crbt: res });
                     }}
                   />
