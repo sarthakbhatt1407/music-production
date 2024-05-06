@@ -174,11 +174,17 @@ const UserPanelHome = () => {
     Dec: 0,
   };
   const defaultReports = {
-    Amazon: 0,
-    Youtube: 0,
-    "Apple Music": 0,
-    Saavan: 0,
+    Spotify: 0,
     Wynk: 0,
+    JioSaavn: 0,
+    Amazon: 0,
+    Gaana: 0,
+    YouTube: 0,
+    SoundCloud: 0,
+    Tiktok: 0,
+    Facebook: 0,
+    Hungama: 0,
+    Other: 0,
   };
   const date = new Date();
   const currentYear = date.getFullYear();
