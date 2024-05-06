@@ -176,19 +176,6 @@ const DrawerPanel = (props) => {
               ),
               label: "Clients",
             },
-
-            {
-              key: "5",
-              icon: (
-                <Link
-                  to={"/admin-panel/profile"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <AccountCircleOutlined />
-                </Link>
-              ),
-              label: "My Account",
-            },
           ]}
         />
       </Sider>

@@ -137,7 +137,6 @@ const Table = styled.table`
         div {
           width: 1rem;
           height: 1rem;
-          background-color: red;
         }
       }
     }
@@ -145,6 +144,19 @@ const Table = styled.table`
 `;
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORSSTREAM = {
+  Spotify: "#25D865",
+  Wynk: "#D92E33",
+  JioSaavn: "#1DA48C",
+  Amazon: "#DBB67A",
+  Gaana: "#FE6109",
+  YouTube: "#FF0808",
+  SoundCloud: "#FE8008",
+  Tiktok: "#2CF4EF",
+  Facebook: "#1FADFD",
+  Hungama: "#73BF4C",
+  Other: "#495145",
+};
 
 const UserPanelHome = () => {
   const defaultEarning = {
@@ -290,9 +302,13 @@ const UserPanelHome = () => {
                     id="category"
                     onChange={getSelectedValue}
                   >
-                    <Option value={2024}>2024</Option>
-                    <Option value={2025}>2025</Option>
-                    <Option value={2026}>2026</Option>
+                    <Option value={`${currentYear}`}>{currentYear}</Option>
+                    <Option value={`${currentYear - 1}`}>
+                      {currentYear - 1}
+                    </Option>
+                    <Option value={`${currentYear - 2}`}>
+                      {currentYear - 2}
+                    </Option>
                   </Select>
                 </div>
                 {earningData && (
@@ -331,9 +347,13 @@ const UserPanelHome = () => {
                     id="reportsYear"
                     onChange={reportsYearChanger}
                   >
-                    <Option value={2024}>2024</Option>
-                    <Option value={2025}>2025</Option>
-                    <Option value={2026}>2026</Option>
+                    <Option value={`${currentYear}`}>{currentYear}</Option>
+                    <Option value={`${currentYear - 1}`}>
+                      {currentYear - 1}
+                    </Option>
+                    <Option value={`${currentYear - 2}`}>
+                      {currentYear - 2}
+                    </Option>
                   </Select>
                 </div>
                 <ResponsiveContainer width={"100%"} height={300}>
@@ -381,7 +401,7 @@ const UserPanelHome = () => {
                     {reportData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
+                        fill={COLORSSTREAM[entry["name"]]}
                       />
                     ))}
                   </Pie>
@@ -411,7 +431,11 @@ const UserPanelHome = () => {
                             width: "100%",
                           }}
                         >
-                          <div></div>
+                          <div
+                            style={{
+                              backgroundColor: `${COLORSSTREAM[name]}`,
+                            }}
+                          ></div>
                         </td>
                         <td>{name}</td>
                         <td>{views}</td>

@@ -484,7 +484,7 @@ const Form = () => {
       const imgData = await imgRes.json();
       console.log(imgData);
       if (imgRes.ok) {
-        success(imgData.message);
+        success("Order created");
         setTimeout(() => {
           navigate("/user-panel/history");
         }, 1000);
@@ -758,7 +758,7 @@ const Form = () => {
           <AllInpBox>
             <LabelInpBox>
               <Label htmlFor="file" id="file">
-                file <span style={{ margin: 0 }}>*</span>
+                Audio/Video <span style={{ margin: 0 }}>*</span>
               </Label>
               <Upload
                 method="get"
