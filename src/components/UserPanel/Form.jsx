@@ -758,7 +758,10 @@ const Form = () => {
           <AllInpBox>
             <LabelInpBox>
               <Label htmlFor="file" id="file">
-                Audio/Video <span style={{ margin: 0 }}>*</span>
+                Audio{" "}
+                <span style={{ margin: 0, textTransform: "none" }}>
+                  (.wav or .mp3)*
+                </span>
               </Label>
               <Upload
                 method="get"
