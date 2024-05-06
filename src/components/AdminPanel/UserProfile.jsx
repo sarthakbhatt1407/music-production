@@ -650,7 +650,7 @@ const UserProfile = () => {
                 <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
                   <p>Details</p>
                   <div>
-                    <span>Name</span>
+                    <span>Label</span>
                     <span>{userData.name}</span>
                   </div>
                   <div>
@@ -662,6 +662,14 @@ const UserProfile = () => {
                   <div>
                     <span>Phone</span>
                     <span>+91-{userData.phone}</span>
+                  </div>
+                  <div>
+                    <span>Channel</span>
+                    <span>
+                      <Link to={`${userData.channelUrl}`} target="_blank">
+                        <LinkOutlined />
+                      </Link>
+                    </span>
                   </div>
                   <div>
                     <span>City</span>
