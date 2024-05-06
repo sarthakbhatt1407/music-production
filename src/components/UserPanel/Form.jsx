@@ -258,11 +258,11 @@ const Form = () => {
         // file.type === "audio/alac" ||
         // file.type === "audio/wma" ||
         // file.type === "audio/aiff" ||
-        file.type === "video/mp4" ||
-        file.type === "video/x-msvideo" ||
-        file.type === "video/x-ms-wmv" ||
-        file.type === "video/x-flv" ||
-        file.type === "video/quicktime";
+        // file.type === "video/mp4" ||
+        // file.type === "video/x-msvideo" ||
+        // file.type === "video/x-ms-wmv" ||
+        // file.type === "video/x-flv" ||
+        // file.type === "video/quicktime";
 
       if (!isValid) {
         message.error(`Upload valid audio or video file!`);
