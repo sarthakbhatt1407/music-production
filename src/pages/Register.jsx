@@ -17,18 +17,20 @@ const OuterBox = styled.div`
 
 const MainBox = styled.div`
   background-color: white;
-  width: 70vw;
+  width: 60vw;
   box-shadow: 0.1rem 0.1rem 2rem rgba(161, 161, 161, 0.28);
   border-radius: 0.5rem;
-  overflow: hidden;
+
   height: fit-content;
   display: grid;
   grid-template-columns: 1.5fr 2fr;
 
   @media only screen and (max-width: 700px) {
     /* display: none; */
+    overflow-y: scroll;
     grid-template-columns: 1fr;
-    width: 90vw;
+    width: 95vw;
+    height: 96svh;
   }
 `;
 
@@ -107,17 +109,17 @@ const LeftDiv = styled.div`
     color: white;
   }
   @media only screen and (max-width: 700px) {
-    padding: 2rem 1rem;
-    gap: 1rem;
+    padding: 1rem 0.5rem;
+    gap: 0.2rem;
     h1 {
-      font-size: 3rem;
+      font-size: 2.2rem;
     }
     p {
-      font-size: 1.4rem;
+      font-size: 1.2rem;
     }
     button {
-      padding: 1rem 3rem;
-      font-size: 1.4rem;
+      padding: 1rem 2rem;
+      font-size: 1rem;
     }
   }
 `;
@@ -238,11 +240,14 @@ const DisabledBtn = styled.button`
 const Span = styled.span`
   text-transform: capitalize;
 `;
-
 const PhotosDiv = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 100%;
+  @media only screen and (max-width: 700px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 `;
 
 const Register = () => {

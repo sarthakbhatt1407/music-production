@@ -393,7 +393,7 @@ function WebNav({ mode, toggleColorMode }) {
                     )}
                     {isLoggedIn && isAdmin && (
                       <Link
-                        to={"/admin-panel/home"}
+                        to={"/admin-panel/orders"}
                         style={{ textDecoration: "none", color: "white" }}
                       >
                         Dashboard

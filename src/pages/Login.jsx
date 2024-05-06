@@ -107,17 +107,17 @@ const LeftDiv = styled.div`
     color: white;
   }
   @media only screen and (max-width: 700px) {
-    padding: 2rem 1rem;
-    gap: 1rem;
+    padding: 1rem 0.5rem;
+    gap: 0.2rem;
     h1 {
-      font-size: 3rem;
+      font-size: 2.2rem;
     }
     p {
-      font-size: 1.4rem;
+      font-size: 1.2rem;
     }
     button {
-      padding: 1rem 3rem;
-      font-size: 1.4rem;
+      padding: 1rem 2rem;
+      font-size: 1rem;
     }
   }
 `;
