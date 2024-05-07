@@ -272,7 +272,7 @@ const ProfilePage = () => {
   const [refresher, setRefresher] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [userData, setUserdata] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [inpFields, setInpFields] = useState({});
 
   const fecher = async () => {
@@ -367,6 +367,8 @@ const ProfilePage = () => {
 
   return (
     <>
+      {" "}
+      {isLoading && <MusicLoader />}
       {showModal && (
         <Modal>
           <ModalBox data-aos="zoom-in">
@@ -438,7 +440,6 @@ const ProfilePage = () => {
         <h1>My Account</h1>
         {userData && (
           <ContentDiv>
-            {isLoading && <MusicLoader />}
             <LeftDiv>
               <img src={userData.userPic} alt="" />
               <div>
