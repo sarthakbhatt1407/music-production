@@ -148,31 +148,6 @@ function WebNav({ mode, toggleColorMode }) {
                 </Typography>
               </MenuItem>
               <MenuItem
-                onClick={() => scrollToSection("portfolio")}
-                sx={{ py: "6px", px: "12px" }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.primary"
-                  style={{
-                    color: active === "portfolio" ? "#D81902" : "",
-                    fontSize: "1.05rem",
-                    borderBottom:
-                      active === "portfolio" ? "1px dashed #d817026d" : "none",
-                    letterSpacing: "0.08rem",
-                    transition: "all .5s",
-                    transform:
-                      active === "portfolio" ? "scale(1.05)" : "scale(1)",
-                    marginRight: "0.7rem",
-                    fontWeight: "550",
-                    backfaceVisibility: "hidden",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  Portfolio
-                </Typography>
-              </MenuItem>
-              <MenuItem
                 onClick={() => scrollToSection("startwithus")}
                 sx={{ py: "6px", px: "12px" }}
               >
@@ -326,9 +301,6 @@ function WebNav({ mode, toggleColorMode }) {
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("services")}>
                   Services
-                </MenuItem>
-                <MenuItem onClick={() => scrollToSection("portfolio")}>
-                  Portfolio
                 </MenuItem>
                 <MenuItem onClick={() => scrollToSection("startwithus")}>
                   Start With Us
