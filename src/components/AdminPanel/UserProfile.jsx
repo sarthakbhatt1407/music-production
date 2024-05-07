@@ -1348,7 +1348,7 @@ const UserProfile = () => {
                         {userData.bankDetails[0].upi.length !== 0
                           ? userData.bankDetails[0].upi
                           : "-"}
-                        {userData.bankDetails[0].upi > 0 && (
+                        {userData.bankDetails[0].upi.length > 0 && (
                           <ContentCopyOutlined
                             style={{
                               cursor: "pointer",
