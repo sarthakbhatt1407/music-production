@@ -143,7 +143,6 @@ const Table = styled.table`
   }
 `;
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const COLORSSTREAM = {
   Spotify: "#25D865",
   Wynk: "#D92E33",
@@ -159,6 +158,20 @@ const COLORSSTREAM = {
 };
 
 const UserPanelHome = () => {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const defaultEarning = {
     Jan: 0,
     Feb: 0,
@@ -188,7 +201,11 @@ const UserPanelHome = () => {
   };
   const date = new Date();
   const currentYear = date.getFullYear();
+  const currentMonth = date.getMonth();
+
+  console.log();
   const [userData, setUserdata] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
   const [earningSelectedYear, setEarningSelectedYear] = useState(currentYear);
   const [reportSelectedYear, setReportSelectedYear] = useState(currentYear);
   const [earningData, setEarningData] = useState(null);
@@ -207,7 +224,7 @@ const UserPanelHome = () => {
       setUserdata(data.user);
 
       // for analytics
-      let resArr = data.user.analytics[0][reportSelectedYear];
+      let resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
       let arr = [];
       for (const key in resArr) {
         const obj = {
@@ -262,7 +279,10 @@ const UserPanelHome = () => {
     console.log(value);
     setReportSelectedYear(Number(value));
 
-    let resArr = userData.analytics[0][value];
+    let resArr;
+    if ((resArr = userData.analytics[0][value])) {
+      resArr = userData.analytics[0][value][selectedMonth];
+    }
     if (!resArr) {
       resArr = defaultReports;
     }
@@ -348,19 +368,64 @@ const UserPanelHome = () => {
                 <div style={{ padding: "0 1rem" }}>
                   {" "}
                   <h2>Reports</h2>{" "}
-                  <Select
-                    name="reportsYear"
-                    id="reportsYear"
-                    onChange={reportsYearChanger}
-                  >
-                    <Option value={`${currentYear}`}>{currentYear}</Option>
-                    <Option value={`${currentYear - 1}`}>
-                      {currentYear - 1}
-                    </Option>
-                    <Option value={`${currentYear - 2}`}>
-                      {currentYear - 2}
-                    </Option>
-                  </Select>
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <Select
+                      name="reportMonth"
+                      id="reportMonth"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
+                        setSelectedMonth(value);
+                        let resArr;
+                        if (
+                          (resArr = userData.analytics[0][reportSelectedYear])
+                        ) {
+                          resArr =
+                            userData.analytics[0][reportSelectedYear][value];
+                        }
+                        if (!resArr) {
+                          resArr = defaultReports;
+                        }
+                        let arr = [];
+                        for (const key in resArr) {
+                          const obj = {
+                            name: key,
+                            views: resArr[key],
+                          };
+                          arr.push(obj);
+                        }
+                        console.log(arr);
+                        setReportData(arr);
+                      }}
+                    >
+                      <Option value={`${months[currentMonth]}`}>
+                        {months[currentMonth]}
+                      </Option>
+                      {months.map((m) => {
+                        if (m === months[currentMonth]) {
+                          return;
+                        }
+                        return (
+                          <Option key={m} value={`${m}`}>
+                            {m}
+                          </Option>
+                        );
+                      })}
+                    </Select>
+                    <Select
+                      name="reportsYear"
+                      id="reportsYear"
+                      onChange={reportsYearChanger}
+                    >
+                      <Option value={`${currentYear}`}>{currentYear}</Option>
+                      <Option value={`${currentYear - 1}`}>
+                        {currentYear - 1}
+                      </Option>
+                      <Option value={`${currentYear - 2}`}>
+                        {currentYear - 2}
+                      </Option>
+                    </Select>
+                  </div>
                 </div>
                 <ResponsiveContainer width={"100%"} height={300}>
                   <BarChart

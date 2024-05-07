@@ -351,7 +351,19 @@ const ReportTable = styled.table`
   }
 `;
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORSSTREAM = {
+  Spotify: "#25D865",
+  Wynk: "#D92E33",
+  JioSaavn: "#1DA48C",
+  Amazon: "#DBB67A",
+  Gaana: "#FE6109",
+  YouTube: "#FF0808",
+  SoundCloud: "#FE8008",
+  Tiktok: "#2CF4EF",
+  Facebook: "#1FADFD",
+  Hungama: "#73BF4C",
+  Other: "#495145",
+};
 
 const MobileBox = styled.div`
   display: flex;
@@ -499,9 +511,24 @@ const Label = styled.label`
 `;
 
 const UserProfile = () => {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const userId = useSelector((state) => state.userId);
   const date = new Date();
   const currentYear = date.getFullYear();
+  const currentMonth = date.getMonth();
   const defaultEarning = {
     Jan: 0,
     Feb: 0,
@@ -529,6 +556,7 @@ const UserProfile = () => {
     Hungama: 0,
     Other: 0,
   };
+  const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
   const [earningSelectedYear, setEarningSelectedYear] = useState(currentYear);
   const [reportSelectedYear, setReportSelectedYear] = useState(currentYear);
   const [earningData, setEarningData] = useState(null);
@@ -630,9 +658,11 @@ const UserProfile = () => {
     if (res.ok) {
       setUserdata(data.user);
       setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
-      setModalStreamInpFields(data.user.analytics[0][currentYear]);
+      setModalStreamInpFields(
+        data.user.analytics[0][currentYear][selectedMonth]
+      );
       // for analytics
-      let resArr = data.user.analytics[0][reportSelectedYear];
+      let resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
       let arr = [];
       for (const key in resArr) {
         const obj = {
@@ -688,7 +718,12 @@ const UserProfile = () => {
     // console.log(value);
     setReportSelectedYear(Number(value));
 
-    let resArr = userData.analytics[0][value];
+    let resArr;
+    if ((resArr = userData.analytics[0][value])) {
+      resArr = userData.analytics[0][value][selectedMonth];
+      setModalStreamInpFields(userData.analytics[0][value][selectedMonth]);
+    }
+
     if (!resArr) {
       resArr = defaultReports;
     }
@@ -737,7 +772,8 @@ const UserProfile = () => {
           userId: id,
           adminId: userId,
           report: modalStreamInpFields,
-          year: currentYear,
+          year: reportSelectedYear,
+          month: selectedMonth,
         }),
       }
     );
@@ -746,9 +782,7 @@ const UserProfile = () => {
     console.log(data);
     if (res.ok) {
       openNotificationWithIcon("success", data.message);
-      setRefresher((prev) => {
-        return prev + 1;
-      });
+      window.location.reload();
     } else {
       openNotificationWithIcon("error", data.message);
     }
@@ -931,6 +965,68 @@ const UserProfile = () => {
         <Modal>
           <ModalBox data-aos="zoom-in">
             <ModalFormBox>
+              <LabelInpBox>
+                <Select
+                  name="reportMonth"
+                  id="reportMonth"
+                  onChange={(e) => {
+                    const ele = document.querySelector(`#${e.target.id}`);
+                    const value = ele.options[ele.selectedIndex].value;
+                    setSelectedMonth(value);
+                    let resArr;
+                    if ((resArr = userData.analytics[0][reportSelectedYear])) {
+                      resArr = userData.analytics[0][reportSelectedYear][value];
+                    }
+                    if (!resArr) {
+                      resArr = defaultReports;
+                    }
+                    setModalStreamInpFields(
+                      userData.analytics[0][reportSelectedYear][value]
+                    );
+                    let arr = [];
+                    for (const key in resArr) {
+                      const obj = {
+                        name: key,
+                        views: resArr[key],
+                      };
+                      arr.push(obj);
+                    }
+                    console.log(arr);
+                    setReportData(arr);
+                  }}
+                >
+                  <Option value={`${months[currentMonth]}`}>
+                    {months[currentMonth]}
+                  </Option>
+                  {months.map((m) => {
+                    if (m === months[currentMonth]) {
+                      return;
+                    }
+                    return (
+                      <Option key={m} value={`${m}`}>
+                        {m}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Select
+                  name="reportsYear"
+                  id="reportsYear"
+                  onChange={reportsYearChanger}
+                >
+                  <Option value={`${currentYear}`}>{currentYear}</Option>
+                  <Option value={`${currentYear - 1}`}>
+                    {currentYear - 1}
+                  </Option>
+                  <Option value={`${currentYear - 2}`}>
+                    {currentYear - 2}
+                  </Option>
+                </Select>
+              </LabelInpBox>
+
               <LabelInpBox>
                 <Label htmlFor="Spotify">Spotify</Label>
                 <ModalInput
@@ -1486,19 +1582,71 @@ const UserProfile = () => {
                     <div style={{ padding: "0 1rem" }}>
                       {" "}
                       <h2>Reports</h2>{" "}
-                      <Select
-                        name="reportsYear"
-                        id="reportsYear"
-                        onChange={reportsYearChanger}
-                      >
-                        <Option value={`${currentYear}`}>{currentYear}</Option>
-                        <Option value={`${currentYear - 1}`}>
-                          {currentYear - 1}
-                        </Option>
-                        <Option value={`${currentYear - 2}`}>
-                          {currentYear - 2}
-                        </Option>
-                      </Select>
+                      <div style={{ display: "flex", gap: "1rem" }}>
+                        <Select
+                          name="reportMonth"
+                          id="reportMonth"
+                          onChange={(e) => {
+                            const ele = document.querySelector(
+                              `#${e.target.id}`
+                            );
+                            const value = ele.options[ele.selectedIndex].value;
+                            setSelectedMonth(value);
+                            let resArr;
+                            if (
+                              (resArr =
+                                userData.analytics[0][reportSelectedYear])
+                            ) {
+                              resArr =
+                                userData.analytics[0][reportSelectedYear][
+                                  value
+                                ];
+                            }
+                            if (!resArr) {
+                              resArr = defaultReports;
+                            }
+                            let arr = [];
+                            for (const key in resArr) {
+                              const obj = {
+                                name: key,
+                                views: resArr[key],
+                              };
+                              arr.push(obj);
+                            }
+                            console.log(arr);
+                            setReportData(arr);
+                          }}
+                        >
+                          <Option value={`${months[currentMonth]}`}>
+                            {months[currentMonth]}
+                          </Option>
+                          {months.map((m) => {
+                            if (m === months[currentMonth]) {
+                              return;
+                            }
+                            return (
+                              <Option key={m} value={`${m}`}>
+                                {m}
+                              </Option>
+                            );
+                          })}
+                        </Select>
+                        <Select
+                          name="reportsYear"
+                          id="reportsYear"
+                          onChange={reportsYearChanger}
+                        >
+                          <Option value={`${currentYear}`}>
+                            {currentYear}
+                          </Option>
+                          <Option value={`${currentYear - 1}`}>
+                            {currentYear - 1}
+                          </Option>
+                          <Option value={`${currentYear - 2}`}>
+                            {currentYear - 2}
+                          </Option>
+                        </Select>
+                      </div>
                     </div>
                     <ResponsiveContainer width={"100%"} height={300}>
                       <BarChart
@@ -1545,7 +1693,7 @@ const UserProfile = () => {
                         {reportData.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
+                            fill={COLORSSTREAM[entry["name"]]}
                           />
                         ))}
                       </Pie>
