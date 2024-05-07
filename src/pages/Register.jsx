@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Alert, Snackbar } from "@mui/material";
@@ -20,7 +20,7 @@ const MainBox = styled.div`
   width: 60vw;
   box-shadow: 0.1rem 0.1rem 2rem rgba(161, 161, 161, 0.28);
   border-radius: 0.5rem;
-
+  height: 50vh;
   height: fit-content;
   display: grid;
   grid-template-columns: 1.5fr 2fr;
@@ -288,6 +288,7 @@ const Register = () => {
       if (info.fileList[0]) {
         img = info.fileList[0].originFileObj;
         setInpFields({ ...inpFields, userPic: img });
+        allFieldChecker();
       } else {
         setInpFields({ ...inpFields, userPic: null });
       }
@@ -309,6 +310,7 @@ const Register = () => {
       if (info.fileList[0]) {
         img = info.fileList[0].originFileObj;
         setInpFields({ ...inpFields, sign: img });
+        allFieldChecker();
       } else {
         setInpFields({ ...inpFields, sign: null });
       }
@@ -406,7 +408,7 @@ const Register = () => {
       channelUrl.length > 9 &&
       state.length > 3 &&
       validateEmail(email) &&
-      contactNum.length === 10 &&
+      contactNum.length > 9 &&
       inpFields.sign != null &&
       inpFields.userPic != null &&
       password.trim().length > 5
@@ -538,11 +540,13 @@ const Register = () => {
     const data = await reslt.json();
     if (!reslt.ok) {
       setServerErr(true);
+      error(data.message);
       setServerTxt(data.message);
     }
     // alert(data.message);
     console.log(data);
     if (data.sent) {
+      success("Otp sent on email.");
       const allInp = document.querySelectorAll(".inputField");
       for (const ele of allInp) {
         ele.disabled = true;
@@ -607,6 +611,9 @@ const Register = () => {
 
   return (
     <>
+      {" "}
+      {contextHolderNot}
+      {contextHolder}
       <Snackbar
         open={open}
         anchorOrigin={{ vertical, horizontal }}
