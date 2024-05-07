@@ -152,7 +152,7 @@ const COLORSSTREAM = {
   YouTube: "#FF0808",
   SoundCloud: "#FE8008",
   Tiktok: "#2CF4EF",
-  Facebook: "#1FADFD",
+  "FB/Insta": "#1FADFD",
   Hungama: "#73BF4C",
   Other: "#495145",
 };
@@ -195,7 +195,7 @@ const UserPanelHome = () => {
     YouTube: 0,
     SoundCloud: 0,
     Tiktok: 0,
-    Facebook: 0,
+    "FB/Insta": 0,
     Hungama: 0,
     Other: 0,
   };
@@ -203,7 +203,6 @@ const UserPanelHome = () => {
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth();
 
-  console.log();
   const [userData, setUserdata] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
   const [earningSelectedYear, setEarningSelectedYear] = useState(currentYear);

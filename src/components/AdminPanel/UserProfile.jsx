@@ -360,7 +360,7 @@ const COLORSSTREAM = {
   YouTube: "#FF0808",
   SoundCloud: "#FE8008",
   Tiktok: "#2CF4EF",
-  Facebook: "#1FADFD",
+  "FB/Insta": "#1FADFD",
   Hungama: "#73BF4C",
   Other: "#495145",
 };
@@ -552,7 +552,7 @@ const UserProfile = () => {
     YouTube: 0,
     SoundCloud: 0,
     Tiktok: 0,
-    Facebook: 0,
+    "FB/Insta": 0,
     Hungama: 0,
     Other: 0,
   };
@@ -615,7 +615,7 @@ const UserProfile = () => {
     YouTube: 0,
     SoundCloud: 0,
     Tiktok: 0,
-    Facebook: 0,
+    "FB/Insta": 0,
     Hungama: 0,
     Other: 0,
   });
@@ -1108,12 +1108,12 @@ const UserProfile = () => {
               </LabelInpBox>
 
               <LabelInpBox>
-                <Label htmlFor="Facebook">Facebook</Label>
+                <Label htmlFor="FB/Insta">FB/Insta</Label>
                 <ModalInput
                   type="number"
-                  id="Facebook"
+                  id="FB/Insta"
                   onChange={modalStraemOnChnage}
-                  value={modalStreamInpFields.Facebook}
+                  value={modalStreamInpFields["FB/Insta"]}
                 />
               </LabelInpBox>
 
