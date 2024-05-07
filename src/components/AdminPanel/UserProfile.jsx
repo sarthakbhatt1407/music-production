@@ -1723,7 +1723,11 @@ const UserProfile = () => {
                                 width: "100%",
                               }}
                             >
-                              <div></div>
+                              <div
+                                style={{
+                                  backgroundColor: `${COLORSSTREAM[name]}`,
+                                }}
+                              ></div>
                             </td>
                             <td>{name}</td>
                             <td>{views}</td>
