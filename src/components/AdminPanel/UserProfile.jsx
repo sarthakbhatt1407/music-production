@@ -752,8 +752,14 @@ const UserProfile = () => {
   };
   const modalStraemOnChnage = (e) => {
     const id = e.target.id;
+
     let val = e.target.value;
-    const ele = document.querySelector(`#${id}`);
+    let ele;
+    if (id === "FB/Insta") {
+      ele = document.getElementById(`FB/Insta`);
+    } else {
+      ele = document.querySelector(`#${id}`);
+    }
 
     ele.style.border = "1px solid #d7d7d7";
     setModalStreamInpFields({ ...modalStreamInpFields, [id]: Number(val) });
