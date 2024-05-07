@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import ready from "../assets/images/logo/ready.png";
 import logo from "../assets/images/logo/logo.png";
+import { useNavigate } from "react-router";
 
 const MainDiv = styled.div`
   position: relative;
@@ -117,6 +118,7 @@ const BtnBox = styled.div`
   }
 `;
 const ReadyToLaunch = () => {
+  const navigate = useNavigate();
   return (
     <MainDiv ready={ready}>
       <LeftDiv data-aos="fade-right">
@@ -130,7 +132,13 @@ const ReadyToLaunch = () => {
       <RightDiv data-aos="fade-left">
         <img src={logo} alt="" />
         <BtnBox>
-          <button>Start</button>
+          <button
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Start
+          </button>
         </BtnBox>
       </RightDiv>
     </MainDiv>
