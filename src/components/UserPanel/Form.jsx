@@ -1002,13 +1002,14 @@ const Form = () => {
             </LabelInpBox>
             <LabelInpBox>
               <Label htmlFor="singer">Add Artist</Label>
-              <button
+              <Input
+                style={{ width: "70%" }}
                 onClick={() => {
                   setShowModal(true);
                 }}
-              >
-                Add Artist{" "}
-              </button>
+                type="button"
+                value="Add Details"
+              />
             </LabelInpBox>
             <LabelInpBox>
               <Label htmlFor="composer">
