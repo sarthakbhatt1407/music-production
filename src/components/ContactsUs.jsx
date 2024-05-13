@@ -295,7 +295,7 @@ const ContactsUs = () => {
         </TextBox>
         <TextBox>
           <p>Contact Number</p>
-          <span>+918126770620 +918384864366</span>
+          <span>+918126770620 +918384864363</span>
         </TextBox>
         <TextBox>
           <p>office address</p>

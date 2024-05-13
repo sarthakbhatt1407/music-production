@@ -36,7 +36,7 @@ const Home = () => {
       >
         <FloatButton
           onClick={() => {
-            window.open("tel:+918384864366", "_blank");
+            window.open("tel:+918384864363", "_blank");
             setOpen(!open);
           }}
           tooltip={<div>Phone</div>}

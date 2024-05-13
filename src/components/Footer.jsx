@@ -198,7 +198,7 @@ const Footer = () => {
           <h2>Get In touch</h2>
           <div>
             <span>
-              <Phone /> +918126770620 +918384864366
+              <Phone /> +918126770620 +918384864363
             </span>
             <span style={{ textTransform: "none" }}>
               <Mail /> s@gmail.com
@@ -207,7 +207,7 @@ const Footer = () => {
             <span style={{ textAlign: "center" }}>
               <Link
                 target="_blank"
-                to={"https://maps.app.goo.gl/UdjjYDiC6edBfuwP6"}
+                to={"https://maps.app.goo.gl/6ccoSexVq3rMYA1r6"}
               >
                 <LocationCity /> Tarun Vihar Lane 4, mothrowala road,
                 banjarawla, near sidheshwar temple.
