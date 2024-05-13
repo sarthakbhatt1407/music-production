@@ -296,6 +296,18 @@ const OrderDetailsPage = () => {
                   if (field === "remark") {
                     field = "Rejection Reason";
                   }
+                  if (field === "artistSpotifyId") {
+                    field = "Artist Spotify ID";
+                  }
+                  if (field === "artistFacebookUrl") {
+                    field = "Artist Facebook Url";
+                  }
+                  if (field === "artistInstagramUrl") {
+                    field = "Artist Instagram Url";
+                  }
+                  if (field === "artistAppleId") {
+                    field = "Artist Apple ID";
+                  }
                   if (field === "thumbnail") {
                     return (
                       <div key={id}>

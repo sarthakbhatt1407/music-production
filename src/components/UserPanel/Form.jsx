@@ -164,6 +164,82 @@ const BtnDiv = styled.div`
     letter-spacing: 0.09rem;
   }
 `;
+const Modal = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #00000038;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+`;
+
+const ModalBox = styled.div`
+  background-color: white;
+  width: 30%;
+  height: fit-content;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  z-index: 20;
+
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    width: 90%;
+  }
+`;
+
+const ModalFormBox = styled.div`
+  background-color: white;
+  width: 90%;
+  height: 80%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 1rem;
+`;
+const ModalInput = styled.input`
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  outline: none;
+  border: 1px solid #d7d7d7;
+
+  &::placeholder {
+    color: #d4cdcd;
+    letter-spacing: 0.09rem;
+    text-transform: capitalize;
+  }
+  &:focus {
+    border: 1px solid #c0c0c0;
+    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
+  }
+`;
+
+const BtnBox = styled.div`
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  button {
+    background-color: #1677ff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.09rem;
+    &:last-child {
+      background-color: #bbb9b9;
+    }
+  }
+`;
 
 const Form = () => {
   const userId = useSelector((state) => state.userId);
@@ -201,11 +277,16 @@ const Form = () => {
     lyricist: "",
     crbt: "",
     genre: "Classical",
+    artistAppleId: "",
+    artistSpotifyId: "",
+    artistFacebookUrl: "",
+    artistInstagramUrl: "",
   };
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
   const [isLoading, setIsloading] = useState(false);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const success = (msg) => {
     messageApi.open({
@@ -223,15 +304,42 @@ const Form = () => {
     return () => {};
   }, []);
 
+  const readrr = async (file) => {
+    var reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = function (e) {
+      var image = new Image();
+
+      image.src = e.target.result;
+      let width, height;
+      image.onload = async function () {
+        height = this.height;
+        width = this.width;
+      };
+
+      if (width != 1600 && height != 1600) {
+        message.error(`Only 1600x1600 images are allowed`);
+        return false;
+      }
+      return true;
+    };
+  };
+
   const imgProps = {
-    beforeUpload: (file) => {
-      const isValid =
+    beforeUpload: async (file) => {
+      let isValid;
+      console.log(file);
+      isValid =
         file.type === "image/png" ||
         file.type === "image/jpeg" ||
         file.type === "image/jpg";
+
       if (!isValid) {
         message.error(`Only .png .jpeg .jpg is allowed`);
       }
+
       return isValid || Upload.LIST_IGNORE;
     },
     onChange: (info) => {
@@ -241,6 +349,7 @@ const Form = () => {
       let img;
       if (info.fileList[0]) {
         img = info.fileList[0].originFileObj;
+
         setInpFields({ ...inpFields, thumbnail: img });
       } else {
         setInpFields({ ...inpFields, thumbnail: null });
@@ -249,7 +358,11 @@ const Form = () => {
   };
   const fileProps = {
     beforeUpload: (file) => {
-      const isValid = file.type === "audio/wav" || file.type === "audio/mp3";
+      console.log(file.type);
+      const isValid =
+        file.type === "audio/wav" ||
+        file.type === "audio/mp3" ||
+        file.type === "audio/mpeg";
       // file.type === "audio/mpeg" ||
       // file.type === "audio/aac" ||
       // file.type === "audio/flac" ||
@@ -453,6 +566,10 @@ const Form = () => {
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
     formData.append("genre", inpFields.genre);
+    formData.append("artistAppleId", inpFields.artistAppleId);
+    formData.append("artistFacebookUrl", inpFields.artistFacebookUrl);
+    formData.append("artistInstagramUrl", inpFields.artistInstagramUrl);
+    formData.append("artistSpotifyId", inpFields.artistSpotifyId);
 
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
@@ -496,6 +613,67 @@ const Form = () => {
   };
   return (
     <MainDiv>
+      {showModal && (
+        <Modal>
+          <ModalBox>
+            <ModalFormBox>
+              <LabelInpBox style={{ width: "100%" }}>
+                <Label htmlFor="artistAppleId">Apple ID</Label>
+                <ModalInput
+                  type="text"
+                  id="artistAppleId"
+                  onChange={onChangeHandler}
+                  value={inpFields.artistAppleId}
+                />
+              </LabelInpBox>
+              <LabelInpBox style={{ width: "100%" }}>
+                <Label htmlFor="artistSpotifyId">Spotify ID</Label>
+                <ModalInput
+                  type="text"
+                  id="artistSpotifyId"
+                  onChange={onChangeHandler}
+                  value={inpFields.artistSpotifyId}
+                />
+              </LabelInpBox>
+              <LabelInpBox style={{ width: "100%" }}>
+                <Label htmlFor="artistFacebookUrl">Facebook Url </Label>
+                <ModalInput
+                  type="text"
+                  id="artistFacebookUrl"
+                  onChange={onChangeHandler}
+                  value={inpFields.artistFacebookUrl}
+                />
+              </LabelInpBox>
+              <LabelInpBox style={{ width: "100%" }}>
+                <Label htmlFor="artistFacebookUrl">Instagram Url </Label>
+                <ModalInput
+                  type="text"
+                  id="artistInstagramUrl"
+                  onChange={onChangeHandler}
+                  value={inpFields.artistInstagramUrl}
+                />
+              </LabelInpBox>
+
+              <BtnBox>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </BtnBox>
+            </ModalFormBox>
+          </ModalBox>
+        </Modal>
+      )}
       {contextHolderNot}
       {contextHolder}
       <Breadcrumb
@@ -821,6 +999,16 @@ const Form = () => {
                 onChange={onChangeHandler}
                 value={inpFields.singer}
               />
+            </LabelInpBox>
+            <LabelInpBox>
+              <Label htmlFor="singer">Add Artist</Label>
+              <button
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Add Artist{" "}
+              </button>
             </LabelInpBox>
             <LabelInpBox>
               <Label htmlFor="composer">

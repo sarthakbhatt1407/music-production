@@ -479,7 +479,7 @@ const ProfilePage = () => {
                   <span>+91-{userData.phone}</span>
                 </div>
                 <div>
-                  <span>Channel</span>
+                  <span>Channel URL</span>
                   <span>
                     <Link to={`${userData.channelUrl}`} target="_blank">
                       <LinkOutlined />
