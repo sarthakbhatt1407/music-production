@@ -235,6 +235,7 @@ const History = () => {
               <tr>
                 <td></td>
                 <td>Album</td>
+                <td>label Name</td>
                 <td>Album Type</td>
                 <td>Language</td>
                 <td>Created</td>
@@ -250,6 +251,7 @@ const History = () => {
                 }
                 const {
                   title,
+                  labelName,
                   language,
                   albumType,
                   status,
@@ -272,7 +274,8 @@ const History = () => {
                         <img src={`${thumbnail}`} alt="" />
                         {title}
                       </span>
-                    </td>
+                    </td>{" "}
+                    <td>{labelName}</td>
                     <td>{albumType}</td>
                     <td>{language}</td>
                     <td>{orderDateAndTime.split("/")[0]}</td>
@@ -356,6 +359,7 @@ const History = () => {
               dateOfRelease,
               orderDateAndTime,
               thumbnail,
+              labelName,
               id,
             } = order;
             console.log(thumbnail);
@@ -366,6 +370,10 @@ const History = () => {
                   <TextBox>
                     <span>Title</span>
                     <span>{title}</span>
+                  </TextBox>{" "}
+                  <TextBox>
+                    <span>Label</span>
+                    <span>{labelName}</span>
                   </TextBox>
                   <TextBox>
                     <span>status</span>

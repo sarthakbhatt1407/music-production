@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import logo from "../assets/images/logo/logo.png";
+import logo from "../assets/images/logo/logo.webp";
 import {
   FacebookOutlined,
   Instagram,
@@ -185,9 +185,7 @@ const Footer = () => {
             <span onClick={scrollToSection.bind(this, "services")}>
               services
             </span>
-            <span onClick={scrollToSection.bind(this, "portfolio")}>
-              portfolio
-            </span>
+
             <span onClick={scrollToSection.bind(this, "contact-us")}>
               contact us
             </span>
@@ -200,7 +198,7 @@ const Footer = () => {
           <h2>Get In touch</h2>
           <div>
             <span>
-              <Phone /> +91-1234567890
+              <Phone /> +918126770620 +918384864366
             </span>
             <span style={{ textTransform: "none" }}>
               <Mail /> s@gmail.com
@@ -211,9 +209,8 @@ const Footer = () => {
                 target="_blank"
                 to={"https://maps.app.goo.gl/UdjjYDiC6edBfuwP6"}
               >
-                <LocationCity /> Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Provident quia nisi totam architecto.
-                Veritatis, aliquid.
+                <LocationCity /> Tarun Vihar Lane 4, mothrowala road,
+                banjarawla, near sidheshwar temple.
               </Link>
             </span>
           </div>

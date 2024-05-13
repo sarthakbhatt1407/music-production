@@ -10,6 +10,7 @@ import {
   DownloadOutlined,
 } from "@ant-design/icons";
 import { saveAs } from "file-saver";
+import { LinkOutlined } from "@mui/icons-material";
 const OuterBox = styled.div`
   width: 100%;
   height: 99%;
@@ -296,17 +297,161 @@ const OrderDetailsPage = () => {
                   if (field === "remark") {
                     field = "Rejection Reason";
                   }
-                  if (field === "artistSpotifyId") {
-                    field = "Artist Spotify ID";
+                  if (field === "singerAppleId") {
+                    field = "singer Apple Id";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
                   }
-                  if (field === "artistFacebookUrl") {
-                    field = "Artist Facebook Url";
+                  if (field === "singerFacebookUrl") {
+                    field = "singer Facebook Url";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
                   }
-                  if (field === "artistInstagramUrl") {
-                    field = "Artist Instagram Url";
+                  if (field === "singerInstagramUrl") {
+                    field = "singer Instagram Url";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
                   }
-                  if (field === "artistAppleId") {
-                    field = "Artist Apple ID";
+                  if (field === "singerSpotifyId") {
+                    field = "singer Spotify Id";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "composerAppleId") {
+                    field = "composer Apple Id";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "composerFacebookUrl") {
+                    field = "composer Facebook Url";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "composerSpotifyId") {
+                    field = "composer Spotify Id";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "composerInstagramUrl") {
+                    field = "composer Instagram Url";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "lyricistAppleId") {
+                    field = "lyricist Apple Id";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "lyricistFacebookUrl") {
+                    field = "lyricist Facebook Url";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "lyricistInstagramUrl") {
+                    field = "lyricist Instagram Url";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  }
+                  if (field === "lyricistSpotifyId") {
+                    field = "lyricist Spotify Id";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>
+                          <Link to={value} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </span>
+                      </div>
+                    );
                   }
                   if (field === "thumbnail") {
                     return (

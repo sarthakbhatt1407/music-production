@@ -182,7 +182,7 @@ const Modal = styled.div`
 
 const ModalBox = styled.div`
   background-color: white;
-  width: 30%;
+  width: 35%;
   height: fit-content;
   padding: 2rem 0;
   display: flex;
@@ -270,17 +270,27 @@ const EditOrder = () => {
     lyricist: "",
     crbt: "",
     genre: "Classical",
-    artistAppleId: "",
-    artistSpotifyId: "",
-    artistFacebookUrl: "",
-    artistInstagramUrl: "",
+    singerAppleId: "",
+    singerSpotifyId: "",
+    singerFacebookUrl: "",
+    singerInstagramUrl: "",
+    composerAppleId: "",
+    composerSpotifyId: "",
+    composerFacebookUrl: "",
+    composerInstagramUrl: "",
+    lyricistAppleId: "",
+    lyricistSpotifyId: "",
+    lyricistFacebookUrl: "",
+    lyricistInstagramUrl: "",
   };
   const id = useParams().id;
   const [order, setOrder] = useState(null);
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
   const [isLoading, setIsloading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showSingerModal, setShowSingerModal] = useState(false);
+  const [showComposerModal, setShowComposerModal] = useState(false);
+  const [showLyricistModal, setShowLyricistModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const fetcher = async () => {
     setIsloading(true);
@@ -557,10 +567,20 @@ const EditOrder = () => {
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
     formData.append("genre", inpFields.genre);
-    formData.append("artistAppleId", inpFields.artistAppleId);
-    formData.append("artistFacebookUrl", inpFields.artistFacebookUrl);
-    formData.append("artistInstagramUrl", inpFields.artistInstagramUrl);
-    formData.append("artistSpotifyId", inpFields.artistSpotifyId);
+    formData.append("singerAppleId", inpFields.singerAppleId);
+    formData.append("singerSpotifyId", inpFields.singerSpotifyId);
+    formData.append("singerFacebookUrl", inpFields.singerFacebookUrl);
+    formData.append("singerInstagramUrl", inpFields.singerInstagramUrl);
+
+    formData.append("composerAppleId", inpFields.composerAppleId);
+    formData.append("composerSpotifyId", inpFields.composerSpotifyId);
+    formData.append("composerFacebookUrl", inpFields.composerFacebookUrl);
+    formData.append("composerInstagramUrl", inpFields.composerInstagramUrl);
+
+    formData.append("lyricistAppleId", inpFields.lyricistAppleId);
+    formData.append("lyricistSpotifyId", inpFields.lyricistSpotifyId);
+    formData.append("lyricistFacebookUrl", inpFields.lyricistFacebookUrl);
+    formData.append("lyricistInstagramUrl", inpFields.lyricistInstagramUrl);
 
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
@@ -606,58 +626,241 @@ const EditOrder = () => {
       {order && (
         <MainDiv>
           {" "}
-          {showModal && (
+          {showComposerModal && (
             <Modal>
               <ModalBox>
+                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                  <p style={{ color: "#353434" }}>
+                    For Artist profile linking, only Facebook page link and
+                    Instagram profile ID link will be accepted
+                  </p>
+                  <p>
+                    Note: Name can't be edited. Please ensure you are adding the
+                    correct name.
+                  </p>
+                </div>
                 <ModalFormBox>
                   <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="artistAppleId">Apple ID</Label>
+                    <Label htmlFor="composer">Name</Label>
                     <ModalInput
                       type="text"
-                      id="artistAppleId"
+                      id="composer"
                       onChange={onChangeHandler}
-                      value={inpFields.artistAppleId}
+                      value={inpFields.composer}
                     />
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="artistSpotifyId">Spotify ID</Label>
+                    <Label htmlFor="composerAppleId">Apple ID</Label>
                     <ModalInput
                       type="text"
-                      id="artistSpotifyId"
+                      id="composerAppleId"
                       onChange={onChangeHandler}
-                      value={inpFields.artistSpotifyId}
+                      value={inpFields.composerAppleId}
                     />
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="artistFacebookUrl">Facebook Url </Label>
+                    <Label htmlFor="composerSpotifyId">Spotify ID</Label>
                     <ModalInput
                       type="text"
-                      id="artistFacebookUrl"
+                      id="composerSpotifyId"
                       onChange={onChangeHandler}
-                      value={inpFields.artistFacebookUrl}
+                      value={inpFields.composerSpotifyId}
                     />
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="artistFacebookUrl">Instagram Url </Label>
+                    <Label htmlFor="composerFacebookUrl">Facebook Url </Label>
                     <ModalInput
                       type="text"
-                      id="artistInstagramUrl"
+                      id="composerFacebookUrl"
                       onChange={onChangeHandler}
-                      value={inpFields.artistInstagramUrl}
+                      value={inpFields.composerFacebookUrl}
                     />
                   </LabelInpBox>
-
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="composerInstagramUrl">Instagram Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="composerInstagramUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.composerInstagramUrl}
+                    />
+                  </LabelInpBox>
+                  <div></div>
                   <BtnBox>
                     <button
                       onClick={() => {
-                        setShowModal(false);
+                        setShowComposerModal(false);
                       }}
                     >
                       Submit
                     </button>
                     <button
                       onClick={() => {
-                        setShowModal(false);
+                        setShowComposerModal(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </BtnBox>
+                </ModalFormBox>
+              </ModalBox>
+            </Modal>
+          )}
+          {showLyricistModal && (
+            <Modal>
+              <ModalBox>
+                {" "}
+                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                  <p style={{ color: "#353434" }}>
+                    For Artist profile linking, only Facebook page link and
+                    Instagram profile ID link will be accepted
+                  </p>
+                  <p>
+                    Note: Name can't be edited. Please ensure you are adding the
+                    correct name.
+                  </p>
+                </div>
+                <ModalFormBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricist">Name</Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricist"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricist}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistAppleId">Apple ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistAppleId"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistAppleId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistSpotifyId">Spotify ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistSpotifyId"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistSpotifyId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistFacebookUrl">Facebook Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistFacebookUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistFacebookUrl}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistInstagramUrl">Instagram Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistInstagramUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistInstagramUrl}
+                    />
+                  </LabelInpBox>
+                  <div></div>
+
+                  <BtnBox>
+                    <button
+                      onClick={() => {
+                        setShowLyricistModal(false);
+                      }}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowLyricistModal(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </BtnBox>
+                </ModalFormBox>
+              </ModalBox>
+            </Modal>
+          )}
+          {showSingerModal && (
+            <Modal>
+              <ModalBox>
+                {" "}
+                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                  <p style={{ color: "#353434" }}>
+                    For Artist profile linking, only Facebook page link and
+                    Instagram profile ID link will be accepted
+                  </p>
+                  <p>
+                    Note: Name can't be edited. Please ensure you are adding the
+                    correct name.
+                  </p>
+                </div>
+                <ModalFormBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singer">Name</Label>
+                    <ModalInput
+                      type="text"
+                      id="singer"
+                      onChange={onChangeHandler}
+                      value={inpFields.singer}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerAppleId">Apple ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="singerAppleId"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerAppleId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerSpotifyId">Spotify ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="singerSpotifyId"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerSpotifyId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerFacebookUrl">Facebook Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="singerFacebookUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerFacebookUrl}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerInstagramUrl">Instagram Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="singerInstagramUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerInstagramUrl}
+                    />
+                  </LabelInpBox>
+                  <div></div>
+
+                  <BtnBox>
+                    <button
+                      onClick={() => {
+                        setShowSingerModal(false);
+                      }}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSingerModal(false);
                       }}
                     >
                       Cancel
@@ -998,16 +1201,16 @@ const EditOrder = () => {
                     onChange={onChangeHandler}
                     value={inpFields.singer}
                   />
-                </LabelInpBox>{" "}
+                </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="singer">Add Artist</Label>
+                  <Label htmlFor="singer">Add Singer Profile</Label>
                   <Input
-                    style={{ width: "70%" }}
+                    style={{ width: "30%" }}
                     onClick={() => {
-                      setShowModal(true);
+                      setShowSingerModal(true);
                     }}
                     type="button"
-                    value="Add Details"
+                    value={`+`}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1021,6 +1224,17 @@ const EditOrder = () => {
                     placeholder="composer name"
                     onChange={onChangeHandler}
                     value={inpFields.composer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="singer">Add Composer Profile</Label>
+                  <Input
+                    style={{ width: "30%" }}
+                    onClick={() => {
+                      setShowComposerModal(true);
+                    }}
+                    type="button"
+                    value={`+`}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1074,8 +1288,19 @@ const EditOrder = () => {
                     onChange={onChangeHandler}
                     value={inpFields.lyricist}
                   />
+                </LabelInpBox>{" "}
+                <LabelInpBox>
+                  <Label htmlFor="singer">Add Lyricist Profile</Label>
+                  <Input
+                    style={{ width: "30%" }}
+                    onClick={() => {
+                      setShowLyricistModal(true);
+                    }}
+                    type="button"
+                    value={`+`}
+                  />
                 </LabelInpBox>
-              </AllInpBox>{" "}
+              </AllInpBox>
               <BtnDiv>
                 <button onClick={onSubmitHandler}>Submit</button>
               </BtnDiv>

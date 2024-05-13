@@ -84,7 +84,7 @@ const OurWork = () => {
           <img src={divider} alt="" /> <img src={divider} alt="" />{" "}
           <img src={divider} alt="" /> <img src={divider} alt="" />
         </ImgBox>
-        <span>SINCE FROM 2000</span>
+        <span>SINCE FROM 2015</span>
         <h2>
           <span>Let’s make great</span>
           <span>something together!</span>

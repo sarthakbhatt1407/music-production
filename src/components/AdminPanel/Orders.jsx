@@ -233,6 +233,7 @@ const Orders = () => {
               <tr>
                 <td></td>
                 <td>Album</td>
+                <td>Label</td>
                 <td>Album Type</td>
                 <td>Language</td>
                 <td>Created</td>
@@ -255,6 +256,7 @@ const Orders = () => {
                   orderDateAndTime,
                   thumbnail,
                   id,
+                  labelName,
                 } = ord;
                 sNo++;
                 return (
@@ -271,6 +273,7 @@ const Orders = () => {
                         {title}
                       </span>
                     </td>
+                    <td>{labelName}</td>
                     <td>{albumType}</td>
                     <td>{language}</td>
                     <td>{orderDateAndTime.split("/")[0]}</td>
@@ -355,6 +358,7 @@ const Orders = () => {
               orderDateAndTime,
               thumbnail,
               id,
+              labelName,
             } = order;
             console.log(thumbnail);
             return (
@@ -364,6 +368,10 @@ const Orders = () => {
                   <TextBox>
                     <span>Title</span>
                     <span>{title}</span>
+                  </TextBox>{" "}
+                  <TextBox>
+                    <span>Label</span>
+                    <span>{labelName}</span>
                   </TextBox>
                   <TextBox>
                     <span>status</span>

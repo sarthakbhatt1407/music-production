@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import ready from "../assets/images/logo/ready.png";
-import logo from "../assets/images/logo/logo.png";
+import logo from "../assets/images/logo/logo.webp";
 import { useNavigate } from "react-router";
 
 const MainDiv = styled.div`
@@ -67,6 +67,9 @@ const RightDiv = styled.div`
   justify-content: center;
   align-items: center;
   gap: 3rem;
+  img {
+    width: 15rem;
+  }
 `;
 
 const BtnBox = styled.div`

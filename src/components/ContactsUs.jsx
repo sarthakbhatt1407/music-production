@@ -295,13 +295,13 @@ const ContactsUs = () => {
         </TextBox>
         <TextBox>
           <p>Contact Number</p>
-          <span>+911234567890 +911234567890</span>
+          <span>+918126770620 +918384864366</span>
         </TextBox>
         <TextBox>
           <p>office address</p>
-          <span>
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe,
-            cupiditate!
+          <span style={{ textTransform: "capitalize" }}>
+            Tarun Vihar Lane 4, mothrowala road, banjarawla, near sidheshwar
+            temple.
           </span>
         </TextBox>
       </RightDiv>

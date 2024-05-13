@@ -298,6 +298,7 @@ const History = () => {
               <tr>
                 <td></td>
                 <td>Album</td>
+                <td>Label</td>
                 <td>Album Type</td>
                 <td>Language</td>
                 <td>Created</td>
@@ -320,6 +321,7 @@ const History = () => {
                   orderDateAndTime,
                   thumbnail,
                   id,
+                  labelName,
                 } = ord;
                 sNo++;
                 return (
@@ -336,6 +338,7 @@ const History = () => {
                         {title}
                       </span>
                     </td>
+                    <td>{labelName}</td>
                     <td>{albumType}</td>
                     <td>{language}</td>
                     <td>{orderDateAndTime.split("/")[0]}</td>
@@ -412,6 +415,7 @@ const History = () => {
               return;
             }
             const {
+              labelName,
               title,
               language,
               albumType,
@@ -429,6 +433,10 @@ const History = () => {
                   <TextBox>
                     <span>Title</span>
                     <span>{title}</span>
+                  </TextBox>
+                  <TextBox>
+                    <span>Label</span>
+                    <span>{labelName}</span>
                   </TextBox>
                   <TextBox>
                     <span>status</span>

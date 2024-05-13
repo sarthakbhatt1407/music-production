@@ -36,7 +36,7 @@ const Home = () => {
       >
         <FloatButton
           onClick={() => {
-            window.open("https://www.whatsapp.com/", "_blank");
+            window.open("tel:+918384864366", "_blank");
             setOpen(!open);
           }}
           tooltip={<div>Phone</div>}
@@ -51,7 +51,7 @@ const Home = () => {
         <FloatButton
           style={{}}
           onClick={() => {
-            window.open("https://www.whatsapp.com/", "_blank");
+            window.open("https://wa.me/+918126770620", "_blank");
             setOpen(!open);
           }}
           tooltip={<div>Whatsapp</div>}
@@ -73,7 +73,7 @@ const Home = () => {
         <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
         <Services />
         <SevicesHeading
-          data={{ para: "WHAT CLIENT SAYS", heading: "Clients" }}
+          data={{ para: "WHAT Artists SAYS", heading: "Artists" }}
         />
         <Clients />
         <SevicesHeading
