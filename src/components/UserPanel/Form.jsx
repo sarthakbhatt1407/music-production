@@ -890,7 +890,7 @@ const Form = () => {
           },
         ]}
       />
-      <h1>Upload</h1>{" "}
+      <h1>Upload Content</h1>{" "}
       <FormBox>
         {isLoading && <MusicLoader />}
         <FormSeperator>
