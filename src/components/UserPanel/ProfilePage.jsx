@@ -465,7 +465,7 @@ const ProfilePage = () => {
               <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
                 <p>Details</p>
                 <div>
-                  <span>Label</span>
+                  <span>Label Name</span>
                   <span>{userData.name}</span>
                 </div>
                 <div>

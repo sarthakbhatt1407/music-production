@@ -3,6 +3,13 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import random from "../assets/images/random.webp";
 
+import atarshah from "../assets/images/AtarShah.jpg";
+import baba from "../assets/images/BabaMusic.jpg";
+import BharatBhatt from "../assets/images/BharatBhatt.jpg";
+import BlueSkyFilms from "../assets/images/BlueSkyFilms.jpg";
+import DagadiyaProduction from "../assets/images/DagadiyaProduction.jpg";
+import BhagirathiFilmsEntertanment from "../assets/images/BhagirathiFilmsEntertanment.jpg";
+
 const OuterBox = styled.div`
   position: relative;
 `;
@@ -130,8 +137,8 @@ const Clients = (props) => {
   });
 
   return (
-    <OuterBox data-aos="fade-up">
-      {/* data-aos="fade-right" */}
+    <OuterBox>
+      {/* data-aos="fade-right"  data-aos="fade-up"*/}
       <MainBox>
         <ImgBox className="image">
           <ReviewBox>
@@ -142,10 +149,11 @@ const Clients = (props) => {
               eaque tenetur?
             </p>
             <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
+              <Avatar alt="Remy Sharp" src={baba} />
+              <span>Baba Music</span>
             </ProfileBox>
           </ReviewBox>
+
           <ReviewBox>
             <Rating name="read-only" value={5} readOnly />
             <p>
@@ -154,8 +162,36 @@ const Clients = (props) => {
               eaque tenetur?
             </p>
             <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
+              <Avatar alt="Remy Sharp" src={BhagirathiFilmsEntertanment} />
+              <span>Bhagirathi Films Entertanment</span>
+            </ProfileBox>
+          </ReviewBox>
+        </ImgBox>
+
+        <ImgBox className="image">
+          <ReviewBox>
+            <Rating name="read-only" value={5} readOnly />
+            <p>
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta
+              deserunt vero nam totam doloremque excepturi aut voluptas! Sunt,
+              eaque tenetur?
+            </p>
+            <ProfileBox>
+              <Avatar alt="Remy Sharp" src={BharatBhatt} />
+              <span>Bharat Bhatt</span>
+            </ProfileBox>
+          </ReviewBox>
+
+          <ReviewBox>
+            <Rating name="read-only" value={5} readOnly />
+            <p>
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta
+              deserunt vero nam totam doloremque excepturi aut voluptas! Sunt,
+              eaque tenetur?
+            </p>
+            <ProfileBox>
+              <Avatar alt="Remy Sharp" src={BlueSkyFilms} />
+              <span>BlueSky Films</span>
             </ProfileBox>
           </ReviewBox>
         </ImgBox>
@@ -168,10 +204,11 @@ const Clients = (props) => {
               eaque tenetur?
             </p>
             <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
+              <Avatar alt="Remy Sharp" src={DagadiyaProduction} />
+              <span>Dagadiya Production</span>
             </ProfileBox>
           </ReviewBox>
+
           <ReviewBox>
             <Rating name="read-only" value={5} readOnly />
             <p>
@@ -180,63 +217,12 @@ const Clients = (props) => {
               eaque tenetur?
             </p>
             <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
+              <Avatar alt="Remy Sharp" src={BlueSkyFilms} />
+              <span>BlueSky Films</span>
             </ProfileBox>
           </ReviewBox>
         </ImgBox>
-        <ImgBox className="image">
-          <ReviewBox>
-            <Rating name="read-only" value={5} readOnly />
-            <p>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta
-              deserunt vero nam totam doloremque excepturi aut voluptas! Sunt,
-              eaque tenetur?
-            </p>
-            <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
-            </ProfileBox>
-          </ReviewBox>
-          <ReviewBox>
-            <Rating name="read-only" value={5} readOnly />
-            <p>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta
-              deserunt vero nam totam doloremque excepturi aut voluptas! Sunt,
-              eaque tenetur?
-            </p>
-            <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
-            </ProfileBox>
-          </ReviewBox>
-        </ImgBox>
-        <ImgBox className="image">
-          <ReviewBox>
-            <Rating name="read-only" value={5} readOnly />
-            <p>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta
-              deserunt vero nam totam doloremque excepturi aut voluptas! Sunt,
-              eaque tenetur?
-            </p>
-            <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
-            </ProfileBox>
-          </ReviewBox>
-          <ReviewBox>
-            <Rating name="read-only" value={5} readOnly />
-            <p>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Soluta
-              deserunt vero nam totam doloremque excepturi aut voluptas! Sunt,
-              eaque tenetur?
-            </p>
-            <ProfileBox>
-              <Avatar alt="Remy Sharp" src={random} />
-              <span>Sarthak Bhatt</span>
-            </ProfileBox>
-          </ReviewBox>
-        </ImgBox>
+
         {/*  */}
       </MainBox>
     </OuterBox>
