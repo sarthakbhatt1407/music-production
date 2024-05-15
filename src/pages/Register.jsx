@@ -624,7 +624,7 @@ const Register = () => {
           onClose={handleClose}
           severity="success"
           variant="filled"
-          sx={{ width: "100%", top: 0, fontSize: "1.6rem" }}
+          sx={{ width: "100%", top: 0, fontSize: "1.1rem" }}
         >
           Sign up successfull. Kindly login now
         </Alert>
