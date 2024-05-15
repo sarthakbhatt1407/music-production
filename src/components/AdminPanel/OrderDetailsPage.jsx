@@ -630,10 +630,7 @@ const OrderDetailsPage = () => {
                           <Link>
                             <DownloadOutlined
                               onClick={() => {
-                                saveAs(
-                                  value,
-                                  `${order.title}_${order.labelName}`
-                                );
+                                saveAs(value, `${order.title}`);
                               }}
                               style={{ transform: "scale(1.5)" }}
                             />

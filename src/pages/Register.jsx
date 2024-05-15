@@ -790,7 +790,7 @@ const Register = () => {
                       maxCount={1}
                     >
                       <Button icon={<UploadOutlined />}>
-                        Upload Profile Photo
+                        Upload Channel Logo
                       </Button>
                     </Upload>
                     <Upload

@@ -1216,6 +1216,30 @@ const Form = () => {
               />
             </LabelInpBox>
             <LabelInpBox>
+              <Label htmlFor="lyricist">
+                lyricist <span style={{ margin: 0 }}>*</span>
+              </Label>
+              <Input
+                type="text"
+                name="lyricist"
+                id="lyricist"
+                placeholder=""
+                onChange={onChangeHandler}
+                value={inpFields.lyricist}
+              />
+            </LabelInpBox>{" "}
+            <LabelInpBox>
+              <Label htmlFor="singer">Add Lyricist Profile</Label>
+              <Input
+                style={{ width: "30%" }}
+                onClick={() => {
+                  setShowLyricistModal(true);
+                }}
+                type="button"
+                value={`+`}
+              />
+            </LabelInpBox>
+            <LabelInpBox>
               <Label htmlFor="composer">
                 composer <span style={{ margin: 0 }}>*</span>
               </Label>
@@ -1276,30 +1300,6 @@ const Form = () => {
                 placeholder=""
                 onChange={onChangeHandler}
                 value={inpFields.starCast}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="lyricist">
-                lyricist <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="lyricist"
-                id="lyricist"
-                placeholder=""
-                onChange={onChangeHandler}
-                value={inpFields.lyricist}
-              />
-            </LabelInpBox>{" "}
-            <LabelInpBox>
-              <Label htmlFor="singer">Add Lyricist Profile</Label>
-              <Input
-                style={{ width: "30%" }}
-                onClick={() => {
-                  setShowLyricistModal(true);
-                }}
-                type="button"
-                value={`+`}
               />
             </LabelInpBox>
           </AllInpBox>
