@@ -834,7 +834,6 @@ const Register = () => {
                       id="otp"
                       onChange={onChangeHandler}
                       placeholder="Enter one time password"
-                      data-aos="zoom-in"
                       value={inpFields.otp}
                       style={{
                         border: `${
