@@ -1149,7 +1149,7 @@ const Form = () => {
                 {...fileProps}
                 maxCount={1}
               >
-                <Button icon={<UploadOutlined />}>Upload file</Button>
+                <Button icon={<UploadOutlined />}>Audio file</Button>
               </Upload>
             </LabelInpBox>
 

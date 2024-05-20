@@ -313,7 +313,7 @@ const History = () => {
                           }}
                         >
                           <CheckCircleTwoTone twoToneColor="#52c41a" />
-                          completed
+                          Live
                         </div>
                       </td>
                     )}
@@ -377,7 +377,7 @@ const History = () => {
                   </TextBox>
                   <TextBox>
                     <span>status</span>
-                    <span>{status}</span>
+                    <span>{status === "completed" ? "live" : status}</span>
                   </TextBox>
                   <TextBox>
                     <span>Date of release</span>
