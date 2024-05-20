@@ -659,7 +659,9 @@ const OrderDetailsPage = () => {
                   return (
                     <div key={id}>
                       <span>{field}</span>
-                      <span style={{ overflowWrap: "anywhere" }}>{value}</span>
+                      <span style={{ overflowWrap: "anywhere" }}>
+                        {value === "completed" ? "live" : value}
+                      </span>
                     </div>
                   );
                 })}
