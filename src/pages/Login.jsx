@@ -309,7 +309,6 @@ const Login = () => {
 
     const password = document.querySelector("#password").value;
     if (contactNum) {
-      console.log("hi");
       if (contactNum.value.length === 10 && password.length > 5) {
         setAllValid(true);
       }
@@ -393,7 +392,7 @@ const Login = () => {
       setInpFields({ ...inpFields, password: "" });
     }
     // alert(data.message);
-    console.log(data);
+
     if (data.success) {
       setName(data.user.name);
       setInpFields(defaultFields);
@@ -672,7 +671,7 @@ const Login = () => {
                             }
                           );
                           const data = await reslt.json();
-                          console.log(data);
+
                           if (reslt.ok) {
                             setForgotEmailSend(true);
                           } else {
@@ -704,7 +703,7 @@ const Login = () => {
                             }
                           );
                           const data = await reslt.json();
-                          console.log(data);
+
                           if (data.valid) {
                             setForOtpVer(true);
                           }
@@ -737,7 +736,7 @@ const Login = () => {
                             }
                           );
                           const data = await reslt.json();
-                          console.log(data);
+
                           if (reslt.ok) {
                             setState({
                               ...state,

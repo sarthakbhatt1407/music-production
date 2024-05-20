@@ -544,7 +544,7 @@ const Register = () => {
       setServerTxt(data.message);
     }
     // alert(data.message);
-    console.log(data);
+
     if (data.sent) {
       success("Otp sent on email.");
       const allInp = document.querySelectorAll(".inputField");
@@ -574,7 +574,7 @@ const Register = () => {
     );
     const data = await reslt.json();
     // alert(data.message);
-    console.log(data);
+
     if (data.valid === false) {
       setOtpText(data.message);
       setOtpErr(true);
@@ -598,7 +598,7 @@ const Register = () => {
         body: formData,
       });
       const resData = await res.json();
-      console.log(resData);
+
       if (resData.success) {
         setState({ ...state, open: true });
         setTimeout(() => {
