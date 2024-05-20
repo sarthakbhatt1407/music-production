@@ -271,7 +271,7 @@ const CopyrightAdmin = () => {
       `${process.env.REACT_APP_BASE_URL}/copyright/get-all-query`
     );
     const data = await res.json();
-    console.log(data.cQueries);
+
     if (res.ok) {
       setQueries(data.cQueries.reverse());
       setIsLoading(false);
@@ -440,7 +440,7 @@ const CopyrightAdmin = () => {
                             title="Confirm"
                             description="Copyright removed?"
                             onConfirm={confirm.bind(this, id)}
-                            onOpenChange={() => console.log("open change")}
+                            onOpenChange={() => {}}
                           >
                             <Link>
                               <CheckCircleOutline />

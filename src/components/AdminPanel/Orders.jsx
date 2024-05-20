@@ -182,7 +182,6 @@ const Orders = () => {
     const data = await res.json();
 
     if (res.ok) {
-      console.log(data.orders.reverse());
       setOrders(data.orders.reverse());
       setFilteredOrders(data.orders.reverse());
     } else {
@@ -360,7 +359,6 @@ const Orders = () => {
               id,
               labelName,
             } = order;
-            console.log(thumbnail);
             return (
               <Link to={`/admin-panel/order/${id}`}>
                 <MobileOrderBox>

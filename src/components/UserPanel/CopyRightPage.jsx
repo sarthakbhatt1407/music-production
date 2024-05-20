@@ -266,7 +266,7 @@ const CopyRightPage = () => {
       `${process.env.REACT_APP_BASE_URL}/copyright/get-all-user-query/?userId=${userId}`
     );
     const data = await res.json();
-    console.log(data.cQueries);
+
     if (res.ok) {
       setQueries(data.cQueries.reverse());
       setIsLoading(false);
@@ -476,7 +476,6 @@ const CopyRightPage = () => {
                               title="Confirm"
                               description="Do you want to delete?"
                               onConfirm={confirm.bind(this, id)}
-                              onOpenChange={() => console.log("open change")}
                             >
                               <Link>
                                 <DeleteForeverOutlined />

@@ -624,7 +624,6 @@ const UserProfile = () => {
     try {
       await navigator.clipboard.writeText(txt);
       openNotificationWithIcon("success", "Copied to clipboard");
-      console.log("Content copied to clipboard");
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
@@ -638,7 +637,6 @@ const UserProfile = () => {
     const data = await res.json();
 
     if (res.ok) {
-      // console.log(data.orders.reverse());
       setOrders(data.orders.reverse());
       setFilteredOrders(data.orders.reverse());
     } else {
@@ -654,7 +652,7 @@ const UserProfile = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${id}`
     );
     const data = await res.json();
-    // console.log(data);
+
     if (res.ok) {
       setUserdata(data.user);
       setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
@@ -715,7 +713,7 @@ const UserProfile = () => {
   const reportsYearChanger = (e) => {
     const ele = document.querySelector(`#${e.target.id}`);
     const value = ele.options[ele.selectedIndex].value;
-    // console.log(value);
+
     setReportSelectedYear(Number(value));
 
     let resArr;
@@ -735,7 +733,6 @@ const UserProfile = () => {
       };
       arr.push(obj);
     }
-    // console.log(arr);
     setReportData(arr);
   };
   const [open, setOpen] = useState(false);
@@ -785,7 +782,6 @@ const UserProfile = () => {
     );
     const data = await res.json();
 
-    console.log(data);
     if (res.ok) {
       openNotificationWithIcon("success", data.message);
       window.location.reload();
@@ -814,7 +810,6 @@ const UserProfile = () => {
     );
     const data = await res.json();
 
-    console.log(data);
     if (res.ok) {
       openNotificationWithIcon("success", data.message);
       setRefresher((prev) => {
@@ -997,7 +992,6 @@ const UserProfile = () => {
                       };
                       arr.push(obj);
                     }
-                    console.log(arr);
                     setReportData(arr);
                   }}
                 >
@@ -1619,7 +1613,6 @@ const UserProfile = () => {
                               };
                               arr.push(obj);
                             }
-                            console.log(arr);
                             setReportData(arr);
                           }}
                         >

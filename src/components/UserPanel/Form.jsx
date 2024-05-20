@@ -340,7 +340,7 @@ const Form = () => {
   const imgProps = {
     beforeUpload: async (file) => {
       let isValid;
-      console.log(file);
+
       isValid =
         file.type === "image/png" ||
         file.type === "image/jpeg" ||
@@ -368,7 +368,6 @@ const Form = () => {
   };
   const fileProps = {
     beforeUpload: (file) => {
-      console.log(file.type);
       const isValid =
         file.type === "audio/wav" ||
         file.type === "audio/mp3" ||
@@ -457,7 +456,6 @@ const Form = () => {
     const ele = document.querySelector("#dateOfRelease");
     ele.style.border = "none";
     setInpFields({ ...inpFields, dateOfRelease: dateString });
-    console.log(dateString);
   };
 
   const onChangeHandler = (e) => {
@@ -603,7 +601,7 @@ const Form = () => {
       }
     );
     const data = await res.json();
-    console.log(data);
+
     if (res.ok) {
       const orderId = data.createdOrder._id;
       const imgFormData = new FormData();
@@ -618,7 +616,7 @@ const Form = () => {
       );
 
       const imgData = await imgRes.json();
-      console.log(imgData);
+
       if (imgRes.ok) {
         success("Order created");
         setTimeout(() => {
@@ -965,7 +963,7 @@ const Form = () => {
                 onChange={(e) => {
                   const ele = document.querySelector(`#${e.target.id}`);
                   const value = ele.options[ele.selectedIndex].value;
-                  console.log(value);
+
                   setInpFields({ ...inpFields, genre: value });
                 }}
               >
@@ -1041,7 +1039,7 @@ const Form = () => {
                 onChange={(e) => {
                   const ele = document.querySelector(`#${e.target.id}`);
                   const value = ele.options[ele.selectedIndex].value;
-                  console.log(value);
+
                   setInpFields({ ...inpFields, language: value });
                 }}
               >
@@ -1082,7 +1080,7 @@ const Form = () => {
                 onChange={(e) => {
                   const ele = document.querySelector(`#${e.target.id}`);
                   const value = ele.options[ele.selectedIndex].value;
-                  console.log(value);
+
                   setInpFields({ ...inpFields, mood: value });
                 }}
               >
@@ -1180,7 +1178,6 @@ const Form = () => {
                   let res;
                   res = time["$m"] + ":" + time["$s"];
 
-                  // console.log(res);
                   setInpFields({ ...inpFields, crbt: res });
                 }}
               />

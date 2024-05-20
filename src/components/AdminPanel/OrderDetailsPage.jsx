@@ -276,7 +276,7 @@ const OrderDetailsPage = () => {
       `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
     );
     const data = await res.json();
-    console.log(data);
+
     if (!data.order) {
       navigate("/admin-panel/pending-work");
     }
@@ -323,7 +323,6 @@ const OrderDetailsPage = () => {
         }, 500);
       });
     }
-    console.log(data);
   };
 
   useEffect(() => {
@@ -359,7 +358,7 @@ const OrderDetailsPage = () => {
       }
     );
     const data = await res.json();
-    console.log(data);
+
     if (res.ok) {
       openNotificationWithIcon("success", data.message);
       setTimeout(() => {
@@ -674,7 +673,7 @@ const OrderDetailsPage = () => {
                         title="Confirm"
                         description="Do you want to approve?"
                         onConfirm={confirm}
-                        onOpenChange={() => console.log("open change")}
+                        onOpenChange={() => {}}
                       >
                         <Link
                           style={{
@@ -704,7 +703,7 @@ const OrderDetailsPage = () => {
                         onConfirm={() => {
                           setShowModal(true);
                         }}
-                        onOpenChange={() => console.log("open change")}
+                        onOpenChange={() => {}}
                       >
                         <Link
                           style={{

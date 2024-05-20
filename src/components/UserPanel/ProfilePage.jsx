@@ -281,7 +281,7 @@ const ProfilePage = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
     );
     const data = await res.json();
-    console.log(data);
+
     if (res.ok) {
       setUserdata(data.user);
       setInpFields(data.user.bankDetails[0]);
@@ -359,7 +359,6 @@ const ProfilePage = () => {
     try {
       await navigator.clipboard.writeText(txt);
       openNotificationWithIcon("success", "Copied to clipboard");
-      console.log("Content copied to clipboard");
     } catch (err) {
       console.error("Failed to copy: ", err);
     }

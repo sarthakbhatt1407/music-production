@@ -131,7 +131,7 @@ const AllUsers = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-all-user/?id=${userId}`
     );
     const data = await res.json();
-    console.log(data);
+
     if (res.ok) {
       setUsers(data.users.reverse());
       setFilteredUsers(data.users.reverse());

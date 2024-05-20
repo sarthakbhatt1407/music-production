@@ -298,7 +298,7 @@ const EditOrder = () => {
       `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
     );
     const data = await res.json();
-    console.log(data);
+
     setInpFields({ ...data.order, thumbnail: null, file: null });
     setOrder(data.order);
     setIsloading(false);
@@ -449,7 +449,6 @@ const EditOrder = () => {
     const ele = document.querySelector("#dateOfRelease");
     ele.style.border = "none";
     setInpFields({ ...inpFields, dateOfRelease: dateString });
-    console.log(dateString);
   };
 
   const onChangeHandler = (e) => {
@@ -543,7 +542,6 @@ const EditOrder = () => {
       openNotificationWithIcon("error");
       return;
     }
-    console.log("start");
     const formData = new FormData();
 
     formData.append("labelName", inpFields.labelName);
@@ -592,7 +590,6 @@ const EditOrder = () => {
       }
     );
     const data = await res.json();
-    console.log(data);
 
     if (res.ok) {
       const imgFormData = new FormData();
@@ -607,7 +604,7 @@ const EditOrder = () => {
       );
 
       const imgData = await imgRes.json();
-      console.log(imgData);
+
       if (imgRes.ok) {
         success(data.message);
         setTimeout(() => {
@@ -1002,7 +999,7 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-                      console.log(value);
+
                       setInpFields({ ...inpFields, genre: value });
                     }}
                   >
@@ -1043,7 +1040,7 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-                      console.log(value);
+
                       setInpFields({ ...inpFields, language: value });
                     }}
                   >
@@ -1084,7 +1081,7 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-                      console.log(value);
+
                       setInpFields({ ...inpFields, mood: value });
                     }}
                   >
@@ -1178,7 +1175,6 @@ const EditOrder = () => {
                       let res;
                       res = time["$m"] + ":" + time["$s"];
 
-                      // console.log(res);
                       setInpFields({ ...inpFields, crbt: res });
                     }}
                   />

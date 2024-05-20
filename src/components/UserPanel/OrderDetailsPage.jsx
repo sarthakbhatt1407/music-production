@@ -175,7 +175,7 @@ const OrderDetailsPage = () => {
       `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
     );
     const data = await res.json();
-    console.log(data);
+
     setOrder(data.order);
     setIsloading(false);
     let arr = [];
@@ -218,7 +218,6 @@ const OrderDetailsPage = () => {
         }, 500);
       });
     }
-    console.log(data);
   };
 
   useEffect(() => {
@@ -504,7 +503,6 @@ const OrderDetailsPage = () => {
                       title="Confirm"
                       description="Do you want to delete?"
                       onConfirm={confirm}
-                      onOpenChange={() => console.log("open change")}
                     >
                       <Link>
                         <DeleteOutlined

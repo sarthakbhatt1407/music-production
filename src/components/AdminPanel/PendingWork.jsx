@@ -313,8 +313,6 @@ const PendingWork = () => {
   };
 
   const onSubmitHandler = async () => {
-    console.log(inpFields);
-
     if (inpFields.upc.length < 1 || inpFields.isrc.length === 0) {
       if (inpFields.upc.length === 0) {
         const upc = document.querySelector("#upc");
@@ -356,7 +354,6 @@ const PendingWork = () => {
     } else {
       openNotificationWithIcon("error", data.message);
     }
-    console.log(data);
     setIsloading(false);
     setShowModal(false);
   };
@@ -370,7 +367,6 @@ const PendingWork = () => {
     const data = await res.json();
 
     if (res.ok) {
-      console.log(data.orders.reverse());
       setOrders(data.orders.reverse());
       setFilteredOrders(data.orders.reverse());
     } else {
@@ -400,7 +396,6 @@ const PendingWork = () => {
     } else {
       openNotificationWithIcon("error", data.message);
     }
-    console.log(data);
     setIsloading(false);
   };
   useEffect(() => {
@@ -600,7 +595,6 @@ const PendingWork = () => {
                           });
                           setShowModal(true);
                         }}
-                        onOpenChange={() => console.log("open change")}
                       >
                         <Link>
                           <Done />
@@ -634,7 +628,6 @@ const PendingWork = () => {
               id,
               labelName,
             } = order;
-            console.log(thumbnail);
             return (
               <Link>
                 <MobileOrderBox>
@@ -693,7 +686,6 @@ const PendingWork = () => {
                           });
                           setShowModal(true);
                         }}
-                        onOpenChange={() => console.log("open change")}
                       >
                         <Link>
                           <Done />

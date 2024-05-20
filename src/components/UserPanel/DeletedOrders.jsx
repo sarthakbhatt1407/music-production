@@ -182,7 +182,6 @@ const DeletedOrders = () => {
     const data = await res.json();
 
     if (res.ok) {
-      console.log(data.orders.reverse());
       setOrders(data.orders.reverse());
       setFilteredOrders(data.orders.reverse());
     }
@@ -221,7 +220,6 @@ const DeletedOrders = () => {
         }, 500);
       });
     }
-    console.log(data);
   };
 
   return (
@@ -342,7 +340,6 @@ const DeletedOrders = () => {
               thumbnail,
               id,
             } = ord;
-            console.log(thumbnail);
             return (
               <MobileOrderBox>
                 <img

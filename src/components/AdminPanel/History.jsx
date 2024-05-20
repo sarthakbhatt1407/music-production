@@ -221,7 +221,6 @@ const History = () => {
     const data = await res.json();
 
     if (res.ok) {
-      console.log(data.orders.reverse());
       setOrders(data.orders.reverse());
       setFilteredOrders(data.orders.reverse());
     } else {
@@ -251,7 +250,6 @@ const History = () => {
     } else {
       openNotificationWithIcon("error", data.message);
     }
-    console.log(data);
     setIsloading(false);
   };
   useEffect(() => {
@@ -425,7 +423,6 @@ const History = () => {
               thumbnail,
               id,
             } = order;
-            console.log(thumbnail);
             return (
               <Link>
                 <MobileOrderBox>

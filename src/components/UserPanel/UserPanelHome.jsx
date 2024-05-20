@@ -218,7 +218,7 @@ const UserPanelHome = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
     );
     const data = await res.json();
-    console.log(data);
+
     if (res.ok) {
       setUserdata(data.user);
 
@@ -275,7 +275,7 @@ const UserPanelHome = () => {
   const reportsYearChanger = (e) => {
     const ele = document.querySelector(`#${e.target.id}`);
     const value = ele.options[ele.selectedIndex].value;
-    console.log(value);
+
     setReportSelectedYear(Number(value));
 
     let resArr;
@@ -293,7 +293,7 @@ const UserPanelHome = () => {
       };
       arr.push(obj);
     }
-    console.log(arr);
+
     setReportData(arr);
   };
 
@@ -393,7 +393,7 @@ const UserPanelHome = () => {
                           };
                           arr.push(obj);
                         }
-                        console.log(arr);
+
                         setReportData(arr);
                       }}
                     >

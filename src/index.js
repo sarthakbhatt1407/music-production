@@ -16,13 +16,3 @@ root.render(
     </Provider>
   </React.StrictMode>
 );
-
-// @media only screen and (min-width: 0px) and (max-width: 350px) {
-
-// }
-// @media only screen and (min-width: 351px) and (max-width: 549px) {
-
-// }
-// @media only screen and (min-width: 550px) and (max-width: 800px) {
-
-// }
