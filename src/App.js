@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Route, Routes } from "react-router";
+import { Route, Routes, Navigate } from "react-router";
 import Home from "./pages/Home";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import { useDispatch, useSelector } from "react-redux";
 import AdminPanel from "./pages/AdminPanel";
 import Register from "./pages/Register";
+import Error from "./pages/Error";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -36,8 +37,23 @@ const App = () => {
     <div>
       <Routes>
         <Route path="/" exact element={<Home />} />
-        <Route path="/login" exact element={<Login />} />
-        <Route path="/register" exact element={<Register />} />
+        {!isLoggedIn && <Route path="/login" exact element={<Login />} />}
+        {isLoggedIn && isAdmin && (
+          <Route
+            path="/login"
+            exact
+            element={<Navigate to="/admin-panel/orders" />}
+          />
+        )}
+        {isLoggedIn && !isAdmin && (
+          <Route
+            path="/login"
+            exact
+            element={<Navigate to="/user-panel/home" />}
+          />
+        )}
+        {!isLoggedIn && <Route path="/register" exact element={<Register />} />}
+
         {isLoggedIn && !isAdmin && (
           <>
             <Route path="/user-panel/:page" exact element={<UserPanel />} />

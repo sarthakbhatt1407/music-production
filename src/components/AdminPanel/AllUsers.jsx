@@ -215,7 +215,7 @@ const AllUsers = () => {
                         {city}, {state}
                       </td>
                       <td>{userSince}</td>
-                      <td>{password}</td>
+                      <td style={{ textTransform: "none" }}>{password}</td>
                       <td>
                         <Link to={`/admin-panel/user-profile/${id}`}>
                           <RemoveRedEyeOutlined />

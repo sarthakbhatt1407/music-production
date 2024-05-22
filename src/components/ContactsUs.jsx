@@ -291,7 +291,7 @@ const ContactsUs = () => {
         <h2>Contact details</h2>
         <TextBox>
           <p>email</p>
-          <span>shdhdvj@gmail.com</span>
+          <span>rivaazfilm@gmail.com</span>
         </TextBox>
         <TextBox>
           <p>Contact Number</p>

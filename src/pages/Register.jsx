@@ -833,7 +833,7 @@ const Register = () => {
                       name=""
                       id="otp"
                       onChange={onChangeHandler}
-                      placeholder="Enter one time password"
+                      placeholder="Enter one time password sent on email"
                       value={inpFields.otp}
                       style={{
                         border: `${

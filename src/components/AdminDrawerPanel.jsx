@@ -19,7 +19,7 @@ import {
   RestoreFromTrashOutlined,
   WorkHistoryOutlined,
 } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
@@ -36,6 +36,7 @@ const LogoDiv = styled.div`
 `;
 
 const DrawerPanel = (props) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const page = props.page;
   const items = [
@@ -52,6 +53,7 @@ const DrawerPanel = (props) => {
         <span
           onClick={() => {
             dispatch({ type: "logout" });
+            navigate("/login");
           }}
         >
           Log out

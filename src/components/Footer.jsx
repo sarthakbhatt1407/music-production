@@ -201,7 +201,7 @@ const Footer = () => {
               <Phone /> +918126770620 +918384864363
             </span>
             <span style={{ textTransform: "none" }}>
-              <Mail /> s@gmail.com
+              <Mail /> rivaazfilm@gmail.com
             </span>
 
             <span style={{ textAlign: "center" }}>

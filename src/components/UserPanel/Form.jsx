@@ -314,26 +314,78 @@ const Form = () => {
     return () => {};
   }, []);
 
-  const readrr = async (file) => {
+  const imgReader = (img) => {
+    var reader = new FileReader();
+
+    // When the file is loaded, display the image
+    reader.onload = function (event) {
+      // Get the image data
+      var imageData = event.target.result;
+
+      // Create a new image element
+      var image = new Image();
+
+      // Set the image src attribute to the image data
+      image.src = imageData;
+      image.style.width = "5rem";
+
+      // Add the image to the document body
+      document.querySelector("#imgbox").appendChild(image);
+    };
+
+    // Read the image file
+    reader.readAsDataURL(img);
+  };
+
+  const readrr = async (e) => {
+    const imgbox = document.getElementById("imgbox");
+    imgbox.innerHTML = "";
+    const file = e.target.files[0];
+    // return;
     var reader = new FileReader();
 
     reader.readAsDataURL(file);
 
+    const isValid =
+      file.type === "image/png" ||
+      file.type === "image/jpeg" ||
+      file.type === "image/jpg";
+    console.log(isValid);
+    if (!isValid) {
+      message.error(`Only png, jpeg, jpg files are allowed.`);
+      setIsloading(false);
+      const thmb = document.getElementById("thmb");
+      thmb.value = "";
+      return;
+    }
+
     reader.onload = function (e) {
+      setIsloading(true);
       var image = new Image();
 
       image.src = e.target.result;
+      image.style.width = "2rem";
       let width, height;
-      image.onload = async function () {
+      image.onload = function (event) {
         height = this.height;
         width = this.width;
-      };
 
-      if (width != 1600 && height != 1600) {
-        message.error(`Only 1600x1600 images are allowed`);
-        return false;
-      }
-      return true;
+        const sixteen = width === 1600 && height === 1600;
+        const three = width === 3000 && height === 3000;
+
+        if (sixteen === false && three === false) {
+          const thmb = document.getElementById("thmb");
+          thmb.value = "";
+
+          message.error(`Only 1600x1600 or 3000x3000 images are allowed`);
+          setInpFields({ ...inpFields, thumbnail: null });
+        } else {
+          imgReader(file);
+          setInpFields({ ...inpFields, thumbnail: file });
+          console.log("done");
+        }
+        setIsloading(false);
+      };
     };
   };
 
@@ -359,7 +411,7 @@ const Form = () => {
       let img;
       if (info.fileList[0]) {
         img = info.fileList[0].originFileObj;
-
+        console.log(img);
         setInpFields({ ...inpFields, thumbnail: img });
       } else {
         setInpFields({ ...inpFields, thumbnail: null });
@@ -474,7 +526,6 @@ const Form = () => {
       inpFields.title.length === 0 ||
       inpFields.dateOfRelease.length === 0 ||
       inpFields.language.length === 0 ||
-      inpFields.description.length === 0 ||
       inpFields.mood.length === 0 ||
       inpFields.singer.length === 0 ||
       inpFields.composer.length === 0 ||
@@ -501,10 +552,7 @@ const Form = () => {
         const language = document.querySelector("#language");
         language.style.border = "1px solid red";
       }
-      if (inpFields.description.length === 0) {
-        const description = document.querySelector("#description");
-        description.style.border = "1px solid red";
-      }
+
       if (inpFields.mood.length === 0) {
         const mood = document.querySelector("#mood");
         mood.style.border = "1px solid red";
@@ -1057,9 +1105,7 @@ const Form = () => {
             </LabelInpBox>
 
             <LabelInpBox>
-              <Label htmlFor="description">
-                Album description <span style={{ margin: 0 }}>*</span>
-              </Label>
+              <Label htmlFor="description">Album description</Label>
               <Input
                 type="text"
                 name="description"
@@ -1108,14 +1154,22 @@ const Form = () => {
               <Label htmlFor="thumbnail" id="thumbnail">
                 Thumbnail <span style={{ margin: 0 }}>*</span>
               </Label>
-              <Upload
+              {/* <Upload
                 method="get"
                 listType="picture"
                 {...imgProps}
                 maxCount={1}
               >
                 <Button icon={<UploadOutlined />}>Upload image</Button>
-              </Upload>
+              </Upload> */}
+              <Input
+                type="file"
+                name=""
+                accept="image/png, image/jpeg, image/jpg "
+                id="thmb"
+                onChange={readrr}
+              />
+              <div id="imgbox" style={{ width: "1rem" }}></div>
             </LabelInpBox>
 
             <LabelInpBox>
