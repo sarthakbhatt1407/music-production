@@ -341,7 +341,7 @@ const Form = () => {
     const imgbox = document.getElementById("imgbox");
     imgbox.innerHTML = "";
     const file = e.target.files[0];
-    // return;
+
     var reader = new FileReader();
 
     reader.readAsDataURL(file);
@@ -382,7 +382,6 @@ const Form = () => {
         } else {
           imgReader(file);
           setInpFields({ ...inpFields, thumbnail: file });
-          console.log("done");
         }
         setIsloading(false);
       };
