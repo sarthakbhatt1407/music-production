@@ -543,10 +543,6 @@ const EditOrder = () => {
       inpFields.language.length === 0 ||
       inpFields.mood.length === 0 ||
       inpFields.singer.length === 0 ||
-      inpFields.composer.length === 0 ||
-      inpFields.director.length === 0 ||
-      inpFields.producer.length === 0 ||
-      inpFields.starCast.length === 0 ||
       inpFields.thumbnail === null ||
       inpFields.file === null
     ) {
@@ -576,22 +572,7 @@ const EditOrder = () => {
         const singer = document.querySelector("#singer");
         singer.style.border = "1px solid red";
       }
-      if (inpFields.composer.length === 0) {
-        const composer = document.querySelector("#composer");
-        composer.style.border = "1px solid red";
-      }
-      if (inpFields.director.length === 0) {
-        const director = document.querySelector("#director");
-        director.style.border = "1px solid red";
-      }
-      if (inpFields.producer.length === 0) {
-        const producer = document.querySelector("#producer");
-        producer.style.border = "1px solid red";
-      }
-      if (inpFields.starCast.length === 0) {
-        const starCast = document.querySelector("#starCast");
-        starCast.style.border = "1px solid red";
-      }
+
       if (inpFields.thumbnail === null) {
         const thumbnail = document.querySelector("#thumbnail");
         thumbnail.style.color = "red";
@@ -1286,69 +1267,6 @@ const EditOrder = () => {
                   />
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="composer">
-                    composer <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="composer"
-                    id="composer"
-                    placeholder="composer name"
-                    onChange={onChangeHandler}
-                    value={inpFields.composer}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="singer">Add Composer Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowComposerModal(true);
-                    }}
-                    type="button"
-                    value={`+`}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="director">
-                    director <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="director"
-                    id="director"
-                    placeholder="director name"
-                    onChange={onChangeHandler}
-                    value={inpFields.director}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="producer">
-                    producer <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="producer"
-                    id="producer"
-                    placeholder="producer name"
-                    onChange={onChangeHandler}
-                    value={inpFields.producer}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="starCast">
-                    starCast <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="starCast"
-                    id="starCast"
-                    placeholder=""
-                    onChange={onChangeHandler}
-                    value={inpFields.starCast}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
                   <Label htmlFor="lyricist">
                     lyricist <span style={{ margin: 0 }}>*</span>
                   </Label>
@@ -1370,6 +1288,61 @@ const EditOrder = () => {
                     }}
                     type="button"
                     value={`+`}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="composer">composer</Label>
+                  <Input
+                    type="text"
+                    name="composer"
+                    id="composer"
+                    placeholder="composer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.composer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="singer">Add Composer Profile</Label>
+                  <Input
+                    style={{ width: "30%" }}
+                    onClick={() => {
+                      setShowComposerModal(true);
+                    }}
+                    type="button"
+                    value={`+`}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="director">director</Label>
+                  <Input
+                    type="text"
+                    name="director"
+                    id="director"
+                    placeholder="director name"
+                    onChange={onChangeHandler}
+                    value={inpFields.director}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="producer">producer</Label>
+                  <Input
+                    type="text"
+                    name="producer"
+                    id="producer"
+                    placeholder="producer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.producer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="starCast">starCast</Label>
+                  <Input
+                    type="text"
+                    name="starCast"
+                    id="starCast"
+                    placeholder=""
+                    onChange={onChangeHandler}
+                    value={inpFields.starCast}
                   />
                 </LabelInpBox>
               </AllInpBox>

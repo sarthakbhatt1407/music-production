@@ -527,10 +527,6 @@ const Form = () => {
       inpFields.language.length === 0 ||
       inpFields.mood.length === 0 ||
       inpFields.singer.length === 0 ||
-      inpFields.composer.length === 0 ||
-      inpFields.director.length === 0 ||
-      inpFields.producer.length === 0 ||
-      inpFields.starCast.length === 0 ||
       inpFields.thumbnail === null ||
       inpFields.file === null
     ) {
@@ -560,22 +556,7 @@ const Form = () => {
         const singer = document.querySelector("#singer");
         singer.style.border = "1px solid red";
       }
-      if (inpFields.composer.length === 0) {
-        const composer = document.querySelector("#composer");
-        composer.style.border = "1px solid red";
-      }
-      if (inpFields.director.length === 0) {
-        const director = document.querySelector("#director");
-        director.style.border = "1px solid red";
-      }
-      if (inpFields.producer.length === 0) {
-        const producer = document.querySelector("#producer");
-        producer.style.border = "1px solid red";
-      }
-      if (inpFields.starCast.length === 0) {
-        const starCast = document.querySelector("#starCast");
-        starCast.style.border = "1px solid red";
-      }
+
       if (inpFields.thumbnail === null) {
         const thumbnail = document.querySelector("#thumbnail");
         thumbnail.style.color = "red";
@@ -1290,9 +1271,7 @@ const Form = () => {
               />
             </LabelInpBox>
             <LabelInpBox>
-              <Label htmlFor="composer">
-                composer <span style={{ margin: 0 }}>*</span>
-              </Label>
+              <Label htmlFor="composer">composer</Label>
               <Input
                 type="text"
                 name="composer"
@@ -1314,9 +1293,7 @@ const Form = () => {
               />
             </LabelInpBox>
             <LabelInpBox>
-              <Label htmlFor="director">
-                director <span style={{ margin: 0 }}>*</span>
-              </Label>
+              <Label htmlFor="director">director</Label>
               <Input
                 type="text"
                 name="director"
@@ -1327,9 +1304,7 @@ const Form = () => {
               />
             </LabelInpBox>
             <LabelInpBox>
-              <Label htmlFor="producer">
-                producer <span style={{ margin: 0 }}>*</span>
-              </Label>
+              <Label htmlFor="producer">producer</Label>
               <Input
                 type="text"
                 name="producer"
@@ -1340,9 +1315,7 @@ const Form = () => {
               />
             </LabelInpBox>
             <LabelInpBox>
-              <Label htmlFor="starCast">
-                starCast <span style={{ margin: 0 }}>*</span>
-              </Label>
+              <Label htmlFor="starCast">starCast</Label>
               <Input
                 type="text"
                 name="starCast"
@@ -1363,29 +1336,3 @@ const Form = () => {
 };
 
 export default Form;
-
-// const orderSchema = mongoose.Schema({
-//     labelName: { type: String, required: true },
-//     subLabel1:"",
-//     subLabel2:"",
-//     subLabel3:"",
-//     title: { type: String, required: true },
-//     dateOfRelease: { type: String, required: true },
-//     albumType: { type: String, required: true },
-//     language: { type: String, required: true },
-//     thumbnail: { type: String, required: true },
-//     orderDateAndTime: { type: String, required: true },
-//     file: { type: String, required: true },
-//     mood: { type: String, required: true },
-//     userId: { type: String, required: true },
-//     description: { type: String, required: true },
-//     singer: { type: String, required: true },
-//     composer: { type: String, required: true },
-//     director: { type: String, required: true },
-//     producer: { type: String, required: true },
-//     starCast: { type: String, required: true },
-//     lyrics:"",
-//     status:"",
-//     remark:"",
-//     deleted: { type: Boolean },
-//   });
