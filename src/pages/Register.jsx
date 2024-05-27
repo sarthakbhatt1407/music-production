@@ -8,11 +8,14 @@ import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload } from "antd";
 const OuterBox = styled.div`
   background-color: #f7f7f7;
-  height: 95svh;
+  height: 100svh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem 0;
+  @media only screen and (max-width: 1000px) {
+    height: fit-content;
+  }
 `;
 
 const MainBox = styled.div`
@@ -274,12 +277,17 @@ const Register = () => {
   };
   const profilePicProps = {
     beforeUpload: (file) => {
-      const isValid =
+      let isValid =
         file.type === "image/png" ||
         file.type === "image/jpeg" ||
         file.type === "image/jpg";
       if (!isValid) {
         message.error(`Only .png .jpeg .jpg is allowed`);
+      }
+      const fileMb = file.size / 1024 ** 2;
+      if (fileMb > 2) {
+        message.error(`Photo size is greater than 2MB.`);
+        isValid = false;
       }
       return isValid || Upload.LIST_IGNORE;
     },
@@ -294,14 +302,20 @@ const Register = () => {
       }
     },
   };
+
   const signProps = {
     beforeUpload: (file) => {
-      const isValid =
+      let isValid =
         file.type === "image/png" ||
         file.type === "image/jpeg" ||
         file.type === "image/jpg";
       if (!isValid) {
         message.error(`Only .png .jpeg .jpg is allowed`);
+      }
+      const fileMb = file.size / 1024 ** 2;
+      if (fileMb > 2) {
+        message.error(`Photo size is greater than 2MB.`);
+        isValid = false;
       }
       return isValid || Upload.LIST_IGNORE;
     },
@@ -624,7 +638,7 @@ const Register = () => {
           onClose={handleClose}
           severity="success"
           variant="filled"
-          sx={{ width: "100%", top: 0, fontSize: "1.1rem" }}
+          sx={{ width: "100%", top: 0, fontSize: "1rem" }}
         >
           Sign up successfull. Kindly login now
         </Alert>
@@ -660,7 +674,7 @@ const Register = () => {
                   name="fullName"
                   id="fullName"
                   className="inputField"
-                  placeholder="Full Name"
+                  placeholder="Label Name"
                   onChange={onChangeHandler}
                   value={inpFields.fullName}
                   onBlur={onBlurHandler}
@@ -790,7 +804,7 @@ const Register = () => {
                       maxCount={1}
                     >
                       <Button icon={<UploadOutlined />}>
-                        Upload Channel Logo
+                        Upload Channel Logo(Max. size 2MB)
                       </Button>
                     </Upload>
                     <Upload
@@ -800,7 +814,7 @@ const Register = () => {
                       maxCount={1}
                     >
                       <Button icon={<UploadOutlined />}>
-                        Upload Signature
+                        Upload Signature(Max. size 2MB)
                       </Button>
                     </Upload>
                   </PhotosDiv>

@@ -290,12 +290,6 @@ const OrderDetailsPage = () => {
                     field = "order Date";
                     value = value.split("/")[0];
                   }
-                  if (field === "starCast") {
-                    field = "star Cast";
-                  }
-                  if (field === "remark") {
-                    field = "Rejection Reason";
-                  }
                   if (field === "singerAppleId") {
                     field = "singer Apple Id";
                     return (
@@ -451,6 +445,18 @@ const OrderDetailsPage = () => {
                         </span>
                       </div>
                     );
+                  }
+                  if (field === "musicDirector") {
+                    field = "Music Director";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>{value}</span>
+                      </div>
+                    );
+                  }
+                  if (field === "starCast") {
+                    field = "star Cast";
                   }
                   if (field === "thumbnail") {
                     return (

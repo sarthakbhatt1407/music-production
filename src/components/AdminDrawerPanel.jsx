@@ -16,6 +16,7 @@ import {
   HistoryOutlined,
   LibraryMusicOutlined,
   PeopleOutlineOutlined,
+  QuestionAnswerOutlined,
   RestoreFromTrashOutlined,
   WorkHistoryOutlined,
 } from "@mui/icons-material";
@@ -83,6 +84,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "all-users") {
       return ["7"];
+    }
+    if (page === "user-queries") {
+      return ["8"];
     }
   };
 
@@ -175,6 +179,18 @@ const DrawerPanel = (props) => {
                   onClick={() => setCollapsed(true)}
                 >
                   <PeopleOutlineOutlined />
+                </Link>
+              ),
+              label: "Labels",
+            },
+            {
+              key: "8",
+              icon: (
+                <Link
+                  to={"/admin-panel/user-queries"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <QuestionAnswerOutlined />
                 </Link>
               ),
               label: "Labels",

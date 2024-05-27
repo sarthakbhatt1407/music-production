@@ -376,6 +376,17 @@ const MobileBox = styled.div`
     display: none;
   }
 `;
+const BankBtn = styled.button`
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 1rem;
+  background-color: #1677ff;
+  color: white;
+  text-transform: capitalize;
+  /* font-size: 1rem; */
+  font-weight: bold;
+  letter-spacing: 0.09rem;
+`;
 
 const MobileOrderBox = styled.div`
   display: flex;
@@ -587,10 +598,26 @@ const UserProfile = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserdata] = useState(null);
+  const [showPaid, setShowPaid] = useState(false);
+  const [totalEarningUser, setTotalEarningUser] = useState(0);
   const [orders, setOrders] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState(null);
   const [modalEarning, setModalEarning] = useState(false);
   const [modalStream, setModalStream] = useState(false);
+  const [paidInp, setPaidInp] = useState(0);
+  const [editPaid, setEditPaid] = useState(0);
+  const [showEditPaid, setShowEditPaid] = useState(false);
+  const totalPaymentReporter = (report) => {
+    let totalPayment = 0;
+    if (report) {
+      for (const year in report) {
+        for (const mon in report[year]) {
+          totalPayment += Number(report[year][mon]);
+        }
+      }
+      setTotalEarningUser(totalPayment);
+    }
+  };
 
   const [modalEarningInpFields, setModalEarningInpFields] = useState({
     Jan: 0,
@@ -655,6 +682,8 @@ const UserProfile = () => {
 
     if (res.ok) {
       setUserdata(data.user);
+      setEditPaid(data.user.paidEarning);
+      totalPaymentReporter(data.user.finacialReport[0]);
       setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
       setModalStreamInpFields(
         data.user.analytics[0][currentYear][selectedMonth]
@@ -825,6 +854,172 @@ const UserProfile = () => {
   return (
     <>
       {" "}
+      {showEditPaid && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <LabelInpBox>
+                <Label htmlFor="jan">Paid Amount</Label>
+                <ModalInput
+                  type="number"
+                  onChange={(e) => {
+                    if (e.target.value.length === 0) {
+                      setEditPaid(0);
+                      return;
+                    }
+                    setEditPaid(e.target.value);
+                  }}
+                  id="paid"
+                  value={editPaid}
+                />
+              </LabelInpBox>
+            </ModalFormBox>
+            <BtnBox>
+              <button
+                onClick={async () => {
+                  if (editPaid === 0) {
+                    openNotificationWithIcon(
+                      "error",
+                      "Amount should be greater than 0."
+                    );
+                    return;
+                  }
+                  if (editPaid > totalEarningUser) {
+                    openNotificationWithIcon(
+                      "error",
+                      "Amount is greater than total amount."
+                    );
+                    return;
+                  }
+                  setIsLoading(true);
+                  const res = await fetch(
+                    `${process.env.REACT_APP_BASE_URL}/user/edit-paid`,
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        userId: id,
+                        adminId: userId,
+                        paid: Number(editPaid),
+                      }),
+                    }
+                  );
+                  const data = await res.json();
+                  console.log(data);
+                  if (res.ok) {
+                    openNotificationWithIcon("success", data.message);
+                    window.location.reload();
+                  } else {
+                    openNotificationWithIcon("error", data.message);
+                  }
+                  setShowPaid(false);
+                  setIsLoading(false);
+                }}
+              >
+                Submit
+              </button>
+              <button
+                onClick={() => {
+                  setShowPaid(false);
+                }}
+              >
+                Cancel
+              </button>
+            </BtnBox>
+          </ModalBox>
+        </Modal>
+      )}
+      {showPaid && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <LabelInpBox>
+                <Label htmlFor="jan">Paid Amount</Label>
+                <ModalInput
+                  type="number"
+                  onChange={(e) => {
+                    if (e.target.value.length === 0) {
+                      setPaidInp(0);
+                      return;
+                    }
+                    setPaidInp(e.target.value);
+                  }}
+                  id="paid"
+                  value={paidInp}
+                />
+              </LabelInpBox>
+            </ModalFormBox>
+            <BtnBox>
+              <button
+                onClick={async () => {
+                  if (paidInp === 0) {
+                    openNotificationWithIcon(
+                      "error",
+                      "Amount should be greater than 0."
+                    );
+                    return;
+                  }
+                  if (paidInp > totalEarningUser - userData.paidEarning) {
+                    openNotificationWithIcon(
+                      "error",
+                      "Amount is greater than remaining amount."
+                    );
+                    return;
+                  }
+                  setIsLoading(true);
+                  const res = await fetch(
+                    `${process.env.REACT_APP_BASE_URL}/user/paid-earning`,
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        userId: id,
+                        adminId: userId,
+                        paid: Number(paidInp),
+                      }),
+                    }
+                  );
+                  const data = await res.json();
+                  console.log(data);
+                  if (res.ok) {
+                    openNotificationWithIcon("success", data.message);
+                    window.location.reload();
+                  } else {
+                    openNotificationWithIcon("error", data.message);
+                  }
+                  setShowPaid(false);
+                  setIsLoading(false);
+                }}
+              >
+                Submit
+              </button>
+              <button
+                onClick={() => {
+                  setShowPaid(false);
+                }}
+              >
+                Cancel
+              </button>
+            </BtnBox>
+          </ModalBox>
+        </Modal>
+      )}
       {modalEarning && (
         <Modal>
           <ModalBox data-aos="zoom-in">
@@ -1356,6 +1551,52 @@ const UserProfile = () => {
                         )}
                       </span>
                     </div>
+                  </div>
+                  <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
+                    <p>Wallet</p>
+                    <div>
+                      <span>Total Earnings</span>
+                      <span> ₹ {totalEarningUser}</span>
+                    </div>
+                    <div>
+                      <span>Paid</span>
+                      <span> ₹ {userData.paidEarning}</span>
+                    </div>
+                    <div>
+                      <span>Remaining</span>
+                      <span>
+                        {" "}
+                        ₹{" "}
+                        {Number(totalEarningUser) -
+                          Number(userData.paidEarning)}
+                      </span>
+                    </div>
+
+                    {totalEarningUser > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: "1rem",
+                        }}
+                      >
+                        <BankBtn
+                          onClick={() => {
+                            setShowPaid(true);
+                          }}
+                        >
+                          Pay
+                        </BankBtn>
+
+                        <BankBtn
+                          onClick={() => {
+                            setShowEditPaid(true);
+                          }}
+                        >
+                          Edit Paid
+                        </BankBtn>
+                      </div>
+                    )}
                   </div>
                 </RightDiv>
               </ContentDiv>

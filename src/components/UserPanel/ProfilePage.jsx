@@ -6,8 +6,9 @@ import { ContentCopyOutlined, LinkOutlined } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { notification } from "antd";
-import { message } from "antd";
+import { Button, message, Upload } from "antd";
 import { Link } from "react-router-dom";
+import { UploadOutlined } from "@ant-design/icons";
 
 const MainDiv = styled.div`
   display: flex;
@@ -267,6 +268,34 @@ const ProfilePage = () => {
       content: msg,
     });
   };
+  const profilePicProps = {
+    beforeUpload: (file) => {
+      let isValid =
+        file.type === "image/png" ||
+        file.type === "image/jpeg" ||
+        file.type === "image/jpg";
+      if (!isValid) {
+        message.error(`Only .png .jpeg .jpg is allowed`);
+      }
+      const fileMb = file.size / 1024 ** 2;
+      if (fileMb > 2) {
+        message.error(`Photo size is greater than 2MB.`);
+        isValid = false;
+      }
+      return isValid || Upload.LIST_IGNORE;
+    },
+    onChange: (info) => {
+      let img;
+      const userPicLabel = document.querySelector("#userPicLabel");
+      userPicLabel.style.color = "#9e9e9e";
+      if (info.fileList[0]) {
+        img = info.fileList[0].originFileObj;
+        setUserProfile({ ...userProfile, userPic: img });
+      } else {
+        setUserProfile({ ...userProfile, userPic: null });
+      }
+    },
+  };
 
   const userId = useSelector((state) => state.userId);
   const [refresher, setRefresher] = useState(0);
@@ -274,6 +303,26 @@ const ProfilePage = () => {
   const [userData, setUserdata] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [inpFields, setInpFields] = useState({});
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [totalEarningUser, setTotalEarningUser] = useState(0);
+  const [userProfile, setUserProfile] = useState({
+    name: "",
+    phone: "",
+    channelUrl: "",
+    userPic: null,
+  });
+
+  const totalPaymentReporter = (report) => {
+    let totalPayment = 0;
+    if (report) {
+      for (const year in report) {
+        for (const mon in report[year]) {
+          totalPayment += Number(report[year][mon]);
+        }
+      }
+      setTotalEarningUser(totalPayment);
+    }
+  };
 
   const fecher = async () => {
     setIsLoading(true);
@@ -284,9 +333,16 @@ const ProfilePage = () => {
 
     if (res.ok) {
       setUserdata(data.user);
+      setUserProfile({
+        name: data.user.name,
+        phone: data.user.phone,
+        channelUrl: data.user.channelUrl,
+        userPic: null,
+      });
+      totalPaymentReporter(data.user.finacialReport[0]);
       setInpFields(data.user.bankDetails[0]);
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
   useEffect(() => {
     fecher();
@@ -301,6 +357,14 @@ const ProfilePage = () => {
 
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val.trim() });
+  };
+  const userProfileChangerHandler = (e) => {
+    const id = e.target.id;
+    const val = e.target.value;
+    const ele = document.querySelector(`#${id}`);
+
+    ele.style.border = "1px solid #d7d7d7";
+    setUserProfile({ ...userProfile, [id]: val.trim() });
   };
 
   const onSubmitHandler = async () => {
@@ -368,6 +432,137 @@ const ProfilePage = () => {
     <>
       {" "}
       {isLoading && <MusicLoader />}
+      {showEditModal && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox>
+              <LabelInpBox>
+                <Label htmlFor="name">Label Name</Label>
+                <Input
+                  type="text"
+                  id="name"
+                  onChange={userProfileChangerHandler}
+                  value={userProfile.name}
+                  placeholder="Label Name"
+                />
+              </LabelInpBox>
+              <LabelInpBox>
+                <Label htmlFor="phone">Contact Number</Label>
+                <Input
+                  type="number"
+                  id="phone"
+                  onChange={userProfileChangerHandler}
+                  value={userProfile.phone}
+                  placeholder="phone"
+                />
+              </LabelInpBox>
+
+              <LabelInpBox>
+                <Label htmlFor="channelUrl">channel Url</Label>
+                <Input
+                  type="text"
+                  id="channelUrl"
+                  onChange={userProfileChangerHandler}
+                  value={userProfile.channelUrl}
+                  placeholder="Url"
+                />
+              </LabelInpBox>
+              <LabelInpBox>
+                {" "}
+                <Label id="userPicLabel" htmlFor="">
+                  Channel Logo (Max. size 2MB)
+                </Label>
+                <Upload
+                  method="get"
+                  listType="picture"
+                  {...profilePicProps}
+                  maxCount={1}
+                >
+                  <Button icon={<UploadOutlined />}>Upload Channel Logo</Button>
+                </Upload>
+              </LabelInpBox>
+
+              <BtnBox>
+                <button
+                  onClick={async () => {
+                    if (
+                      userProfile.name.length < 3 ||
+                      userProfile.phone.toString().length < 10 ||
+                      userProfile.phone.toString().length > 10 ||
+                      userProfile.channelUrl.length < 10 ||
+                      userProfile.userPic === null
+                    ) {
+                      if (userProfile.name.length < 3) {
+                        const name = document.querySelector("#name");
+                        name.style.border = "1px solid red";
+                      }
+
+                      if (
+                        userProfile.phone.toString().length < 10 ||
+                        userProfile.phone.toString().length > 10
+                      ) {
+                        const phone = document.querySelector("#phone");
+                        phone.style.border = "1px solid red";
+                      }
+                      if (userProfile.channelUrl.length < 10) {
+                        const channelUrl =
+                          document.querySelector("#channelUrl");
+                        channelUrl.style.border = "1px solid red";
+                      }
+                      if (userProfile.userPic === null) {
+                        const userPicLabel =
+                          document.querySelector("#userPicLabel");
+                        userPicLabel.style.color = "red";
+                      }
+
+                      openNotificationWithIcon(
+                        "error",
+                        "Fill all require fields."
+                      );
+                      return;
+                    }
+                    setIsLoading(true);
+                    const formData = new FormData();
+                    formData.append("name", userProfile.name);
+                    formData.append("phone", userProfile.phone);
+                    formData.append("channelUrl", userProfile.channelUrl);
+                    formData.append("userPic", userProfile.userPic);
+                    formData.append("userId", userId);
+
+                    const res = await fetch(
+                      `${process.env.REACT_APP_BASE_URL}/user/edit-profile`,
+                      {
+                        method: "POST",
+                        body: formData,
+                      }
+                    );
+                    const resData = await res.json();
+
+                    if (res.ok) {
+                      openNotificationWithIcon("success", resData.message);
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 1000);
+                    } else {
+                      openNotificationWithIcon("error", resData.message);
+                    }
+                    setIsLoading(false);
+                  }}
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </BtnBox>
+            </ModalFormBox>
+          </ModalBox>
+        </Modal>
+      )}
       {showModal && (
         <Modal>
           <ModalBox data-aos="zoom-in">
@@ -459,6 +654,14 @@ const ProfilePage = () => {
                   {userData.email}
                 </span>
               </div>
+              <BankBtn
+                onClick={() => {
+                  setShowEditModal(true);
+                }}
+                style={{ width: "fit-content" }}
+              >
+                Edit Profile
+              </BankBtn>
             </LeftDiv>
             <RightDiv>
               <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
@@ -585,6 +788,24 @@ const ProfilePage = () => {
                       Edit
                     </BankBtn>
                   )}
+                </div>
+              </div>
+              <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
+                <p>Wallet</p>
+                <div>
+                  <span>Total Earnings</span>
+                  <span> ₹ {totalEarningUser}</span>
+                </div>
+                <div>
+                  <span>Paid</span>
+                  <span> ₹ {userData.paidEarning}</span>
+                </div>
+                <div>
+                  <span>Remaining</span>
+                  <span>
+                    {" "}
+                    ₹ {Number(totalEarningUser) - Number(userData.paidEarning)}
+                  </span>
                 </div>
               </div>
             </RightDiv>

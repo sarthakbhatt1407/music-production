@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { notification } from "antd";
+import { Button, message, Upload } from "antd";
+import MusicLoader from "./Loader/MusicLoader";
 
 const MainDiv = styled.div`
   width: 90%;
@@ -165,6 +166,27 @@ const Btn = styled.button`
 `;
 
 const ContactsUs = () => {
+  const [api, contextHolderNot] = notification.useNotification({
+    duration: 1.5,
+  });
+  const openNotificationWithIcon = (type, msg) => {
+    api[type]({
+      message: msg,
+    });
+  };
+  const [messageApi, contextHolder] = message.useMessage();
+  const success = (msg) => {
+    messageApi.open({
+      type: "success",
+      content: msg,
+    });
+  };
+  const error = (msg) => {
+    messageApi.open({
+      type: "error",
+      content: msg,
+    });
+  };
   const validateEmail = (email) => {
     return String(email)
       .toLowerCase()
@@ -179,6 +201,7 @@ const ContactsUs = () => {
     message: "",
   };
   const [inpField, setInpField] = useState(defaultField);
+  const [isLoading, setIsLoading] = useState(false);
   const [nameErr, setNameErr] = useState(false);
   const [emailErr, setEmailErr] = useState(false);
   const [phoneErr, setPhoneErr] = useState(false);
@@ -210,7 +233,7 @@ const ContactsUs = () => {
     setInpField({ ...inpField, [id]: val.trim() });
   };
 
-  const onSubmitHandler = () => {
+  const onSubmitHandler = async () => {
     if (
       inpField.name.length < 1 ||
       inpField.phone.length !== 10 ||
@@ -231,22 +254,35 @@ const ContactsUs = () => {
       }
       return;
     }
+    setIsLoading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/query/new-query`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...inpField,
+        }),
+      }
+    );
+    const data = await res.json();
+    if (res.ok) {
+      success(data.message);
+    } else {
+      error(data.message);
+    }
+    setIsLoading(false);
     setInpField(defaultField);
     setOpen(true);
   };
 
   return (
     <MainDiv id="contact-us">
-      <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-        <Alert
-          onClose={handleClose}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          This is a success Alert inside a Snackbar!
-        </Alert>
-      </Snackbar>
+      {" "}
+      {contextHolderNot}
+      {contextHolder}
       <LeftDiv data-aos="fade-right">
         <h2>Online Inquiry</h2>
         <FormBox>

@@ -289,6 +289,7 @@ const Form = () => {
     lyricistSpotifyId: "",
     lyricistFacebookUrl: "",
     lyricistInstagramUrl: "",
+    musicDirector: "",
   };
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
@@ -341,7 +342,15 @@ const Form = () => {
     const imgbox = document.getElementById("imgbox");
     imgbox.innerHTML = "";
     const file = e.target.files[0];
-
+    const fileMb = file.size / 1024 ** 2;
+    if (fileMb > 10) {
+      message.error(`Image size is greater than 10MB.`);
+      const imgbox = document.getElementById("imgbox");
+      imgbox.innerHTML = "";
+      const thmb = document.getElementById("thmb");
+      thmb.value = "";
+      return;
+    }
     var reader = new FileReader();
 
     reader.readAsDataURL(file);
@@ -350,7 +359,7 @@ const Form = () => {
       file.type === "image/png" ||
       file.type === "image/jpeg" ||
       file.type === "image/jpg";
-    console.log(isValid);
+
     if (!isValid) {
       message.error(`Only png, jpeg, jpg files are allowed.`);
       setIsloading(false);
@@ -410,7 +419,7 @@ const Form = () => {
       let img;
       if (info.fileList[0]) {
         img = info.fileList[0].originFileObj;
-        console.log(img);
+
         setInpFields({ ...inpFields, thumbnail: img });
       } else {
         setInpFields({ ...inpFields, thumbnail: null });
@@ -520,6 +529,8 @@ const Form = () => {
 
   const onSubmitHandler = async () => {
     setIsloading(true);
+
+    // return;
     if (
       inpFields.labelName.length === 0 ||
       inpFields.title.length === 0 ||
@@ -569,15 +580,7 @@ const Form = () => {
       openNotificationWithIcon("error");
       return;
     }
-    if (inpFields.lyricist.length === 0) {
-      const lyricist = document.querySelector("#lyricist");
-      lyricist.style.border = "1px solid red";
-
-      setIsloading(false);
-      openNotificationWithIcon("error");
-      return;
-    }
-
+    console.log(inpFields);
     const formData = new FormData();
 
     formData.append("labelName", inpFields.labelName);
@@ -617,6 +620,7 @@ const Form = () => {
     formData.append("lyricistSpotifyId", inpFields.lyricistSpotifyId);
     formData.append("lyricistFacebookUrl", inpFields.lyricistFacebookUrl);
     formData.append("lyricistInstagramUrl", inpFields.lyricistInstagramUrl);
+    formData.append("musicDirector", inpFields.musicDirector);
 
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
@@ -629,6 +633,7 @@ const Form = () => {
       }
     );
     const data = await res.json();
+    console.log(data);
 
     if (res.ok) {
       const orderId = data.createdOrder._id;
@@ -1132,7 +1137,7 @@ const Form = () => {
 
             <LabelInpBox>
               <Label htmlFor="thumbnail" id="thumbnail">
-                Thumbnail <span style={{ margin: 0 }}>*</span>
+                Thumbnail (Max. size 10MB)<span style={{ margin: 0 }}>*</span>
               </Label>
               {/* <Upload
                 method="get"
@@ -1247,9 +1252,7 @@ const Form = () => {
               />
             </LabelInpBox>
             <LabelInpBox>
-              <Label htmlFor="lyricist">
-                lyricist <span style={{ margin: 0 }}>*</span>
-              </Label>
+              <Label htmlFor="lyricist">lyricist</Label>
               <Input
                 type="text"
                 name="lyricist"
@@ -1290,6 +1293,17 @@ const Form = () => {
                 }}
                 type="button"
                 value={`+`}
+              />
+            </LabelInpBox>
+            <LabelInpBox>
+              <Label htmlFor="musicDirector">music Director</Label>
+              <Input
+                type="text"
+                name="musicDirector"
+                id="musicDirector"
+                placeholder="music Director"
+                onChange={onChangeHandler}
+                value={inpFields.musicDirector}
               />
             </LabelInpBox>
             <LabelInpBox>

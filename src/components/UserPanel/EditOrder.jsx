@@ -270,6 +270,7 @@ const EditOrder = () => {
     lyricist: "",
     crbt: "",
     genre: "Classical",
+    musicDirector: "",
     singerAppleId: "",
     singerSpotifyId: "",
     singerFacebookUrl: "",
@@ -362,7 +363,15 @@ const EditOrder = () => {
     const imgbox = document.getElementById("imgbox");
     imgbox.innerHTML = "";
     const file = e.target.files[0];
-
+    const fileMb = file.size / 1024 ** 2;
+    if (fileMb > 10) {
+      message.error(`Image size is greater than 10MB.`);
+      const imgbox = document.getElementById("imgbox");
+      imgbox.innerHTML = "";
+      const thmb = document.getElementById("thmb");
+      thmb.value = "";
+      return;
+    }
     var reader = new FileReader();
 
     reader.readAsDataURL(file);
@@ -585,14 +594,7 @@ const EditOrder = () => {
       openNotificationWithIcon("error");
       return;
     }
-    if (inpFields.lyricist.length === 0) {
-      const lyricist = document.querySelector("#lyricist");
-      lyricist.style.border = "1px solid red";
 
-      setIsloading(false);
-      openNotificationWithIcon("error");
-      return;
-    }
     const formData = new FormData();
 
     formData.append("labelName", inpFields.labelName);
@@ -620,7 +622,7 @@ const EditOrder = () => {
     formData.append("singerSpotifyId", inpFields.singerSpotifyId);
     formData.append("singerFacebookUrl", inpFields.singerFacebookUrl);
     formData.append("singerInstagramUrl", inpFields.singerInstagramUrl);
-
+    formData.append("musicDirector", inpFields.musicDirector);
     formData.append("composerAppleId", inpFields.composerAppleId);
     formData.append("composerSpotifyId", inpFields.composerSpotifyId);
     formData.append("composerFacebookUrl", inpFields.composerFacebookUrl);
@@ -1156,7 +1158,8 @@ const EditOrder = () => {
 
                 <LabelInpBox>
                   <Label htmlFor="thumbnail" id="thumbnail">
-                    Thumbnail <span style={{ margin: 0 }}>*</span>
+                    Thumbnail (Max. size 10MB){" "}
+                    <span style={{ margin: 0 }}>*</span>
                   </Label>
                   {/* <Upload
                     method="get"
@@ -1310,6 +1313,17 @@ const EditOrder = () => {
                     }}
                     type="button"
                     value={`+`}
+                  />
+                </LabelInpBox>{" "}
+                <LabelInpBox>
+                  <Label htmlFor="musicDirector">music Director</Label>
+                  <Input
+                    type="text"
+                    name="musicDirector"
+                    id="musicDirector"
+                    placeholder="music Director"
+                    onChange={onChangeHandler}
+                    value={inpFields.musicDirector}
                   />
                 </LabelInpBox>
                 <LabelInpBox>

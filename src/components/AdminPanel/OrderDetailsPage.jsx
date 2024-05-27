@@ -638,6 +638,15 @@ const OrderDetailsPage = () => {
                       </div>
                     );
                   }
+                  if (field === "musicDirector") {
+                    field = "Music Director";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>{value}</span>
+                      </div>
+                    );
+                  }
                   if (field === "file") {
                     return (
                       <div key={id}>
