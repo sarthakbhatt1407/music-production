@@ -77,6 +77,11 @@ const App = () => {
               path="/admin-panel/:page/:id"
               exact
               element={<AdminPanel />}
+            />{" "}
+            <Route
+              path="/admin-panel/order/:id/:action"
+              exact
+              element={<AdminPanel />}
             />
           </>
         )}

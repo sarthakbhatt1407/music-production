@@ -230,26 +230,26 @@ const ContactsUs = () => {
     if (id === "message") {
       setMessage(false);
     }
-    setInpField({ ...inpField, [id]: val.trim() });
+    setInpField({ ...inpField, [id]: val });
   };
 
   const onSubmitHandler = async () => {
     if (
-      inpField.name.length < 1 ||
-      inpField.phone.length !== 10 ||
+      inpField.name.trim().length < 1 ||
+      inpField.phone.trim().length !== 10 ||
       !validateEmail(inpField.email) ||
-      inpField.message.length < 6
+      inpField.message.trim().length < 6
     ) {
-      if (inpField.name.length < 1) {
+      if (inpField.name.trim().length < 1) {
         setNameErr(true);
       }
-      if (inpField.phone.length !== 10) {
+      if (inpField.phone.trim().length !== 10) {
         setPhoneErr(true);
       }
       if (!validateEmail(inpField.email)) {
         setEmailErr(true);
       }
-      if (inpField.message.length < 6) {
+      if (inpField.message.trim().length < 6) {
         setMessage(true);
       }
       return;

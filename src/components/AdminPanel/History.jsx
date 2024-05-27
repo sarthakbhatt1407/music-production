@@ -307,9 +307,13 @@ const History = () => {
             </TableHead>{" "}
             <TableBody>
               {filteredOrders.map((ord) => {
-                if (ord.deleted === true || ord.status !== "completed") {
+                if (ord.deleted === true) {
                   return;
                 }
+                if (ord.status !== "takedown" && ord.status !== "completed") {
+                  return;
+                }
+
                 const {
                   title,
                   language,
@@ -378,7 +382,7 @@ const History = () => {
                         </div>
                       </td>
                     )}
-                    {status === "rejected" && (
+                    {(status === "rejected" || status === "takedown") && (
                       <td>
                         <div
                           style={{
@@ -387,7 +391,7 @@ const History = () => {
                           }}
                         >
                           <CloseOutlined />
-                          rejected
+                          {status === "rejected" ? "rejected" : "removed"}
                         </div>
                       </td>
                     )}

@@ -673,6 +673,148 @@ const OrderDetailsPage = () => {
                     </div>
                   );
                 })}
+              {order.status === "completed" && (
+                <>
+                  <div>
+                    <span style={{ backgroundColor: "white" }}>
+                      {" "}
+                      <Popconfirm
+                        title="Confirm"
+                        description="Do you want to takedown album?"
+                        onConfirm={async () => {
+                          const res = await fetch(
+                            `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=takedown&userId=${userId}`,
+                            {
+                              method: "PATCH",
+                            }
+                          );
+                          const data = await res.json();
+                          if (res.ok) {
+                            openNotificationWithIcon("success", data.message);
+                            new Promise((resolve) => {
+                              setTimeout(() => {
+                                resolve(null);
+                                navigate("/admin-panel/history");
+                              }, 500);
+                            });
+                          }
+                        }}
+                        onOpenChange={() => {}}
+                      >
+                        <Link
+                          style={{
+                            backgroundColor: "#e86464",
+                            color: "white",
+                            padding: ".4rem .7rem",
+                            gap: ".3rem",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "48%",
+                            borderRadius: ".5rem",
+                          }}
+                        >
+                          Takedown
+                        </Link>
+                      </Popconfirm>
+                    </span>
+                  </div>{" "}
+                  <div>
+                    <span>
+                      <Link
+                        style={{
+                          backgroundColor: "#acadab",
+                          color: "white",
+                          padding: ".4rem .2rem",
+                          gap: ".3rem",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: "48%",
+                          borderRadius: ".5rem",
+                        }}
+                        to={`/admin-panel/order/${order._id}/edit`}
+                      >
+                        <EditOutlined
+                          style={{ backgroundColor: "transparent" }}
+                        />{" "}
+                        Edit
+                      </Link>
+                    </span>
+                  </div>
+                </>
+              )}
+              {order.status === "takedown" && (
+                <>
+                  <div>
+                    <span style={{ backgroundColor: "white" }}>
+                      {" "}
+                      <Popconfirm
+                        title="Confirm"
+                        description="Do you want to restore this album?"
+                        onConfirm={async () => {
+                          const res = await fetch(
+                            `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=completed&userId=${userId}`,
+                            {
+                              method: "PATCH",
+                            }
+                          );
+                          const data = await res.json();
+                          if (res.ok) {
+                            openNotificationWithIcon("success", data.message);
+                            new Promise((resolve) => {
+                              setTimeout(() => {
+                                resolve(null);
+                                navigate("/admin-panel/history");
+                              }, 500);
+                            });
+                          }
+                        }}
+                        onOpenChange={() => {}}
+                      >
+                        <Link
+                          style={{
+                            backgroundColor: "#e86464",
+                            color: "white",
+                            padding: ".4rem .7rem",
+                            gap: ".3rem",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "48%",
+                            borderRadius: ".5rem",
+                          }}
+                        >
+                          Restore
+                        </Link>
+                      </Popconfirm>{" "}
+                    </span>{" "}
+                  </div>
+                  <div>
+                    <span>
+                      <Link
+                        style={{
+                          backgroundColor: "#acadab",
+                          color: "white",
+                          padding: ".4rem .2rem",
+                          gap: ".3rem",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: "48%",
+                          borderRadius: ".5rem",
+                        }}
+                        to={`/admin-panel/order/${order._id}/edit`}
+                      >
+                        <EditOutlined
+                          style={{ backgroundColor: "transparent" }}
+                        />{" "}
+                        Edit
+                      </Link>
+                    </span>
+                  </div>
+                </>
+              )}
               {order.status === "waiting" && (
                 <>
                   <div>
@@ -734,7 +876,7 @@ const OrderDetailsPage = () => {
                     </span>
                   </div>
                 </>
-              )}
+              )}{" "}
             </RightDiv>
           </>
         )}

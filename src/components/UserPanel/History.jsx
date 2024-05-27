@@ -316,7 +316,7 @@ const History = () => {
                         </div>
                       </td>
                     )}
-                    {status === "rejected" && (
+                    {(status === "rejected" || status === "takedown") && (
                       <td>
                         <div
                           style={{
@@ -325,7 +325,7 @@ const History = () => {
                           }}
                         >
                           <CloseOutlined />
-                          rejected
+                          {status === "rejected" ? "rejected" : "removed"}
                         </div>
                       </td>
                     )}

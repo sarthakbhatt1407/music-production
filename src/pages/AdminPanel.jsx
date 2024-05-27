@@ -9,6 +9,7 @@ import AllUsers from "../components/AdminPanel/AllUsers";
 import UserProfile from "../components/AdminPanel/UserProfile";
 import CopyrightAdmin from "../components/AdminPanel/CopyrightAdmin";
 import UserQueries from "../components/AdminPanel/UserQueries";
+import EditOrder from "../components/AdminPanel/EditOrder";
 
 const AdminPanel = () => {
   const page = useParams().page;
@@ -26,6 +27,7 @@ const AdminPanel = () => {
         {page === "user-profile" && <UserProfile />}
         {page === "user-queries" && <UserQueries />}
         {id && !action && !page && <OrderDetailsPage />}
+        {action === "edit" && <EditOrder />}
       </AdminDrawerPanel>
     </div>
   );
