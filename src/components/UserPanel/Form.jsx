@@ -580,7 +580,6 @@ const Form = () => {
       openNotificationWithIcon("error");
       return;
     }
-    console.log(inpFields);
     const formData = new FormData();
 
     formData.append("labelName", inpFields.labelName);
@@ -633,7 +632,6 @@ const Form = () => {
       }
     );
     const data = await res.json();
-    console.log(data);
 
     if (res.ok) {
       const orderId = data.createdOrder._id;

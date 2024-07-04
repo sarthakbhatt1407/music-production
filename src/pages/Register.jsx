@@ -847,7 +847,7 @@ const Register = () => {
                       name=""
                       id="otp"
                       onChange={onChangeHandler}
-                      placeholder="Enter one time password sent on email"
+                      placeholder="Enter OTP sent on email. If not received check spam folder."
                       value={inpFields.otp}
                       style={{
                         border: `${
