@@ -166,7 +166,10 @@ const AllUsers = () => {
           onChange={(e) => {
             const val = e.target.value.trim().toLowerCase();
             const arr = users.filter((usr) => {
-              return usr.name.toLowerCase().includes(val);
+              return (
+                usr.name.toLowerCase().includes(val) ||
+                usr.phone.toString().includes(val)
+              );
             });
             setFilteredUsers(arr);
           }}

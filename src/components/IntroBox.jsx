@@ -76,6 +76,7 @@ const TextBox = styled.div`
   @media only screen and (min-width: 0px) and (max-width: 549px) {
     margin-bottom: 2rem;
     div {
+      padding: 0 0.2rem;
       width: 100%;
       gap: 0.5rem;
       justify-content: center;
@@ -197,7 +198,7 @@ const IntroBox = () => {
         </div>
         <div>
           <Para data-aos="fade-right">a mordern solution for</Para>
-          <Para data-aos="fade-left">music production</Para>
+          <Para data-aos="fade-left">music distribution</Para>
         </div>
 
         <BtnBox>

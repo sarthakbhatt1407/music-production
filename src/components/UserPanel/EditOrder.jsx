@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { TimePicker } from "antd";
 import { notification } from "antd";
 import { useSelector } from "react-redux";
+import { Apple, FacebookOutlined, Instagram } from "@mui/icons-material";
 
 const OuterBox = styled.div`
   height: 99%;
@@ -594,6 +595,15 @@ const EditOrder = () => {
       openNotificationWithIcon("error");
       return;
     }
+    if (inpFields.isrc.length > 0) {
+      if (inpFields.isrc.length < 12) {
+        const isrc = document.querySelector("#isrc");
+        isrc.style.border = "1px solid red";
+        setIsloading(false);
+        openNotificationWithIcon("error");
+        return;
+      }
+    }
 
     const formData = new FormData();
 
@@ -1073,17 +1083,6 @@ const EditOrder = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
-                  <Label htmlFor="upc">isrc</Label>
-                  <Input
-                    type="text"
-                    name="isrc"
-                    id="isrc"
-                    onChange={onChangeHandler}
-                    value={inpFields.isrc}
-                    placeholder="isrc"
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>
                   </Label>
@@ -1208,9 +1207,20 @@ const EditOrder = () => {
                     <Button icon={<UploadOutlined />}>Upload file</Button>
                   </Upload>
                 </LabelInpBox>
-
+                <LabelInpBox>
+                  <Label htmlFor="upc">isrc</Label>
+                  <Input
+                    type="text"
+                    name="isrc"
+                    id="isrc"
+                    onChange={onChangeHandler}
+                    value={inpFields.isrc}
+                    placeholder="isrc"
+                  />
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="title">title</Label>
+
                   <Input
                     type="text"
                     name="title"
@@ -1260,19 +1270,29 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Singer Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowSingerModal(true);
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
                     }}
-                    type="button"
-                    value={`+`}
-                  />
+                  >
+                    <FacebookOutlined />
+                    <Instagram />
+                    <Apple />
+
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowSingerModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="lyricist">
-                    lyricist <span style={{ margin: 0 }}>*</span>
-                  </Label>
+                  <Label htmlFor="lyricist">lyricist</Label>
                   <Input
                     type="text"
                     name="lyricist"
@@ -1284,14 +1304,26 @@ const EditOrder = () => {
                 </LabelInpBox>{" "}
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Lyricist Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowLyricistModal(true);
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
                     }}
-                    type="button"
-                    value={`+`}
-                  />
+                  >
+                    <FacebookOutlined />
+                    <Instagram />
+                    <Apple />
+
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowLyricistModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="composer">composer</Label>
@@ -1306,15 +1338,27 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Composer Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowComposerModal(true);
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
                     }}
-                    type="button"
-                    value={`+`}
-                  />
-                </LabelInpBox>{" "}
+                  >
+                    <FacebookOutlined />
+                    <Instagram />
+                    <Apple />
+
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowComposerModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="musicDirector">music Director</Label>
                   <Input

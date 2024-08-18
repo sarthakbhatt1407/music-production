@@ -229,7 +229,7 @@ const CopyRightPage = () => {
   let c = 0;
   const defaultF = {
     link: "",
-    platform: "",
+    platform: "Youtube",
   };
 
   const [api, contextHolderNot] = notification.useNotification({
@@ -308,15 +308,12 @@ const CopyRightPage = () => {
   };
 
   const onSubmitHandler = async () => {
-    if (inpFields.link.length === 0 || inpFields.platform.length === 0) {
+    if (inpFields.link.length === 0) {
       if (inpFields.link.length === 0) {
         const link = document.querySelector("#link");
         link.style.border = "1px solid red";
       }
-      if (inpFields.platform.length === 0) {
-        const platform = document.querySelector("#platform");
-        platform.style.border = "1px solid red";
-      }
+
       openNotificationWithIcon("error", "Fill all require fields.");
       return;
     }
@@ -356,15 +353,6 @@ const CopyRightPage = () => {
         <Modal>
           <ModalBox data-aos="zoom-in">
             <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="platform">Platform</Label>
-                <Input
-                  type="text"
-                  id="platform"
-                  onChange={onChangeHandler}
-                  value={inpFields.platform}
-                />
-              </LabelInpBox>
               <LabelInpBox>
                 <Label htmlFor="link">Link</Label>
                 <Input

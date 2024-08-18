@@ -7,12 +7,19 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { notification } from "antd";
 import { message } from "antd";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 import {
   EditOutlined,
   DeleteOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import { CloseOutlined, DoneOutline, LinkOutlined } from "@mui/icons-material";
+import {
+  CloseOutlined,
+  ContentCopyOutlined,
+  DoneOutline,
+  LinkOutlined,
+} from "@mui/icons-material";
 import { saveAs } from "file-saver";
 const OuterBox = styled.div`
   width: 100%;
@@ -239,6 +246,14 @@ const Input = styled.input`
 `;
 
 const OrderDetailsPage = () => {
+  const copyToClipBoard = async (txt) => {
+    try {
+      await navigator.clipboard.writeText(txt);
+      openNotificationWithIcon("success", "Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
@@ -281,6 +296,8 @@ const OrderDetailsPage = () => {
       navigate("/admin-panel/pending-work");
     }
     setOrder(data.order);
+    console.log(data.order);
+
     setIsloading(false);
     let arr = [];
     for (const key in data.order) {
@@ -431,6 +448,11 @@ const OrderDetailsPage = () => {
                 }
               />
               <h1>{order.title}</h1>
+              <AudioPlayer
+                src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
+                onPlay={(e) => console.log("onPlay")}
+                // other props here
+              />
               <p>{order.description}</p>
             </LeftDiv>
             <RightDiv>
@@ -643,7 +665,16 @@ const OrderDetailsPage = () => {
                     return (
                       <div key={id}>
                         <span>{field}</span>
-                        <span>{value}</span>
+                        <span>
+                          {value}
+                          <ContentCopyOutlined
+                            style={{
+                              cursor: "pointer",
+                              transform: "scale(.8)",
+                            }}
+                            onClick={copyToClipBoard.bind(this, value)}
+                          />
+                        </span>
                       </div>
                     );
                   }
@@ -667,8 +698,23 @@ const OrderDetailsPage = () => {
                   return (
                     <div key={id}>
                       <span>{field}</span>
-                      <span style={{ overflowWrap: "anywhere" }}>
-                        {value === "completed" ? "live" : value}
+                      <span
+                        style={{
+                          overflowWrap: "anywhere",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: "2rem",
+                        }}
+                      >
+                        {value === "completed" ? "live" : value}{" "}
+                        <ContentCopyOutlined
+                          style={{
+                            cursor: "pointer",
+                            transform: "scale(.8)",
+                          }}
+                          onClick={copyToClipBoard.bind(this, value)}
+                        />
                       </span>
                     </div>
                   );

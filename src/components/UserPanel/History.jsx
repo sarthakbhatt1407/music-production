@@ -233,6 +233,7 @@ const History = () => {
             <TableHead>
               <tr>
                 <td></td>
+                <td>Thumbnail</td>
                 <td>Album</td>
                 <td>label Name</td>
                 <td>Album Type</td>
@@ -271,9 +272,11 @@ const History = () => {
                     <td>
                       <span>
                         <img src={`${thumbnail}`} alt="" />
-                        {title}
                       </span>
-                    </td>{" "}
+                    </td>
+                    <td>
+                      <span>{title}</span>
+                    </td>
                     <td>{labelName}</td>
                     <td>{albumType}</td>
                     <td>{language}</td>

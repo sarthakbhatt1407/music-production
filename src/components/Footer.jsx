@@ -76,8 +76,6 @@ const MidDiv = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* background-color: red; */
-
   h2 {
     font-size: 2.4rem;
     text-transform: capitalize;
@@ -88,7 +86,7 @@ const MidDiv = styled.div`
     align-items: center;
     justify-content: center;
     /* background-color: red; */
-    width: 70%;
+    width: 100%;
     gap: 1rem;
     font-size: 1.3rem;
     text-transform: capitalize;
@@ -96,6 +94,10 @@ const MidDiv = styled.div`
       cursor: pointer;
       transition: all 0.4s;
       color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
       a {
         text-decoration: none;
         color: black;
@@ -110,7 +112,6 @@ const MidDiv = styled.div`
     }
   }
 `;
-
 // const RightDiv = styled.div``;
 
 const SecondDiv = styled.div`
@@ -194,7 +195,7 @@ const Footer = () => {
             </span>
           </div>
         </MidDiv>
-        <MidDiv>
+        <MidDiv className="middiv">
           <h2>Get In touch</h2>
           <div>
             <span>

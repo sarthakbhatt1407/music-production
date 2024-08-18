@@ -15,7 +15,7 @@ import { Breadcrumb } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { Empty } from "antd";
 import { useSelector } from "react-redux";
-import { Done } from "@mui/icons-material";
+import { Done, PersonOutline } from "@mui/icons-material";
 
 const MainBox = styled.div`
   width: 100%;
@@ -259,8 +259,13 @@ const History = () => {
 
   const onCHangeHandler = (e) => {
     const val = e.target.value.toLowerCase();
+
     const arr = orders.filter((ord) => {
-      return ord.title.toLowerCase().includes(val);
+      return (
+        ord.title.toLowerCase().includes(val) ||
+        ord.labelName.toLowerCase().includes(val) ||
+        ord.isrc.toLowerCase().includes(val)
+      );
     });
     setFilteredOrders(arr);
   };
@@ -295,6 +300,7 @@ const History = () => {
             <TableHead>
               <tr>
                 <td></td>
+                <td>Thumbnail</td>
                 <td>Album</td>
                 <td>Label</td>
                 <td>Album Type</td>
@@ -302,6 +308,7 @@ const History = () => {
                 <td>Created</td>
                 <td>Date Of release</td>
                 <td>Status</td>
+                <td>User</td>
                 <td>View</td>
               </tr>
             </TableHead>{" "}
@@ -337,10 +344,23 @@ const History = () => {
                     <td style={{ textAlign: "center" }}>
                       <span>
                         <img src={`${thumbnail}`} alt="" />
-                        {title}
                       </span>
                     </td>
-                    <td>{labelName}</td>
+                    <td
+                      style={{
+                        textAlign: "center",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      <span>{title.toLowerCase()}</span>
+                    </td>
+                    <td
+                      style={{
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {labelName.toLowerCase()}
+                    </td>
                     <td>{albumType}</td>
                     <td>{language}</td>
                     <td>{orderDateAndTime.split("/")[0]}</td>
@@ -395,6 +415,11 @@ const History = () => {
                         </div>
                       </td>
                     )}
+                    <td>
+                      <Link to={`/admin-panel/user-profile/${ord.userId}`}>
+                        <PersonOutline />
+                      </Link>
+                    </td>
                     <td>
                       <Link to={`/admin-panel/order/${id}`}>
                         <EyeOutlined />

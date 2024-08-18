@@ -3,16 +3,20 @@ const defaultState = {
   isLoggedIn: false,
   userId: "",
   isAdmin: false,
+  labelName: "",
 };
 
 const storeReducer = (state = defaultState, action) => {
   if (action.type === "log in") {
     const data = action.data;
+
     const user = data.user;
+
     const obj = {
       ...state,
       isLoggedIn: true,
       userId: user.id,
+      labelName: user.name,
       isAdmin: user.isAdmin,
     };
 
@@ -21,6 +25,7 @@ const storeReducer = (state = defaultState, action) => {
       ...state,
       isLoggedIn: true,
       userId: user.id,
+      labelName: user.name,
       isAdmin: user.isAdmin,
     };
   }
