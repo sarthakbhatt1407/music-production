@@ -597,6 +597,9 @@ const Form = () => {
         return;
       }
     }
+
+    console.log(`${process.env.REACT_APP_BASE_URL}/order/new-order`);
+
     const formData = new FormData();
 
     formData.append("labelName", inpFields.labelName);
@@ -639,6 +642,7 @@ const Form = () => {
     formData.append("musicDirector", inpFields.musicDirector);
 
     formData.append("file", inpFields.file);
+    formData.append("thumbnail", inpFields.thumbnail);
     formData.append("userId", userId);
 
     const res = await fetch(
@@ -649,31 +653,16 @@ const Form = () => {
       }
     );
     const data = await res.json();
+    console.log(data);
 
     if (res.ok) {
-      const orderId = data.createdOrder._id;
-      const imgFormData = new FormData();
-      imgFormData.append("image", inpFields.thumbnail);
-      imgFormData.append("orderId", orderId);
-      const imgRes = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/add-order-image`,
-        {
-          method: "POST",
-          body: imgFormData,
-        }
-      );
-
-      const imgData = await imgRes.json();
-
-      if (imgRes.ok) {
-        success("Order created");
-        setTimeout(() => {
-          navigate("/user-panel/history");
-        }, 1000);
-      }
-      if (!imgRes.ok) {
-        error(imgData.message);
-      }
+      success("Order created");
+      setTimeout(() => {
+        navigate("/user-panel/history");
+      }, 1000);
+    }
+    if (!res.ok) {
+      error(data.message);
     }
 
     setIsloading(false);

@@ -4,6 +4,7 @@ import styled, { keyframes } from "styled-components";
 import MusicLoader from "../Loader/MusicLoader";
 import { Image, Popconfirm } from "antd";
 import { Link } from "react-router-dom";
+import AudioPlayer from "react-h5-audio-player";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -177,6 +178,8 @@ const OrderDetailsPage = () => {
     const data = await res.json();
 
     setOrder(data.order);
+    console.log(`${process.env.REACT_APP_BASE_URL}/${data.order.thumbnail}`);
+
     setIsloading(false);
     let arr = [];
     for (const key in data.order) {
@@ -249,16 +252,21 @@ const OrderDetailsPage = () => {
               {/* <img src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`} alt="" /> */}{" "}
               <Image
                 width={200}
-                src={`${order.thumbnail}`}
+                src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
                 placeholder={
                   <Image
                     preview={false}
-                    src={`${order.thumbnail}`}
+                    src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
                     width={200}
                   />
                 }
               />
               <h1>{order.title}</h1>
+              <AudioPlayer
+                src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
+                onPlay={(e) => console.log("onPlay")}
+                // other props here
+              />
               <p>{order.description}</p>
             </LeftDiv>
             <RightDiv>
@@ -463,11 +471,11 @@ const OrderDetailsPage = () => {
                       <div key={id}>
                         <span>{field}</span>
                         <span>
-                          <Link>
+                          <Link
+                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
+                            target="_blank"
+                          >
                             <DownloadOutlined
-                              onClick={() => {
-                                saveAs(value, `${order.title}`);
-                              }}
                               style={{ transform: "scale(1.5)" }}
                             />
                           </Link>

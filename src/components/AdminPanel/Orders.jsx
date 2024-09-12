@@ -275,7 +275,10 @@ const Orders = () => {
                     <td>{sNo}</td>
                     <td style={{ textAlign: "center" }}>
                       <span>
-                        <img src={`${thumbnail}`} alt="" />
+                        <img
+                          src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
+                          alt=""
+                        />
                       </span>
                     </td>
                     <td

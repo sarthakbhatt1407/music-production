@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Breadcrumb } from "antd";
 import styled from "@emotion/styled";
 import random from "../../assets/images/random.webp";
-import { ContentCopyOutlined, LinkOutlined } from "@mui/icons-material";
+import {
+  ContentCopyOutlined,
+  DownloadOutlined,
+  LinkOutlined,
+} from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { notification } from "antd";
@@ -536,7 +540,9 @@ const ProfilePage = () => {
                         body: formData,
                       }
                     );
+
                     const resData = await res.json();
+                    console.log(resData);
 
                     if (res.ok) {
                       openNotificationWithIcon("success", resData.message);
@@ -635,7 +641,10 @@ const ProfilePage = () => {
         {userData && (
           <ContentDiv>
             <LeftDiv>
-              <img src={userData.userPic} alt="" />
+              <img
+                src={`${process.env.REACT_APP_BASE_URL}/${userData.userPic}`}
+                alt=""
+              />
               <div>
                 <span>{userData.name}</span>
                 <span>+91-{userData.phone}</span>
@@ -699,6 +708,18 @@ const ProfilePage = () => {
                 <div>
                   <span>Country</span>
                   <span>{userData.country}</span>
+                </div>
+                <div>
+                  <span>Sign</span>
+
+                  <span>
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.sign}`}
+                      target="_blank"
+                    >
+                      <DownloadOutlined style={{ transform: "scale(1.5)" }} />
+                    </Link>
+                  </span>
                 </div>
               </div>
             </RightDiv>

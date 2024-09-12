@@ -438,11 +438,11 @@ const OrderDetailsPage = () => {
               {/* <img src={`${order.thumbnail}`} alt="" /> */}{" "}
               <Image
                 width={200}
-                src={`${order.thumbnail}`}
+                src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
                 placeholder={
                   <Image
                     preview={false}
-                    src={`${order.thumbnail}`}
+                    src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
                     width={200}
                   />
                 }
@@ -648,11 +648,11 @@ const OrderDetailsPage = () => {
                       <div key={id}>
                         <span>{field}</span>
                         <span>
-                          <Link>
+                          <Link
+                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
+                            target="_blank"
+                          >
                             <DownloadOutlined
-                              onClick={() => {
-                                saveAs(value, `${order.title}`);
-                              }}
                               style={{ transform: "scale(1.5)" }}
                             />
                           </Link>

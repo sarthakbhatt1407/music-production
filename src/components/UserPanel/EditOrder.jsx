@@ -615,6 +615,7 @@ const EditOrder = () => {
     formData.append("mood", inpFields.mood);
     formData.append("description", inpFields.description);
     formData.append("singer", inpFields.singer);
+    formData.append("thumbnail", inpFields.thumbnail);
     formData.append("composer", inpFields.composer);
     formData.append("director", inpFields.director);
     formData.append("producer", inpFields.producer);
@@ -655,31 +656,15 @@ const EditOrder = () => {
     const data = await res.json();
 
     if (res.ok) {
-      const imgFormData = new FormData();
-      imgFormData.append("image", inpFields.thumbnail);
-      imgFormData.append("orderId", id);
-      const imgRes = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/add-order-image`,
-        {
-          method: "POST",
-          body: imgFormData,
-        }
-      );
-
-      const imgData = await imgRes.json();
-
-      if (imgRes.ok) {
-        success(data.message);
-        setTimeout(() => {
-          navigate("/user-panel/history");
-        }, 1000);
-      }
-      if (!imgRes.ok) {
-        error(data.message);
-      }
-
-      setIsloading(false);
+      success(data.message);
+      setTimeout(() => {
+        navigate("/user-panel/history");
+      }, 1000);
     }
+    if (!res.ok) {
+      error(data.message);
+    }
+    setIsloading(false);
   };
   return (
     <OuterBox>
