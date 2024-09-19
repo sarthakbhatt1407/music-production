@@ -260,6 +260,9 @@ const History = () => {
                   thumbnail,
                   id,
                 } = ord;
+                const th = thumbnail.includes("cloudinary")
+                  ? thumbnail
+                  : `${process.env.REACT_APP_BASE_URL}/${thumbnail}`;
                 sNo++;
                 return (
                   <tr
@@ -271,10 +274,7 @@ const History = () => {
                     <td>{sNo}</td>
                     <td>
                       <span>
-                        <img
-                          src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                          alt=""
-                        />
+                        <img src={th} alt="" />
                       </span>
                     </td>
                     <td>

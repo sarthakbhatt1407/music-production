@@ -245,7 +245,7 @@ const TableBody = styled.tbody`
 
 const ReportDiv = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 0.8fr;
   gap: 1rem;
 
   height: fit-content;
@@ -355,6 +355,7 @@ const COLORSSTREAM = {
   Spotify: "#25D865",
   Wynk: "#D92E33",
   JioSaavn: "#1DA48C",
+  "Apple Music": "#1FADFD",
   Amazon: "#DBB67A",
   Gaana: "#FE6109",
   YouTube: "#FF0808",
@@ -566,6 +567,7 @@ const UserProfile = () => {
     "FB/Insta": 0,
     Hungama: 0,
     Other: 0,
+    "Apple Music": 0,
   };
   const [selectedMonth, setSelectedMonth] = useState(months[currentMonth]);
   const [earningSelectedYear, setEarningSelectedYear] = useState(currentYear);
@@ -781,8 +783,12 @@ const UserProfile = () => {
 
     let val = e.target.value;
     let ele;
-    if (id === "FB/Insta") {
-      ele = document.getElementById(`FB/Insta`);
+    if (id === "FB/Insta" || id === "Apple Music") {
+      if (id === "Apple Music") {
+        ele = document.getElementById("Apple Music");
+      } else {
+        ele = document.getElementById(`FB/Insta`);
+      }
     } else {
       ele = document.querySelector(`#${id}`);
     }
@@ -1229,6 +1235,15 @@ const UserProfile = () => {
                   id="Spotify"
                   onChange={modalStraemOnChnage}
                   value={modalStreamInpFields.Spotify}
+                />
+              </LabelInpBox>
+              <LabelInpBox>
+                <Label htmlFor="Apple Music">Apple Music</Label>
+                <ModalInput
+                  type="number"
+                  id="Apple Music"
+                  onChange={modalStraemOnChnage}
+                  value={modalStreamInpFields["Apple Music"]}
                 />
               </LabelInpBox>
 
@@ -1919,7 +1934,7 @@ const UserProfile = () => {
                   <h2>Reports Summary</h2>
 
                   <ResponsiveContainer width="100%" height={300}>
-                    <PieChart width={400} height={400}>
+                    <PieChart width={1000} height={400}>
                       <Pie
                         dataKey="views"
                         isAnimationActive={true}

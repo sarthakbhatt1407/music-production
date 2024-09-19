@@ -27,7 +27,7 @@ const MainDiv = styled.div`
   height: 100%;
   background-color: #f5f5f5;
   border-radius: 0.5rem;
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   overflow-y: scroll;
   h1 {
     margin: 0.5rem 0;
@@ -38,7 +38,7 @@ const MainDiv = styled.div`
 `;
 const ContentDiv = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 0.8fr;
   gap: 1rem;
 
   height: fit-content;
@@ -155,6 +155,7 @@ const COLORSSTREAM = {
   "FB/Insta": "#1FADFD",
   Hungama: "#73BF4C",
   Other: "#495145",
+  "Apple Music": "#1FADFD",
 };
 
 const UserPanelHome = () => {
@@ -189,6 +190,7 @@ const UserPanelHome = () => {
   const defaultReports = {
     Spotify: 0,
     Wynk: 0,
+    "Apple Music": 0,
     JioSaavn: 0,
     Amazon: 0,
     Gaana: 0,
@@ -457,7 +459,7 @@ const UserPanelHome = () => {
               <h2>Reports Summary</h2>
 
               <ResponsiveContainer width="100%" height={300}>
-                <PieChart width={400} height={400}>
+                <PieChart width={1000} height={400}>
                   <Pie
                     dataKey="views"
                     isAnimationActive={true}

@@ -378,7 +378,7 @@ const ProfilePage = () => {
       inpFields.bankName.length === 0 ||
       inpFields.upi.length === 0
     ) {
-      if (inpFields.accountNo.length === 0) {
+      if (inpFields.accountNo.length < 10) {
         const accountNo = document.querySelector("#accountNo");
         accountNo.style.border = "1px solid red";
       }

@@ -512,6 +512,10 @@ const PendingWork = () => {
                   labelName,
                 } = ord;
                 sNo++;
+                const th = thumbnail.includes("cloudinary")
+                  ? thumbnail
+                  : `${process.env.REACT_APP_BASE_URL}/${thumbnail}`;
+
                 return (
                   <tr
                     key={ord.id}
@@ -522,10 +526,8 @@ const PendingWork = () => {
                     <td>{sNo}</td>
                     <td style={{ textAlign: "center" }}>
                       <span>
-                        <img
-                          src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                          alt=""
-                        />
+                        {/* ${process.env.REACT_APP_BASE_URL}/${thumbnail} */}
+                        <img src={th} alt="" />
                       </span>
                     </td>
                     <td

@@ -256,7 +256,11 @@ const OrderDetailsPage = () => {
                 placeholder={
                   <Image
                     preview={false}
-                    src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
+                    src={
+                      order.thumbnail.includes("cloudinary")
+                        ? order.thumbnail
+                        : `${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`
+                    }
                     width={200}
                   />
                 }

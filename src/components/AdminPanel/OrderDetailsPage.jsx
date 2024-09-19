@@ -438,7 +438,11 @@ const OrderDetailsPage = () => {
               {/* <img src={`${order.thumbnail}`} alt="" /> */}{" "}
               <Image
                 width={200}
-                src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
+                src={
+                  order.thumbnail.includes("cloudinary")
+                    ? order.thumbnail
+                    : `${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`
+                }
                 placeholder={
                   <Image
                     preview={false}

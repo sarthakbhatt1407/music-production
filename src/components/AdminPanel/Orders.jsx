@@ -264,6 +264,9 @@ const Orders = () => {
                   id,
                   labelName,
                 } = ord;
+                const th = thumbnail.includes("cloudinary")
+                  ? thumbnail
+                  : `${process.env.REACT_APP_BASE_URL}/${thumbnail}`;
                 sNo++;
                 return (
                   <tr
@@ -275,10 +278,7 @@ const Orders = () => {
                     <td>{sNo}</td>
                     <td style={{ textAlign: "center" }}>
                       <span>
-                        <img
-                          src={`${process.env.REACT_APP_BASE_URL}/${thumbnail}`}
-                          alt=""
-                        />
+                        <img src={th} alt="" />
                       </span>
                     </td>
                     <td
