@@ -1422,7 +1422,14 @@ const UserProfile = () => {
               <ContentDiv>
                 {isLoading && <MusicLoader />}
                 <LeftDiv>
-                  <img src={userData.userPic} alt="" />
+                  <img
+                    src={
+                      userData.userPic.includes("cloudinary")
+                        ? `${userData.userPic}`
+                        : `${process.env.REACT_APP_BASE_URL}/${userData.userPic}`
+                    }
+                    alt=""
+                  />
                   <div>
                     <span>{userData.name}</span>
                     <span>+91-{userData.phone}</span>

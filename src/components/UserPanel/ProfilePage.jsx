@@ -642,7 +642,12 @@ const ProfilePage = () => {
           <ContentDiv>
             <LeftDiv>
               <img
-                src={`${process.env.REACT_APP_BASE_URL}/${userData.userPic}`}
+                // src={`${process.env.REACT_APP_BASE_URL}/${userData.userPic}`}
+                src={
+                  userData.userPic.includes("cloudinary")
+                    ? `${userData.userPic}`
+                    : `${process.env.REACT_APP_BASE_URL}/${userData.userPic}`
+                }
                 alt=""
               />
               <div>
