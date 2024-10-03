@@ -8,11 +8,12 @@ import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload } from "antd";
 const OuterBox = styled.div`
   background-color: #f7f7f7;
-  height: 100svh;
+  height: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem 0;
+
   @media only screen and (max-width: 1000px) {
     height: fit-content;
   }
@@ -20,11 +21,10 @@ const OuterBox = styled.div`
 
 const MainBox = styled.div`
   background-color: white;
-  width: 60vw;
+  width: fit-content;
   box-shadow: 0.1rem 0.1rem 2rem rgba(161, 161, 161, 0.28);
   border-radius: 0.5rem;
-  height: 50vh;
-  height: fit-content;
+
   display: grid;
   grid-template-columns: 1.5fr 2fr;
 
@@ -32,8 +32,7 @@ const MainBox = styled.div`
     /* display: none; */
     overflow-y: scroll;
     grid-template-columns: 1fr;
-    width: 95vw;
-    height: 96svh;
+    width: 90vw;
   }
 `;
 
@@ -135,6 +134,7 @@ const RightDiv = styled.div`
   gap: 1rem;
   animation: ${RightDivAni} 0.6s;
   padding: 1rem;
+
   h2 {
     font-size: 2rem;
     margin: 0;
@@ -336,6 +336,8 @@ const Register = () => {
   const [emailErr, setEmailErr] = useState(false);
   const [nameErr, setNameErr] = useState(false);
   const [mobileErr, setMobileErr] = useState(false);
+  const [pincodeErr, setPincodeErr] = useState(false);
+  const [addressErr, setAddressErr] = useState(false);
   const [cityErr, setCityErr] = useState(false);
   const [stateErr, setStateErr] = useState(false);
   const [channelUrlErr, setChannelUrlErr] = useState(false);
@@ -377,6 +379,8 @@ const Register = () => {
     channelUrl: "",
     sign: null,
     userPic: null,
+    pincode: "",
+    address: "",
   };
   const [inpFields, setInpFields] = useState(defaultFields);
   const validateEmail = (email) => {
@@ -397,6 +401,8 @@ const Register = () => {
     const state = document.querySelector("#state").value;
     const country = document.querySelector("#country").value;
     const channelUrl = document.querySelector("#channelUrl").value;
+    const address = document.querySelector("#address").value;
+    const pincode = document.querySelector("#pincode").value;
 
     // if (fullName.length < 4) {
     //   setNameErr(true);
@@ -418,6 +424,8 @@ const Register = () => {
     if (
       fullName.length > 4 &&
       city.length > 3 &&
+      pincode.toString().length == 6 &&
+      address.length > 4 &&
       country.length > 3 &&
       channelUrl.length > 9 &&
       state.length > 3 &&
@@ -442,6 +450,8 @@ const Register = () => {
     const state = document.querySelector("#state").value;
     const country = document.querySelector("#country").value;
     const channelUrl = document.querySelector("#channelUrl").value;
+    const address = document.querySelector("#address").value;
+    const pincode = document.querySelector("#pincode").value;
 
     if (id === "fullName" && fullName.length < 4) {
       setNameErr(true);
@@ -449,6 +459,14 @@ const Register = () => {
     }
     if (id === "city" && city.length < 4) {
       setCityErr(true);
+      return;
+    }
+    if (id === "pincode" && pincode.toString().length < 6) {
+      setCityErr(true);
+      return;
+    }
+    if (id === "address" && address.length < 4) {
+      setAddressErr(true);
       return;
     }
     if (id === "channelUrl" && channelUrl.length < 10) {
@@ -490,8 +508,19 @@ const Register = () => {
     if (id === "city") {
       setCityErr(false);
     }
+    if (id === "pincode") {
+      if (val.toString().length > 6) {
+        return;
+      }
+      setInpFields({ ...inpFields, [id]: val });
+      setCityErr(false);
+      return;
+    }
     if (id === "channelUrl") {
       setChannelUrlErr(false);
+    }
+    if (id === "address") {
+      setAddressErr(false);
     }
     if (id === "country") {
       setCountryErr(false);
@@ -606,6 +635,8 @@ const Register = () => {
       formData.append("channelUrl", inpFields.channelUrl);
       formData.append("sign", inpFields.sign);
       formData.append("userPic", inpFields.userPic);
+      formData.append("address", inpFields.address);
+      formData.append("pincode", inpFields.pincode);
 
       const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {
         method: "POST",
@@ -625,7 +656,6 @@ const Register = () => {
 
   return (
     <>
-      {" "}
       {contextHolderNot}
       {contextHolder}
       <Snackbar
@@ -723,6 +753,42 @@ const Register = () => {
                   }}
                 />{" "}
                 {mobileErr && <p>Invalid Contact Number</p>}
+                <Input
+                  type="text"
+                  name=""
+                  className="inputField"
+                  id="address"
+                  onBlur={onBlurHandler}
+                  onChange={onChangeHandler}
+                  placeholder="Address"
+                  value={inpFields.address}
+                  style={{
+                    border: `${
+                      addressErr
+                        ? "1px solid #d72020"
+                        : "1px solid rgba(166, 166, 166, 0.3)"
+                    }`,
+                  }}
+                />{" "}
+                {addressErr && <p>Invalid address</p>}
+                <Input
+                  type="number"
+                  name=""
+                  className="inputField"
+                  id="pincode"
+                  onBlur={onBlurHandler}
+                  onChange={onChangeHandler}
+                  placeholder="Pincode"
+                  value={inpFields.pincode}
+                  style={{
+                    border: `${
+                      pincodeErr
+                        ? "1px solid #d72020"
+                        : "1px solid rgba(166, 166, 166, 0.3)"
+                    }`,
+                  }}
+                />{" "}
+                {pincodeErr && <p>Invalid Pincode</p>}
                 <Input
                   type="text"
                   name=""

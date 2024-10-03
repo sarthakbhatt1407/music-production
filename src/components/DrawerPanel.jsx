@@ -13,6 +13,7 @@ import { Layout, Menu, Button, theme, Avatar } from "antd";
 import {
   AccountCircleOutlined,
   Copyright,
+  DocumentScannerOutlined,
   HistoryOutlined,
   RestoreFromTrashOutlined,
 } from "@mui/icons-material";
@@ -74,6 +75,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "profile") {
       return ["5"];
+    }
+    if (page === "legal-document") {
+      return ["6"];
     }
   };
 

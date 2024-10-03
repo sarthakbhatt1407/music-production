@@ -10,6 +10,7 @@ import ProfilePage from "../components/UserPanel/ProfilePage";
 import CopyRightPage from "../components/UserPanel/CopyRightPage";
 import { PhoneOutlined, WhatsAppOutlined } from "@ant-design/icons";
 import { FloatButton } from "antd";
+import LegalDoc from "../components/UserPanel/LegalDoc";
 
 const UserPanel = () => {
   const page = useParams().page;
@@ -74,6 +75,7 @@ const UserPanel = () => {
           {page === "upload" && <Form />}
           {page === "history" && <History />}
           {page === "copyright" && <CopyRightPage />}
+          {page === "legal-document" && <LegalDoc />}
           {id && !action && <OrderDetailsPage />}
           {action === "edit" && <EditOrder />}
         </DrawerPanel>{" "}

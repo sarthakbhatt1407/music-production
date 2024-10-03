@@ -18,6 +18,7 @@ import {
   PeopleOutlineOutlined,
   QuestionAnswerOutlined,
   RestoreFromTrashOutlined,
+  TimerRounded,
   WorkHistoryOutlined,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
@@ -88,6 +89,9 @@ const DrawerPanel = (props) => {
     if (page === "user-queries") {
       return ["8"];
     }
+    if (page === "pending-profile") {
+      return ["9"];
+    }
   };
 
   const [collapsed, setCollapsed] = useState(true);
@@ -107,7 +111,7 @@ const DrawerPanel = (props) => {
             display: "flex",
             flexDirection: "column",
             gap: ".6rem",
-            fontSize: "1.1rem",
+            fontSize: "1rem",
           }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
@@ -193,7 +197,19 @@ const DrawerPanel = (props) => {
                   <QuestionAnswerOutlined />
                 </Link>
               ),
-              label: "Labels",
+              label: "Queries",
+            },
+            {
+              key: "9",
+              icon: (
+                <Link
+                  to={"/admin-panel/pending-profile"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <TimerRounded />
+                </Link>
+              ),
+              label: "Pending Profiles",
             },
           ]}
         />

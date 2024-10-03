@@ -241,6 +241,16 @@ const BtnBox = styled.div`
     }
   }
 `;
+const PendingBox = styled.div`
+  background-color: white;
+  height: 50svh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.4rem;
+  color: #0000008e;
+  letter-spacing: 0.09rem;
+`;
 
 const Form = () => {
   const userId = useSelector((state) => state.userId);
@@ -301,6 +311,7 @@ const Form = () => {
   const [showComposerModal, setShowComposerModal] = useState(false);
   const [showLyricistModal, setShowLyricistModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [userData, setUserdata] = useState(null);
   const success = (msg) => {
     messageApi.open({
       type: "success",
@@ -313,7 +324,22 @@ const Form = () => {
       content: msg,
     });
   };
+  const fetcher = async () => {
+    setIsloading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+    );
+    const data = await res.json();
+
+    if (res.ok) {
+      console.log(data.user);
+
+      setUserdata(data.user);
+    }
+    setIsloading(false);
+  };
   useEffect(() => {
+    fetcher();
     setInpFields({ ...inpFields, labelName: labelNameFromStore });
     return () => {};
   }, [labelNameFromStore]);
@@ -669,252 +695,6 @@ const Form = () => {
   };
   return (
     <MainDiv>
-      {showComposerModal && (
-        <Modal>
-          <ModalBox>
-            <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
-              <p style={{ color: "#353434" }}>
-                For Artist profile linking, only Facebook page link and
-                Instagram profile ID link will be accepted
-              </p>
-              <p>
-                Note: Name can't be edited. Please ensure you are adding the
-                correct name.
-              </p>
-            </div>
-            <ModalFormBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="composer">Name</Label>
-                <ModalInput
-                  type="text"
-                  id="composer"
-                  onChange={onChangeHandler}
-                  value={inpFields.composer}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="composerAppleId">Apple ID</Label>
-                <ModalInput
-                  type="text"
-                  id="composerAppleId"
-                  onChange={onChangeHandler}
-                  value={inpFields.composerAppleId}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="composerSpotifyId">Spotify ID</Label>
-                <ModalInput
-                  type="text"
-                  id="composerSpotifyId"
-                  onChange={onChangeHandler}
-                  value={inpFields.composerSpotifyId}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="composerFacebookUrl">Facebook Url </Label>
-                <ModalInput
-                  type="text"
-                  id="composerFacebookUrl"
-                  onChange={onChangeHandler}
-                  value={inpFields.composerFacebookUrl}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="composerInstagramUrl">Instagram Url </Label>
-                <ModalInput
-                  type="text"
-                  id="composerInstagramUrl"
-                  onChange={onChangeHandler}
-                  value={inpFields.composerInstagramUrl}
-                />
-              </LabelInpBox>
-              <div></div>
-              <BtnBox>
-                <button
-                  onClick={() => {
-                    setShowComposerModal(false);
-                  }}
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={() => {
-                    setShowComposerModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
-      {showLyricistModal && (
-        <Modal>
-          <ModalBox>
-            {" "}
-            <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
-              <p style={{ color: "#353434" }}>
-                For Artist profile linking, only Facebook page link and
-                Instagram profile ID link will be accepted
-              </p>
-              <p>
-                Note: Name can't be edited. Please ensure you are adding the
-                correct name.
-              </p>
-            </div>
-            <ModalFormBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="lyricist">Name</Label>
-                <ModalInput
-                  type="text"
-                  id="lyricist"
-                  onChange={onChangeHandler}
-                  value={inpFields.lyricist}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="lyricistAppleId">Apple ID</Label>
-                <ModalInput
-                  type="text"
-                  id="lyricistAppleId"
-                  onChange={onChangeHandler}
-                  value={inpFields.lyricistAppleId}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="lyricistSpotifyId">Spotify ID</Label>
-                <ModalInput
-                  type="text"
-                  id="lyricistSpotifyId"
-                  onChange={onChangeHandler}
-                  value={inpFields.lyricistSpotifyId}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="lyricistFacebookUrl">Facebook Url </Label>
-                <ModalInput
-                  type="text"
-                  id="lyricistFacebookUrl"
-                  onChange={onChangeHandler}
-                  value={inpFields.lyricistFacebookUrl}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="lyricistInstagramUrl">Instagram Url </Label>
-                <ModalInput
-                  type="text"
-                  id="lyricistInstagramUrl"
-                  onChange={onChangeHandler}
-                  value={inpFields.lyricistInstagramUrl}
-                />
-              </LabelInpBox>
-              <div></div>
-
-              <BtnBox>
-                <button
-                  onClick={() => {
-                    setShowLyricistModal(false);
-                  }}
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={() => {
-                    setShowLyricistModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
-      {showSingerModal && (
-        <Modal>
-          <ModalBox>
-            {" "}
-            <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
-              <p style={{ color: "#353434" }}>
-                For Artist profile linking, only Facebook page link and
-                Instagram profile ID link will be accepted
-              </p>
-              <p>
-                Note: Name can't be edited. Please ensure you are adding the
-                correct name.
-              </p>
-            </div>
-            <ModalFormBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="singer">Name</Label>
-                <ModalInput
-                  type="text"
-                  id="singer"
-                  onChange={onChangeHandler}
-                  value={inpFields.singer}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="singerAppleId">Apple ID</Label>
-                <ModalInput
-                  type="text"
-                  id="singerAppleId"
-                  onChange={onChangeHandler}
-                  value={inpFields.singerAppleId}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="singerSpotifyId">Spotify ID</Label>
-                <ModalInput
-                  type="text"
-                  id="singerSpotifyId"
-                  onChange={onChangeHandler}
-                  value={inpFields.singerSpotifyId}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="singerFacebookUrl">Facebook Url </Label>
-                <ModalInput
-                  type="text"
-                  id="singerFacebookUrl"
-                  onChange={onChangeHandler}
-                  value={inpFields.singerFacebookUrl}
-                />
-              </LabelInpBox>
-              <LabelInpBox style={{ width: "100%" }}>
-                <Label htmlFor="singerInstagramUrl">Instagram Url </Label>
-                <ModalInput
-                  type="text"
-                  id="singerInstagramUrl"
-                  onChange={onChangeHandler}
-                  value={inpFields.singerInstagramUrl}
-                />
-              </LabelInpBox>
-              <div></div>
-
-              <BtnBox>
-                <button
-                  onClick={() => {
-                    setShowSingerModal(false);
-                  }}
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={() => {
-                    setShowSingerModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
-      {contextHolderNot}
-      {contextHolder}
       <Breadcrumb
         items={[
           {
@@ -925,214 +705,478 @@ const Form = () => {
           },
         ]}
       />
+      {isLoading && <MusicLoader />}
       <h1>Upload Content</h1>{" "}
-      <FormBox>
-        {isLoading && <MusicLoader />}
-        <FormSeperator>
-          <h2>Label</h2>
-          <AllInpBox>
-            <LabelInpBox id="1">
-              <Label htmlFor="labelName">
-                label name <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="labelName"
-                id="labelName"
-                placeholder="Label"
-                disabled
-                onChange={onChangeHandler}
-                value={inpFields.labelName}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label>sub-label</Label>
-              <Select name="category" id="category" onChange={getSelectedValue}>
-                <Option defaultValue value={0}>
-                  NA
-                </Option>
-                <Option value={1}>1</Option>
-                <Option value={2}>2</Option>
-                <Option value={3}>3</Option>
-              </Select>
-            </LabelInpBox>
-            {subLabels.length > 0 &&
-              subLabels.map((sbl) => {
-                return (
-                  <LabelInpBox key={sbl.key}>
-                    <Label htmlFor={sbl.id}>{sbl.lbl}</Label>
-                    <Input
+      {!isLoading && userData && userData.status === "pending" && (
+        <>
+          <PendingBox>
+            Your profile is in review. Kindly wait for admin approval to upload
+            content.
+          </PendingBox>
+        </>
+      )}
+      {!isLoading && userData && userData.status != "pending" && (
+        <>
+          {showComposerModal && (
+            <Modal>
+              <ModalBox>
+                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                  <p style={{ color: "#353434" }}>
+                    For Artist profile linking, only Facebook page link and
+                    Instagram profile ID link will be accepted
+                  </p>
+                  <p>
+                    Note: Name can't be edited. Please ensure you are adding the
+                    correct name.
+                  </p>
+                </div>
+                <ModalFormBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="composer">Name</Label>
+                    <ModalInput
                       type="text"
-                      name={sbl.id}
-                      id={sbl.id}
-                      placeholder="sub-label name"
+                      id="composer"
                       onChange={onChangeHandler}
-                      value={inpFields[sbl.id]}
+                      value={inpFields.composer}
                     />
                   </LabelInpBox>
-                );
-              })}
-          </AllInpBox>
-        </FormSeperator>
-        <FormSeperator>
-          <h2>Album</h2>
-          <AllInpBox>
-            <LabelInpBox>
-              <Label htmlFor="title">
-                Album title <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="title"
-                id="title"
-                placeholder="title"
-                onChange={onChangeHandler}
-                value={inpFields.title}
-              />
-            </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="composerAppleId">Apple ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="composerAppleId"
+                      onChange={onChangeHandler}
+                      value={inpFields.composerAppleId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="composerSpotifyId">Spotify ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="composerSpotifyId"
+                      onChange={onChangeHandler}
+                      value={inpFields.composerSpotifyId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="composerFacebookUrl">Facebook Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="composerFacebookUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.composerFacebookUrl}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="composerInstagramUrl">Instagram Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="composerInstagramUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.composerInstagramUrl}
+                    />
+                  </LabelInpBox>
+                  <div></div>
+                  <BtnBox>
+                    <button
+                      onClick={() => {
+                        setShowComposerModal(false);
+                      }}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowComposerModal(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </BtnBox>
+                </ModalFormBox>
+              </ModalBox>
+            </Modal>
+          )}
+          {showLyricistModal && (
+            <Modal>
+              <ModalBox>
+                {" "}
+                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                  <p style={{ color: "#353434" }}>
+                    For Artist profile linking, only Facebook page link and
+                    Instagram profile ID link will be accepted
+                  </p>
+                  <p>
+                    Note: Name can't be edited. Please ensure you are adding the
+                    correct name.
+                  </p>
+                </div>
+                <ModalFormBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricist">Name</Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricist"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricist}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistAppleId">Apple ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistAppleId"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistAppleId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistSpotifyId">Spotify ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistSpotifyId"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistSpotifyId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistFacebookUrl">Facebook Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistFacebookUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistFacebookUrl}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="lyricistInstagramUrl">Instagram Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="lyricistInstagramUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyricistInstagramUrl}
+                    />
+                  </LabelInpBox>
+                  <div></div>
 
-            <LabelInpBox>
-              <Label htmlFor="genre">
-                genre<span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Select
-                name="genre"
-                id="genre"
-                onChange={(e) => {
-                  const ele = document.querySelector(`#${e.target.id}`);
-                  const value = ele.options[ele.selectedIndex].value;
+                  <BtnBox>
+                    <button
+                      onClick={() => {
+                        setShowLyricistModal(false);
+                      }}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowLyricistModal(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </BtnBox>
+                </ModalFormBox>
+              </ModalBox>
+            </Modal>
+          )}
+          {showSingerModal && (
+            <Modal>
+              <ModalBox>
+                {" "}
+                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                  <p style={{ color: "#353434" }}>
+                    For Artist profile linking, only Facebook page link and
+                    Instagram profile ID link will be accepted
+                  </p>
+                  <p>
+                    Note: Name can't be edited. Please ensure you are adding the
+                    correct name.
+                  </p>
+                </div>
+                <ModalFormBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singer">Name</Label>
+                    <ModalInput
+                      type="text"
+                      id="singer"
+                      onChange={onChangeHandler}
+                      value={inpFields.singer}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerAppleId">Apple ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="singerAppleId"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerAppleId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerSpotifyId">Spotify ID</Label>
+                    <ModalInput
+                      type="text"
+                      id="singerSpotifyId"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerSpotifyId}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerFacebookUrl">Facebook Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="singerFacebookUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerFacebookUrl}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox style={{ width: "100%" }}>
+                    <Label htmlFor="singerInstagramUrl">Instagram Url </Label>
+                    <ModalInput
+                      type="text"
+                      id="singerInstagramUrl"
+                      onChange={onChangeHandler}
+                      value={inpFields.singerInstagramUrl}
+                    />
+                  </LabelInpBox>
+                  <div></div>
 
-                  setInpFields({ ...inpFields, genre: value });
-                }}
-              >
-                <Option value={"Classical"}>Classical</Option>
-                <Option value={"Hip-Hop/Rap"}>Hip-Hop/Rap</Option>
-                <Option value={"Devotional"}>Devotional</Option>
-                <Option value={"Carnatic Classical"}>Carnatic Classical</Option>
-                <Option value={"Ambient / Instrumental"}>
-                  Ambient / Instrumental
-                </Option>
-                <Option value={"Film"}>Film</Option>
-                <Option value={"Pop"}>Pop</Option>
-                <Option value={"Indie"}>Indie</Option>
-                <Option value={"Folk"}>Folk</Option>
-              </Select>
-            </LabelInpBox>
+                  <BtnBox>
+                    <button
+                      onClick={() => {
+                        setShowSingerModal(false);
+                      }}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSingerModal(false);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </BtnBox>
+                </ModalFormBox>
+              </ModalBox>
+            </Modal>
+          )}
+          {contextHolderNot}
+          {contextHolder}
 
-            <LabelInpBox>
-              <Label htmlFor="upc">upc</Label>
-              <Input
-                type="text"
-                name="upc"
-                id="upc"
-                onChange={onChangeHandler}
-                value={inpFields.upc}
-                placeholder="upc"
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="dateOfRelease">
-                Date of release <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <DatePicker onChange={onDateChanger} id="dateOfRelease" />
-            </LabelInpBox>
+          <FormBox>
+            <FormSeperator>
+              <h2>Label</h2>
+              <AllInpBox>
+                <LabelInpBox id="1">
+                  <Label htmlFor="labelName">
+                    label name <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="labelName"
+                    id="labelName"
+                    placeholder="Label"
+                    disabled
+                    onChange={onChangeHandler}
+                    value={inpFields.labelName}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label>sub-label</Label>
+                  <Select
+                    name="category"
+                    id="category"
+                    onChange={getSelectedValue}
+                  >
+                    <Option defaultValue value={0}>
+                      NA
+                    </Option>
+                    <Option value={1}>1</Option>
+                    <Option value={2}>2</Option>
+                    <Option value={3}>3</Option>
+                  </Select>
+                </LabelInpBox>
+                {subLabels.length > 0 &&
+                  subLabels.map((sbl) => {
+                    return (
+                      <LabelInpBox key={sbl.key}>
+                        <Label htmlFor={sbl.id}>{sbl.lbl}</Label>
+                        <Input
+                          type="text"
+                          name={sbl.id}
+                          id={sbl.id}
+                          placeholder="sub-label name"
+                          onChange={onChangeHandler}
+                          value={inpFields[sbl.id]}
+                        />
+                      </LabelInpBox>
+                    );
+                  })}
+              </AllInpBox>
+            </FormSeperator>
+            <FormSeperator>
+              <h2>Album</h2>
+              <AllInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="title">
+                    Album title <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="title"
+                    id="title"
+                    placeholder="title"
+                    onChange={onChangeHandler}
+                    value={inpFields.title}
+                  />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label>
-                Album type <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Select
-                name="albumType"
-                id="albumType"
-                onChange={(e) => {
-                  const ele = document.querySelector(`#${e.target.id}`);
-                  const value = ele.options[ele.selectedIndex].value;
-                  setInpFields({ ...inpFields, albumType: value });
-                }}
-              >
-                <Option value={"album"}>Album</Option>
-                <Option value={"film"}>film</Option>
-              </Select>
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="genre">
+                    genre<span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="genre"
+                    id="genre"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
 
-            <LabelInpBox>
-              <Label htmlFor="language">
-                Album Language <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Select
-                name="language"
-                id="language"
-                onChange={(e) => {
-                  const ele = document.querySelector(`#${e.target.id}`);
-                  const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, genre: value });
+                    }}
+                  >
+                    <Option value={"Classical"}>Classical</Option>
+                    <Option value={"Hip-Hop/Rap"}>Hip-Hop/Rap</Option>
+                    <Option value={"Devotional"}>Devotional</Option>
+                    <Option value={"Carnatic Classical"}>
+                      Carnatic Classical
+                    </Option>
+                    <Option value={"Ambient / Instrumental"}>
+                      Ambient / Instrumental
+                    </Option>
+                    <Option value={"Film"}>Film</Option>
+                    <Option value={"Pop"}>Pop</Option>
+                    <Option value={"Indie"}>Indie</Option>
+                    <Option value={"Folk"}>Folk</Option>
+                  </Select>
+                </LabelInpBox>
 
-                  setInpFields({ ...inpFields, language: value });
-                }}
-              >
-                <Option value={"Hindi "}>Hindi </Option>
-                <Option value={"Punjabi"}>Punjabi</Option>
-                <Option value={"Garhwali"}>Garhwali</Option>
-                <Option value={"English"}>English</Option>
-                <Option value={"Nepali"}>Nepali</Option>
-                <Option value={"Kumauni"}>Kumauni</Option>
-                <Option value={"Jaunsari"}>Jaunsari</Option>
-                <Option value={"Himanchali"}>Himanchali</Option>
-                <Option value={"Haryanvi"}>Haryanvi</Option>
-                <Option value={"Urdu"}>Urdu</Option>
-              </Select>
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="upc">upc</Label>
+                  <Input
+                    type="text"
+                    name="upc"
+                    id="upc"
+                    onChange={onChangeHandler}
+                    value={inpFields.upc}
+                    placeholder="upc"
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="dateOfRelease">
+                    Date of release <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <DatePicker onChange={onDateChanger} id="dateOfRelease" />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="description">Album description</Label>
-              <Input
-                type="text"
-                name="description"
-                id="description"
-                onChange={onChangeHandler}
-                value={inpFields.description}
-                placeholder="description"
-              />
-            </LabelInpBox>
+                <LabelInpBox>
+                  <Label>
+                    Album type <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="albumType"
+                    id="albumType"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, albumType: value });
+                    }}
+                  >
+                    <Option value={"album"}>Album</Option>
+                    <Option value={"film"}>film</Option>
+                  </Select>
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="mood">
-                Album mood <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Select
-                name="mood"
-                id="mood"
-                onChange={(e) => {
-                  const ele = document.querySelector(`#${e.target.id}`);
-                  const value = ele.options[ele.selectedIndex].value;
+                <LabelInpBox>
+                  <Label htmlFor="language">
+                    Album Language <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="language"
+                    id="language"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
 
-                  setInpFields({ ...inpFields, mood: value });
-                }}
-              >
-                <Option value={"Romantic"}>Romantic</Option>
-                <Option value={"Happy"}>Happy</Option>
-                <Option value={"Sad"}>Sad</Option>
-                <Option value={"Dance"}>Dance</Option>
-                <Option value={"Bhangra"}>Bhangra</Option>
-                <Option value={"Partiotic"}>Partiotic</Option>
-                <Option value={"Nostalgic"}>Nostalgic</Option>
-                <Option value={"Inspirational"}>Inspirational</Option>
-                <Option value={"Enthusiastic"}>Enthusiastic</Option>
-                <Option value={"Optimistic"}>Optimistic</Option>
-                <Option value={"Passion"}>Passion</Option>
-                <Option value={"Pessimistic"}>Pessimistic</Option>
-                <Option value={"Spiritual"}>Spiritual</Option>
-                <Option value={"Peppy"}>Peppy</Option>
-                <Option value={"Philosophical"}>Philosophical</Option>
-                <Option value={"Mellow"}>Mellow</Option>
-                <Option value={"Calm"}>Calm</Option>
-              </Select>
-            </LabelInpBox>
+                      setInpFields({ ...inpFields, language: value });
+                    }}
+                  >
+                    <Option value={"Hindi "}>Hindi </Option>
+                    <Option value={"Punjabi"}>Punjabi</Option>
+                    <Option value={"Garhwali"}>Garhwali</Option>
+                    <Option value={"English"}>English</Option>
+                    <Option value={"Nepali"}>Nepali</Option>
+                    <Option value={"Kumauni"}>Kumauni</Option>
+                    <Option value={"Jaunsari"}>Jaunsari</Option>
+                    <Option value={"Himanchali"}>Himanchali</Option>
+                    <Option value={"Haryanvi"}>Haryanvi</Option>
+                    <Option value={"Urdu"}>Urdu</Option>
+                  </Select>
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="thumbnail" id="thumbnail">
-                Thumbnail (Max. size 10MB)<span style={{ margin: 0 }}>*</span>
-              </Label>
-              {/* <Upload
+                <LabelInpBox>
+                  <Label htmlFor="description">Album description</Label>
+                  <Input
+                    type="text"
+                    name="description"
+                    id="description"
+                    onChange={onChangeHandler}
+                    value={inpFields.description}
+                    placeholder="description"
+                  />
+                </LabelInpBox>
+
+                <LabelInpBox>
+                  <Label htmlFor="mood">
+                    Album mood <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="mood"
+                    id="mood"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+
+                      setInpFields({ ...inpFields, mood: value });
+                    }}
+                  >
+                    <Option value={"Romantic"}>Romantic</Option>
+                    <Option value={"Happy"}>Happy</Option>
+                    <Option value={"Sad"}>Sad</Option>
+                    <Option value={"Dance"}>Dance</Option>
+                    <Option value={"Bhangra"}>Bhangra</Option>
+                    <Option value={"Partiotic"}>Partiotic</Option>
+                    <Option value={"Nostalgic"}>Nostalgic</Option>
+                    <Option value={"Inspirational"}>Inspirational</Option>
+                    <Option value={"Enthusiastic"}>Enthusiastic</Option>
+                    <Option value={"Optimistic"}>Optimistic</Option>
+                    <Option value={"Passion"}>Passion</Option>
+                    <Option value={"Pessimistic"}>Pessimistic</Option>
+                    <Option value={"Spiritual"}>Spiritual</Option>
+                    <Option value={"Peppy"}>Peppy</Option>
+                    <Option value={"Philosophical"}>Philosophical</Option>
+                    <Option value={"Mellow"}>Mellow</Option>
+                    <Option value={"Calm"}>Calm</Option>
+                  </Select>
+                </LabelInpBox>
+
+                <LabelInpBox>
+                  <Label htmlFor="thumbnail" id="thumbnail">
+                    Thumbnail (Max. size 10MB)
+                    <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  {/* <Upload
                 method="get"
                 listType="picture"
                 {...imgProps}
@@ -1140,250 +1184,252 @@ const Form = () => {
               >
                 <Button icon={<UploadOutlined />}>Upload image</Button>
               </Upload> */}
-              <Input
-                type="file"
-                name=""
-                accept="image/png, image/jpeg, image/jpg "
-                id="thmb"
-                onChange={readrr}
-              />
-              <div id="imgbox" style={{ width: "1rem" }}></div>
-            </LabelInpBox>
+                  <Input
+                    type="file"
+                    name=""
+                    accept="image/png, image/jpeg, image/jpg "
+                    id="thmb"
+                    onChange={readrr}
+                  />
+                  <div id="imgbox" style={{ width: "1rem" }}></div>
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="lyrics">Album lyrics (optional)</Label>
-              <TxtArea
-                rows="5"
-                id="lyrics"
-                placeholder="lyrics"
-                onChange={onChangeHandler}
-                value={inpFields.lyrics}
-              ></TxtArea>
-            </LabelInpBox>
-          </AllInpBox>
-        </FormSeperator>
+                <LabelInpBox>
+                  <Label htmlFor="lyrics">Album lyrics (optional)</Label>
+                  <TxtArea
+                    rows="5"
+                    id="lyrics"
+                    placeholder="lyrics"
+                    onChange={onChangeHandler}
+                    value={inpFields.lyrics}
+                  ></TxtArea>
+                </LabelInpBox>
+              </AllInpBox>
+            </FormSeperator>
 
-        <FormSeperator>
-          <h2>CRBT</h2>
-          <AllInpBox>
-            <LabelInpBox>
-              <Label htmlFor="file" id="file">
-                Audio{" "}
-                <span style={{ margin: 0, textTransform: "none" }}>
-                  (.wav or .mp3)*
-                </span>
-              </Label>
-              <Upload
-                method="get"
-                listType="picture"
-                {...fileProps}
-                maxCount={1}
-              >
-                <Button icon={<UploadOutlined />}>Audio file</Button>
-              </Upload>
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="isrc">isrc</Label>
-              <Input
-                type="text"
-                name="isrc"
-                id="isrc"
-                onChange={onChangeHandler}
-                value={inpFields.isrc}
-                placeholder="isrc"
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="title">title</Label>
-              <Input
-                type="text"
-                name="title"
-                id="title"
-                placeholder="title"
-                disabled
-                onChange={onChangeHandler}
-                value={inpFields.title}
-              />
-            </LabelInpBox>
+            <FormSeperator>
+              <h2>CRBT</h2>
+              <AllInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="file" id="file">
+                    Audio{" "}
+                    <span style={{ margin: 0, textTransform: "none" }}>
+                      (.wav or .mp3)*
+                    </span>
+                  </Label>
+                  <Upload
+                    method="get"
+                    listType="picture"
+                    {...fileProps}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />}>Audio file</Button>
+                  </Upload>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="isrc">isrc</Label>
+                  <Input
+                    type="text"
+                    name="isrc"
+                    id="isrc"
+                    onChange={onChangeHandler}
+                    value={inpFields.isrc}
+                    placeholder="isrc"
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="title">title</Label>
+                  <Input
+                    type="text"
+                    name="title"
+                    id="title"
+                    placeholder="title"
+                    disabled
+                    onChange={onChangeHandler}
+                    value={inpFields.title}
+                  />
+                </LabelInpBox>
 
-            <LabelInpBox>
-              <Label htmlFor="title">Time</Label>
+                <LabelInpBox>
+                  <Label htmlFor="title">Time</Label>
 
-              <TimePicker
-                name="crbt"
-                id="crbt"
-                format={format}
-                onChange={(time) => {
-                  if (!time) {
-                    return;
-                  }
-                  let res;
-                  res = time["$m"] + ":" + time["$s"];
+                  <TimePicker
+                    name="crbt"
+                    id="crbt"
+                    format={format}
+                    onChange={(time) => {
+                      if (!time) {
+                        return;
+                      }
+                      let res;
+                      res = time["$m"] + ":" + time["$s"];
 
-                  setInpFields({ ...inpFields, crbt: res });
-                }}
-              />
-            </LabelInpBox>
-          </AllInpBox>
-        </FormSeperator>
+                      setInpFields({ ...inpFields, crbt: res });
+                    }}
+                  />
+                </LabelInpBox>
+              </AllInpBox>
+            </FormSeperator>
 
-        <FormSeperator>
-          <h2>Artists</h2>
-          <AllInpBox>
-            <LabelInpBox>
-              <Label htmlFor="singer">
-                singer <span style={{ margin: 0 }}>*</span>
-              </Label>
-              <Input
-                type="text"
-                name="singer"
-                id="singer"
-                placeholder="singer name"
-                onChange={onChangeHandler}
-                value={inpFields.singer}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="singer">Add Singer Profile</Label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: ".5rem",
-                }}
-              >
-                <FacebookOutlined />
-                <Instagram />
-                <Apple />
+            <FormSeperator>
+              <h2>Artists</h2>
+              <AllInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="singer">
+                    singer <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="singer"
+                    id="singer"
+                    placeholder="singer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.singer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="singer">Add Singer Profile</Label>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
+                    }}
+                  >
+                    <FacebookOutlined />
+                    <Instagram />
+                    <Apple />
 
-                <Input
-                  style={{ width: "15%" }}
-                  onClick={() => {
-                    setShowSingerModal(true);
-                  }}
-                  type="button"
-                  value={`+`}
-                />
-              </div>
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="lyricist">lyricist</Label>
-              <Input
-                type="text"
-                name="lyricist"
-                id="lyricist"
-                placeholder=""
-                onChange={onChangeHandler}
-                value={inpFields.lyricist}
-              />
-            </LabelInpBox>{" "}
-            <LabelInpBox>
-              <Label htmlFor="singer">Add Lyricist Profile</Label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: ".5rem",
-                }}
-              >
-                <FacebookOutlined />
-                <Instagram />
-                <Apple />
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowSingerModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="lyricist">lyricist</Label>
+                  <Input
+                    type="text"
+                    name="lyricist"
+                    id="lyricist"
+                    placeholder=""
+                    onChange={onChangeHandler}
+                    value={inpFields.lyricist}
+                  />
+                </LabelInpBox>{" "}
+                <LabelInpBox>
+                  <Label htmlFor="singer">Add Lyricist Profile</Label>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
+                    }}
+                  >
+                    <FacebookOutlined />
+                    <Instagram />
+                    <Apple />
 
-                <Input
-                  style={{ width: "15%" }}
-                  onClick={() => {
-                    setShowLyricistModal(true);
-                  }}
-                  type="button"
-                  value={`+`}
-                />
-              </div>
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="composer">composer</Label>
-              <Input
-                type="text"
-                name="composer"
-                id="composer"
-                placeholder="composer name"
-                onChange={onChangeHandler}
-                value={inpFields.composer}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="singer">Add Composer Profile</Label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: ".5rem",
-                }}
-              >
-                <FacebookOutlined />
-                <Instagram />
-                <Apple />
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowLyricistModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="composer">composer</Label>
+                  <Input
+                    type="text"
+                    name="composer"
+                    id="composer"
+                    placeholder="composer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.composer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="singer">Add Composer Profile</Label>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
+                    }}
+                  >
+                    <FacebookOutlined />
+                    <Instagram />
+                    <Apple />
 
-                <Input
-                  style={{ width: "15%" }}
-                  onClick={() => {
-                    setShowComposerModal(true);
-                  }}
-                  type="button"
-                  value={`+`}
-                />
-              </div>
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="musicDirector">music Director</Label>
-              <Input
-                type="text"
-                name="musicDirector"
-                id="musicDirector"
-                placeholder="music Director"
-                onChange={onChangeHandler}
-                value={inpFields.musicDirector}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="director">director</Label>
-              <Input
-                type="text"
-                name="director"
-                id="director"
-                placeholder="director name"
-                onChange={onChangeHandler}
-                value={inpFields.director}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="producer">producer</Label>
-              <Input
-                type="text"
-                name="producer"
-                id="producer"
-                placeholder="producer name"
-                onChange={onChangeHandler}
-                value={inpFields.producer}
-              />
-            </LabelInpBox>
-            <LabelInpBox>
-              <Label htmlFor="starCast">starCast</Label>
-              <Input
-                type="text"
-                name="starCast"
-                id="starCast"
-                placeholder=""
-                onChange={onChangeHandler}
-                value={inpFields.starCast}
-              />
-            </LabelInpBox>
-          </AllInpBox>
-          <BtnDiv>
-            <button onClick={onSubmitHandler}>Submit</button>
-          </BtnDiv>
-        </FormSeperator>
-      </FormBox>
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowComposerModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="musicDirector">music Director</Label>
+                  <Input
+                    type="text"
+                    name="musicDirector"
+                    id="musicDirector"
+                    placeholder="music Director"
+                    onChange={onChangeHandler}
+                    value={inpFields.musicDirector}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="director">director</Label>
+                  <Input
+                    type="text"
+                    name="director"
+                    id="director"
+                    placeholder="director name"
+                    onChange={onChangeHandler}
+                    value={inpFields.director}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="producer">producer</Label>
+                  <Input
+                    type="text"
+                    name="producer"
+                    id="producer"
+                    placeholder="producer name"
+                    onChange={onChangeHandler}
+                    value={inpFields.producer}
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="starCast">starCast</Label>
+                  <Input
+                    type="text"
+                    name="starCast"
+                    id="starCast"
+                    placeholder=""
+                    onChange={onChangeHandler}
+                    value={inpFields.starCast}
+                  />
+                </LabelInpBox>
+              </AllInpBox>
+              <BtnDiv>
+                <button onClick={onSubmitHandler}>Submit</button>
+              </BtnDiv>
+            </FormSeperator>
+          </FormBox>
+        </>
+      )}
     </MainDiv>
   );
 };

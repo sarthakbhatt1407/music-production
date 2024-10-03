@@ -20,6 +20,7 @@ import {
   Cell,
 } from "recharts";
 import MusicLoader from "../Loader/MusicLoader";
+import UserOrdersStatus from "../UserOrdersStatus";
 
 const MainDiv = styled.div`
   position: relative;
@@ -316,6 +317,7 @@ const UserPanelHome = () => {
         <h1>
           <span>Overview</span>
         </h1>{" "}
+        <UserOrdersStatus />
         {userData && !isLoading && (
           <ContentDiv>
             <LeftDiv>

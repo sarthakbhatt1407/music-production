@@ -703,9 +703,16 @@ const ProfilePage = () => {
                   </span>
                 </div>
                 <div>
-                  <span>City</span>
-                  <span>{userData.city}</span>
+                  <span>Address</span>
+                  <span>
+                    {userData.address},{userData.city}
+                  </span>
                 </div>
+                <div>
+                  <span>Pincode</span>
+                  <span>{userData.pincode}</span>
+                </div>
+
                 <div>
                   <span>State</span>
                   <span>{userData.state}</span>
@@ -714,6 +721,19 @@ const ProfilePage = () => {
                   <span>Country</span>
                   <span>{userData.country}</span>
                 </div>
+                {userData.docs && (
+                  <div>
+                    <span>Agreement</span>
+                    <span>
+                      <Link
+                        to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.docs}`}
+                        target="_blank"
+                      >
+                        <DownloadOutlined style={{ transform: "scale(1.5)" }} />
+                      </Link>
+                    </span>
+                  </div>
+                )}
                 <div>
                   <span>Sign</span>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Select } from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
 import { notification } from "antd";
@@ -166,6 +166,11 @@ const ModalFormBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+`;
+const Option = styled.option`
+  color: #777;
+  font-weight: bold;
+  text-transform: capitalize;
 `;
 
 const BtnBox = styled.div`
@@ -343,7 +348,13 @@ const CopyRightPage = () => {
     setRefresher(refresher + 1);
     setIsLoading(false);
   };
+  const getSelectedValue = (e) => {
+    setInpFields({ ...inpFields, platform: e });
 
+    // const ele = document.querySelector(`#${e.target.id}`);
+    // const value = Number(ele.options[ele.selectedIndex].value);
+    // console.log(value);
+  };
   return (
     <MainBox>
       {" "}
@@ -353,6 +364,21 @@ const CopyRightPage = () => {
         <Modal>
           <ModalBox data-aos="zoom-in">
             <ModalFormBox>
+              <LabelInpBox>
+                {" "}
+                <Label htmlFor="platform">Platform</Label>
+                <Select
+                  name="platform"
+                  id="platform"
+                  onChange={getSelectedValue}
+                  value={inpFields.platform}
+                >
+                  <Option defaultValue value={"Youtube"}>
+                    Youtube
+                  </Option>
+                  <Option value={"Facebook"}>Facebook</Option>
+                </Select>
+              </LabelInpBox>
               <LabelInpBox>
                 <Label htmlFor="link">Link</Label>
                 <Input
