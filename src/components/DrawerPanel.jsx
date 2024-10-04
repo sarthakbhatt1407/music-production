@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -15,6 +15,7 @@ import {
   Copyright,
   DocumentScannerOutlined,
   HistoryOutlined,
+  NotificationsNoneOutlined,
   RestoreFromTrashOutlined,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,6 +23,8 @@ import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { SiMicrosoftexcel } from "react-icons/si";
+import { IoIosNotifications } from "react-icons/io";
+import { Badge } from "@mui/material";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -81,12 +84,36 @@ const DrawerPanel = (props) => {
     if (page === "reports") {
       return ["6"];
     }
+    if (page === "notification") {
+      return ["7"];
+    }
   };
 
   const [collapsed, setCollapsed] = useState(true);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const [noti, setNoti] = useState(null);
+  const fetcher = async () => {
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/notification/get-all`
+    );
+    const data = await res.json();
+    console.log(data);
+    if (data.success) {
+      setNoti(data.notifications.reverse());
+    }
+  };
+  useEffect(() => {
+    fetcher();
+    const intv = setInterval(() => {
+      fetcher();
+    }, 2000);
+    return () => {
+      clearInterval(intv);
+    };
+  }, []);
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -180,6 +207,31 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Reports",
+            },
+            {
+              key: "7",
+              icon: (
+                <Link
+                  to={"/user-panel/notification"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  {/* <IoIosNotifications
+                    style={{
+                      transform: "scale(1.6)",
+                    }}
+                  /> */}
+                  <Badge
+                    badgeContent={noti ? noti.length : 0}
+                    color="success"
+                    style={{
+                      marginTop: ".7rem",
+                    }}
+                  >
+                    <NotificationsNoneOutlined />
+                  </Badge>
+                </Link>
+              ),
+              label: "Notifications",
             },
           ]}
         />

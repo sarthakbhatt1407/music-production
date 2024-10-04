@@ -12,6 +12,7 @@ import { PhoneOutlined, WhatsAppOutlined } from "@ant-design/icons";
 import { FloatButton } from "antd";
 import LegalDoc from "../components/UserPanel/LegalDoc";
 import Reports from "../components/UserPanel/Reports";
+import UserNoti from "../components/UserPanel/UserNoti";
 
 const UserPanel = () => {
   const page = useParams().page;
@@ -76,6 +77,7 @@ const UserPanel = () => {
           {page === "upload" && <Form />}
           {page === "reports" && <Reports />}
           {page === "history" && <History />}
+          {page === "notification" && <UserNoti />}
           {page === "copyright" && <CopyRightPage />}
           {page === "legal-document" && <LegalDoc />}
           {id && !action && <OrderDetailsPage />}

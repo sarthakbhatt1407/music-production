@@ -30,11 +30,11 @@ const MainBox = styled.div`
 const TableBox = styled.div`
   height: 71svh;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
+  /* &::-webkit-scrollbar {
     display: none;
-  }
+  } */
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    display: none;
+    /* display: none; */
   }
 `;
 
@@ -66,6 +66,9 @@ const TableBody = styled.tbody`
       padding: 1rem 0;
       font-weight: 500;
       font-size: 1rem;
+      @media only screen and (min-width: 0px) and (max-width: 1000px) {
+        font-size: 0.8rem;
+      }
 
       div {
         display: flex;

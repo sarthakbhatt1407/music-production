@@ -12,11 +12,19 @@ const MainBox = styled.div`
   grid-template-columns: 1fr;
   gap: 3rem;
   align-items: center;
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    padding: 1rem 0;
+  }
 `;
 const OrderBox = styled.div`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+  }
 `;
 const TextBox = styled.div`
   display: flex;
@@ -25,6 +33,12 @@ const TextBox = styled.div`
   justify-content: center;
   span {
     font-size: 1.9rem;
+  }
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    flex-direction: column;
+    span {
+      font-size: 1.3rem;
+    }
   }
 `;
 
@@ -44,6 +58,10 @@ const OrderStatusBox = styled.div`
   }
   span {
     font-size: 1rem;
+  }
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    width: 80%;
+    margin: auto;
   }
 `;
 

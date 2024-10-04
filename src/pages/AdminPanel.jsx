@@ -11,6 +11,7 @@ import CopyrightAdmin from "../components/AdminPanel/CopyrightAdmin";
 import UserQueries from "../components/AdminPanel/UserQueries";
 import EditOrder from "../components/AdminPanel/EditOrder";
 import PendingProfiles from "../components/AdminPanel/PendingProfiles";
+import Notification from "../components/AdminPanel/Notification";
 
 const AdminPanel = () => {
   const page = useParams().page;
@@ -25,6 +26,7 @@ const AdminPanel = () => {
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}
         {page === "all-users" && <AllUsers />}
+        {page === "notification" && <Notification />}
         {page === "user-profile" && <UserProfile />}
         {page === "user-queries" && <UserQueries />}
         {page === "pending-profile" && <PendingProfiles />}

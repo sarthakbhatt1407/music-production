@@ -25,6 +25,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
+import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -91,6 +92,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "pending-profile") {
       return ["9"];
+    }
+    if (page === "notification") {
+      return ["10"];
     }
   };
 
@@ -210,6 +214,22 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Pending Profiles",
+            },
+            {
+              key: "10",
+              icon: (
+                <Link
+                  to={"/admin-panel/notification"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <IoIosNotifications
+                    style={{
+                      transform: "scale(1.6)",
+                    }}
+                  />
+                </Link>
+              ),
+              label: "Notifications",
             },
           ]}
         />
