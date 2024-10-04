@@ -258,8 +258,10 @@ const History = () => {
                   dateOfRelease,
                   orderDateAndTime,
                   thumbnail,
+                  dateLive,
                   id,
                 } = ord;
+
                 const th = thumbnail.includes("cloudinary")
                   ? thumbnail
                   : `${process.env.REACT_APP_BASE_URL}/${thumbnail}`;
@@ -284,7 +286,11 @@ const History = () => {
                     <td>{albumType}</td>
                     <td>{language}</td>
                     <td>{orderDateAndTime.split("/")[0]}</td>
-                    <td>{dateOfRelease}</td>
+                    <td>
+                      {dateLive && dateLive.length > 2
+                        ? dateLive
+                        : dateOfRelease}
+                    </td>
                     {status === "waiting" && (
                       <td>
                         <div

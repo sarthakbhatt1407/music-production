@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Breadcrumb } from "antd";
 import styled from "@emotion/styled";
-import random from "../../assets/images/random.webp";
+import { saveAs } from "file-saver";
 import {
   ContentCopyOutlined,
   DownloadOutlined,
@@ -705,13 +705,18 @@ const ProfilePage = () => {
                 <div>
                   <span>Address</span>
                   <span>
-                    {userData.address},{userData.city}
+                    {userData.address &&
+                      userData.address.length > 0 &&
+                      userData.address + ","}
+                    {userData.city}
                   </span>
                 </div>
-                <div>
-                  <span>Pincode</span>
-                  <span>{userData.pincode}</span>
-                </div>
+                {userData.pincode && (
+                  <div>
+                    <span>Pincode</span>
+                    <span>{userData.pincode}</span>
+                  </div>
+                )}
 
                 <div>
                   <span>State</span>
@@ -735,15 +740,13 @@ const ProfilePage = () => {
                   </div>
                 )}
                 <div>
-                  <span>Sign</span>
-
+                  <span>Signature</span>
                   <span>
-                    <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.sign}`}
-                      target="_blank"
-                    >
-                      <DownloadOutlined style={{ transform: "scale(1.5)" }} />
-                    </Link>
+                    <DownloadOutlined
+                      onClick={() => {
+                        saveAs(userData.sign, `${userData.name}_sign`);
+                      }}
+                    />
                   </span>
                 </div>
               </div>

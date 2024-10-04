@@ -29,9 +29,9 @@ const MainBox = styled.div`
 const TableBox = styled.div`
   height: 71svh;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
+  /* &::-webkit-scrollbar {
     display: none;
-  }
+  } */
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     display: none;
   }
@@ -196,15 +196,16 @@ const Orders = () => {
     fetcher();
     return () => {};
   }, []);
-
   const onCHangeHandler = (e) => {
     const val = e.target.value.toLowerCase();
 
     const arr = orders.filter((ord) => {
-      return (
-        ord.title.toLowerCase().includes(val) ||
-        ord.labelName.toLowerCase().includes(val)
-      );
+      if (ord.title && ord.labelName) {
+        return (
+          ord.title.toString().toLowerCase().includes(val) ||
+          ord.labelName.toString().toLowerCase().includes(val)
+        );
+      }
     });
     setFilteredOrders(arr);
   };

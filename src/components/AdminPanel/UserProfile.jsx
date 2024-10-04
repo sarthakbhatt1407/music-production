@@ -35,6 +35,7 @@ import random from "../../assets/images/random.webp";
 import {
   ContentCopyOutlined,
   CurrencyRupeeSharp,
+  DocumentScannerOutlined,
   DownloadOutlined,
   LinkOutlined,
   SmartDisplayOutlined,
@@ -44,6 +45,7 @@ import MusicLoader from "../Loader/MusicLoader";
 import { notification } from "antd";
 import { message } from "antd";
 import { saveAs } from "file-saver";
+import { SiMicrosoftexcel } from "react-icons/si";
 
 const MainDiv = styled.div`
   display: grid;
@@ -609,6 +611,8 @@ const UserProfile = () => {
   const [paidInp, setPaidInp] = useState(0);
   const [editPaid, setEditPaid] = useState(0);
   const [showEditPaid, setShowEditPaid] = useState(false);
+  const [showLeglmod, setShowLegalMod] = useState(false);
+  const [showExcel, setShowExcel] = useState(false);
   const totalPaymentReporter = (report) => {
     let totalPayment = 0;
     if (report) {
@@ -856,10 +860,176 @@ const UserProfile = () => {
     setIsLoading(false);
     setModalEarning(false);
   };
+  const [pdfFile, setPdfFile] = useState(null); // Store PDF file
+  const [excelFile, setExcelFile] = useState(null); // Store PDF file
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
 
+    if (file && file.type === "application/pdf") {
+      setPdfFile(file); // Store the selected PDF in state
+      console.log("done");
+    } else {
+      alert("Please upload a valid PDF file.");
+    }
+  };
+  const handleExcelFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+
+    if (
+      file &&
+      (file.type === "application/vnd.ms-excel" ||
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    ) {
+      setExcelFile(file); // Store the selected Excel file in state
+    } else {
+      alert("Please upload a valid Excel file (.xls or .xlsx).");
+    }
+  };
   return (
     <>
-      {" "}
+      {showExcel && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <LabelInpBox>
+                <Label htmlFor="accountNo">Excel File</Label>
+                <ModalInput
+                  type="file"
+                  id="doc"
+                  accept=".xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  onChange={handleExcelFileChange} // Handle Excel file input
+                />
+              </LabelInpBox>
+
+              <BtnBox>
+                <button
+                  onClick={async () => {
+                    setIsLoading(true);
+                    if (excelFile) {
+                      const formD = new FormData();
+                      formD.append("excel", excelFile);
+                      formD.append("userId", id);
+                      formD.append("adminId", userId);
+
+                      const res = await fetch(
+                        `${process.env.REACT_APP_BASE_URL}/user/add-excel`,
+                        {
+                          method: "POST",
+
+                          body: formD,
+                        }
+                      );
+                      const data = await res.json();
+
+                      if (res.ok) {
+                        success(data.message);
+                        setTimeout(() => {
+                          setRefresher((prev) => {
+                            return prev + 1;
+                          });
+                          setShowExcel(false);
+                        }, 600);
+                      } else {
+                        error(data.message);
+                      }
+                    } else {
+                      error("Please select a excel file.");
+                    }
+                    setIsLoading(false);
+                  }}
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => {
+                    setShowExcel(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </BtnBox>
+            </ModalFormBox>
+          </ModalBox>
+        </Modal>
+      )}
+      {showLeglmod && (
+        <Modal>
+          <ModalBox data-aos="zoom-in">
+            <ModalFormBox
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <LabelInpBox>
+                <Label htmlFor="accountNo">Legal Document</Label>
+                <ModalInput
+                  type="file"
+                  id="doc"
+                  accept="application/pdf"
+                  onChange={handleFileChange} // Handle file input
+                />
+              </LabelInpBox>
+
+              <BtnBox>
+                <button
+                  onClick={async () => {
+                    setIsLoading(true);
+                    if (pdfFile) {
+                      const formD = new FormData();
+                      formD.append("doc", pdfFile);
+                      formD.append("userId", id);
+                      formD.append("adminId", userId);
+
+                      const res = await fetch(
+                        `${process.env.REACT_APP_BASE_URL}/user/legal-doc`,
+                        {
+                          method: "POST",
+
+                          body: formD,
+                        }
+                      );
+                      const data = await res.json();
+
+                      if (res.ok) {
+                        success(data.message);
+                        setTimeout(() => {
+                          setRefresher((prev) => {
+                            return prev + 1;
+                          });
+                          setShowLegalMod(false);
+                        }, 600);
+                      } else {
+                        error(data.message);
+                      }
+                    } else {
+                      error("Please select a PDF file.");
+                    }
+                    setIsLoading(false);
+                  }}
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLegalMod(false);
+                  }}
+                >
+                  Cancel
+                </button>
+              </BtnBox>
+            </ModalFormBox>
+          </ModalBox>
+        </Modal>
+      )}
       {showEditPaid && (
         <Modal>
           <ModalBox data-aos="zoom-in">
@@ -1369,10 +1539,42 @@ const UserProfile = () => {
             right: 30,
             transform: "scale(1.5)",
             zIndex: 1,
+            bottom: "10%",
           }}
           tooltip={<div>Add Data</div>}
           icon={<UserAddOutlined />}
         >
+          <FloatButton
+            style={{}}
+            onClick={() => {
+              setShowLegalMod(true);
+              setOpen(!open);
+            }}
+            tooltip={<div>Agreement</div>}
+            icon={
+              <DocumentScannerOutlined
+                style={{
+                  color: "#50CC5E",
+                  transform: "scale(.9)",
+                }}
+              />
+            }
+          />
+          <FloatButton
+            style={{}}
+            onClick={() => {
+              setShowExcel(true);
+              setOpen(!open);
+            }}
+            tooltip={<div>Excel Strem Report</div>}
+            icon={
+              <SiMicrosoftexcel
+                style={{
+                  color: "#50CC5E",
+                }}
+              />
+            }
+          />
           <FloatButton
             onClick={() => {
               setModalStream(true);
@@ -1479,9 +1681,20 @@ const UserProfile = () => {
                       </span>
                     </div>
                     <div>
-                      <span>City</span>
-                      <span>{userData.city}</span>
+                      <span>Address</span>
+                      <span>
+                        {userData.address &&
+                          userData.address.length > 0 &&
+                          userData.address + ","}
+                        {userData.city}
+                      </span>
                     </div>
+                    {userData.pincode && (
+                      <div>
+                        <span>Pincode</span>
+                        <span>{userData.pincode}</span>
+                      </div>
+                    )}
                     <div>
                       <span>State</span>
                       <span>{userData.state}</span>
@@ -1490,6 +1703,7 @@ const UserProfile = () => {
                       <span>Country</span>
                       <span>{userData.country}</span>
                     </div>
+
                     <div>
                       <span>Signature</span>
                       <span>

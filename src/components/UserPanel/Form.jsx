@@ -11,6 +11,7 @@ import { TimePicker } from "antd";
 import { notification } from "antd";
 import { useSelector } from "react-redux";
 import { Apple, FacebookOutlined, Instagram } from "@mui/icons-material";
+import { FaSpotify } from "react-icons/fa";
 
 const MainDiv = styled.div`
   height: 100%;
@@ -264,7 +265,7 @@ const Form = () => {
       message: "Fill all require fields.",
     });
   };
-  const format = "mm:ss";
+  const format = "hh:mm:ss";
   const deafaultFields = {
     labelName: labelNameFromStore,
     title: "",
@@ -302,6 +303,8 @@ const Form = () => {
     lyricistFacebookUrl: "",
     lyricistInstagramUrl: "",
     musicDirector: "",
+    subgenre: "Vocal",
+    releaseDate: "",
   };
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
@@ -332,8 +335,6 @@ const Form = () => {
     const data = await res.json();
 
     if (res.ok) {
-      console.log(data.user);
-
       setUserdata(data.user);
     }
     setIsloading(false);
@@ -371,6 +372,8 @@ const Form = () => {
     const imgbox = document.getElementById("imgbox");
     imgbox.innerHTML = "";
     const file = e.target.files[0];
+    console.log(file);
+
     const fileMb = file.size / 1024 ** 2;
     if (fileMb > 10) {
       message.error(`Image size is greater than 10MB.`);
@@ -407,13 +410,17 @@ const Form = () => {
       image.onload = function (event) {
         height = this.height;
         width = this.width;
+        console.log(width, height);
 
         const sixteen = width === 1600 && height === 1600;
         const three = width === 3000 && height === 3000;
 
         if (sixteen === false && three === false) {
           const thmb = document.getElementById("thmb");
-          thmb.value = "";
+
+          if (thmb) {
+            thmb.value = "";
+          }
 
           message.error(`Only 1600x1600 or 3000x3000 images are allowed`);
           setInpFields({ ...inpFields, thumbnail: null });
@@ -670,6 +677,8 @@ const Form = () => {
     formData.append("file", inpFields.file);
     formData.append("thumbnail", inpFields.thumbnail);
     formData.append("userId", userId);
+    formData.append("releaseDate", inpFields.releaseDate);
+    formData.append("subgenre", inpFields.subgenre);
 
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/order/new-order`,
@@ -1063,6 +1072,25 @@ const Form = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
+                  <Label htmlFor="subgenre">
+                    sub genre<span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="subgenre"
+                    id="subgenre"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+
+                      setInpFields({ ...inpFields, subgenre: value });
+                    }}
+                  >
+                    <Option value={"Vocal"}>Vocal</Option>
+                    <Option value={"Instrument"}>Instrument</Option>
+                  </Select>
+                </LabelInpBox>
+
+                <LabelInpBox>
                   <Label htmlFor="upc">upc</Label>
                   <Input
                     type="text"
@@ -1075,7 +1103,7 @@ const Form = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="dateOfRelease">
-                    Date of release <span style={{ margin: 0 }}>*</span>
+                    Date of Live <span style={{ margin: 0 }}>*</span>
                   </Label>
                   <DatePicker onChange={onDateChanger} id="dateOfRelease" />
                 </LabelInpBox>
@@ -1096,6 +1124,25 @@ const Form = () => {
                     <Option value={"album"}>Album</Option>
                     <Option value={"film"}>film</Option>
                   </Select>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="releaseDate">
+                    release date{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (If already released)
+                    </span>
+                  </Label>
+                  <DatePicker
+                    onChange={(date, dateString) => {
+                      setInpFields({ ...inpFields, releaseDate: dateString });
+                    }}
+                    id="releaseDate"
+                  />
                 </LabelInpBox>
 
                 <LabelInpBox>
@@ -1251,7 +1298,17 @@ const Form = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
-                  <Label htmlFor="title">Time</Label>
+                  <Label htmlFor="crbt">
+                    Time{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (hh:mm:ss)
+                    </span>
+                  </Label>
 
                   <TimePicker
                     name="crbt"
@@ -1262,7 +1319,9 @@ const Form = () => {
                         return;
                       }
                       let res;
-                      res = time["$m"] + ":" + time["$s"];
+
+                      res = time["$H"] + ":" + time["$m"] + ":" + time["$s"];
+                      console.log(res);
 
                       setInpFields({ ...inpFields, crbt: res });
                     }}
@@ -1299,7 +1358,12 @@ const Form = () => {
                     <FacebookOutlined />
                     <Instagram />
                     <Apple />
-
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                    />
                     <Input
                       style={{ width: "15%" }}
                       onClick={() => {
@@ -1333,7 +1397,12 @@ const Form = () => {
                     <FacebookOutlined />
                     <Instagram />
                     <Apple />
-
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                    />
                     <Input
                       style={{ width: "15%" }}
                       onClick={() => {
@@ -1367,7 +1436,12 @@ const Form = () => {
                     <FacebookOutlined />
                     <Instagram />
                     <Apple />
-
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                    />
                     <Input
                       style={{ width: "15%" }}
                       onClick={() => {

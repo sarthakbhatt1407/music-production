@@ -315,6 +315,18 @@ const OrderDetailsPage = () => {
                       </div>
                     );
                   }
+                  if (field === "dateLive") {
+                    return;
+                  }
+                  if (field === "releaseDate" && value.length > 0) {
+                    field = "release Date";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>{value}</span>
+                      </div>
+                    );
+                  }
                   if (field === "singerFacebookUrl") {
                     field = "singer Facebook Url";
                     return (

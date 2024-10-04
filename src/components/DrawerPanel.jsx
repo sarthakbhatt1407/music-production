@@ -21,6 +21,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
+import { SiMicrosoftexcel } from "react-icons/si";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -76,7 +77,8 @@ const DrawerPanel = (props) => {
     if (page === "profile") {
       return ["5"];
     }
-    if (page === "legal-document") {
+
+    if (page === "reports") {
       return ["6"];
     }
   };
@@ -162,6 +164,22 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "My Account",
+            },
+            {
+              key: "6",
+              icon: (
+                <Link
+                  to={"/user-panel/reports"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <SiMicrosoftexcel
+                    style={{
+                      transform: "scale(1.2)",
+                    }}
+                  />
+                </Link>
+              ),
+              label: "Reports",
             },
           ]}
         />

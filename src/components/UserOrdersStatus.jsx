@@ -67,8 +67,13 @@ const UserOrdersStatus = () => {
     if (res.ok) {
       const arr = data.orders;
       const com = arr.filter((ord) => {
-        return ord.deleted != true;
+        return (
+          ord.status === "pending" ||
+          ord.status === "completed" ||
+          ord.status === "processing"
+        );
       });
+
       const pending = arr.filter((ord) => {
         return ord.status === "pending" && ord.deleted != true;
       });
@@ -82,7 +87,6 @@ const UserOrdersStatus = () => {
       setProcessingOrd(proc);
       setCompOrd(comp);
       setPendingOrd(pending);
-      console.log(arr);
     } else {
     }
     setIsloading(false);

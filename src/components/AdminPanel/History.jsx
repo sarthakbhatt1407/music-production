@@ -33,9 +33,9 @@ const MainBox = styled.div`
 const TableBox = styled.div`
   height: 71svh;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
+  /* &::-webkit-scrollbar {
     display: none;
-  }
+  } */
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     display: none;
   }
@@ -261,11 +261,13 @@ const History = () => {
     const val = e.target.value.toLowerCase();
 
     const arr = orders.filter((ord) => {
-      return (
-        ord.title.toLowerCase().includes(val) ||
-        ord.labelName.toLowerCase().includes(val) ||
-        ord.isrc.toLowerCase().includes(val)
-      );
+      if (ord.title && ord.labelName && ord.isrc) {
+        return (
+          ord.title.toString().toLowerCase().includes(val) ||
+          ord.labelName.toString().toLowerCase().includes(val) ||
+          ord.isrc.toString().toLowerCase().includes(val)
+        );
+      }
     });
     setFilteredOrders(arr);
   };
@@ -331,6 +333,7 @@ const History = () => {
                   thumbnail,
                   id,
                   labelName,
+                  dateLive,
                 } = ord;
                 const th = thumbnail.includes("cloudinary")
                   ? thumbnail
@@ -367,7 +370,11 @@ const History = () => {
                     <td>{albumType}</td>
                     <td>{language}</td>
                     <td>{orderDateAndTime.split("/")[0]}</td>
-                    <td>{dateOfRelease}</td>
+                    <td>
+                      {dateLive && dateLive.length > 2
+                        ? dateLive
+                        : dateOfRelease}
+                    </td>
                     {status === "waiting" && (
                       <td>
                         <div

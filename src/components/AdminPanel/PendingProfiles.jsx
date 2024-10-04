@@ -4,7 +4,8 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Done, RemoveRedEyeOutlined } from "@mui/icons-material";
 import MusicLoader from "../Loader/MusicLoader";
-import { Breadcrumb, Button, Empty, message } from "antd";
+import { Breadcrumb, Button, Empty, message, Popconfirm } from "antd";
+import { ImCross } from "react-icons/im";
 
 const MainBox = styled.div`
   width: 100%;
@@ -22,9 +23,9 @@ const MainBox = styled.div`
 const TableBox = styled.div`
   height: 71svh;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
+  /* &::-webkit-scrollbar {
     display: none;
-  }
+  } */
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     display: none;
   }
@@ -412,7 +413,14 @@ const PendingProfile = () => {
                           <RemoveRedEyeOutlined />
                         </Link>
                       </td>
-                      <td>
+                      <td
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: "1rem",
+                          alignItems: "center",
+                        }}
+                      >
                         <Button
                           onClick={() => {
                             setSelUser(id);
@@ -421,6 +429,41 @@ const PendingProfile = () => {
                         >
                           <Done />
                         </Button>
+                        <Popconfirm
+                          title="Confirm"
+                          description="Delete User?"
+                          onConfirm={async () => {
+                            setIsloading(true);
+                            const res = await fetch(
+                              `${process.env.REACT_APP_BASE_URL}/user/delete-user`,
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  userId: id,
+                                }),
+                              }
+                            );
+                            const data = await res.json();
+                            if (data.success) {
+                              success(data.message);
+                              setTimeout(() => {
+                                setRefresher((prev) => {
+                                  return prev + 1;
+                                });
+                              }, 600);
+                            } else {
+                              error(data.message);
+                            }
+                            setIsloading(false);
+                          }}
+                        >
+                          <Link>
+                            <ImCross />
+                          </Link>
+                        </Popconfirm>
                       </td>
                     </tr>
                   );

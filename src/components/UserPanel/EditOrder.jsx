@@ -284,6 +284,8 @@ const EditOrder = () => {
     lyricistSpotifyId: "",
     lyricistFacebookUrl: "",
     lyricistInstagramUrl: "",
+    subgenre: "",
+    releaseDate: "",
   };
   const id = useParams().id;
   const [order, setOrder] = useState(null);
@@ -543,7 +545,7 @@ const EditOrder = () => {
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val });
   };
-  const format = "mm:ss";
+  const format = "hh:mm:ss";
   const onSubmitHandler = async () => {
     setIsloading(true);
     if (
@@ -646,6 +648,9 @@ const EditOrder = () => {
 
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
+    formData.append("releaseDate", inpFields.releaseDate);
+    formData.append("subgenre", inpFields.subgenre);
+
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${id}&action=edit`,
       {
@@ -1014,7 +1019,7 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="dateOfRelease">
-                    Date of release <span style={{ margin: 0 }}>*</span>
+                    Date of Live <span style={{ margin: 0 }}>*</span>
                   </Label>
                   <DatePicker onChange={onDateChanger} id="dateOfRelease" />
                 </LabelInpBox>
@@ -1066,7 +1071,24 @@ const EditOrder = () => {
                     <Option value={"Folk"}>Folk</Option>
                   </Select>
                 </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="subgenre">
+                    sub genre<span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="subgenre"
+                    id="subgenre"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
 
+                      setInpFields({ ...inpFields, subgenre: value });
+                    }}
+                  >
+                    <Option value={"Vocal"}>Vocal</Option>
+                    <Option value={"Instrument"}>Instrument</Option>
+                  </Select>
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>
@@ -1105,7 +1127,25 @@ const EditOrder = () => {
                     placeholder="description"
                   />
                 </LabelInpBox>
-
+                <LabelInpBox>
+                  <Label htmlFor="releaseDate">
+                    release date{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (If already released)
+                    </span>
+                  </Label>
+                  <DatePicker
+                    onChange={(date, dateString) => {
+                      setInpFields({ ...inpFields, releaseDate: dateString });
+                    }}
+                    id="releaseDate"
+                  />
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="mood">
                     Album mood <span style={{ margin: 0 }}>*</span>
@@ -1218,7 +1258,18 @@ const EditOrder = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
-                  <Label htmlFor="title">Time</Label>
+                  <Label htmlFor="crbt">
+                    Time{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (hh:mm:ss)
+                    </span>
+                  </Label>
+
                   <TimePicker
                     name="crbt"
                     id="crbt"
@@ -1228,7 +1279,9 @@ const EditOrder = () => {
                         return;
                       }
                       let res;
-                      res = time["$m"] + ":" + time["$s"];
+
+                      res = time["$H"] + ":" + time["$m"] + ":" + time["$s"];
+                      console.log(res);
 
                       setInpFields({ ...inpFields, crbt: res });
                     }}

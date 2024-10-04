@@ -4,7 +4,8 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RemoveRedEyeOutlined } from "@mui/icons-material";
 import MusicLoader from "../Loader/MusicLoader";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, message, Popconfirm } from "antd";
+import { MdDeleteOutline } from "react-icons/md";
 
 const MainBox = styled.div`
   width: 100%;
@@ -22,9 +23,9 @@ const MainBox = styled.div`
 const TableBox = styled.div`
   height: 71svh;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
+  /* &::-webkit-scrollbar {
     display: none;
-  }
+  } */
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     display: none;
   }
@@ -124,7 +125,20 @@ const AllUsers = () => {
   const [isLoading, setIsloading] = useState(true);
   const userId = useSelector((state) => state.userId);
   let c = 0;
-
+  const [refresher, setRefresher] = useState(0);
+  const [messageApi, contextHolder] = message.useMessage();
+  const success = (msg) => {
+    messageApi.open({
+      type: "success",
+      content: msg,
+    });
+  };
+  const error = (msg) => {
+    messageApi.open({
+      type: "error",
+      content: msg,
+    });
+  };
   const fetcher = async () => {
     setIsloading(true);
     const res = await fetch(
@@ -143,7 +157,7 @@ const AllUsers = () => {
   useEffect(() => {
     fetcher();
     return () => {};
-  }, []);
+  }, [refresher]);
 
   return (
     <MainBox>
@@ -187,6 +201,7 @@ const AllUsers = () => {
               <td>Since</td>
               <td>Password</td>
               <td>View Profile</td>
+              <td>Action</td>
             </tr>
           </TableHead>
           {isLoading && <MusicLoader />}
@@ -223,6 +238,47 @@ const AllUsers = () => {
                         <Link to={`/admin-panel/user-profile/${id}`}>
                           <RemoveRedEyeOutlined />
                         </Link>
+                      </td>
+                      <td>
+                        <Popconfirm
+                          title="Confirm"
+                          description="Delete User?"
+                          onConfirm={async () => {
+                            setIsloading(true);
+                            const res = await fetch(
+                              `${process.env.REACT_APP_BASE_URL}/user/delete-user`,
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  userId: id,
+                                }),
+                              }
+                            );
+                            const data = await res.json();
+                            if (data.success) {
+                              success(data.message);
+                              setTimeout(() => {
+                                setRefresher((prev) => {
+                                  return prev + 1;
+                                });
+                              }, 600);
+                            } else {
+                              error(data.message);
+                            }
+                            setIsloading(false);
+                          }}
+                        >
+                          <Link>
+                            <MdDeleteOutline
+                              style={{
+                                transform: "scale(1.4)",
+                              }}
+                            />
+                          </Link>
+                        </Popconfirm>
                       </td>
                     </tr>
                   );

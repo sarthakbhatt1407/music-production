@@ -501,6 +501,7 @@ const OrderDetailsPage = () => {
                       </div>
                     );
                   }
+
                   if (field === "singerFacebookUrl") {
                     field = "singer Facebook Url";
                     return (
@@ -524,6 +525,15 @@ const OrderDetailsPage = () => {
                             <LinkOutlined />
                           </Link>
                         </span>
+                      </div>
+                    );
+                  }
+                  if (field === "releaseDate" && value.length > 0) {
+                    field = "release Date";
+                    return (
+                      <div key={id}>
+                        <span>{field}</span>
+                        <span>{value}</span>
                       </div>
                     );
                   }
