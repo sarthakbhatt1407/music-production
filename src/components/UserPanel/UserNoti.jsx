@@ -296,7 +296,7 @@ const UserNoti = () => {
                     <td
                       style={{
                         width: "50%",
-                        textAlign: "justify",
+                        textAlign: "center",
                       }}
                     >
                       {n.des}

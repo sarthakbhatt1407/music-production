@@ -702,9 +702,21 @@ const ProfilePage = () => {
                     </Link>
                   </span>
                 </div>
-                <div>
+                <div
+                  style={{
+                    padding: ".5rem 0 .5rem 1rem",
+                  }}
+                >
                   <span>Address</span>
-                  <span>
+                  <span
+                    style={{
+                      width: "50%",
+                      padding: "0",
+                      fontSize: ".9rem",
+                      textTransform: "none",
+                      textAlign: "center",
+                    }}
+                  >
                     {userData.address &&
                       userData.address.length > 0 &&
                       userData.address + ","}
