@@ -36,6 +36,15 @@ const LogoDiv = styled.div`
     width: 2rem;
   }
 `;
+const Para = styled.p`
+  margin: "0 1rem";
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+    font-size: 1rem;
+  }
+`;
 
 const DrawerPanel = (props) => {
   const dispatch = useDispatch();
@@ -286,16 +295,7 @@ const DrawerPanel = (props) => {
                 padding: "0 1rem",
               }}
             >
-              <p
-                style={{
-                  margin: "0 1rem",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  textTransform: "capitalize",
-                }}
-              >
-                {userData && userData.name}
-              </p>
+              <Para style={{}}>{userData && userData.name}</Para>
               <Avatar
                 style={{ transform: "scale(1.3)" }}
                 icon={<UserOutlined />}

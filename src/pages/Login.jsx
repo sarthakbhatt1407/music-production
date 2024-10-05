@@ -13,6 +13,10 @@ const OuterBox = styled.div`
   justify-content: center;
   align-items: center;
   padding: 1rem 0;
+  @media only screen and (max-width: 1000px) {
+    height: 100svh;
+    overflow: scroll;
+  }
 `;
 
 const MainBox = styled.div`
@@ -107,16 +111,18 @@ const LeftDiv = styled.div`
     color: white;
   }
   @media only screen and (max-width: 700px) {
-    padding: 1rem 0.5rem;
-    gap: 0.2rem;
+    padding: 1rem;
+    gap: 1rem;
     h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
+      margin: 0;
     }
     p {
-      font-size: 1.2rem;
+      font-size: 1rem;
+      margin: 0;
     }
     button {
-      padding: 1rem 2rem;
+      padding: 0.7rem 1.7rem;
       font-size: 1rem;
     }
   }
@@ -142,6 +148,14 @@ const RightDiv = styled.div`
   }
   @media only screen and (max-width: 700px) {
     padding: 1rem;
+    h2 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
   }
 `;
 

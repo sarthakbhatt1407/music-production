@@ -90,6 +90,8 @@ const MidDiv = styled.div`
     gap: 1rem;
     font-size: 1.3rem;
     text-transform: capitalize;
+    @media only screen and (max-width: 700px) {
+    }
     span {
       cursor: pointer;
       transition: all 0.4s;
@@ -108,6 +110,10 @@ const MidDiv = styled.div`
       &:hover {
         color: #d61c01;
         transform: scale(1.1);
+      }
+      @media only screen and (max-width: 700px) {
+        font-size: 1.2rem;
+        gap: 0.4rem;
       }
     }
   }
