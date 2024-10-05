@@ -228,13 +228,31 @@ const UserPanelHome = () => {
       // for analytics
       let resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
       let arr = [];
+
       for (const key in resArr) {
+        if (key === "Other") {
+          continue;
+        }
         const obj = {
           name: key,
           views: resArr[key],
         };
         arr.push(obj);
       }
+      arr.sort((a, b) => {
+        return a.name.localeCompare(b.name);
+      });
+      for (const key in resArr) {
+        if (key === "Other") {
+          const obj = {
+            name: key,
+            views: resArr[key],
+          };
+          arr.push(obj);
+        }
+        continue;
+      }
+
       setReportData(arr);
       //   for earning
       resArr = data.user.finacialReport[0][earningSelectedYear];

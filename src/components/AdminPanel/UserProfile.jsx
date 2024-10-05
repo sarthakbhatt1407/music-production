@@ -1096,7 +1096,7 @@ const UserProfile = () => {
                   } else {
                     openNotificationWithIcon("error", data.message);
                   }
-                  setShowPaid(false);
+                  setShowEditPaid(false);
                   setIsLoading(false);
                 }}
               >
@@ -1104,7 +1104,7 @@ const UserProfile = () => {
               </button>
               <button
                 onClick={() => {
-                  setShowPaid(false);
+                  setShowEditPaid(false);
                 }}
               >
                 Cancel
@@ -1413,7 +1413,11 @@ const UserProfile = () => {
                   type="number"
                   id="Apple Music"
                   onChange={modalStraemOnChnage}
-                  value={modalStreamInpFields["Apple Music"]}
+                  value={
+                    modalStreamInpFields["Apple Music"]
+                      ? modalStreamInpFields["Apple Music"]
+                      : 0
+                  }
                 />
               </LabelInpBox>
 

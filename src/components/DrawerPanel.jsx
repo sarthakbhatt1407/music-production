@@ -19,7 +19,7 @@ import {
   RestoreFromTrashOutlined,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { SiMicrosoftexcel } from "react-icons/si";
@@ -88,8 +88,9 @@ const DrawerPanel = (props) => {
       return ["7"];
     }
   };
-
+  const userId = useSelector((state) => state.userId);
   const [collapsed, setCollapsed] = useState(true);
+  const [userData, setUserdata] = useState(null);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -99,9 +100,17 @@ const DrawerPanel = (props) => {
       `${process.env.REACT_APP_BASE_URL}/notification/get-all`
     );
     const data = await res.json();
-    console.log(data);
+
     if (data.success) {
       setNoti(data.notifications.reverse());
+    }
+    const resUser = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+    );
+    const dataUser = await resUser.json();
+
+    if (resUser.ok) {
+      setUserdata(dataUser.user);
     }
   };
   useEffect(() => {
@@ -277,6 +286,16 @@ const DrawerPanel = (props) => {
                 padding: "0 1rem",
               }}
             >
+              <p
+                style={{
+                  margin: "0 1rem",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                  textTransform: "capitalize",
+                }}
+              >
+                {userData && userData.name}
+              </p>
               <Avatar
                 style={{ transform: "scale(1.3)" }}
                 icon={<UserOutlined />}

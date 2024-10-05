@@ -123,6 +123,7 @@ const UserOrdersStatus = () => {
             fontWeight: "bold",
             fontSize: "2rem",
             letterSpacing: ".07rem",
+            textTransform: "capitalize",
           }}
         >
           {labelName},
