@@ -73,7 +73,7 @@ const TextBox = styled.div`
       color: #d91903;
     }
   }
-  @media only screen and (min-width: 0px) and (max-width: 549px) {
+  @media only screen and (min-width: 0px) and (max-width: 700px) {
     margin-bottom: 2rem;
     div {
       padding: 0 0.2rem;
@@ -83,22 +83,10 @@ const TextBox = styled.div`
       padding: 0;
 
       h1 {
-        font-size: 4rem;
+        font-size: 3.5rem;
       }
       h2 {
-        font-size: 4rem;
-      }
-    }
-  }
-  @media only screen and (min-width: 550px) and (max-width: 800px) {
-    div {
-      width: 100%;
-      gap: 0.5rem;
-      h1 {
-        font-size: 4.5rem;
-      }
-      h2 {
-        font-size: 4.5rem;
+        font-size: 3.5rem;
       }
     }
   }
@@ -113,11 +101,13 @@ const Para = styled.span`
   &:last-child {
     color: #d91903;
   }
-  @media only screen and (min-width: 0px) and (max-width: 350px) {
-    font-size: 0.8rem;
-    margin-top: -4rem;
+  @media only screen and (min-width: 0px) and (max-width: 700px) {
+    font-size: 1.1rem;
+    margin-top: -5.5rem;
+    font-weight: bold;
+    letter-spacing: 0;
   }
-  @media only screen and (min-width: 351px) and (max-width: 549px) {
+  /* @media only screen and (min-width: 351px) and (max-width: 549px) {
     font-size: 1.3rem;
     margin-top: -5rem;
     letter-spacing: 0;
@@ -126,7 +116,7 @@ const Para = styled.span`
   @media only screen and (min-width: 550px) and (max-width: 800px) {
     font-size: 1.5rem;
     margin-top: -5rem;
-  }
+  } */
 `;
 const BtnBox = styled.div`
   button {
