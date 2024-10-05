@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import React, { useEffect, useState } from "react";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Popconfirm } from "antd";
 import { FloatButton } from "antd";
 import {
   EyeOutlined,
@@ -35,6 +35,7 @@ import random from "../../assets/images/random.webp";
 import {
   ContentCopyOutlined,
   CurrencyRupeeSharp,
+  DeleteForeverOutlined,
   DocumentScannerOutlined,
   DownloadOutlined,
   LinkOutlined,
@@ -46,6 +47,7 @@ import { notification } from "antd";
 import { message } from "antd";
 import { saveAs } from "file-saver";
 import { SiMicrosoftexcel } from "react-icons/si";
+import Reports from "../UserPanel/Reports";
 
 const MainDiv = styled.div`
   display: grid;
@@ -177,7 +179,7 @@ const RightDiv = styled.div`
   }
 `;
 const TableBox = styled.div`
-  height: 21svh;
+  height: 50svh;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;
@@ -612,6 +614,7 @@ const UserProfile = () => {
   const [editPaid, setEditPaid] = useState(0);
   const [showEditPaid, setShowEditPaid] = useState(false);
   const [showLeglmod, setShowLegalMod] = useState(false);
+  let a = 0;
   const [showExcel, setShowExcel] = useState(false);
   const totalPaymentReporter = (report) => {
     let totalPayment = 0;
@@ -624,6 +627,8 @@ const UserProfile = () => {
       setTotalEarningUser(totalPayment);
     }
   };
+  const [reports, setReports] = useState(null);
+  const [filReports, setFillReports] = useState(null);
 
   const [modalEarningInpFields, setModalEarningInpFields] = useState({
     Jan: 0,
@@ -694,6 +699,15 @@ const UserProfile = () => {
       setModalStreamInpFields(
         data.user.analytics[0][currentYear][selectedMonth]
       );
+      if (data.user.excelRep.length > 0) {
+        const repArr = data.user.excelRep.split("&=&").reverse();
+
+        setReports(repArr);
+        setFillReports(repArr);
+      } else {
+        setReports([]);
+        setFillReports([]);
+      }
       // for analytics
       let resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
       let arr = [];
@@ -986,6 +1000,7 @@ const UserProfile = () => {
                   onClick={async () => {
                     setIsLoading(true);
                     if (pdfFile) {
+                      setIsLoading(true);
                       const formD = new FormData();
                       formD.append("doc", pdfFile);
                       formD.append("userId", id);
@@ -2223,6 +2238,89 @@ const UserProfile = () => {
             )}
           </>
         )}
+        <h2>Excel Reports</h2>
+        <TableBox>
+          {1 && (
+            <Table cellSpacing={0}>
+              <TableHead>
+                <tr>
+                  <td>S. No.</td>
+                  <td>File</td>
+                  <td>Action</td>
+                </tr>
+              </TableHead>{" "}
+              <TableBody>
+                {filReports &&
+                  filReports.length > 0 &&
+                  filReports.map((r) => {
+                    a++;
+                    return (
+                      <>
+                        <tr>
+                          <td>{a}.</td>
+                          <td>{r && r.split("/")[2].split(".xl")[0]}</td>
+                          <td>
+                            {" "}
+                            <span>
+                              <Link
+                                to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${r}`}
+                                target="_blank"
+                              >
+                                <DownloadOutlined
+                                  style={{ transform: "scale(1)" }}
+                                />
+                              </Link>
+                              <Popconfirm
+                                title="Confirm"
+                                description="Delete file?"
+                                onConfirm={async () => {
+                                  setIsLoading(true);
+                                  const res = await fetch(
+                                    `${process.env.REACT_APP_BASE_URL}/user/excel-delete`,
+                                    {
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                      },
+                                      body: JSON.stringify({
+                                        userId: id,
+                                        filePath: r,
+                                      }),
+                                    }
+                                  );
+                                  const data = await res.json();
+                                  if (res.ok) {
+                                    success(data.message);
+                                    setTimeout(() => {
+                                      setRefresher((prev) => {
+                                        return prev + 1;
+                                      });
+                                      setShowExcel(false);
+                                    }, 600);
+                                  } else {
+                                    error(data.message);
+                                  }
+                                  setIsLoading(false);
+                                }}
+                                onOpenChange={() => {}}
+                              >
+                                <Link>
+                                  <DeleteForeverOutlined />
+                                </Link>
+                              </Popconfirm>
+                            </span>
+                          </td>
+                        </tr>
+                      </>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          )}
+          {filReports && filReports.length === 0 && !isLoading && (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
+        </TableBox>
       </MainDiv>
     </>
   );

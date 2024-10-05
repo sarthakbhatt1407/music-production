@@ -297,6 +297,15 @@ const UserPanel = () => {
           <Modal>
             <ModalBox data-aos="zoom-in">
               <ModalFormBox>
+                <p
+                  style={{
+                    margin: 0,
+                    textAlign: "center",
+                    fontSize: "1.7rem",
+                  }}
+                >
+                  Query
+                </p>
                 <FormBox>
                   <Input
                     type="text"
@@ -332,7 +341,21 @@ const UserPanel = () => {
                     value={inpField.message}
                   ></textarea>{" "}
                   {messageErr && <span>Message too short</span>}
-                  <Btn onClick={onSubmitHandler}>Submit</Btn>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                    }}
+                  >
+                    <Btn onClick={onSubmitHandler}>Submit</Btn>
+                    <Btn
+                      onClick={() => {
+                        setShowModal(false);
+                      }}
+                    >
+                      Cancel
+                    </Btn>
+                  </div>
                 </FormBox>
               </ModalFormBox>
             </ModalBox>
