@@ -879,13 +879,15 @@ const UserProfile = () => {
 
     if (
       file &&
-      (file.type === "application/vnd.ms-excel" ||
+      (file.type === "application/vnd.ms-excel" || // .xls
         file.type ===
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || // .xlsx
+        file.type === "text/csv") // .csv
     ) {
-      setExcelFile(file); // Store the selected Excel file in state
+      setExcelFile(file); // Store the selected Excel or CSV file in state
+      console.log("File selected:", file.name);
     } else {
-      alert("Please upload a valid Excel file (.xls or .xlsx).");
+      alert("Please upload a valid file (.xls, .xlsx, or .csv).");
     }
   };
   return (
@@ -904,8 +906,8 @@ const UserProfile = () => {
                 <ModalInput
                   type="file"
                   id="doc"
-                  accept=".xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                  onChange={handleExcelFileChange} // Handle Excel file input
+                  accept=".xls, .xlsx, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
+                  onChange={handleExcelFileChange} // Handle Excel and CSV file input
                 />
               </LabelInpBox>
 
