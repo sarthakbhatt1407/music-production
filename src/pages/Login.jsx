@@ -4,8 +4,9 @@ import styled, { keyframes } from "styled-components";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Alert, Snackbar, setRef } from "@mui/material";
 import { useDispatch } from "react-redux";
+import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import MusicLoader from "../components/Loader/MusicLoader";
-
+import { Input as IN } from "antd";
 const OuterBox = styled.div`
   background-color: #f7f7f7;
   height: 95svh;
@@ -315,6 +316,9 @@ const Login = () => {
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       );
   };
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const allFieldChecker = () => {
     setAllValid(false);
@@ -479,9 +483,9 @@ const Login = () => {
                     )}
                     {!showMobile && (
                       <>
-                        <Input
+                        <IN
+                          className="inputField inp"
                           type="text"
-                          className="inputField"
                           name="email"
                           id="email"
                           onChange={onChangeHandler}
@@ -521,8 +525,8 @@ const Login = () => {
                         {mobileErr && <p>Invalid Contact Number</p>}
                       </>
                     )}
-                    <Input
-                      type="password"
+                    {/* <Input
+                      type={showPassword ? "text" : "password"}
                       name=""
                       className="inputField"
                       id="password"
@@ -537,7 +541,25 @@ const Login = () => {
                             : "1px solid rgba(166, 166, 166, 0.3)"
                         }`,
                       }}
-                    />{" "}
+                    /> */}
+                    <IN.Password
+                      name=""
+                      className="inputField inp"
+                      id="password"
+                      onBlur={onBlurHandler}
+                      value={inpFields.password}
+                      onChange={onChangeHandler}
+                      placeholder="Password"
+                      style={{
+                        border: `${
+                          passwordErr
+                            ? "1px solid #d72020"
+                            : "1px solid rgba(166, 166, 166, 0.3)"
+                        }`,
+                        color: "#000", // Ensure text color is black (or any desired color)
+                      }}
+                    />
+
                     {passwordErr && (
                       <p>Password is too short (minimun 6 charcters.)</p>
                     )}
@@ -585,9 +607,9 @@ const Login = () => {
                     {!showMobile && (
                       <>
                         {!forgotEmailSend && (
-                          <Input
+                          <IN
                             type="text"
-                            className="inputField"
+                            className="inputField inp"
                             name="email"
                             id="email"
                             value={inpFields.email}
@@ -619,10 +641,9 @@ const Login = () => {
                       </>
                     )}
                     {forgotEmailSend && forOtpVer && (
-                      <Input
-                        type="password"
+                      <IN.Password
                         name=""
-                        className="inputField"
+                        className="inputField inp"
                         id="password"
                         onBlur={onBlurHandler}
                         onChange={(e) => {

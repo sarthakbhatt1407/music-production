@@ -6,6 +6,7 @@ import MusicLoader from "../components/Loader/MusicLoader";
 import { notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload } from "antd";
+import { Input as IN } from "antd";
 const OuterBox = styled.div`
   background-color: #f7f7f7;
   height: fit-content;
@@ -699,11 +700,11 @@ const Register = () => {
                     <MusicLoader />
                   </LoaderBox>
                 )}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
                   name="fullName"
                   id="fullName"
-                  className="inputField"
                   placeholder="Label Name"
                   onChange={onChangeHandler}
                   value={inpFields.fullName}
@@ -717,9 +718,9 @@ const Register = () => {
                   }}
                 />
                 {nameErr && <p>Invalid Name</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
-                  className="inputField"
                   name="email"
                   id="email"
                   onChange={onChangeHandler}
@@ -735,10 +736,10 @@ const Register = () => {
                   }}
                 />
                 {emailErr && <p>Invalid Email</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="number"
                   name=""
-                  className="inputField"
                   id="contactNum"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -753,10 +754,10 @@ const Register = () => {
                   }}
                 />{" "}
                 {mobileErr && <p>Invalid Contact Number</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
                   name=""
-                  className="inputField"
                   id="address"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -771,10 +772,10 @@ const Register = () => {
                   }}
                 />{" "}
                 {addressErr && <p>Invalid address</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="number"
                   name=""
-                  className="inputField"
                   id="pincode"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -789,10 +790,10 @@ const Register = () => {
                   }}
                 />{" "}
                 {pincodeErr && <p>Invalid Pincode</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
                   name=""
-                  className="inputField"
                   id="city"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -807,10 +808,10 @@ const Register = () => {
                   }}
                 />{" "}
                 {cityErr && <p>Invalid City Name</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
                   name=""
-                  className="inputField"
                   id="state"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -825,10 +826,10 @@ const Register = () => {
                   }}
                 />{" "}
                 {stateErr && <p>Invalid State Name</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
                   name=""
-                  className="inputField"
                   id="country"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -843,10 +844,10 @@ const Register = () => {
                   }}
                 />{" "}
                 {countryErr && <p>Invalid Country Name</p>}
-                <Input
+                <IN
+                  className="inputField inp"
                   type="text"
                   name=""
-                  className="inputField"
                   id="channelUrl"
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
@@ -885,16 +886,17 @@ const Register = () => {
                     </Upload>
                   </PhotosDiv>
                 )}
-                <Input
+                <IN.Password
                   type="password"
                   name=""
-                  className="inputField"
+                  className="inputField inp"
                   id="password"
                   onBlur={onBlurHandler}
                   value={inpFields.password}
                   onChange={onChangeHandler}
                   placeholder="Password"
                   style={{
+                    color: "#000",
                     border: `${
                       passwordErr
                         ? "1px solid #d72020"
