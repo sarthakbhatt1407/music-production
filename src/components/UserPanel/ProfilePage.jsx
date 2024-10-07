@@ -710,11 +710,9 @@ const ProfilePage = () => {
                   <span>Address</span>
                   <span
                     style={{
-                      width: "50%",
-                      padding: "0",
                       fontSize: ".9rem",
-                      textTransform: "none",
-                      textAlign: "center",
+                      width: "fit-content",
+                      maxWidth: "70%",
                     }}
                   >
                     {userData.address &&

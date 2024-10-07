@@ -372,7 +372,7 @@ const PendingProfile = () => {
               <td>Phone</td>
               <td>Location</td>
               <td>Since</td>
-              <td>Password</td>
+
               <td>View Profile</td>
               <td>Action</td>
             </tr>
@@ -407,7 +407,7 @@ const PendingProfile = () => {
                         {address}, {city}, {state}
                       </td>
                       <td>{userSince}</td>
-                      <td style={{ textTransform: "none" }}>{password}</td>
+                      {/* <td style={{ textTransform: "none" }}>{password}</td> */}
                       <td>
                         <Link to={`/admin-panel/user-profile/${id}`}>
                           <RemoveRedEyeOutlined />

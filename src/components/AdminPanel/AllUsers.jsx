@@ -147,8 +147,10 @@ const AllUsers = () => {
     const data = await res.json();
 
     if (res.ok) {
-      setUsers(data.users.reverse());
-      setFilteredUsers(data.users.reverse());
+      const arr = data.users;
+      arr.reverse();
+      setUsers(arr);
+      setFilteredUsers(arr);
     } else {
     }
     setIsloading(false);

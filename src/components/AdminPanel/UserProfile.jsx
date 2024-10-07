@@ -1703,7 +1703,13 @@ const UserProfile = () => {
                     </div>
                     <div>
                       <span>Address</span>
-                      <span>
+                      <span
+                        style={{
+                          fontSize: ".9rem",
+                          width: "fit-content",
+                          maxWidth: "70%",
+                        }}
+                      >
                         {userData.address &&
                           userData.address.length > 0 &&
                           userData.address + ","}

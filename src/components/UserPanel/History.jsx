@@ -184,8 +184,10 @@ const History = () => {
     const data = await res.json();
 
     if (res.ok) {
-      setOrders(data.orders.reverse());
-      setFilteredOrders(data.orders.reverse());
+      const arr = data.orders;
+      arr.reverse();
+      setOrders(arr);
+      setFilteredOrders(arr);
     } else {
       setOrders([]);
       setFilteredOrders([]);
