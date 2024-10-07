@@ -178,7 +178,7 @@ const OrderDetailsPage = () => {
     const data = await res.json();
 
     setOrder(data.order);
-    console.log(`${process.env.REACT_APP_BASE_URL}/${data.order.thumbnail}`);
+    console.log(`${data.order.thumbnail}`);
 
     setIsloading(false);
     let arr = [];

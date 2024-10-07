@@ -283,6 +283,8 @@ const EditOrder = () => {
     lyricistSpotifyId: "",
     lyricistFacebookUrl: "",
     lyricistInstagramUrl: "",
+    subgenre: "",
+    releaseDate: "",
   };
   const id = useParams().id;
   const [order, setOrder] = useState(null);
@@ -595,6 +597,7 @@ const EditOrder = () => {
       openNotificationWithIcon("error");
       return;
     }
+    console.log(inpFields);
 
     const formData = new FormData();
 
@@ -636,7 +639,10 @@ const EditOrder = () => {
     formData.append("lyricistInstagramUrl", inpFields.lyricistInstagramUrl);
 
     formData.append("file", inpFields.file);
+    formData.append("thumbnail", inpFields.thumbnail);
     formData.append("userId", order.id);
+    formData.append("releaseDate", inpFields.releaseDate);
+    formData.append("subgenre", inpFields.subgenre);
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${id}&action=edit`,
       {
@@ -647,31 +653,15 @@ const EditOrder = () => {
     const data = await res.json();
 
     if (res.ok) {
-      const imgFormData = new FormData();
-      imgFormData.append("image", inpFields.thumbnail);
-      imgFormData.append("orderId", id);
-      const imgRes = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/add-order-image`,
-        {
-          method: "POST",
-          body: imgFormData,
-        }
-      );
-
-      const imgData = await imgRes.json();
-
-      if (imgRes.ok) {
-        success(data.message);
-        setTimeout(() => {
-          navigate("/admin-panel/history");
-        }, 1000);
-      }
-      if (!imgRes.ok) {
-        error(data.message);
-      }
-
-      setIsloading(false);
+      success(data.message);
+      setTimeout(() => {
+        navigate("/admin-panel/history");
+      }, 1000);
     }
+    if (!res.ok) {
+      error(data.message);
+    }
+    setIsloading(false);
   };
   return (
     <OuterBox>
@@ -1073,7 +1063,24 @@ const EditOrder = () => {
                     <Option value={"Folk"}>Folk</Option>
                   </Select>
                 </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="subgenre">
+                    sub genre<span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="subgenre"
+                    id="subgenre"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
 
+                      setInpFields({ ...inpFields, subgenre: value });
+                    }}
+                  >
+                    <Option value={"Vocal"}>Vocal</Option>
+                    <Option value={"Instrument"}>Instrument</Option>
+                  </Select>
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="upc">isrc</Label>
                   <Input
@@ -1085,6 +1092,7 @@ const EditOrder = () => {
                     placeholder="isrc"
                   />
                 </LabelInpBox>
+
                 <LabelInpBox>
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>

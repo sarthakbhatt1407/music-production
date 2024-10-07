@@ -296,7 +296,7 @@ const OrderDetailsPage = () => {
       navigate("/admin-panel/pending-work");
     }
     setOrder(data.order);
-    console.log(data.order);
+    console.log(`${data.order.thumbnail}`);
 
     setIsloading(false);
     let arr = [];
