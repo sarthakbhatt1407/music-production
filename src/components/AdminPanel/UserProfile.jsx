@@ -1728,11 +1728,14 @@ const UserProfile = () => {
                     <div>
                       <span>Signature</span>
                       <span>
-                        <DownloadOutlined
-                          onClick={() => {
-                            saveAs(userData.sign, `${userData.name}_sign`);
-                          }}
-                        />
+                        <Link
+                          to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.sign}`}
+                          target="_blank"
+                        >
+                          <DownloadOutlined
+                            style={{ transform: "scale(1.2)" }}
+                          />
+                        </Link>
                       </span>
                     </div>
                   </div>
