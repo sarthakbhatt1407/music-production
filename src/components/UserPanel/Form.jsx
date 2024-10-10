@@ -265,7 +265,7 @@ const Form = () => {
       message: "Fill all require fields.",
     });
   };
-  const format = "hh:mm:ss";
+  const format = "HH:mm:ss";
   const deafaultFields = {
     labelName: labelNameFromStore,
     title: "",
@@ -1320,7 +1320,7 @@ const Form = () => {
                       }
                       let res;
 
-                      res = time["$H"] + ":" + time["$m"] + ":" + time["$s"];
+                      res = time.format(format); // Use moment's format to ensure correct output
                       console.log(res);
 
                       setInpFields({ ...inpFields, crbt: res });
