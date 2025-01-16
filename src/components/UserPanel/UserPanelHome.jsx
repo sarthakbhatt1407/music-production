@@ -226,7 +226,10 @@ const UserPanelHome = () => {
       setUserdata(data.user);
 
       // for analytics
-      let resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
+      let resArr;
+      if (data.user.analytics[0][reportSelectedYear]) {
+        resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
+      }
       let arr = [];
 
       for (const key in resArr) {

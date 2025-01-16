@@ -711,7 +711,9 @@ const OrderDetailsPage = () => {
                   }
                   return (
                     <div key={id}>
-                      <span>{field}</span>
+                      <span>
+                        {field == "dateLive" ? "Date of Live" : field}
+                      </span>
                       <span
                         style={{
                           overflowWrap: "anywhere",

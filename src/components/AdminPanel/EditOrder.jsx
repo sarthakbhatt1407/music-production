@@ -10,7 +10,8 @@ import { Link } from "react-router-dom";
 import { TimePicker } from "antd";
 import { notification } from "antd";
 import { useSelector } from "react-redux";
-
+import { Apple, FacebookOutlined, Instagram } from "@mui/icons-material";
+import { FaSpotify } from "react-icons/fa";
 const OuterBox = styled.div`
   height: 99%;
   overflow-y: scroll;
@@ -245,7 +246,6 @@ const BtnBox = styled.div`
 
 const EditOrder = () => {
   const userId = useSelector((state) => state.userId);
-
   const deafaultFields = {
     labelName: "",
     title: "",
@@ -609,6 +609,7 @@ const EditOrder = () => {
     formData.append("mood", inpFields.mood);
     formData.append("description", inpFields.description);
     formData.append("singer", inpFields.singer);
+    formData.append("thumbnail", inpFields.thumbnail);
     formData.append("composer", inpFields.composer);
     formData.append("director", inpFields.director);
     formData.append("producer", inpFields.producer);
@@ -631,7 +632,6 @@ const EditOrder = () => {
     formData.append("composerSpotifyId", inpFields.composerSpotifyId);
     formData.append("composerFacebookUrl", inpFields.composerFacebookUrl);
     formData.append("composerInstagramUrl", inpFields.composerInstagramUrl);
-    formData.append("admin", true);
 
     formData.append("lyricistAppleId", inpFields.lyricistAppleId);
     formData.append("lyricistSpotifyId", inpFields.lyricistSpotifyId);
@@ -639,8 +639,7 @@ const EditOrder = () => {
     formData.append("lyricistInstagramUrl", inpFields.lyricistInstagramUrl);
 
     formData.append("file", inpFields.file);
-    formData.append("thumbnail", inpFields.thumbnail);
-    formData.append("userId", order.id);
+    formData.append("userId", userId);
     formData.append("releaseDate", inpFields.releaseDate);
     formData.append("subgenre", inpFields.subgenre);
     const res = await fetch(
@@ -1011,7 +1010,7 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="dateOfRelease">
-                    Date of release <span style={{ margin: 0 }}>*</span>
+                    Date of Live <span style={{ margin: 0 }}>*</span>
                   </Label>
                   <DatePicker onChange={onDateChanger} id="dateOfRelease" />
                 </LabelInpBox>
@@ -1082,18 +1081,6 @@ const EditOrder = () => {
                   </Select>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="upc">isrc</Label>
-                  <Input
-                    type="text"
-                    name="isrc"
-                    id="isrc"
-                    onChange={onChangeHandler}
-                    value={inpFields.isrc}
-                    placeholder="isrc"
-                  />
-                </LabelInpBox>
-
-                <LabelInpBox>
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>
                   </Label>
@@ -1131,7 +1118,25 @@ const EditOrder = () => {
                     placeholder="description"
                   />
                 </LabelInpBox>
-
+                <LabelInpBox>
+                  <Label htmlFor="releaseDate">
+                    release date{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (If already released)
+                    </span>
+                  </Label>
+                  <DatePicker
+                    onChange={(date, dateString) => {
+                      setInpFields({ ...inpFields, releaseDate: dateString });
+                    }}
+                    id="releaseDate"
+                  />
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="mood">
                     Album mood <span style={{ margin: 0 }}>*</span>
@@ -1218,9 +1223,20 @@ const EditOrder = () => {
                     <Button icon={<UploadOutlined />}>Upload file</Button>
                   </Upload>
                 </LabelInpBox>
-
+                <LabelInpBox>
+                  <Label htmlFor="upc">isrc</Label>
+                  <Input
+                    type="text"
+                    name="isrc"
+                    id="isrc"
+                    onChange={onChangeHandler}
+                    value={inpFields.isrc}
+                    placeholder="isrc"
+                  />
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="title">title</Label>
+
                   <Input
                     type="text"
                     name="title"
@@ -1233,7 +1249,18 @@ const EditOrder = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
-                  <Label htmlFor="title">Time</Label>
+                  <Label htmlFor="crbt">
+                    Time{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (hh:mm:ss)
+                    </span>
+                  </Label>
+
                   <TimePicker
                     name="crbt"
                     id="crbt"
@@ -1243,7 +1270,9 @@ const EditOrder = () => {
                         return;
                       }
                       let res;
-                      res = time["$m"] + ":" + time["$s"];
+
+                      res = time["$H"] + ":" + time["$m"] + ":" + time["$s"];
+                      console.log(res);
 
                       setInpFields({ ...inpFields, crbt: res });
                     }}
@@ -1270,19 +1299,51 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Singer Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowSingerModal(true);
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
                     }}
-                    type="button"
-                    value={`+`}
-                  />
+                  >
+                    <FacebookOutlined
+                      onClick={() => {
+                        window.open("https://www.facebook.com/", "_blank");
+                      }}
+                    />
+
+                    <Instagram
+                      onClick={() => {
+                        window.open("https://www.instagram.com/", "_blank");
+                      }}
+                    />
+                    <Apple
+                      onClick={() => {
+                        window.open("https://music.apple.com/us/new", "_blank");
+                      }}
+                    />
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                      onClick={() => {
+                        window.open("https://open.spotify.com/", "_blank");
+                      }}
+                    />
+
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowSingerModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="lyricist">
-                    lyricist <span style={{ margin: 0 }}>*</span>
-                  </Label>
+                  <Label htmlFor="lyricist">lyricist</Label>
                   <Input
                     type="text"
                     name="lyricist"
@@ -1294,14 +1355,48 @@ const EditOrder = () => {
                 </LabelInpBox>{" "}
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Lyricist Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowLyricistModal(true);
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
                     }}
-                    type="button"
-                    value={`+`}
-                  />
+                  >
+                    <FacebookOutlined
+                      onClick={() => {
+                        window.open("https://www.facebook.com/", "_blank");
+                      }}
+                    />
+
+                    <Instagram
+                      onClick={() => {
+                        window.open("https://www.instagram.com/", "_blank");
+                      }}
+                    />
+                    <Apple
+                      onClick={() => {
+                        window.open("https://music.apple.com/us/new", "_blank");
+                      }}
+                    />
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                      onClick={() => {
+                        window.open("https://open.spotify.com/", "_blank");
+                      }}
+                    />
+
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowLyricistModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="composer">composer</Label>
@@ -1316,15 +1411,49 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Composer Profile</Label>
-                  <Input
-                    style={{ width: "30%" }}
-                    onClick={() => {
-                      setShowComposerModal(true);
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".5rem",
                     }}
-                    type="button"
-                    value={`+`}
-                  />
-                </LabelInpBox>{" "}
+                  >
+                    <FacebookOutlined
+                      onClick={() => {
+                        window.open("https://www.facebook.com/", "_blank");
+                      }}
+                    />
+
+                    <Instagram
+                      onClick={() => {
+                        window.open("https://www.instagram.com/", "_blank");
+                      }}
+                    />
+                    <Apple
+                      onClick={() => {
+                        window.open("https://music.apple.com/us/new", "_blank");
+                      }}
+                    />
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                      onClick={() => {
+                        window.open("https://open.spotify.com/", "_blank");
+                      }}
+                    />
+
+                    <Input
+                      style={{ width: "15%" }}
+                      onClick={() => {
+                        setShowComposerModal(true);
+                      }}
+                      type="button"
+                      value={`+`}
+                    />
+                  </div>
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="musicDirector">music Director</Label>
                   <Input

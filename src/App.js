@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import AdminPanel from "./pages/AdminPanel";
 import Register from "./pages/Register";
 import Error from "./pages/Error";
+import ProAndInfLogin from "./pages/PromoterAndInf/Login";
+import BrandAdminPanel from "./pages/PromoterAndInf/BrandAdminPanel";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -39,6 +41,9 @@ const App = () => {
       <Routes>
         <Route path="/" exact element={<Home />} />
         {!isLoggedIn && <Route path="/login" exact element={<Login />} />}
+        {!isLoggedIn && (
+          <Route path="/promotions/login" exact element={<ProAndInfLogin />} />
+        )}
         {isLoggedIn && isAdmin && (
           <Route
             path="/login"
@@ -66,6 +71,7 @@ const App = () => {
             />
           </>
         )}
+
         {isLoggedIn && isAdmin && (
           <>
             <Route path="/admin-panel/:page" exact element={<AdminPanel />} />
@@ -86,6 +92,12 @@ const App = () => {
             />
           </>
         )}
+        <Route
+          path="/promotor-admin-panel/:page"
+          exact
+          element={<BrandAdminPanel />}
+        />
+
         <Route path="*" exact element={<Home />} />
       </Routes>
     </div>

@@ -14,7 +14,7 @@ const MainBox = styled.div`
   top: 0;
   left: 0;
   z-index: 2;
-  z-index: 200;
+  z-index: 20000000;
 `;
 
 const MusicLoader = () => {

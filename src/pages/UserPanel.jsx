@@ -371,14 +371,14 @@ const UserPanel = () => {
             zIndex: 1,
           }}
           tooltip={<div>Contact us</div>}
-          icon={<PhoneOutlined />}
+          icon={<FaQuestion />}
         >
           <FloatButton
             onClick={() => {
               setShowModal(true);
               setOpen(!open);
             }}
-            tooltip={<div>Phone</div>}
+            tooltip={<div>Help</div>}
             icon={
               <FaQuestion
                 style={{

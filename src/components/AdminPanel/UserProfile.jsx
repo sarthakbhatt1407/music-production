@@ -690,15 +690,22 @@ const UserProfile = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${id}`
     );
     const data = await res.json();
+    console.log(data);
 
     if (res.ok) {
       setUserdata(data.user);
       setEditPaid(data.user.paidEarning);
       totalPaymentReporter(data.user.finacialReport[0]);
-      setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
-      setModalStreamInpFields(
-        data.user.analytics[0][currentYear][selectedMonth]
-      );
+      if (data.user.finacialReport[0][currentYear]) {
+        setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
+      }
+
+      if (data.user.analytics[0][currentYear]) {
+        setModalStreamInpFields(
+          data.user.analytics[0][currentYear][selectedMonth]
+        );
+      }
+
       if (data.user.excelRep.length > 0) {
         const repArr = data.user.excelRep.split("&=&").reverse();
 
@@ -709,7 +716,10 @@ const UserProfile = () => {
         setFillReports([]);
       }
       // for analytics
-      let resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
+      let resArr;
+      if (data.user.analytics[0][reportSelectedYear]) {
+        resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
+      }
       let arr = [];
       for (const key in resArr) {
         const obj = {

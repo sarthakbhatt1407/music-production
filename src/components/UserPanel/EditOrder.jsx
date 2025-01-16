@@ -11,6 +11,7 @@ import { TimePicker } from "antd";
 import { notification } from "antd";
 import { useSelector } from "react-redux";
 import { Apple, FacebookOutlined, Instagram } from "@mui/icons-material";
+import { FaSpotify } from "react-icons/fa";
 
 const OuterBox = styled.div`
   height: 99%;
@@ -1315,9 +1316,31 @@ const EditOrder = () => {
                       gap: ".5rem",
                     }}
                   >
-                    <FacebookOutlined />
-                    <Instagram />
-                    <Apple />
+                    <FacebookOutlined
+                      onClick={() => {
+                        window.open("https://www.facebook.com/", "_blank");
+                      }}
+                    />
+
+                    <Instagram
+                      onClick={() => {
+                        window.open("https://www.instagram.com/", "_blank");
+                      }}
+                    />
+                    <Apple
+                      onClick={() => {
+                        window.open("https://music.apple.com/us/new", "_blank");
+                      }}
+                    />
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                      onClick={() => {
+                        window.open("https://open.spotify.com/", "_blank");
+                      }}
+                    />
 
                     <Input
                       style={{ width: "15%" }}
@@ -1349,9 +1372,31 @@ const EditOrder = () => {
                       gap: ".5rem",
                     }}
                   >
-                    <FacebookOutlined />
-                    <Instagram />
-                    <Apple />
+                    <FacebookOutlined
+                      onClick={() => {
+                        window.open("https://www.facebook.com/", "_blank");
+                      }}
+                    />
+
+                    <Instagram
+                      onClick={() => {
+                        window.open("https://www.instagram.com/", "_blank");
+                      }}
+                    />
+                    <Apple
+                      onClick={() => {
+                        window.open("https://music.apple.com/us/new", "_blank");
+                      }}
+                    />
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                      onClick={() => {
+                        window.open("https://open.spotify.com/", "_blank");
+                      }}
+                    />
 
                     <Input
                       style={{ width: "15%" }}
@@ -1383,9 +1428,31 @@ const EditOrder = () => {
                       gap: ".5rem",
                     }}
                   >
-                    <FacebookOutlined />
-                    <Instagram />
-                    <Apple />
+                    <FacebookOutlined
+                      onClick={() => {
+                        window.open("https://www.facebook.com/", "_blank");
+                      }}
+                    />
+
+                    <Instagram
+                      onClick={() => {
+                        window.open("https://www.instagram.com/", "_blank");
+                      }}
+                    />
+                    <Apple
+                      onClick={() => {
+                        window.open("https://music.apple.com/us/new", "_blank");
+                      }}
+                    />
+                    <FaSpotify
+                      style={{
+                        transform: "scale(1.5)",
+                        margin: "0 .3rem",
+                      }}
+                      onClick={() => {
+                        window.open("https://open.spotify.com/", "_blank");
+                      }}
+                    />
 
                     <Input
                       style={{ width: "15%" }}
