@@ -267,6 +267,7 @@ const History = () => {
         return (
           ord.title.toString().toLowerCase().includes(val) ||
           ord.labelName.toString().toLowerCase().includes(val) ||
+          ord.upc.toString().toLowerCase().includes(val) ||
           ord.isrc.toString().toLowerCase().includes(val)
         );
       }

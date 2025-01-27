@@ -19,11 +19,10 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FaUserCheck, FaSearch } from "react-icons/fa";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, message } from "antd";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: "24px",
-  // marginBottom: "24px",
   borderRadius: "12px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
 }));
@@ -35,12 +34,17 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const OrderCretaor = () => {
+const OrderCreator = () => {
   const [selectedInfluencers, setSelectedInfluencers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     brandName: "",
+    campaignName: "",
+    collaborationId: "",
     campaignDescription: "",
+    audioFile: null,
+    videoFile: null,
+    photos: [],
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -127,21 +131,83 @@ const OrderCretaor = () => {
     });
   };
 
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (name === "photos") {
+      setFormData({
+        ...formData,
+        [name]: Array.from(files),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: files[0],
+      });
+    }
+  };
+
   const handleRemoveInfluencer = (influencerId) => {
     setSelectedInfluencers((prev) => prev.filter((i) => i.id !== influencerId));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !formData.brandName ||
-      !formData.campaignDescription ||
-      selectedInfluencers.length === 0
-    ) {
-      return;
+    console.log(formData);
+
+    // Prepare the form data to send
+    const formDataToSubmit = new FormData();
+
+    formDataToSubmit.append("brandName", formData.brandName);
+    formDataToSubmit.append("campaignName", formData.campaignName);
+    formDataToSubmit.append("collaborationId", formData.collaborationId);
+    formDataToSubmit.append(
+      "campaignDescription",
+      formData.campaignDescription
+    );
+    formDataToSubmit.append("video", formData.videoFile);
+
+    // Append photos if available
+    formData.photos.forEach((photo, index) => {
+      formDataToSubmit.append(`image`, photo);
+    });
+    let idArr = selectedInfluencers.map((influencer) => influencer.id);
+
+    // Append selected influencers
+    formDataToSubmit.append(
+      "selectedInfluencers",
+      JSON.stringify(selectedInfluencers)
+    );
+    formDataToSubmit.append("infIdArr", JSON.stringify(idArr));
+    formDataToSubmit.append("file", formData.audioFile);
+
+    console.log(`${process.env.REACT_APP_BASE_URL}/brand/new-order`);
+
+    try {
+      // Sending the form data to the API
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/new-order`,
+        {
+          method: "POST",
+          body: formDataToSubmit,
+        }
+      );
+
+      // Check if the response is OK
+      if (response.ok) {
+        // Parse the response if needed
+        const data = await response.json();
+
+        // Show success message
+        message.success("Campaign submitted successfully!");
+        console.log(data); // Log the response data
+      } else {
+        throw new Error("Failed to submit campaign");
+      }
+    } catch (error) {
+      // Show error message if submission fails
+      message.error("Failed to submit the campaign. Please try again.");
+      console.error(error);
     }
-    setSubmitted(true);
-    console.log({ ...formData, selectedInfluencers });
   };
 
   return (
@@ -181,10 +247,7 @@ const OrderCretaor = () => {
             </Box>
 
             <TableContainer
-              sx={{
-                maxHeight: "350px", // Adjust height as needed
-                overflow: "auto",
-              }}
+              sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
             >
               <Table>
                 <TableHead>
@@ -262,6 +325,24 @@ const OrderCretaor = () => {
               />
               <TextField
                 fullWidth
+                label="Campaign Name"
+                name="campaignName"
+                value={formData.campaignName}
+                onChange={handleInputChange}
+                required
+                sx={{ mb: 3 }}
+              />
+              <TextField
+                fullWidth
+                label="Collaboration ID"
+                name="collaborationId"
+                value={formData.collaborationId}
+                onChange={handleInputChange}
+                required
+                sx={{ mb: 3 }}
+              />
+              <TextField
+                fullWidth
                 label="Campaign Description"
                 name="campaignDescription"
                 value={formData.campaignDescription}
@@ -294,6 +375,63 @@ const OrderCretaor = () => {
                   ))
                 )}
               </Stack>
+              <Typography variant="subtitle1" gutterBottom>
+                Select Audio :
+              </Typography>
+              {/* Audio File Input */}
+              <Box sx={{ mb: 3 }}>
+                <TextField
+                  fullWidth
+                  name="audioFile"
+                  type="file"
+                  onChange={handleFileChange}
+                  inputProps={{ accept: ".mp3, .wav" }}
+                  sx={{ mb: 3 }}
+                />
+              </Box>
+              <Typography variant="subtitle1" gutterBottom>
+                Select Video :
+              </Typography>
+              {/* Video File Input */}
+              <Box sx={{ mb: 3 }}>
+                <TextField
+                  fullWidth
+                  name="videoFile"
+                  type="file"
+                  onChange={handleFileChange}
+                  inputProps={{ accept: "video/mp4, video/avi, video/mov" }}
+                  sx={{ mb: 3 }}
+                />
+              </Box>
+              <Typography variant="subtitle1" gutterBottom>
+                Select Photos :
+              </Typography>
+              {/* Photo Input */}
+              <Box sx={{ mb: 3 }}>
+                <input
+                  type="file"
+                  name="photos"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileChange}
+                />
+                <Box sx={{ mt: 2 }}>
+                  {formData.photos.map((photo, index) => (
+                    <img
+                      key={index}
+                      src={URL.createObjectURL(photo)}
+                      alt={`photo-${index}`}
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+
               <StyledButton
                 type="submit"
                 variant="contained"
@@ -301,8 +439,13 @@ const OrderCretaor = () => {
                 fullWidth
                 disabled={
                   !formData.brandName ||
+                  !formData.campaignName ||
+                  !formData.collaborationId ||
                   !formData.campaignDescription ||
-                  selectedInfluencers.length === 0
+                  selectedInfluencers.length === 0 ||
+                  !formData.audioFile ||
+                  !formData.videoFile ||
+                  formData.photos.length === 0
                 }
               >
                 Submit Campaign
@@ -321,4 +464,4 @@ const OrderCretaor = () => {
   );
 };
 
-export default OrderCretaor;
+export default OrderCreator;

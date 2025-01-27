@@ -249,7 +249,8 @@ const TableBody = styled.tbody`
 
 const ReportDiv = styled.div`
   display: grid;
-  grid-template-columns: 2fr 0.8fr;
+  /* grid-template-columns: 2fr 0.8fr; */
+  grid-template-columns: 1fr;
   gap: 1rem;
 
   height: fit-content;
@@ -629,7 +630,7 @@ const UserProfile = () => {
   };
   const [reports, setReports] = useState(null);
   const [filReports, setFillReports] = useState(null);
-
+  const [modalYearSel, setModalYearSel] = useState(currentYear);
   const [modalEarningInpFields, setModalEarningInpFields] = useState({
     Jan: 0,
     Feb: 0,
@@ -697,7 +698,7 @@ const UserProfile = () => {
       setEditPaid(data.user.paidEarning);
       totalPaymentReporter(data.user.finacialReport[0]);
       if (data.user.finacialReport[0][currentYear]) {
-        setModalEarningInpFields(data.user.finacialReport[0][currentYear]);
+        setModalEarningInpFields(data.user.finacialReport[0][modalYearSel]);
       }
 
       if (data.user.analytics[0][currentYear]) {
@@ -856,6 +857,8 @@ const UserProfile = () => {
   };
   const onSubmit = async () => {
     setIsLoading(true);
+    console.log(modalYearSel);
+
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/user/add-financial-report`,
       {
@@ -867,7 +870,7 @@ const UserProfile = () => {
           userId: id,
           adminId: userId,
           report: modalEarningInpFields,
-          year: currentYear,
+          year: modalYearSel,
         }),
       }
     );
@@ -1227,6 +1230,33 @@ const UserProfile = () => {
         <Modal>
           <ModalBox data-aos="zoom-in">
             <ModalFormBox>
+              <LabelInpBox style={{ gridColumn: "1/3" }}>
+                <Label htmlFor="reportsYear">Select year</Label>
+                <Select
+                  name="reportsYear"
+                  id="reportsYear"
+                  onChange={(e) => {
+                    const ele = document.querySelector(`#${e.target.id}`);
+                    const value = ele.options[ele.selectedIndex].value;
+                    setModalYearSel(value);
+                    if (userData.finacialReport[0][value]) {
+                      setModalEarningInpFields(
+                        userData.finacialReport[0][value]
+                      );
+                    } else {
+                      setModalEarningInpFields(defaultEarning);
+                    }
+                  }}
+                >
+                  <Option value={`${currentYear}`}>{currentYear}</Option>
+                  <Option value={`${currentYear - 1}`}>
+                    {currentYear - 1}
+                  </Option>
+                  <Option value={`${currentYear - 2}`}>
+                    {currentYear - 2}
+                  </Option>
+                </Select>
+              </LabelInpBox>
               <LabelInpBox>
                 <Label htmlFor="jan">January</Label>
                 <ModalInput
@@ -2191,7 +2221,7 @@ const UserProfile = () => {
                     </ResponsiveContainer>
                   </ChartBox>
                 </ReportLeftDiv>
-                <ReportRightDiv>
+                {/* <ReportRightDiv>
                   <h2>Reports Summary</h2>
 
                   <ResponsiveContainer width="100%" height={300}>
@@ -2199,7 +2229,7 @@ const UserProfile = () => {
                       <Pie
                         dataKey="views"
                         isAnimationActive={true}
-                        data={reportData}
+                        data={earningData}
                         cx="50%"
                         cy="50%"
                         outerRadius={120}
@@ -2252,7 +2282,7 @@ const UserProfile = () => {
                       })}
                     </tbody>
                   </ReportTable>
-                </ReportRightDiv>
+                </ReportRightDiv> */}
               </ReportDiv>
             )}
           </>

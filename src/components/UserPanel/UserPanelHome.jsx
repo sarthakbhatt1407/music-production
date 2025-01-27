@@ -39,7 +39,8 @@ const MainDiv = styled.div`
 `;
 const ContentDiv = styled.div`
   display: grid;
-  grid-template-columns: 2fr 0.8fr;
+  /* grid-template-columns: 2fr 0.8fr; */
+  grid-template-columns: 1fr;
   gap: 1rem;
 
   height: fit-content;
@@ -478,7 +479,7 @@ const UserPanelHome = () => {
                 </ResponsiveContainer>
               </ChartBox>
             </LeftDiv>
-            <RightDiv>
+            {/* <RightDiv>
               <h2>Reports Summary</h2>
 
               <ResponsiveContainer width="100%" height={300}>
@@ -539,7 +540,7 @@ const UserPanelHome = () => {
                   })}
                 </tbody>
               </Table>
-            </RightDiv>
+            </RightDiv> */}
           </ContentDiv>
         )}
       </MainDiv>

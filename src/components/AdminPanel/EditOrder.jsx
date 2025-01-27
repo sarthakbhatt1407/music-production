@@ -545,7 +545,7 @@ const EditOrder = () => {
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val });
   };
-  const format = "mm:ss";
+  const format = "HH:mm:ss";
   const onSubmitHandler = async () => {
     setIsloading(true);
     if (
@@ -1224,7 +1224,7 @@ const EditOrder = () => {
                   </Upload>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="upc">isrc</Label>
+                  <Label htmlFor="isrc">isrc</Label>
                   <Input
                     type="text"
                     name="isrc"
@@ -1271,7 +1271,7 @@ const EditOrder = () => {
                       }
                       let res;
 
-                      res = time["$H"] + ":" + time["$m"] + ":" + time["$s"];
+                      res = time.format(format); // Use moment's format to ensure correct output
                       console.log(res);
 
                       setInpFields({ ...inpFields, crbt: res });
