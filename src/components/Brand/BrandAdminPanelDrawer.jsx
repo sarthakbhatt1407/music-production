@@ -5,6 +5,7 @@ import {
   UploadOutlined,
   HomeOutlined,
   UserOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
 
 import { Dropdown, Space } from "antd";
@@ -66,13 +67,11 @@ const BrandDrawerPanel = (props) => {
     },
   ];
   const defaultSelector = (page) => {
-    if (page === "home") {
-      return ["1"];
-    }
-    if (page === "orders") {
+    if (page === "new-order") {
       return ["2"];
     }
-    if (page === "history") {
+
+    if (page === "order-history") {
       return ["3"];
     }
     if (page === "copyright") {
@@ -119,47 +118,23 @@ const BrandDrawerPanel = (props) => {
           }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
-            // {
-            //   key: "1",
-            //   icon: (
-            //     <Link
-            //       to={"/admin-panel/home"}
-            //       onClick={() => setCollapsed(true)}
-            //     >
-            //       <HomeOutlined />
-            //     </Link>
-            //   ),
-            //   label: "Home",
-            // },
             {
               key: "2",
               icon: (
                 <Link
-                  to={"/admin-panel/orders"}
+                  to={"/promotor-admin-panel/new-order"}
                   onClick={() => setCollapsed(true)}
                 >
-                  <LibraryMusicOutlined />
+                  <FormOutlined />
                 </Link>
               ),
               label: "Orders",
             },
             {
-              key: "6",
-              icon: (
-                <Link
-                  to={"/admin-panel/pending-work"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <WorkHistoryOutlined />
-                </Link>
-              ),
-              label: "Pending",
-            },
-            {
               key: "3",
               icon: (
                 <Link
-                  to={"/admin-panel/history"}
+                  to={"/promotor-admin-panel/order-history"}
                   onClick={() => setCollapsed(true)}
                 >
                   <HistoryOutlined />
@@ -167,70 +142,70 @@ const BrandDrawerPanel = (props) => {
               ),
               label: "History",
             },
-            {
-              key: "4",
-              icon: (
-                <Link
-                  to={"/admin-panel/copyright"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <Copyright />
-                </Link>
-              ),
-              label: "Copyright",
-            },
-            {
-              key: "7",
-              icon: (
-                <Link
-                  to={"/admin-panel/all-users"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <PeopleOutlineOutlined />
-                </Link>
-              ),
-              label: "Labels",
-            },
-            {
-              key: "8",
-              icon: (
-                <Link
-                  to={"/admin-panel/user-queries"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <QuestionAnswerOutlined />
-                </Link>
-              ),
-              label: "Queries",
-            },
-            {
-              key: "9",
-              icon: (
-                <Link
-                  to={"/admin-panel/pending-profile"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <TimerRounded />
-                </Link>
-              ),
-              label: "Pending Profiles",
-            },
-            {
-              key: "10",
-              icon: (
-                <Link
-                  to={"/admin-panel/notification"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <IoIosNotifications
-                    style={{
-                      transform: "scale(1.6)",
-                    }}
-                  />
-                </Link>
-              ),
-              label: "Notifications",
-            },
+            // {
+            //   key: "4",
+            //   icon: (
+            //     <Link
+            //       to={"/admin-panel/copyright"}
+            //       onClick={() => setCollapsed(true)}
+            //     >
+            //       <Copyright />
+            //     </Link>
+            //   ),
+            //   label: "Copyright",
+            // },
+            // {
+            //   key: "7",
+            //   icon: (
+            //     <Link
+            //       to={"/admin-panel/all-users"}
+            //       onClick={() => setCollapsed(true)}
+            //     >
+            //       <PeopleOutlineOutlined />
+            //     </Link>
+            //   ),
+            //   label: "Labels",
+            // },
+            // {
+            //   key: "8",
+            //   icon: (
+            //     <Link
+            //       to={"/admin-panel/user-queries"}
+            //       onClick={() => setCollapsed(true)}
+            //     >
+            //       <QuestionAnswerOutlined />
+            //     </Link>
+            //   ),
+            //   label: "Queries",
+            // },
+            // {
+            //   key: "9",
+            //   icon: (
+            //     <Link
+            //       to={"/admin-panel/pending-profile"}
+            //       onClick={() => setCollapsed(true)}
+            //     >
+            //       <TimerRounded />
+            //     </Link>
+            //   ),
+            //   label: "Pending Profiles",
+            // },
+            // {
+            //   key: "10",
+            //   icon: (
+            //     <Link
+            //       to={"/admin-panel/notification"}
+            //       onClick={() => setCollapsed(true)}
+            //     >
+            //       <IoIosNotifications
+            //         style={{
+            //           transform: "scale(1.6)",
+            //         }}
+            //       />
+            //     </Link>
+            //   ),
+            //   label: "Notifications",
+            // },
           ]}
         />
       </Sider>

@@ -3,6 +3,8 @@ import { useParams } from "react-router";
 
 import BrandDrawerPanel from "../../components/Brand/BrandAdminPanelDrawer";
 import OrderCreator from "../../components/Brand/OrderCreator";
+import OrdersHistory from "../../components/Brand/OrdersHistory";
+import OrderDetailsPage from "../../components/Brand/OrderDetailsPage";
 
 const BrandAdminPanel = () => {
   const page = useParams().page;
@@ -13,6 +15,8 @@ const BrandAdminPanel = () => {
     <div>
       <BrandDrawerPanel page={page}>
         {page === "new-order" && <OrderCreator />}
+        {page === "order-history" && <OrdersHistory />}
+        {page === "order-details" && id && <OrderDetailsPage />}
         {/* {page === "pending-work" && <PendingWork />}
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}

@@ -97,6 +97,11 @@ const App = () => {
           exact
           element={<BrandAdminPanel />}
         />
+        <Route
+          path="/promotor-admin-panel/:page/:id"
+          exact
+          element={<BrandAdminPanel />}
+        />
 
         <Route path="*" exact element={<Home />} />
       </Routes>
