@@ -6,6 +6,7 @@ import {
   HomeOutlined,
   UserOutlined,
   FormOutlined,
+  ProfileOutlined,
 } from "@ant-design/icons";
 
 import { Dropdown, Space } from "antd";
@@ -16,6 +17,7 @@ import {
   Copyright,
   HistoryOutlined,
   LibraryMusicOutlined,
+  MessageOutlined,
   PeopleOutlineOutlined,
   QuestionAnswerOutlined,
   RestoreFromTrashOutlined,
@@ -74,7 +76,7 @@ const BrandDrawerPanel = (props) => {
     if (page === "order-history") {
       return ["3"];
     }
-    if (page === "copyright") {
+    if (page === "chat") {
       return ["4"];
     }
     if (page === "profile") {
@@ -128,7 +130,7 @@ const BrandDrawerPanel = (props) => {
                   <FormOutlined />
                 </Link>
               ),
-              label: "Orders",
+              label: "New Campaign",
             },
             {
               key: "3",
@@ -140,7 +142,31 @@ const BrandDrawerPanel = (props) => {
                   <HistoryOutlined />
                 </Link>
               ),
-              label: "History",
+              label: "Order History",
+            },
+            {
+              key: "4",
+              icon: (
+                <Link
+                  to={"/promotor-admin-panel/chat"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <MessageOutlined />
+                </Link>
+              ),
+              label: "Chat",
+            },
+            {
+              key: "5",
+              icon: (
+                <Link
+                  to={"/promotor-admin-panel/profile"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <AccountCircleOutlined />
+                </Link>
+              ),
+              label: "Profile",
             },
             // {
             //   key: "4",
