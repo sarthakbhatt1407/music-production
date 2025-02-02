@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   Typography,
@@ -76,7 +76,7 @@ const getStatusColor = (status) => {
   switch (status) {
     case "pending":
       return "warning";
-    case "in_process":
+    case "in process":
       return "info";
     case "completed":
       return "success";
@@ -93,44 +93,38 @@ const OrdersHistory = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const dummyData = [
-    {
-      id: 1,
-      brandLogo: "https://images.unsplash.com/photo-1560472355-536de3962603",
-      brandName: "TechCorp",
-      campaignName: "Summer Digital Drive",
-      collaborationId: "TC-2023-001",
-      campaignDescription:
-        "Innovative digital marketing campaign focusing on Gen Z audience",
-      campaignImage:
-        "https://images.unsplash.com/photo-1552664730-d307ca884978",
-      status: "completed",
-    },
-    {
-      id: 2,
-      brandLogo: "https://images.unsplash.com/photo-1606857521015-7f9fcf423740",
-      brandName: "EcoWear",
-      campaignName: "Sustainable Fashion Initiative",
-      collaborationId: "EW-2023-002",
-      campaignDescription:
-        "Promoting eco-friendly fashion choices through social media",
-      campaignImage:
-        "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04",
-      status: "in_process",
-    },
-    {
-      id: 3,
-      brandLogo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9",
-      brandName: "FoodieDelight",
-      campaignName: "Tastes of the World",
-      collaborationId: "FD-2023-003",
-      campaignDescription:
-        "Global cuisine exploration campaign with food influencers",
-      campaignImage:
-        "https://images.unsplash.com/photo-1544148103-0773bf10d330",
-      status: "pending",
-    },
-  ];
+
+  const [orders, setOrders] = useState([]);
+  const fetchOrdersByUserID = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/get-order-by-user-id`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: "12345" }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
+      }
+
+      const data = await response.json();
+      console.log(data["orders"]);
+      setOrders(data["orders"].reverse());
+    } catch (error) {
+      console.log("Error fetching orders:", error);
+      return [];
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    fetchOrdersByUserID();
+  }, []);
 
   const columns = [
     {
@@ -140,18 +134,21 @@ const OrdersHistory = () => {
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <img
-            src={params.value}
+            src={`${process.env.REACT_APP_BASE_URL}/${
+              params.row.images.split(",")[0]
+            }`}
             alt="Campaign"
             style={{
-              width: 45,
-              height: 45,
+              width: 40,
+              height: 40,
               objectFit: "cover",
               borderRadius: 4,
             }}
             onClick={() => setSelectedImage(params.value)}
             onError={(e) => {
-              e.target.src =
-                "https://images.unsplash.com/photo-1557683316-973673baf926";
+              e.target.src = `${process.env.REACT_APP_BASE_URL}/${
+                params.images.split(",")[0]
+              }`;
             }}
           />
         </div>
@@ -211,17 +208,19 @@ const OrdersHistory = () => {
       field: "status",
       headerName: "Status",
       width: 150,
-      renderCell: (params) => (
-        <Chip
-          label={params.value.replace("_", " ").toUpperCase()}
-          color={getStatusColor(params.value)}
-          size="small"
-        />
-      ),
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params.value.replace("_", " ").toUpperCase()}
+            color={getStatusColor(params.value)}
+            size="small"
+          />
+        );
+      },
     },
   ];
 
-  const filteredData = dummyData.filter((item) => {
+  const filteredData = orders.filter((item) => {
     const matchesSearch = Object.values(item).some((value) =>
       value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -270,7 +269,7 @@ const OrdersHistory = () => {
             >
               <MenuItem value="all">All Status</MenuItem>
               <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="in_process">In Process</MenuItem>
+              <MenuItem value="in process">In Process</MenuItem>
               <MenuItem value="completed">Completed</MenuItem>
             </Select>
           </FormControl>
@@ -282,7 +281,7 @@ const OrdersHistory = () => {
           }}
         >
           {loading ? (
-            <Skeleton variant="rectangular" height={400} />
+            <Skeleton variant="rectangular" height={300} />
           ) : (
             <StyledDataGrid
               rows={filteredData}
@@ -292,11 +291,12 @@ const OrdersHistory = () => {
               autoHeight
               disableSelectionOnClick
               onCellClick={(cell) => {
-                console.log(cell);
                 if (cell.field === "campaignImage") {
                   return;
                 } else {
-                  navigate("/promotor-admin-panel/order-details/11111");
+                  console.log(cell);
+
+                  navigate(`/promotor-admin-panel/order-details/${cell.id}`);
                 }
               }}
             />

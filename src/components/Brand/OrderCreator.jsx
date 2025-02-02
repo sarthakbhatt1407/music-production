@@ -45,6 +45,7 @@ const OrderCreator = () => {
     audioFile: null,
     videoFile: null,
     photos: [],
+    campaignUrl: "",
   });
   const [submitted, setSubmitted] = useState(false);
 
@@ -159,6 +160,8 @@ const OrderCreator = () => {
 
     formDataToSubmit.append("brandName", formData.brandName);
     formDataToSubmit.append("campaignName", formData.campaignName);
+    formDataToSubmit.append("userId", "12345");
+    formDataToSubmit.append("campaignUrl", formData.campaignUrl);
     formDataToSubmit.append("collaborationId", formData.collaborationId);
     formDataToSubmit.append(
       "campaignDescription",
@@ -341,6 +344,16 @@ const OrderCreator = () => {
                 required
                 sx={{ mb: 3 }}
               />
+
+              <TextField
+                fullWidth
+                label="Campaign URL"
+                name="campaignUrl"
+                value={formData.campaignUrl}
+                onChange={handleInputChange}
+                required
+                sx={{ mb: 3 }}
+              />
               <TextField
                 fullWidth
                 label="Campaign Description"
@@ -352,6 +365,7 @@ const OrderCreator = () => {
                 rows={4}
                 sx={{ mb: 3 }}
               />
+
               <Typography variant="subtitle1" gutterBottom>
                 Selected Influencers:
               </Typography>
@@ -439,6 +453,7 @@ const OrderCreator = () => {
                 fullWidth
                 disabled={
                   !formData.brandName ||
+                  !formData.campaignUrl ||
                   !formData.campaignName ||
                   !formData.collaborationId ||
                   !formData.campaignDescription ||
