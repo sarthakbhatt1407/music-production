@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -29,6 +29,7 @@ import { useDispatch } from "react-redux";
 import logo from "../../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
+import { Badge } from "@mui/material";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -99,6 +100,45 @@ const BrandDrawerPanel = (props) => {
     }
   };
 
+  const [unseenChat, setUnseenChat] = useState(0);
+  const fetchChats = async (brandId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/get-chats`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ brandId: "67a33c48d9f27471b3bd6eba" }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.chats.length > 0) {
+          if (data.chats[data.chats.length - 1]["sender"] == "other") {
+            setUnseenChat(1);
+          } else {
+            setUnseenChat(0);
+          }
+        }
+      } else {
+        throw new Error("Failed to load chats.");
+      }
+    } catch (error) {
+      console.error("Error fetching chat data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchChats();
+    }, 1000); // Fetch every second
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
   const [collapsed, setCollapsed] = useState(true);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -151,7 +191,15 @@ const BrandDrawerPanel = (props) => {
                   to={"/promotor-admin-panel/chat"}
                   onClick={() => setCollapsed(true)}
                 >
-                  <MessageOutlined />
+                  <Badge
+                    badgeContent={unseenChat}
+                    color="success"
+                    style={{
+                      marginTop: ".7rem",
+                    }}
+                  >
+                    <MessageOutlined />
+                  </Badge>
                 </Link>
               ),
               label: "Chat",

@@ -12,6 +12,7 @@ import {
 import { IoSend } from "react-icons/io5";
 import { BsCheckAll, BsCheck } from "react-icons/bs";
 import { Breadcrumb } from "antd";
+import MusicLoader from "../Loader/MusicLoader";
 
 const ChatContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -62,25 +63,64 @@ const InputContainer = styled(Box)(({ theme }) => ({
 }));
 
 const ChatScreen = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Hey! How are you?",
-      sender: "other",
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      status: "seen",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 2,
-      text: "I'm doing great! How about you?",
-      sender: "self",
-      timestamp: new Date(Date.now() - 1800000).toISOString(),
-      status: "seen",
-      avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const fetchChats = async (brandId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/get-chats`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ brandId: "67a33c48d9f27471b3bd6eba" }),
+        }
+      );
 
+      const data = await response.json();
+
+      if (data.success) {
+        if (messages.length == data.chats.length) {
+        } else {
+          setMessages(data.chats);
+        }
+      } else {
+        throw new Error("Failed to load chats.");
+      }
+    } catch (error) {
+      console.error("Error fetching chat data:", error);
+    }
+    setLoading(false);
+  };
+  const sendChats = async (brandId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            brandId: "67a33c48d9f27471b3bd6eba",
+            message: inputMessage,
+            from: "67a33c48d9f27471b3bd6eba",
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setInputMessage("");
+      } else {
+        throw new Error("Failed to load chats.");
+      }
+    } catch (error) {
+      console.error("Error fetching chat data:", error);
+    }
+  };
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
@@ -91,30 +131,22 @@ const ChatScreen = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
+
+    const interval = setInterval(() => {
+      fetchChats();
+    }, 1000); // Fetch every second
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+  useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    const trimmedMessage = inputMessage.trim();
-    if (trimmedMessage) {
-      const newMessage = {
-        id: Date.now(),
-        text: trimmedMessage,
-        sender: "self",
-        timestamp: new Date().toISOString(),
-        status: "sent",
-        avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-      };
-      setMessages([...messages, newMessage]);
-      setInputMessage("");
-      setIsTyping(false);
-    }
-  };
-
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && inputMessage.trim()) {
       e.preventDefault();
-      handleSendMessage();
+      sendChats();
     }
   };
 
@@ -157,56 +189,58 @@ const ChatScreen = () => {
         />
       </div>
       <ChatContainer>
+        {loading && <MusicLoader />}
         <MessagesContainer>
-          {messages.map((message) => (
-            <Box
-              key={message.id}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems:
-                  message.sender === "self" ? "flex-end" : "flex-start",
-                mb: 2,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "flex-end", mb: 0.5 }}>
-                {message.sender !== "self" && (
-                  <Avatar
-                    src={message.avatar}
-                    alt="User Avatar"
-                    sx={{ width: 24, height: 24, mr: 1 }}
-                  />
-                )}
-                <MessageBubble isOwn={message.sender === "self"}>
-                  <Typography variant="body1">{message.text}</Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                      mt: 0.5,
-                      opacity: 0.7,
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    {formatTime(message.timestamp)}
-                    {message.sender === "self" && (
-                      <Box sx={{ ml: 0.5 }}>
-                        <MessageStatus status={message.status} />
-                      </Box>
-                    )}
-                  </Box>
-                </MessageBubble>
-                {message.sender === "self" && (
-                  <Avatar
-                    src={message.avatar}
-                    alt="User Avatar"
-                    sx={{ width: 24, height: 24, ml: 1 }}
-                  />
-                )}
+          {messages.length > 0 &&
+            messages.map((message) => (
+              <Box
+                key={message.id}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems:
+                    message.sender === "self" ? "flex-end" : "flex-start",
+                  mb: 2,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "flex-end", mb: 0.5 }}>
+                  {message.sender !== "self" && (
+                    <Avatar
+                      src={message.avatar}
+                      alt="User Avatar"
+                      sx={{ width: 24, height: 24, mr: 1 }}
+                    />
+                  )}
+                  <MessageBubble isOwn={message.sender === "self"}>
+                    <Typography variant="body1">{message.text}</Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        mt: 0.5,
+                        opacity: 0.7,
+                        fontSize: "0.75rem",
+                      }}
+                    >
+                      {formatTime(message.timestamp)}
+                      {message.sender === "self" && (
+                        <Box sx={{ ml: 0.5 }}>
+                          <MessageStatus status={message.status} />
+                        </Box>
+                      )}
+                    </Box>
+                  </MessageBubble>
+                  {message.sender === "self" && (
+                    <Avatar
+                      src={message.avatar}
+                      alt="User Avatar"
+                      sx={{ width: 24, height: 24, ml: 1 }}
+                    />
+                  )}
+                </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
           <div ref={messagesEndRef} />
         </MessagesContainer>
 
@@ -229,7 +263,7 @@ const ChatScreen = () => {
             />
             <IconButton
               color="primary"
-              onClick={handleSendMessage}
+              onClick={sendChats}
               disabled={!inputMessage.trim()}
               aria-label="Send message"
             >
