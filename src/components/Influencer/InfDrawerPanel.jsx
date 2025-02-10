@@ -42,7 +42,7 @@ const LogoDiv = styled.div`
   }
 `;
 
-const BrandDrawerPanel = (props) => {
+const InfDrawerPanel = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const page = props.page;
@@ -70,11 +70,7 @@ const BrandDrawerPanel = (props) => {
     },
   ];
   const defaultSelector = (page) => {
-    if (page === "new-order") {
-      return ["2"];
-    }
-
-    if (page === "order-history") {
+    if (page === "orders") {
       return ["3"];
     }
     if (page === "chat") {
@@ -154,22 +150,10 @@ const BrandDrawerPanel = (props) => {
           defaultSelectedKeys={defaultSelector(page)}
           items={[
             {
-              key: "2",
-              icon: (
-                <Link
-                  to={"/promotor-admin-panel/new-order"}
-                  onClick={() => setCollapsed(true)}
-                >
-                  <FormOutlined />
-                </Link>
-              ),
-              label: "New Campaign",
-            },
-            {
               key: "3",
               icon: (
                 <Link
-                  to={"/promotor-admin-panel/order-history"}
+                  to={"/influencer-admin-panel/orders"}
                   onClick={() => setCollapsed(true)}
                 >
                   <HistoryOutlined />
@@ -201,7 +185,7 @@ const BrandDrawerPanel = (props) => {
               key: "5",
               icon: (
                 <Link
-                  to={"/promotor-admin-panel/profile"}
+                  to={"/influencer-admin-panel/profile"}
                   onClick={() => setCollapsed(true)}
                 >
                   <AccountCircleOutlined />
@@ -340,4 +324,4 @@ const BrandDrawerPanel = (props) => {
     </Layout>
   );
 };
-export default BrandDrawerPanel;
+export default InfDrawerPanel;

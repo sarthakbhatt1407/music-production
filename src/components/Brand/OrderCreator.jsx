@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -20,6 +20,10 @@ import {
 import { styled } from "@mui/system";
 import { FaUserCheck, FaSearch } from "react-icons/fa";
 import { Breadcrumb, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { LinkOutlined, LinkSharp, LinkTwoTone } from "@mui/icons-material";
+import MusicLoader from "../Loader/MusicLoader";
+import { useSelector } from "react-redux";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: "24px",
@@ -35,7 +39,10 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const OrderCreator = () => {
+  const [loading, setLoading] = useState(false);
+  const userid = useSelector((state) => state.userId);
   const [selectedInfluencers, setSelectedInfluencers] = useState([]);
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     brandName: "",
@@ -48,8 +55,8 @@ const OrderCreator = () => {
     campaignUrl: "",
   });
   const [submitted, setSubmitted] = useState(false);
-
-  const influencers = [
+  const [influencers, setInfluencers] = useState([]);
+  const influencers1 = [
     {
       id: 1,
       name: "Emma Johnson",
@@ -146,7 +153,27 @@ const OrderCreator = () => {
       });
     }
   };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/inf/user/get-all-inf`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        console.log(data);
+        setInfluencers(data.users);
+      } catch (err) {
+      } finally {
+      }
+      setLoading(false);
+    };
 
+    fetchUsers();
+  }, []);
   const handleRemoveInfluencer = (influencerId) => {
     setSelectedInfluencers((prev) => prev.filter((i) => i.id !== influencerId));
   };
@@ -154,13 +181,13 @@ const OrderCreator = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
-
+    setLoading(true);
     // Prepare the form data to send
     const formDataToSubmit = new FormData();
 
     formDataToSubmit.append("brandName", formData.brandName);
     formDataToSubmit.append("campaignName", formData.campaignName);
-    formDataToSubmit.append("userId", "12345");
+    formDataToSubmit.append("userId", userid);
     formDataToSubmit.append("campaignUrl", formData.campaignUrl);
     formDataToSubmit.append("collaborationId", formData.collaborationId);
     formDataToSubmit.append(
@@ -202,6 +229,8 @@ const OrderCreator = () => {
 
         // Show success message
         message.success("Campaign submitted successfully!");
+        navigate("/promotor-admin-panel/order-history");
+
         console.log(data); // Log the response data
       } else {
         throw new Error("Failed to submit campaign");
@@ -211,6 +240,7 @@ const OrderCreator = () => {
       message.error("Failed to submit the campaign. Please try again.");
       console.error(error);
     }
+    setLoading(false);
   };
 
   return (
@@ -218,6 +248,7 @@ const OrderCreator = () => {
       maxWidth="xl"
       sx={{ py: 1, maxHeight: "100%", overflow: "scroll" }}
     >
+      {loading && <MusicLoader />}
       <Typography variant="h5" gutterBottom sx={{ mb: 2, textAlign: "start" }}>
         Brand Promotion Campaign
       </Typography>
@@ -256,8 +287,8 @@ const OrderCreator = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Influencer</TableCell>
-                    <TableCell>Followers</TableCell>
                     <TableCell>Category</TableCell>
+                    <TableCell>Social Media </TableCell>
                     <TableCell align="center">Action</TableCell>
                   </TableRow>
                 </TableHead>
@@ -269,7 +300,7 @@ const OrderCreator = () => {
                           sx={{ display: "flex", alignItems: "center", gap: 2 }}
                         >
                           <img
-                            src={influencer.image}
+                            src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
                             alt={influencer.name}
                             style={{
                               width: "40px",
@@ -281,8 +312,12 @@ const OrderCreator = () => {
                           {influencer.name}
                         </Box>
                       </TableCell>
-                      <TableCell>{influencer.followers}</TableCell>
-                      <TableCell>{influencer.category}</TableCell>
+                      <TableCell>{influencer.profession}</TableCell>{" "}
+                      <TableCell align="center">
+                        <Link to={influencer.socialMediaUrl} target="_blank">
+                          <LinkOutlined />
+                        </Link>
+                      </TableCell>
                       <TableCell align="center">
                         <StyledButton
                           variant="contained"

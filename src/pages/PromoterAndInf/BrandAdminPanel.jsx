@@ -19,8 +19,9 @@ const BrandAdminPanel = () => {
         {page === "new-order" && <OrderCreator />}
         {page === "order-history" && <OrdersHistory />}
         {page === "order-details" && id && <OrderDetailsPage />}
-        {page === "chat" && <ChatScreen />}
         {page === "profile" && <ProfilePage />}
+        {/* {page === "chat" && <ChatScreen />} */}
+
         {/* {page === "pending-work" && <PendingWork />}
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}

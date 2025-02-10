@@ -8,19 +8,15 @@ import {
   Button,
   Avatar,
   Grid,
-  IconButton,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Switch,
-  Tooltip,
   CircularProgress,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FiEdit2, FiUpload } from "react-icons/fi";
-import { MdOutlineDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { Breadcrumb } from "antd";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
@@ -45,9 +41,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
-const ProfilePage = () => {
+const InfProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [formError, setFormError] = useState("");
@@ -61,6 +56,14 @@ const ProfilePage = () => {
     state: "",
     postalCode: "",
     profileImage: "",
+    userSince: "",
+    role: "",
+    socialMediaUrl: "",
+    accountNumber: "",
+    ifscCode: "",
+    bankName: "",
+    profession: "",
+    price: "", // Add price field
   });
 
   const handleImageUpload = (event) => {
@@ -93,12 +96,18 @@ const ProfilePage = () => {
       const formDataToSend = new FormData();
       formDataToSend.append("id", userId);
       formDataToSend.append("name", formData.fullName);
-      formDataToSend.append("contactNum", formData.phone);
       formDataToSend.append("email", formData.email);
       formDataToSend.append("fullAddress", formData.address);
       formDataToSend.append("pinCode", formData.postalCode);
       formDataToSend.append("city", formData.city);
       formDataToSend.append("state", formData.state);
+
+      formDataToSend.append("socialMediaUrl", formData.socialMediaUrl);
+      formDataToSend.append("accountNumber", formData.accountNumber);
+      formDataToSend.append("ifscCode", formData.ifscCode);
+      formDataToSend.append("bankName", formData.bankName);
+      formDataToSend.append("profession", formData.profession);
+      formDataToSend.append("price", formData.price); // Include price field
       if (previewImage) {
         const fileInput = document.getElementById("image-upload");
         const file = fileInput.files[0];
@@ -106,7 +115,7 @@ const ProfilePage = () => {
       }
 
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/inf/user/editBrandUser`,
+        `${process.env.REACT_APP_BASE_URL}/inf/user/editInfUser`,
         {
           method: "POST",
           body: formDataToSend,
@@ -132,13 +141,14 @@ const ProfilePage = () => {
       setLoading(false);
     }
   };
+
   const userId = useSelector((state) => state.userId);
 
   const fetchUserProfile = async () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/inf/user/get-user-pro`,
+        `${process.env.REACT_APP_BASE_URL}/inf/user/get-user-inf`,
         {
           method: "POST",
           headers: {
@@ -163,6 +173,14 @@ const ProfilePage = () => {
           state: user.state || "",
           postalCode: user.pinCode,
           profileImage: user.profileImage,
+          userSince: user.userSince || "",
+          role: user.userType || "",
+          socialMediaUrl: user.socialMediaUrl || "",
+          accountNumber: user.accountNumber || "",
+          ifscCode: user.ifscCode || "",
+          bankName: user.bankName || "",
+          profession: user.profession || "",
+          price: user.price || "", // Set price field
         });
       } else {
         throw new Error(data.message || "Failed to fetch user profile.");
@@ -273,7 +291,7 @@ const ProfilePage = () => {
                 label="Phone"
                 value={formData.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
-                disabled={!editMode}
+                disabled={true}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -316,6 +334,85 @@ const ProfilePage = () => {
                 disabled={!editMode}
               />
             </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Social Media URL"
+                value={formData.socialMediaUrl}
+                onChange={(e) =>
+                  handleInputChange("socialMediaUrl", e.target.value)
+                }
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Account Number"
+                value={formData.accountNumber}
+                onChange={(e) =>
+                  handleInputChange("accountNumber", e.target.value)
+                }
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="IFSC Code"
+                value={formData.ifscCode}
+                onChange={(e) => handleInputChange("ifscCode", e.target.value)}
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Bank Name"
+                value={formData.bankName}
+                onChange={(e) => handleInputChange("bankName", e.target.value)}
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel id="profession-label">Profession</InputLabel>
+                <Select
+                  labelId="profession-label"
+                  id="profession"
+                  value={formData.profession}
+                  onChange={(e) =>
+                    handleInputChange("profession", e.target.value)
+                  }
+                  disabled={!editMode}
+                >
+                  <MenuItem value="Model">Model</MenuItem>
+                  <MenuItem value="Creator">Creator</MenuItem>
+                  <MenuItem value="Non-Creator">Non-Creator</MenuItem>
+                  <MenuItem value="Neno-Creator">Neno-Creator</MenuItem>
+                  <MenuItem value="Singer">Singer</MenuItem>
+                  <MenuItem value="Actor">Actor</MenuItem>
+                  <MenuItem value="Music Director">Music Director</MenuItem>
+                  <MenuItem value="Lyricist">Lyricist</MenuItem>
+                  <MenuItem value="Comedian">Comedian</MenuItem>
+                  <MenuItem value="Editor">Editor</MenuItem>
+                  <MenuItem value="Cinematographer">Cinematographer</MenuItem>
+                  <MenuItem value="Poster Designer">Poster Designer</MenuItem>
+                  <MenuItem value="Script Writer">Script Writer</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Price"
+                value={formData.price}
+                onChange={(e) => handleInputChange("price", e.target.value)}
+                disabled={!editMode}
+                type="number"
+              />
+            </Grid>
           </Grid>
 
           {editMode && (
@@ -335,4 +432,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default InfProfilePage;

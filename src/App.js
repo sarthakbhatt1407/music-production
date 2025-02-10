@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import Error from "./pages/Error";
 import ProAndInfLogin from "./pages/PromoterAndInf/Login";
 import BrandAdminPanel from "./pages/PromoterAndInf/BrandAdminPanel";
+import InfAdminPanel from "./pages/PromoterAndInf/InfAdminPanel";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -101,6 +102,16 @@ const App = () => {
           path="/promotor-admin-panel/:page/:id"
           exact
           element={<BrandAdminPanel />}
+        />
+        <Route
+          path="/influencer-admin-panel/:page"
+          exact
+          element={<InfAdminPanel />}
+        />
+        <Route
+          path="/influencer-admin-panel/:page/:id"
+          exact
+          element={<InfAdminPanel />}
         />
 
         <Route path="*" exact element={<Home />} />

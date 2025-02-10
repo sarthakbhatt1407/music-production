@@ -22,7 +22,7 @@ const Home = () => {
   return (
     <>
       <WebNav />
-
+      {/* 
       <FloatButton.Group
         open={open}
         onClick={onChange}
@@ -64,7 +64,7 @@ const Home = () => {
             />
           }
         />
-      </FloatButton.Group>
+      </FloatButton.Group> */}
 
       <div>
         <IntroBox />

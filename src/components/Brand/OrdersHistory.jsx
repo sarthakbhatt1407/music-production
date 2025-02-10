@@ -19,6 +19,7 @@ import { BiSearchAlt } from "react-icons/bi";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router";
 import { Breadcrumb } from "antd";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   padding: 0.5rem 1rem;
@@ -80,12 +81,15 @@ const getStatusColor = (status) => {
       return "info";
     case "completed":
       return "success";
+    case "rejected":
+      return "error";
     default:
       return "default";
   }
 };
 
 const OrdersHistory = () => {
+  const userId = useSelector((state) => state.userId);
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -105,7 +109,7 @@ const OrdersHistory = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ id: "12345" }),
+          body: JSON.stringify({ id: userId }),
         }
       );
 
@@ -124,7 +128,7 @@ const OrdersHistory = () => {
   };
   useEffect(() => {
     fetchOrdersByUserID();
-  }, []);
+  }, [userId]);
 
   const columns = [
     {
@@ -290,9 +294,12 @@ const OrdersHistory = () => {
               rowsPerPageOptions={[5, 10, 20]}
               autoHeight
               disableSelectionOnClick
+              onRowClick={(row) => {
+                navigate(`/promotor-admin-panel/order-details/${row.id}`);
+              }}
               onCellClick={(cell) => {
                 if (cell.field === "campaignImage") {
-                  return;
+                  navigate(`/promotor-admin-panel/order-details/${cell.id}`);
                 } else {
                   console.log(cell);
 

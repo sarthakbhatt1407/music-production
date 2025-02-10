@@ -31,7 +31,8 @@ import moment from "moment";
 import { useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Divider } from "antd";
-import { DeleteOutline } from "@mui/icons-material";
+import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -106,6 +107,7 @@ const OrderDetailsPage = () => {
               ...findObj,
               workLink: ord.workLink,
               status: ord.status,
+              remark: ord.remark,
             };
           }
           if (obj) {
@@ -139,19 +141,6 @@ const OrderDetailsPage = () => {
   useEffect(() => {
     fetchOrderById();
   }, [id]);
-  const images = [
-    "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
-    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f",
-  ];
-
-  const campaignData = {
-    brandName: "SportFlex",
-    campaignName: "Summer Athletic Collection 2024",
-    collaborationId: "CLB-2024-001",
-    description:
-      "Premium athletic wear campaign focusing on comfort and style for active lifestyle enthusiasts.",
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -161,80 +150,27 @@ const OrderDetailsPage = () => {
         return "info";
       case "completed":
         return "success";
+      case "rejected":
+        return "error";
       default:
         return "default";
     }
   };
   const steps = ["Pending", "In Process", "Completed"];
 
-  const influencers = [
-    {
-      id: 1,
-      name: "Emma Johnson",
-      followers: "1.2M",
-      category: "Lifestyle",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 2,
-      name: "David Chen",
-      followers: "850K",
-      category: "Tech",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-    },
-    {
-      id: 3,
-      name: "Sarah Williams",
-      followers: "2.1M",
-      category: "Fashion",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
-    },
-    {
-      id: 4,
-      name: "Michael Brown",
-      followers: "920K",
-      category: "Fitness",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    },
-    {
-      id: 5,
-      name: "Jessica Lee",
-      followers: "1.5M",
-      category: "Travel",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 6,
-      name: "Daniel Kim",
-      followers: "800K",
-      category: "Food",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 7,
-      name: "Olivia Taylor",
-      followers: "3.3M",
-      category: "Beauty",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 8,
-      name: "James Walker",
-      followers: "1.8M",
-      category: "Music",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-  ];
-
   const handleNextImage = () => {
     if (order.images.split(",").length > 1) {
-      setCurrentImage((prev) => (prev + 1) % images.length);
+      setCurrentImage((prev) => (prev + 1) % order.images.split(",").length);
     }
   };
 
   const handlePrevImage = () => {
     if (order.images.split(",").length > 1) {
-      setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
+      setCurrentImage(
+        (prev) =>
+          (prev - 1 + order.images.split(",").length) %
+          order.images.split(",").length
+      );
     }
   };
 
@@ -291,7 +227,7 @@ const OrderDetailsPage = () => {
       );
       return;
     }
-
+    setLoading(true);
     const orderRes = await fetch(
       `${process.env.REACT_APP_BASE_URL}/payment/create-order`,
       {
@@ -315,6 +251,7 @@ const OrderDetailsPage = () => {
       return;
     }
 
+    setLoading(false);
     var options = {
       key: "rzp_test_gXfTe6otLGAN8Y", // Replace with your Razorpay test/live key
       amount: data.amount, // Amount from backend response
@@ -322,6 +259,7 @@ const OrderDetailsPage = () => {
       order_id: data.order_id, // ✅ Adding order ID here
 
       handler: async function (response) {
+        setLoading(true);
         console.log("Payment Success:", response);
 
         // Send the payment details to your server for verification and capturing
@@ -333,6 +271,7 @@ const OrderDetailsPage = () => {
         fetchOrderById();
         if (data.paymentStatus == "completed") {
         }
+        setLoading(false);
       },
 
       theme: {
@@ -356,7 +295,7 @@ const OrderDetailsPage = () => {
             <ImageSlider>
               <SliderImage
                 src={`${process.env.REACT_APP_BASE_URL}/${
-                  order.images.split(",")[currentImage]
+                  order.images.split(", ")[currentImage]
                 }`}
                 alt={`Campaign Image ${currentImage + 1}`}
                 loading="lazy"
@@ -519,8 +458,8 @@ const OrderDetailsPage = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Influencer</TableCell>
-                      <TableCell>Followers</TableCell>
-                      <TableCell>Category</TableCell>{" "}
+                      <TableCell>Category</TableCell>
+                      <TableCell>Social Media </TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Preview</TableCell>
                     </TableRow>
@@ -537,7 +476,7 @@ const OrderDetailsPage = () => {
                             }}
                           >
                             <img
-                              src={influencer.image}
+                              src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
                               alt={influencer.name}
                               style={{
                                 width: "40px",
@@ -549,9 +488,12 @@ const OrderDetailsPage = () => {
                             {influencer.name}
                           </Box>
                         </TableCell>
-                        <TableCell>{influencer.followers}</TableCell>
-                        <TableCell>{influencer.category}</TableCell>
-
+                        <TableCell>{influencer.profession}</TableCell>{" "}
+                        <TableCell>
+                          <Link to={influencer.socialMediaUrl} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </TableCell>
                         <TableCell>
                           <Chip
                             label={influencer.status
@@ -562,9 +504,23 @@ const OrderDetailsPage = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          {influencer.workLink.length > 0
-                            ? influencer.workLink
-                            : "-"}
+                          {influencer.status != "rejected" &&
+                            (influencer.workLink.length > 0 ? (
+                              <Link to={influencer.workLink} target="_blank">
+                                <LinkOutlined />
+                              </Link>
+                            ) : (
+                              "-"
+                            ))}
+                          {influencer.status == "rejected" && (
+                            <p
+                              style={{
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              Remark : {influencer.remark}
+                            </p>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
