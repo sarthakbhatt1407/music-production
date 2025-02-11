@@ -361,7 +361,7 @@ const UserPanel = () => {
             </ModalBox>
           </Modal>
         )}
-        <FloatButton.Group
+        {/* <FloatButton.Group
           open={open}
           onClick={onChange}
           trigger="click"
@@ -416,7 +416,7 @@ const UserPanel = () => {
               />
             }
           />
-        </FloatButton.Group>
+        </FloatButton.Group> */}
         <DrawerPanel page={page}>
           {page === "home" && <UserPanelHome />}
           {page === "profile" && <ProfilePage />}

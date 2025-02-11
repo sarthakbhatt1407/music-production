@@ -88,7 +88,7 @@ const getStatusColor = (status) => {
   }
 };
 
-const OrdersHistory = () => {
+const AdminOrderHistory = () => {
   const userId = useSelector((state) => state.userId);
   const theme = useTheme();
   const navigate = useNavigate();
@@ -103,7 +103,7 @@ const OrdersHistory = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/brand/get-order-by-user-id`,
+        `${process.env.REACT_APP_BASE_URL}/brand/get-all-orders`,
         {
           method: "POST",
           headers: {
@@ -222,18 +222,6 @@ const OrdersHistory = () => {
         );
       },
     },
-    {
-      field: "paymentAmount",
-      headerName: "Payment",
-      width: 150,
-      renderCell: (params) => {
-        return (
-          <Typography>
-            {params.value != 0 ? "Pay Now" : "In admin review"}
-          </Typography>
-        );
-      },
-    },
   ];
 
   const filteredData = orders.filter((item) => {
@@ -307,15 +295,15 @@ const OrdersHistory = () => {
               autoHeight
               disableSelectionOnClick
               onRowClick={(row) => {
-                navigate(`/promotor-admin-panel/order-details/${row.id}`);
+                navigate(`/admin-admin-panel/order-details/${row.id}`);
               }}
               onCellClick={(cell) => {
                 if (cell.field === "campaignImage") {
-                  navigate(`/promotor-admin-panel/order-details/${cell.id}`);
+                  navigate(`/admin-admin-panel/order-details/${cell.id}`);
                 } else {
                   console.log(cell);
 
-                  navigate(`/promotor-admin-panel/order-details/${cell.id}`);
+                  navigate(`/admin-admin-panel/order-details/${cell.id}`);
                 }
               }}
             />
@@ -337,4 +325,4 @@ const OrdersHistory = () => {
   );
 };
 
-export default OrdersHistory;
+export default AdminOrderHistory;

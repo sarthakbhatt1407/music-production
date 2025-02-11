@@ -236,7 +236,7 @@ const OrderDetailsPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: 20,
+          amount: order.paymentAmount,
           currency: "INR",
         }),
       }
@@ -419,116 +419,192 @@ const OrderDetailsPage = () => {
                   </Step>
                 ))}
               </Stepper>
-              {order.paymentStatus != "completed" && (
-                <>
-                  <Typography variant="h6" gutterBottom color="#333">
-                    Amount: ₹ 499
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={displayRazorpayPaymentSdk}
-                    sx={{
-                      mt: 2,
-                      backgroundColor: "#1677FF",
-                      color: "#fff",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                      borderRadius: "8px",
-                      padding: "10px 20px",
-                      "&:hover": {
-                        backgroundColor: "#574dcf",
-                      },
-                    }}
-                  >
-                    Pay Now
-                  </Button>
-                </>
-              )}
+              {order.paymentStatus != "completed" &&
+                order.paymentAmount != 0 && (
+                  <>
+                    <Typography variant="h6" gutterBottom color="#333">
+                      Amount: ₹ {order.paymentAmount}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={displayRazorpayPaymentSdk}
+                      sx={{
+                        mt: 2,
+                        backgroundColor: "#1677FF",
+                        color: "#fff",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        padding: "10px 20px",
+                        "&:hover": {
+                          backgroundColor: "#574dcf",
+                        },
+                      }}
+                    >
+                      Pay Now
+                    </Button>
+                  </>
+                )}
+              {order.paymentStatus != "completed" &&
+                order.paymentAmount == 0 && (
+                  <>
+                    <Typography variant="body1" gutterBottom color="#333">
+                      Your order is currently under review by our admin team. We
+                      appreciate your patience.
+                    </Typography>
+                  </>
+                )}
             </Paper>
           </Grid>
-          <Grid item xs={12}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Influencer Details
-              </Typography>
-              <TableContainer
-                sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
-              >
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Influencer</TableCell>
-                      <TableCell>Category</TableCell>
-                      <TableCell>Social Media </TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Preview</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {selInfluencers.map((influencer) => (
-                      <TableRow key={influencer.id}>
-                        <TableCell>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 2,
-                            }}
-                          >
-                            <img
-                              src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
-                              alt={influencer.name}
-                              style={{
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "50%",
-                                objectFit: "cover",
-                              }}
-                            />
-                            {influencer.name}
-                          </Box>
-                        </TableCell>
-                        <TableCell>{influencer.profession}</TableCell>{" "}
-                        <TableCell>
-                          <Link to={influencer.socialMediaUrl} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={influencer.status
-                              .replace("_", " ")
-                              .toUpperCase()}
-                            color={getStatusColor(influencer.status)}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          {influencer.status != "rejected" &&
-                            (influencer.workLink.length > 0 ? (
-                              <Link to={influencer.workLink} target="_blank">
-                                <LinkOutlined />
-                              </Link>
-                            ) : (
-                              "-"
-                            ))}
-                          {influencer.status == "rejected" && (
-                            <p
-                              style={{
-                                textTransform: "capitalize",
+          {order.status != "pending" && (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Influencer Details
+                </Typography>
+                <TableContainer
+                  sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
+                >
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Influencer</TableCell>
+                        <TableCell>Category</TableCell>
+                        <TableCell>Social Media </TableCell>
+                        <TableCell>Status</TableCell>
+                        <TableCell>Preview</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {selInfluencers.map((influencer) => (
+                        <TableRow key={influencer.id}>
+                          <TableCell>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 2,
                               }}
                             >
-                              Remark : {influencer.remark}
-                            </p>
-                          )}
-                        </TableCell>
+                              <img
+                                src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
+                                alt={influencer.name}
+                                style={{
+                                  width: "40px",
+                                  height: "40px",
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                              {influencer.name}
+                            </Box>
+                          </TableCell>
+                          <TableCell>{influencer.profession}</TableCell>{" "}
+                          <TableCell>
+                            <Link
+                              to={influencer.socialMediaUrl}
+                              target="_blank"
+                            >
+                              <LinkOutlined />
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={influencer.status
+                                .replace("_", " ")
+                                .toUpperCase()}
+                              color={getStatusColor(influencer.status)}
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {influencer.status != "rejected" &&
+                              (influencer.workLink.length > 0 ? (
+                                <Link to={influencer.workLink} target="_blank">
+                                  <LinkOutlined />
+                                </Link>
+                              ) : (
+                                "-"
+                              ))}
+                            {influencer.status == "rejected" && (
+                              <p
+                                style={{
+                                  textTransform: "capitalize",
+                                }}
+                              >
+                                Remark : {influencer.remark}
+                              </p>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </Grid>
+          )}
+
+          {order.status == "pending" && (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Influencer Details
+                </Typography>
+                <TableContainer
+                  sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
+                >
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Influencer</TableCell>
+                        <TableCell>Category</TableCell>
+                        <TableCell>Social Media </TableCell>
+                        <TableCell>Amount </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          </Grid>
+                    </TableHead>
+                    <TableBody>
+                      {order.selectedInfluencers.map((influencer) => (
+                        <TableRow key={influencer.id}>
+                          <TableCell>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 2,
+                              }}
+                            >
+                              <img
+                                src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
+                                alt={influencer.name}
+                                style={{
+                                  width: "40px",
+                                  height: "40px",
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                              {influencer.name}
+                            </Box>
+                          </TableCell>
+                          <TableCell>{influencer.profession}</TableCell>{" "}
+                          <TableCell>
+                            <Link
+                              to={influencer.socialMediaUrl}
+                              target="_blank"
+                            >
+                              <LinkOutlined />
+                            </Link>
+                          </TableCell>
+                          <TableCell>₹ {influencer.price}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </Grid>
+          )}
           {order.status == "pending" && (
             <Button
               variant="contained"

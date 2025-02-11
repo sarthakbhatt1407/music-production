@@ -56,64 +56,6 @@ const OrderCreator = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [influencers, setInfluencers] = useState([]);
-  const influencers1 = [
-    {
-      id: 1,
-      name: "Emma Johnson",
-      followers: "1.2M",
-      category: "Lifestyle",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 2,
-      name: "David Chen",
-      followers: "850K",
-      category: "Tech",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-    },
-    {
-      id: 3,
-      name: "Sarah Williams",
-      followers: "2.1M",
-      category: "Fashion",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
-    },
-    {
-      id: 4,
-      name: "Michael Brown",
-      followers: "920K",
-      category: "Fitness",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    },
-    {
-      id: 5,
-      name: "Jessica Lee",
-      followers: "1.5M",
-      category: "Travel",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 6,
-      name: "Daniel Kim",
-      followers: "800K",
-      category: "Food",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 7,
-      name: "Olivia Taylor",
-      followers: "3.3M",
-      category: "Beauty",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-    {
-      id: 8,
-      name: "James Walker",
-      followers: "1.8M",
-      category: "Music",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    },
-  ];
 
   const filteredInfluencers = influencers.filter(
     (influencer) =>
@@ -180,16 +122,16 @@ const OrderCreator = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    setLoading(true);
-    // Prepare the form data to send
-    const formDataToSubmit = new FormData();
 
+    setLoading(true);
+
+    const formDataToSubmit = new FormData();
     formDataToSubmit.append("brandName", formData.brandName);
     formDataToSubmit.append("campaignName", formData.campaignName);
     formDataToSubmit.append("userId", userid);
     formDataToSubmit.append("campaignUrl", formData.campaignUrl);
     formDataToSubmit.append("collaborationId", formData.collaborationId);
+
     formDataToSubmit.append(
       "campaignDescription",
       formData.campaignDescription
@@ -201,6 +143,9 @@ const OrderCreator = () => {
       formDataToSubmit.append(`image`, photo);
     });
     let idArr = selectedInfluencers.map((influencer) => influencer.id);
+    const influencersAmount = selectedInfluencers.reduce((acc, influencer) => {
+      return acc + influencer.price;
+    }, 0);
 
     // Append selected influencers
     formDataToSubmit.append(
@@ -209,8 +154,7 @@ const OrderCreator = () => {
     );
     formDataToSubmit.append("infIdArr", JSON.stringify(idArr));
     formDataToSubmit.append("file", formData.audioFile);
-
-    console.log(`${process.env.REACT_APP_BASE_URL}/brand/new-order`);
+    formDataToSubmit.append("influencersAmount", influencersAmount);
 
     try {
       // Sending the form data to the API
@@ -289,6 +233,7 @@ const OrderCreator = () => {
                     <TableCell>Influencer</TableCell>
                     <TableCell>Category</TableCell>
                     <TableCell>Social Media </TableCell>
+                    <TableCell>Amount </TableCell>
                     <TableCell align="center">Action</TableCell>
                   </TableRow>
                 </TableHead>
@@ -309,6 +254,7 @@ const OrderCreator = () => {
                               objectFit: "cover",
                             }}
                           />
+
                           {influencer.name}
                         </Box>
                       </TableCell>
@@ -318,6 +264,7 @@ const OrderCreator = () => {
                           <LinkOutlined />
                         </Link>
                       </TableCell>
+                      <TableCell align="center">₹ {influencer.price}</TableCell>
                       <TableCell align="center">
                         <StyledButton
                           variant="contained"
