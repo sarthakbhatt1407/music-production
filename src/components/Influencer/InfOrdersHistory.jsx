@@ -247,7 +247,7 @@ const InfOrdersHistory = () => {
       if (response.ok && data.status) {
         setUser(data.user);
         if (
-          data.user.paymentOrderId.length > 0 &&
+          data.user.paymentOrderId.length > 1 &&
           data.user.paymentStatus == "pending"
         ) {
           updatePayment(data.user.paymentOrderId);
@@ -462,89 +462,99 @@ const InfOrdersHistory = () => {
             </Button>
           </Alert>
         )}
+        {user &&
+          user.paymentStatus == "completed" &&
+          user.legalDoc.length < 2 && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              Your profile is currently under review by the admin team. Please
+              check after some time.
+            </Alert>
+          )}
 
-        {user && user.paymentStatus == "completed" && (
-          <>
-            <StyledPaper>
-              <FilterContainer isMobile={isMobile}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Search orders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <BiSearchAlt size={20} style={{ marginRight: 8 }} />
-                    ),
-                  }}
-                />
-                <FormControl sx={{ minWidth: 200 }}>
-                  <Select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                  >
-                    <MenuItem value="all">All Status</MenuItem>
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="in process">In Process</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                  </Select>
-                </FormControl>
-              </FilterContainer>
-              <div
-                style={{
-                  maxHeight: "60svh",
-                  overflow: "scroll",
-                }}
-              >
-                {loading ? (
-                  <Skeleton variant="rectangular" height={300} />
-                ) : (
-                  <StyledDataGrid
-                    rows={filteredData}
-                    columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10, 20]}
-                    autoHeight
-                    disableSelectionOnClick
-                    onRowClick={(row) => {
-                      navigate(
-                        `/influencer-admin-panel/order-details/${row.id}`
-                      );
-                    }}
-                    onCellClick={(cell) => {
-                      if (cell.field === "campaignImage") {
-                        navigate(
-                          `/influencer-admin-panel/order-details/${cell.id}`
-                        );
-                      } else {
-                        console.log(cell);
-
-                        navigate(
-                          `/influencer-admin-panel/order-details/${cell.id}`
-                        );
-                      }
+        {user &&
+          user.paymentStatus == "completed" &&
+          user.legalDoc.length > 1 && (
+            <>
+              <StyledPaper>
+                <FilterContainer isMobile={isMobile}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search orders..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <BiSearchAlt size={20} style={{ marginRight: 8 }} />
+                      ),
                     }}
                   />
-                )}
-              </div>
-            </StyledPaper>
+                  <FormControl sx={{ minWidth: 200 }}>
+                    <Select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                      <MenuItem value="all">All Status</MenuItem>
+                      <MenuItem value="pending">Pending</MenuItem>
+                      <MenuItem value="in process">In Process</MenuItem>
+                      <MenuItem value="completed">Completed</MenuItem>
+                    </Select>
+                  </FormControl>
+                </FilterContainer>
+                <div
+                  style={{
+                    maxHeight: "60svh",
+                    overflow: "scroll",
+                  }}
+                >
+                  {loading ? (
+                    <Skeleton variant="rectangular" height={300} />
+                  ) : (
+                    <StyledDataGrid
+                      rows={filteredData}
+                      columns={columns}
+                      pageSize={5}
+                      rowsPerPageOptions={[5, 10, 20]}
+                      autoHeight
+                      disableSelectionOnClick
+                      onRowClick={(row) => {
+                        navigate(
+                          `/influencer-admin-panel/order-details/${row.id}`
+                        );
+                      }}
+                      onCellClick={(cell) => {
+                        if (cell.field === "campaignImage") {
+                          navigate(
+                            `/influencer-admin-panel/order-details/${cell.id}`
+                          );
+                        } else {
+                          console.log(cell);
 
-            <ImageModal
-              open={!!selectedImage}
-              onClose={() => setSelectedImage(null)}
-            >
-              <ImagePreview
-                src={selectedImage}
-                alt="Campaign Preview"
-                onError={(e) => {
-                  e.target.src =
-                    "https://images.unsplash.com/photo-1557683316-973673baf926";
-                }}
-              />
-            </ImageModal>
-          </>
-        )}
+                          navigate(
+                            `/influencer-admin-panel/order-details/${cell.id}`
+                          );
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+              </StyledPaper>
+
+              <ImageModal
+                open={!!selectedImage}
+                onClose={() => setSelectedImage(null)}
+              >
+                <ImagePreview
+                  src={selectedImage}
+                  alt="Campaign Preview"
+                  onError={(e) => {
+                    e.target.src =
+                      "https://images.unsplash.com/photo-1557683316-973673baf926";
+                  }}
+                />
+              </ImageModal>
+            </>
+          )}
       </Container>
     </>
   );

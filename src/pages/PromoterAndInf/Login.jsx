@@ -132,8 +132,8 @@ const ProAndInfLogin = () => {
   const demoLogin = async () => {
     // const contactNum = "7895603314";
     // const contactNum = "8630435041";
-    // const contactNum = "7088360325";
-    const contactNum = "8755684261";
+    const contactNum = "7088360325";
+    // const contactNum = "8755684261";
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
       {

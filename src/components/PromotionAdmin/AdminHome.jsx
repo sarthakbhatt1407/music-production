@@ -15,6 +15,7 @@ import {
   FiCheckCircle,
   FiClock,
   FiRefreshCw,
+  FiUser,
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { Breadcrumb } from "antd";
@@ -120,21 +121,6 @@ const MetricCard = ({
       >
         {value}
       </Typography>
-      {/* {trend && (
-        <Typography
-          variant="body2"
-          sx={{
-            mt: "auto",
-            pt: 2,
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}% from last month
-        </Typography>
-      )} */}
     </StyledCard>
   );
 };
@@ -145,6 +131,25 @@ const AdminHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userId = useSelector((state) => state.userId);
+
+  const colors = [
+    theme.palette.primary.main,
+    theme.palette.success.main,
+    theme.palette.warning.main,
+    theme.palette.info.main,
+    theme.palette.secondary.main,
+  ];
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
+  const shuffledColors = shuffleArray([...colors]);
+
   useEffect(() => {
     const getInfHomeData = async () => {
       setLoading(true);
@@ -167,7 +172,9 @@ const AdminHome = () => {
         }
         console.log(data);
         setMetrics({ ...data });
-      } catch (error) {}
+      } catch (error) {
+        setError(error.message);
+      }
       setLoading(false);
     };
 
@@ -187,7 +194,6 @@ const AdminHome = () => {
       sx={{
         py: 1,
         maxHeight: "88svh",
-
         overflow: "scroll",
       }}
     >
@@ -207,13 +213,22 @@ const AdminHome = () => {
           },
         ]}
       />
-      <Grid container spacing={2}>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2, textAlign: "start" }}>
+        Orders
+      </Typography>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          marginBottom: "1rem",
+        }}
+      >
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard
             title="Total Orders"
             value={metrics?.totalOrders}
             icon={FiShoppingCart}
-            color={theme.palette.primary.main}
+            color={shuffledColors[0]}
             loading={loading}
             error={error}
           />
@@ -224,7 +239,7 @@ const AdminHome = () => {
             title="Completed Orders"
             value={metrics?.completedOrders}
             icon={FiCheckCircle}
-            color={theme.palette.success.main}
+            color={shuffledColors[1]}
             loading={loading}
             error={error}
           />
@@ -235,7 +250,7 @@ const AdminHome = () => {
             title="Pending Orders"
             value={metrics?.pendingOrders}
             icon={FiClock}
-            color={theme.palette.warning.main}
+            color={shuffledColors[2]}
             loading={loading}
             error={error}
           />
@@ -246,7 +261,28 @@ const AdminHome = () => {
             title="In-Process Orders"
             value={metrics?.inProcess}
             icon={FiRefreshCw}
-            color={theme.palette.info.main}
+            color={shuffledColors[3]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+      </Grid>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2, textAlign: "start" }}>
+        Users
+      </Typography>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          marginBottom: "1rem",
+        }}
+      >
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Total Users"
+            value={metrics?.totalUsers}
+            icon={FiUser}
+            color={shuffledColors[4]}
             loading={loading}
             error={error}
           />
@@ -254,10 +290,82 @@ const AdminHome = () => {
 
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard
+            title="Promoters"
+            value={metrics?.totalBrandUsers}
+            icon={FiUser}
+            color={shuffledColors[0]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Influencers"
+            value={metrics?.totalInfUsers}
+            icon={FiUser}
+            color={shuffledColors[1]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Active Influencers"
+            value={metrics?.activeUsers}
+            icon={FiUser}
+            color={shuffledColors[2]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Inactive Influencers"
+            value={metrics?.inactiveUsers}
+            icon={FiUser}
+            color={shuffledColors[3]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Influencers with pending payment"
+            value={metrics?.initialUsers}
+            icon={FiUser}
+            color={shuffledColors[4]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Influencers with admin review pending"
+            value={metrics?.adminApprovalUsers}
+            icon={FiUser}
+            color={shuffledColors[0]}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
+      </Grid>
+      <Typography variant="h6" gutterBottom sx={{ mb: 2, textAlign: "start" }}>
+        Payment
+      </Typography>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          marginBottom: "1rem",
+        }}
+      >
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
             title="Total Earned"
             value={metrics ? formatCurrency(metrics.paidOrders) : null}
             icon={BiRupee}
-            color={theme.palette.secondary.main}
+            color={shuffledColors[1]}
             loading={loading}
             error={error}
           />

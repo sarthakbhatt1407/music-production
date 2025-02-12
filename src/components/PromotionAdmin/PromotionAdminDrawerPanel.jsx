@@ -15,6 +15,7 @@ import { Layout, Menu, Button, theme, Avatar } from "antd";
 import {
   AccountCircleOutlined,
   Copyright,
+  GroupOutlined,
   HistoryOutlined,
   LibraryMusicOutlined,
   MessageOutlined,
@@ -164,6 +165,18 @@ const PromotionAdminDrawerPanel = (props) => {
             //   ),
             //   label: "Chat",
             // },
+            {
+              key: "4",
+              icon: (
+                <Link
+                  to={"/admin-admin-panel/users"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <GroupOutlined />
+                </Link>
+              ),
+              label: "Users",
+            },
             {
               key: "5",
               icon: (

@@ -8,6 +8,8 @@ import {
   useTheme,
   CircularProgress,
   Paper,
+  Button,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import {
@@ -20,6 +22,7 @@ import { useState, useEffect } from "react";
 import { Breadcrumb } from "antd";
 import { BiRupee } from "react-icons/bi";
 import { useSelector } from "react-redux";
+import MusicLoader from "../Loader/MusicLoader";
 
 const StyledCard = styled(Card)(({ theme, color }) => ({
   padding: "28px",
@@ -145,6 +148,162 @@ const InfHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userId = useSelector((state) => state.userId);
+  const [user, setUser] = useState(null);
+  const updatePayment = async (paymentOrderId) => {
+    setLoading(true);
+    const resPay = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier-inf/${paymentOrderId}`
+    );
+    const dataPay = await resPay.json();
+    console.log(dataPay);
+    if (dataPay.paymentStatus == "completed") {
+      fetchUserProfile();
+    }
+    setLoading(true);
+  };
+
+  const loadRazorpayScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
+  const updatePaymentOrderId = async (id, paymentOrderId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/update-payment-id`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id, paymentOrderId }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update payment order ID");
+      }
+
+      console.log("Payment Order ID updated successfully:", data);
+      return data;
+    } catch (error) {
+      console.error("Error updating payment order ID:", error);
+      return { error: error.message };
+    }
+  };
+
+  const displayRazorpayPaymentSdk = async () => {
+    const res = await loadRazorpayScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!res) {
+      alert(
+        "Razorpay SDK failed to load. Please check your internet connection."
+      );
+      return;
+    }
+    setLoading(true);
+    const orderRes = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/payment/create-order`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: 999,
+          currency: "INR",
+        }),
+      }
+    );
+
+    const data = await orderRes.json();
+    console.log(data);
+
+    if (!data || !data.order_id) {
+      alert("Failed to create order. Please try again.");
+      return;
+    }
+    updatePaymentOrderId(userId, data.order_id);
+
+    setLoading(false);
+    var options = {
+      key: "rzp_test_gXfTe6otLGAN8Y", // Replace with your Razorpay test/live key
+      amount: data.amount, // Amount from backend response
+      currency: data.currency, // INR
+      order_id: data.order_id, // ✅ Adding order ID here
+
+      handler: async function (response) {
+        setLoading(true);
+        console.log("Payment Success:", response);
+
+        // Send the payment details to your server for verification and capturing
+        const res = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier-inf/${response.razorpay_order_id}`
+        );
+        const data = await res.json();
+        console.log(data);
+        fetchUserProfile();
+
+        setLoading(false);
+      },
+
+      theme: {
+        color: "#32a86d",
+      },
+    };
+
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  };
+  const fetchUserProfile = async () => {
+    setUser(null);
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/get-user-inf`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: userId }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok && data.status) {
+        setUser(data.user);
+        if (
+          data.user.paymentOrderId.length > 0 &&
+          data.user.paymentStatus == "pending"
+        ) {
+          updatePayment(data.user.paymentOrderId);
+        }
+      } else {
+        throw new Error(data.message || "Failed to fetch user profile.");
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     const getInfHomeData = async () => {
       setLoading(true);
@@ -170,7 +329,7 @@ const InfHome = () => {
       } catch (error) {}
       setLoading(false);
     };
-
+    fetchUserProfile();
     getInfHomeData();
   }, [userId]);
 
@@ -191,6 +350,7 @@ const InfHome = () => {
         overflow: "scroll",
       }}
     >
+      {loading && <MusicLoader />}
       <Typography variant="h5" gutterBottom sx={{ mb: 2, textAlign: "start" }}>
         Dashboard
       </Typography>
@@ -207,62 +367,91 @@ const InfHome = () => {
           },
         ]}
       />
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={4}>
-          <MetricCard
-            title="Total Orders"
-            value={metrics?.totalOrders}
-            icon={FiShoppingCart}
-            color={theme.palette.primary.main}
-            loading={loading}
-            error={error}
-          />
-        </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <MetricCard
-            title="Completed Orders"
-            value={metrics?.completedOrders}
-            icon={FiCheckCircle}
-            color={theme.palette.success.main}
-            loading={loading}
-            error={error}
-          />
-        </Grid>
+      {user && user.paymentStatus != "completed" && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Your payment is pending. Please complete the payment to access your
+          orders. If you have already paid, please wait for 10 minutes for the
+          payment to be processed.
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={displayRazorpayPaymentSdk}
+            sx={{ ml: 2 }}
+          >
+            Pay Now
+          </Button>
+        </Alert>
+      )}
+      {user &&
+        user.paymentStatus == "completed" &&
+        user.legalDoc.length < 2 && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            Your profile is currently under review by the admin team. Please
+            check after some time.
+          </Alert>
+        )}
 
-        <Grid item xs={12} sm={6} md={4}>
-          <MetricCard
-            title="Pending Orders"
-            value={metrics?.pendingOrders}
-            icon={FiClock}
-            color={theme.palette.warning.main}
-            loading={loading}
-            error={error}
-          />
-        </Grid>
+      {user &&
+        user.paymentStatus == "completed" &&
+        user.legalDoc.length > 1 && (
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Total Orders"
+                value={metrics?.totalOrders}
+                icon={FiShoppingCart}
+                color={theme.palette.primary.main}
+                loading={loading}
+                error={error}
+              />
+            </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <MetricCard
-            title="In-Process Orders"
-            value={metrics?.inProcess}
-            icon={FiRefreshCw}
-            color={theme.palette.info.main}
-            loading={loading}
-            error={error}
-          />
-        </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Completed Orders"
+                value={metrics?.completedOrders}
+                icon={FiCheckCircle}
+                color={theme.palette.success.main}
+                loading={loading}
+                error={error}
+              />
+            </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <MetricCard
-            title="Total Earned"
-            value={metrics ? formatCurrency(metrics.paidOrders) : null}
-            icon={BiRupee}
-            color={theme.palette.secondary.main}
-            loading={loading}
-            error={error}
-          />
-        </Grid>
-      </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Pending Orders"
+                value={metrics?.pendingOrders}
+                icon={FiClock}
+                color={theme.palette.warning.main}
+                loading={loading}
+                error={error}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="In-Process Orders"
+                value={metrics?.inProcess}
+                icon={FiRefreshCw}
+                color={theme.palette.info.main}
+                loading={loading}
+                error={error}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Total Earned"
+                value={metrics ? formatCurrency(metrics.paidOrders) : null}
+                icon={BiRupee}
+                color={theme.palette.secondary.main}
+                loading={loading}
+                error={error}
+              />
+            </Grid>
+          </Grid>
+        )}
     </Container>
   );
 };

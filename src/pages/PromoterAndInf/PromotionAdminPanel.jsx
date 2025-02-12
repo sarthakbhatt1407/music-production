@@ -5,6 +5,8 @@ import AdminOrderHistory from "../../components/PromotionAdmin/AdminOrderHistory
 import AdminOrderDetails from "../../components/PromotionAdmin/AdminOrderDetails";
 import AdminProfilePage from "../../components/PromotionAdmin/AdminProfilePage";
 import AdminHome from "../../components/PromotionAdmin/AdminHome";
+import Users from "../../components/PromotionAdmin/Users";
+import AdminUserProfile from "../../components/PromotionAdmin/AdminUserProfile";
 
 const PromotionAdminPanel = () => {
   const page = useParams().page;
@@ -18,6 +20,10 @@ const PromotionAdminPanel = () => {
         {page == "orders" && <AdminOrderHistory />}
         {page === "order-details" && <AdminOrderDetails />}
         {page === "profile" && <AdminProfilePage />}
+        {page === "users" && <Users />}
+        {(page === "influencer" || page == "promoter") && id && (
+          <AdminUserProfile />
+        )}
       </PromotionAdminDrawerPanel>
     </div>
   );
