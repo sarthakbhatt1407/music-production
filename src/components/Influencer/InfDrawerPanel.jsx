@@ -70,6 +70,9 @@ const InfDrawerPanel = (props) => {
     },
   ];
   const defaultSelector = (page) => {
+    if (page === "home") {
+      return ["2"];
+    }
     if (page === "orders") {
       return ["3"];
     }
@@ -149,6 +152,18 @@ const InfDrawerPanel = (props) => {
           }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
+            {
+              key: "2",
+              icon: (
+                <Link
+                  to={"/influencer-admin-panel/home"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <HomeOutlined />
+                </Link>
+              ),
+              label: "Home",
+            },
             {
               key: "3",
               icon: (

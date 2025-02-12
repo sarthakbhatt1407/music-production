@@ -28,9 +28,9 @@ import { styled } from "@mui/system";
 import { DataGrid } from "@mui/x-data-grid";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import moment from "moment";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
-import { Divider } from "antd";
+import { Divider, message, Popconfirm } from "antd";
 import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
@@ -63,6 +63,7 @@ const OrderDetailsPage = () => {
   const [order, setOrder] = useState(null);
   const [selInfluencers, setSelInf] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const updatePayment = async (paymentOrderId) => {
     const resPay = await fetch(
@@ -73,6 +74,36 @@ const OrderDetailsPage = () => {
     if (dataPay.paymentStatus == "completed") {
       fetchOrderById();
     }
+  };
+
+  const handleDeleteOrder = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/delete-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: id }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete order.");
+      }
+
+      message.success("Order deleted successfully.");
+      navigate("/promotor-admin-panel/order-history");
+      // Optionally, you can refresh the order list or redirect the user
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      message.error("Error deleting order.");
+    }
+    setLoading(false);
   };
   const fetchOrderById = async () => {
     setLoading(true);
@@ -404,21 +435,39 @@ const OrderDetailsPage = () => {
                 fontWeight="bold"
                 gutterBottom
                 color="#333"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
               >
-                Campaign Status
+                Campaign Status{" "}
+                {order.status == "rejected" && (
+                  <Typography variant="h5" fontWeight="bold" color="red">
+                    : Rejected
+                  </Typography>
+                )}
               </Typography>
 
-              <Stepper
-                activeStep={activeStep}
-                alternativeLabel
-                sx={{ mt: 2, mb: 3 }}
-              >
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
+              {order.status == "rejected" && (
+                <Typography variant="subtitle1">
+                  Remark: {order.remark}
+                </Typography>
+              )}
+              {order.status != "rejected" && (
+                <Stepper
+                  activeStep={activeStep}
+                  alternativeLabel
+                  sx={{ mt: 2, mb: 3 }}
+                >
+                  {steps.map((label) => (
+                    <Step key={label}>
+                      <StepLabel>{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
+              )}
               {order.paymentStatus != "completed" &&
                 order.paymentAmount != 0 && (
                   <>
@@ -446,6 +495,7 @@ const OrderDetailsPage = () => {
                   </>
                 )}
               {order.paymentStatus != "completed" &&
+                order.status != "rejected" &&
                 order.paymentAmount == 0 && (
                   <>
                     <Typography variant="body1" gutterBottom color="#333">
@@ -456,7 +506,7 @@ const OrderDetailsPage = () => {
                 )}
             </Paper>
           </Grid>
-          {order.status != "pending" && (
+          {order.status != "pending" && order.status != "rejected" && (
             <Grid item xs={12}>
               <Paper sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
@@ -545,7 +595,7 @@ const OrderDetailsPage = () => {
             </Grid>
           )}
 
-          {order.status == "pending" && (
+          {(order.status == "pending" || order.status == "rejected") && (
             <Grid item xs={12}>
               <Paper sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
@@ -605,36 +655,43 @@ const OrderDetailsPage = () => {
               </Paper>
             </Grid>
           )}
-          {order.status == "pending" && (
-            <Button
-              variant="contained"
-              sx={{
-                mt: 2,
-                width: "fit-content", // Corrected this to use string value
-                margin: "2rem auto", // Corrected this to use string value
-                borderRadius: "2rem", // Corrected syntax here
-                display: "block",
-                backgroundColor: "white",
-                color: "black",
-                fontWeight: 700,
-                fontSize: "17px",
-                padding: "10px 12px 10px",
-                transition: "0.3s",
-                border: "1px solid #d7d7d7",
-                gap: ".5rem",
-                textTransform: "capitalize",
-                "&:hover": {
-                  opacity: 0.9,
-                  backgroundColor: "#1677ff",
-                  color: "white",
-                  border: "1px solid #1677ff",
-                },
-                display: "flex",
-                alignItems: "center",
-              }}
+          {(order.status == "pending" || order.status == "rejected") && (
+            <Popconfirm
+              title="Are you sure you want to delete this order?"
+              onConfirm={() => handleDeleteOrder()}
+              okText="Yes"
+              cancelText="No"
             >
-              <DeleteOutline /> Delete
-            </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  width: "fit-content",
+                  margin: "2rem auto",
+                  borderRadius: "2rem",
+                  display: "block",
+                  backgroundColor: "white",
+                  color: "black",
+                  fontWeight: 700,
+                  fontSize: "17px",
+                  padding: "10px 12px 10px",
+                  transition: "0.3s",
+                  border: "1px solid #d7d7d7",
+                  gap: ".5rem",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    opacity: 0.9,
+                    backgroundColor: "#1677ff",
+                    color: "white",
+                    border: "1px solid #1677ff",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <DeleteOutline /> Delete
+              </Button>
+            </Popconfirm>
           )}
         </Grid>
       )}

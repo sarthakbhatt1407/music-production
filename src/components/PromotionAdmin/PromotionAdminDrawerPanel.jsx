@@ -70,6 +70,9 @@ const PromotionAdminDrawerPanel = (props) => {
     },
   ];
   const defaultSelector = (page) => {
+    if (page === "home") {
+      return ["2"];
+    }
     if (page === "orders") {
       return ["3"];
     }
@@ -96,38 +99,6 @@ const PromotionAdminDrawerPanel = (props) => {
     }
   };
 
-  const [unseenChat, setUnseenChat] = useState(0);
-  const fetchChats = async (brandId) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/inf/user/get-chats`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ brandId: "67a33c48d9f27471b3bd6eba" }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        if (data.chats.length > 0) {
-          if (data.chats[data.chats.length - 1]["sender"] == "other") {
-            setUnseenChat(1);
-          } else {
-            setUnseenChat(0);
-          }
-        }
-      } else {
-        throw new Error("Failed to load chats.");
-      }
-    } catch (error) {
-      console.error("Error fetching chat data:", error);
-    }
-  };
-
   const [collapsed, setCollapsed] = useState(true);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -149,6 +120,18 @@ const PromotionAdminDrawerPanel = (props) => {
           }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
+            {
+              key: "2",
+              icon: (
+                <Link
+                  to={"/admin-admin-panel/home"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <HomeOutlined />
+                </Link>
+              ),
+              label: "Home",
+            },
             {
               key: "3",
               icon: (

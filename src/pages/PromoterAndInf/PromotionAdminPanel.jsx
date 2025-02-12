@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router";
-import InfOrdersHistory from "../../components/Influencer/InfOrdersHistory";
-import InfOrderDetailsPage from "../../components/Influencer/InfOrderDetailsPage";
-import InfProfilePage from "../../components/Influencer/InfProfilePage";
 import PromotionAdminDrawerPanel from "../../components/PromotionAdmin/PromotionAdminDrawerPanel";
 import AdminOrderHistory from "../../components/PromotionAdmin/AdminOrderHistory";
 import AdminOrderDetails from "../../components/PromotionAdmin/AdminOrderDetails";
 import AdminProfilePage from "../../components/PromotionAdmin/AdminProfilePage";
+import AdminHome from "../../components/PromotionAdmin/AdminHome";
 
 const PromotionAdminPanel = () => {
   const page = useParams().page;
@@ -16,6 +14,7 @@ const PromotionAdminPanel = () => {
   return (
     <div>
       <PromotionAdminDrawerPanel page={page}>
+        {page === "home" && <AdminHome />}
         {page == "orders" && <AdminOrderHistory />}
         {page === "order-details" && <AdminOrderDetails />}
         {page === "profile" && <AdminProfilePage />}

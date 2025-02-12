@@ -4,6 +4,7 @@ import InfDrawerPanel from "../../components/Influencer/InfDrawerPanel";
 import InfOrdersHistory from "../../components/Influencer/InfOrdersHistory";
 import InfOrderDetailsPage from "../../components/Influencer/InfOrderDetailsPage";
 import InfProfilePage from "../../components/Influencer/InfProfilePage";
+import InfHome from "../../components/Influencer/InfHome";
 
 const InfAdminPanel = () => {
   const page = useParams().page;
@@ -13,6 +14,7 @@ const InfAdminPanel = () => {
   return (
     <div>
       <InfDrawerPanel page={page}>
+        {page === "home" && <InfHome />}
         {page == "orders" && <InfOrdersHistory />}
         {page === "order-details" && <InfOrderDetailsPage />}
         {page === "profile" && <InfProfilePage />}

@@ -34,7 +34,7 @@ import { FaUserCheck, FaSearch } from "react-icons/fa";
 import { styled } from "@mui/system";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import moment from "moment";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Divider, message, Popconfirm } from "antd";
 import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
@@ -82,7 +82,8 @@ const AdminOrderDetails = () => {
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
   const [openInfModal, setOpenInfModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
-
+  const [openRejectModal, setOpenRejectModal] = useState(false);
+  const [remark, setRemark] = useState("");
   const updatePayment = async (paymentOrderId) => {
     const resPay = await fetch(
       `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier/${paymentOrderId}`
@@ -108,7 +109,37 @@ const AdminOrderDetails = () => {
       }
     });
   };
+  const handleCloseRejectModal = () => {
+    setOpenRejectModal(false);
+  };
+  const handleConfirmReject = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/reject-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: id, remark }),
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("Failed to reject order.");
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      setOrder(null);
+      fetchOrderById();
+
+      setOpenRejectModal(false);
+    } catch (error) {
+      console.error("Error rejecting order:", error);
+    }
+  };
   const fetchOrderById = async () => {
     setLoading(true);
     try {
@@ -240,6 +271,9 @@ const AdminOrderDetails = () => {
   const handleClosePaymentModal = () => {
     setOpenPaymentModal(false);
   };
+  const handleReject = () => {
+    setOpenRejectModal(true);
+  };
 
   const handleConfirmPayment = async () => {
     setLoading(true);
@@ -306,7 +340,37 @@ const AdminOrderDetails = () => {
     }
     setLoading(false);
   };
+  const navigate = useNavigate();
 
+  const handleDeleteOrder = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/delete-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: id }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to delete order.");
+      }
+
+      message.success("Order deleted successfully.");
+      navigate("/admin-admin-panel/orders");
+      // Optionally, you can refresh the order list or redirect the user
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      message.error("Error deleting order.");
+    }
+    setLoading(false);
+  };
   return (
     <Container
       maxWidth="xl"
@@ -427,22 +491,41 @@ const AdminOrderDetails = () => {
                 fontWeight="bold"
                 gutterBottom
                 color="#333"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
               >
-                Campaign Status
+                Campaign Status{" "}
+                {order.status == "rejected" && (
+                  <Typography variant="h5" fontWeight="bold" color="red">
+                    : Rejected
+                  </Typography>
+                )}
               </Typography>
 
-              <Stepper
-                activeStep={activeStep}
-                alternativeLabel
-                sx={{ mt: 2, mb: 3 }}
-              >
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-              {order.paymentAmount < 1 && (
+              {order.status == "rejected" && (
+                <Typography variant="subtitle1">
+                  Remark: {order.remark}
+                </Typography>
+              )}
+              {order.status != "rejected" && (
+                <Stepper
+                  activeStep={activeStep}
+                  alternativeLabel
+                  sx={{ mt: 2, mb: 3 }}
+                >
+                  {steps.map((label) => (
+                    <Step key={label}>
+                      <StepLabel>{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
+              )}
+
+              {order.paymentAmount < 1 && order.status != "rejected" && (
                 <>
                   {" "}
                   <Typography
@@ -467,6 +550,20 @@ const AdminOrderDetails = () => {
                   >
                     Add Payment Amount
                   </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleReject}
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "17px",
+                      padding: "5px 10px",
+                      textTransform: "capitalize",
+                      marginLeft: "15px",
+                    }}
+                  >
+                    Reject
+                  </Button>
                 </>
               )}
               {order.paymentAmount > 0 && (
@@ -482,7 +579,7 @@ const AdminOrderDetails = () => {
               )}
             </Paper>
           </Grid>
-          {order && order.status != "pending" && (
+          {order && order.status != "pending" && order.status != "rejected" && (
             <Grid item xs={12}>
               <Paper sx={{ p: 3 }}>
                 <Box
@@ -616,7 +713,7 @@ const AdminOrderDetails = () => {
             </Grid>
           )}
 
-          {order.status == "pending" && (
+          {(order.status == "pending" || order.status == "rejected") && (
             <Grid item xs={12}>
               <Paper sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
@@ -676,36 +773,44 @@ const AdminOrderDetails = () => {
               </Paper>
             </Grid>
           )}
-          {order.status == "pending" && (
-            <Button
-              variant="contained"
-              sx={{
-                mt: 2,
-                width: "fit-content", // Corrected this to use string value
-                margin: "2rem auto", // Corrected this to use string value
-                borderRadius: "2rem", // Corrected syntax here
-                display: "block",
-                backgroundColor: "white",
-                color: "black",
-                fontWeight: 700,
-                fontSize: "17px",
-                padding: "10px 12px 10px",
-                transition: "0.3s",
-                border: "1px solid #d7d7d7",
-                gap: ".5rem",
-                textTransform: "capitalize",
-                "&:hover": {
-                  opacity: 0.9,
-                  backgroundColor: "#1677ff",
-                  color: "white",
-                  border: "1px solid #1677ff",
-                },
-                display: "flex",
-                alignItems: "center",
-              }}
+
+          {(order.status == "pending" || order.status == "rejected") && (
+            <Popconfirm
+              title="Are you sure you want to delete this order?"
+              onConfirm={() => handleDeleteOrder()}
+              okText="Yes"
+              cancelText="No"
             >
-              <DeleteOutline /> Delete
-            </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  width: "fit-content",
+                  margin: "2rem auto",
+                  borderRadius: "2rem",
+                  display: "block",
+                  backgroundColor: "white",
+                  color: "black",
+                  fontWeight: 700,
+                  fontSize: "17px",
+                  padding: "10px 12px 10px",
+                  transition: "0.3s",
+                  border: "1px solid #d7d7d7",
+                  gap: ".5rem",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    opacity: 0.9,
+                    backgroundColor: "#1677ff",
+                    color: "white",
+                    border: "1px solid #1677ff",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <DeleteOutline /> Delete
+              </Button>
+            </Popconfirm>
           )}
         </Grid>
       )}
@@ -858,6 +963,33 @@ const AdminOrderDetails = () => {
             color="primary"
           >
             Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openRejectModal} onClose={handleCloseRejectModal}>
+        <DialogTitle>Reject Order</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide a remark for rejecting the order.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Remark"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={remark}
+            onChange={(e) => setRemark(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRejectModal} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmReject} color="error">
+            Reject
           </Button>
         </DialogActions>
       </Dialog>

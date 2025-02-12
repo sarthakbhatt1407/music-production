@@ -170,13 +170,13 @@ const ProAndInfLogin = () => {
         setTimeout(() => {
           dispatch({ type: "log in", data: { ...loginData } });
           if (loginData.user.userType === "promoter") {
-            navigate("/promotor-admin-panel/new-order");
+            navigate("/promotor-admin-panel/home");
           }
           if (loginData.user.userType === "influencer") {
-            navigate("/influencer-admin-panel/orders");
+            navigate("/influencer-admin-panel/home");
           }
           if (loginData.user.userType === "admin") {
-            navigate("/admin-admin-panel/orders");
+            navigate("/admin-admin-panel/home");
           }
         }, 700);
       }

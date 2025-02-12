@@ -70,6 +70,9 @@ const BrandDrawerPanel = (props) => {
     },
   ];
   const defaultSelector = (page) => {
+    if (page === "home") {
+      return ["1"];
+    }
     if (page === "new-order") {
       return ["2"];
     }
@@ -153,6 +156,18 @@ const BrandDrawerPanel = (props) => {
           }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
+            {
+              key: "1",
+              icon: (
+                <Link
+                  to={"/promotor-admin-panel/home"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <HomeOutlined />
+                </Link>
+              ),
+              label: "Home",
+            },
             {
               key: "2",
               icon: (

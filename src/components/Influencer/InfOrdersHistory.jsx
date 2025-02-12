@@ -447,10 +447,11 @@ const InfOrdersHistory = () => {
           ]}
         />
 
-        {user && user.paymentStatus === "pending" && (
+        {user && user.paymentStatus != "completed" && (
           <Alert severity="warning" sx={{ mb: 2 }}>
             Your payment is pending. Please complete the payment to access your
-            orders.
+            orders. If you have already paid, please wait for 10 minutes for the
+            payment to be processed.
             <Button
               variant="contained"
               color="primary"
@@ -462,7 +463,7 @@ const InfOrdersHistory = () => {
           </Alert>
         )}
 
-        {user && user.paymentStatus !== "pending" && (
+        {user && user.paymentStatus == "completed" && (
           <>
             <StyledPaper>
               <FilterContainer isMobile={isMobile}>
