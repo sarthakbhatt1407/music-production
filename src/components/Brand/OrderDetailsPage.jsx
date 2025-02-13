@@ -31,7 +31,7 @@ import moment from "moment";
 import { useNavigate, useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Divider, message, Popconfirm } from "antd";
-import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
+import { DeleteOutline, Done, LinkOutlined } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -75,7 +75,34 @@ const OrderDetailsPage = () => {
       fetchOrderById();
     }
   };
+  const handleCompleteOrder = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/complete-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: id, action: "completed" }),
+        }
+      );
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to complete order.");
+      }
+
+      message.success(" Order completed successfully.");
+      fetchOrderById();
+      // Optionally, you can refresh the order list or redirect the user
+    } catch (error) {
+      message.error(" Error completing order.");
+    }
+    setLoading(false);
+  };
   const handleDeleteOrder = async () => {
     setLoading(true);
     try {
@@ -299,8 +326,13 @@ const OrderDetailsPage = () => {
         );
         const data = await res.json();
         console.log(data);
-        fetchOrderById();
+
         if (data.paymentStatus == "completed") {
+          fetchOrderById();
+        } else {
+          message.success(
+            "Payment successfully completed. If payment is not updated kindly wait for a while."
+          );
         }
         setLoading(false);
       },
@@ -690,6 +722,44 @@ const OrderDetailsPage = () => {
                 }}
               >
                 <DeleteOutline /> Delete
+              </Button>
+            </Popconfirm>
+          )}
+          {order.status == "in process" && (
+            <Popconfirm
+              title="Are you sure you want to mark this order as completed?"
+              onConfirm={() => handleCompleteOrder()}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  width: "fit-content",
+                  margin: "2rem auto",
+                  borderRadius: "2rem",
+                  display: "block",
+                  backgroundColor: "white",
+                  color: "black",
+                  fontWeight: 500,
+                  fontSize: "17px",
+                  padding: "10px 12px 10px",
+                  transition: "0.3s",
+                  border: "1px solid #d7d7d7",
+                  gap: ".5rem",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    opacity: 0.9,
+                    backgroundColor: "#1677ff",
+                    color: "white",
+                    border: "1px solid #1677ff",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Done /> Mark as Completed
               </Button>
             </Popconfirm>
           )}

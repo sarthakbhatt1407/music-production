@@ -251,7 +251,7 @@ const BrandHome = () => {
             error={error}
           />
         </Grid>
-
+        {/* 
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard
             title="Total Spent"
@@ -261,7 +261,7 @@ const BrandHome = () => {
             loading={loading}
             error={error}
           />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Container>
   );

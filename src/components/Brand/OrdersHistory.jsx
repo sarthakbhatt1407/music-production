@@ -223,18 +223,6 @@ const OrdersHistory = () => {
         );
       },
     },
-    {
-      field: "paymentAmount",
-      headerName: "Payment",
-      width: 150,
-      renderCell: (params) => {
-        return (
-          <Typography>
-            {params.value != 0 ? "Pay Now" : "In admin review"}
-          </Typography>
-        );
-      },
-    },
   ];
 
   const filteredData = orders.filter((item) => {

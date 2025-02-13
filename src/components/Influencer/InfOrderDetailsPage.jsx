@@ -296,6 +296,32 @@ const InfOrderDetailsPage = () => {
                 <Typography variant="subtitle1" color="text.secondary">
                   Description: {order.campaignDescription}
                 </Typography>
+                {order.status === "rejected" && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      gutterBottom
+                      color="#333"
+                      style={{
+                        display: "flex",
+                        // justifyContent: "center",
+                        // alignItems: "center",
+                        gap: "5px",
+                      }}
+                    >
+                      Campaign Status{" "}
+                      {order.status == "rejected" && (
+                        <Typography variant="h6" fontWeight="bold" color="red">
+                          : Rejected
+                        </Typography>
+                      )}
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary">
+                      Remark: {order.remark}
+                    </Typography>
+                  </>
+                )}
               </CardContent>
             </StyledCard>
           </Grid>
@@ -438,6 +464,34 @@ const InfOrderDetailsPage = () => {
                 }}
               >
                 Complete
+              </Button>
+            </Box>
+          )}
+          {order.status === "rejected" && (
+            <Box
+              sx={{
+                mt: 2,
+                display: "flex",
+                justifyContent: "center",
+                gap: 2,
+                alignItems: "center",
+                width: "100%",
+                marginTop: "2rem",
+                marginBottom: "1rem",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleComplete}
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "17px",
+                  padding: "5px 10px",
+                  textTransform: "capitalize",
+                }}
+              >
+                Resubmit
               </Button>
             </Box>
           )}

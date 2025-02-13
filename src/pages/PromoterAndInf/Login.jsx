@@ -132,8 +132,8 @@ const ProAndInfLogin = () => {
   const demoLogin = async () => {
     // const contactNum = "7895603314";
     // const contactNum = "8630435041";
-    const contactNum = "7088360325";
-    // const contactNum = "8755684261";
+    // const contactNum = "7088360325";
+    const contactNum = "8755684261";
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
       {
@@ -266,26 +266,25 @@ const ProAndInfLogin = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    if (formData.name.length < 2 || !role) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (
+      formData.name.length < 2 ||
+      !role ||
+      !formData.email ||
+      !formData.profileImage ||
+      !emailRegex.test(formData.email)
+    ) {
       if (formData.name.length < 2) {
         setNameErr(true);
       }
 
-      error("Fill all required fields! ");
+      error("Fill all required fields correctly!");
       return;
     }
-
-    if (role === "influencer") {
-      if (
-        !formData.socialMediaUrl ||
-        !formData.accountNumber ||
-        !formData.ifscCode ||
-        !formData.bankName ||
-        !formData.profession
-      ) {
-        error("Fill all required fields for Influencer!");
-        return;
-      }
+    if (role === "influencer" && formData.socialMediaUrl.length < 2) {
+      error("Fill all required fields correctly!");
+      return;
     }
 
     setSpinning(true);
@@ -357,10 +356,13 @@ const ProAndInfLogin = () => {
             data: { ...loginData },
           });
           if (loginData.user.userType === "promoter") {
-            navigate("/promotor-admin-panel/new-order");
+            navigate("/promotor-admin-panel/home");
           }
           if (loginData.user.userType === "influencer") {
-            navigate("/influencer-admin-panel/orders");
+            navigate("/influencer-admin-panel/home");
+          }
+          if (loginData.user.userType === "admin") {
+            navigate("/admin-admin-panel/home");
           }
         }, 700);
       }
@@ -462,13 +464,12 @@ const ProAndInfLogin = () => {
                         <MenuItem value="influencer">Influencer</MenuItem>
                       </Select>
                     </FormControl>
-                    <FormControl fullWidth sx={{ mb: 3 }}>
+                    {/* <FormControl fullWidth sx={{ mb: 3 }}>
                       <TextField
                         label="Full Address"
                         name="fullAddress"
                         value={formData.fullAddress}
                         onChange={handleChange}
-                        required
                         variant="outlined"
                       />
                     </FormControl>
@@ -479,7 +480,6 @@ const ProAndInfLogin = () => {
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        required
                         variant="outlined"
                       />
                     </FormControl>
@@ -490,7 +490,6 @@ const ProAndInfLogin = () => {
                         name="state"
                         value={formData.state}
                         onChange={handleChange}
-                        required
                         variant="outlined"
                       />
                     </FormControl>
@@ -501,10 +500,9 @@ const ProAndInfLogin = () => {
                         name="pinCode"
                         value={formData.pinCode}
                         onChange={handleChange}
-                        required
                         variant="outlined"
                       />
-                    </FormControl>
+                    </FormControl> */}
                     {role === "influencer" && (
                       <>
                         <FormControl fullWidth sx={{ mb: 3 }}>
@@ -513,17 +511,15 @@ const ProAndInfLogin = () => {
                             name="socialMediaUrl"
                             value={formData.socialMediaUrl}
                             onChange={handleChange}
-                            required
                             variant="outlined"
                           />
                         </FormControl>
-                        <FormControl fullWidth sx={{ mb: 3 }}>
+                        {/* <FormControl fullWidth sx={{ mb: 3 }}>
                           <TextField
                             label="Price per promotion"
                             name="price"
                             value={formData.price}
                             onChange={handleChange}
-                            required
                             variant="outlined"
                             type="number"
                           />
@@ -535,7 +531,6 @@ const ProAndInfLogin = () => {
                             name="accountNumber"
                             value={formData.accountNumber}
                             onChange={handleChange}
-                            required
                             variant="outlined"
                           />
                         </FormControl>
@@ -546,7 +541,6 @@ const ProAndInfLogin = () => {
                             name="ifscCode"
                             value={formData.ifscCode}
                             onChange={handleChange}
-                            required
                             variant="outlined"
                           />
                         </FormControl>
@@ -557,7 +551,6 @@ const ProAndInfLogin = () => {
                             name="bankName"
                             value={formData.bankName}
                             onChange={handleChange}
-                            required
                             variant="outlined"
                           />
                         </FormControl>
@@ -571,7 +564,6 @@ const ProAndInfLogin = () => {
                             id="profession"
                             value={formData.profession}
                             onChange={handleProfessionChange}
-                            required
                             MenuProps={{
                               PaperProps: {
                                 style: {
@@ -604,7 +596,7 @@ const ProAndInfLogin = () => {
                               Script Writer
                             </MenuItem>
                           </Select>
-                        </FormControl>
+                        </FormControl> */}
                       </>
                     )}
 

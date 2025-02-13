@@ -22,6 +22,8 @@ import {
   QuestionAnswerOutlined,
   RestoreFromTrashOutlined,
   TimerRounded,
+  Wallet,
+  WalletOutlined,
   WorkHistoryOutlined,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,6 +32,7 @@ import logo from "../../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
 import { Badge } from "@mui/material";
+import { BiWallet } from "react-icons/bi";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -48,7 +51,7 @@ const InfDrawerPanel = (props) => {
   const page = props.page;
   const items = [
     {
-      label: <Link to={"/admin-panel/all-users"}>Labels</Link>,
+      label: <Link to={"/influencer-admin-panel/profile"}>Profile</Link>,
       key: "0",
     },
     {
@@ -76,7 +79,7 @@ const InfDrawerPanel = (props) => {
     if (page === "orders") {
       return ["3"];
     }
-    if (page === "chat") {
+    if (page === "wallet") {
       return ["4"];
     }
     if (page === "profile") {
@@ -175,6 +178,18 @@ const InfDrawerPanel = (props) => {
                 </Link>
               ),
               label: "Order History",
+            },
+            {
+              key: "4",
+              icon: (
+                <Link
+                  to={"/influencer-admin-panel/wallet"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <Wallet />
+                </Link>
+              ),
+              label: "Wallet",
             },
             // {
             //   key: "4",

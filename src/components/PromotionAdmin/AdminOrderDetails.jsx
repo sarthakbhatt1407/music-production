@@ -37,8 +37,16 @@ import moment from "moment";
 import { useNavigate, useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Divider, message, Popconfirm } from "antd";
-import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
+import {
+  Close,
+  DeleteOutline,
+  Done,
+  DoneOutline,
+  LinkOutlined,
+  RestartAlt,
+} from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { act } from "react";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -83,17 +91,10 @@ const AdminOrderDetails = () => {
   const [openInfModal, setOpenInfModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [openRejectModal, setOpenRejectModal] = useState(false);
+  const [openInfRejectModal, setOpenInfRejectModal] = useState(false);
   const [remark, setRemark] = useState("");
-  const updatePayment = async (paymentOrderId) => {
-    const resPay = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier/${paymentOrderId}`
-    );
-    const dataPay = await resPay.json();
-    console.log(dataPay);
-    if (dataPay.paymentStatus == "completed") {
-      fetchOrderById();
-    }
-  };
+  const [remarkInf, setRemarkInf] = useState("");
+  const [selInfRej, setSelInfRej] = useState(null);
   const filteredInfluencers = influencers.filter(
     (influencer) =>
       influencer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,6 +112,9 @@ const AdminOrderDetails = () => {
   };
   const handleCloseRejectModal = () => {
     setOpenRejectModal(false);
+  };
+  const handleCloseInfRejectModal = () => {
+    setOpenInfRejectModal(false);
   };
   const handleConfirmReject = async () => {
     try {
@@ -131,11 +135,46 @@ const AdminOrderDetails = () => {
 
       const data = await response.json();
       console.log(data);
-
+      setRemark("");
       setOrder(null);
       fetchOrderById();
 
       setOpenRejectModal(false);
+    } catch (error) {
+      console.error("Error rejecting order:", error);
+    }
+  };
+  const handleConfirmRejectInf = async () => {
+    if (!selInfRej) {
+      message.error("Error rejecting influencer.");
+    }
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/reject-inf-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId: id,
+            remark: remarkInf,
+            infId: selInfRej,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to reject order.");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setRemarkInf("");
+      setOrder(null);
+      fetchOrderById();
+      setSelInf(null);
+      setOpenInfRejectModal(false);
     } catch (error) {
       console.error("Error rejecting order:", error);
     }
@@ -186,13 +225,6 @@ const AdminOrderDetails = () => {
         console.log(selectedIndOrders);
 
         setSelInf(selectedIndOrders);
-      }
-
-      if (
-        data.paymentOrderId.length > 0 &&
-        (data.paymentStatus == "failed" || data.paymentStatus == "pending")
-      ) {
-        updatePayment(data.paymentOrderId);
       }
 
       if (data.status == "pending") {
@@ -368,6 +400,41 @@ const AdminOrderDetails = () => {
     } catch (error) {
       console.error("Error deleting order:", error);
       message.error("Error deleting order.");
+    }
+    setLoading(false);
+  };
+  const handleCompleteOrder = async (action) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/complete-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId: id, action }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error();
+      }
+      if (action == "completed") {
+        message.success("Order completed successfully.");
+      } else {
+        message.success("Order reopened successfully.");
+      }
+      fetchOrderById();
+      // Optionally, you can refresh the order list or redirect the user
+    } catch (error) {
+      if (action == "completed") {
+        message.error(" Error completing order.");
+      } else {
+        message.error(" Error reopening order.");
+      }
     }
     setLoading(false);
   };
@@ -621,7 +688,7 @@ const AdminOrderDetails = () => {
                         <TableCell>Amount</TableCell>
                         <TableCell>Status</TableCell>
                         <TableCell>Preview</TableCell>
-                        <TableCell>Action</TableCell>
+                        <TableCell align="center">Action</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -690,19 +757,37 @@ const AdminOrderDetails = () => {
                                 </p>
                               )}
                             </TableCell>
-                            <TableCell>
-                              <Popconfirm
-                                title="Are you sure you want to delete this influencer?"
-                                onConfirm={() =>
-                                  deleteInfFromOrder(id, influencer.id)
-                                }
-                                okText="Yes"
-                                cancelText="No"
+                            <TableCell style={{}}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
                               >
-                                <Button>
-                                  <DeleteOutline />
-                                </Button>
-                              </Popconfirm>
+                                {" "}
+                                <Popconfirm
+                                  title="Are you sure you want to delete this influencer?"
+                                  onConfirm={() =>
+                                    deleteInfFromOrder(id, influencer.id)
+                                  }
+                                  okText="Yes"
+                                  cancelText="No"
+                                >
+                                  <Button>
+                                    <DeleteOutline />
+                                  </Button>
+                                </Popconfirm>
+                                {influencer.status == "completed" && (
+                                  <Button
+                                    onClick={() => {
+                                      setSelInfRej(influencer.id);
+                                      setOpenInfRejectModal(true);
+                                    }}
+                                  >
+                                    <Close />
+                                  </Button>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -809,6 +894,82 @@ const AdminOrderDetails = () => {
                 }}
               >
                 <DeleteOutline /> Delete
+              </Button>
+            </Popconfirm>
+          )}
+          {order.status == "in process" && (
+            <Popconfirm
+              title="Are you sure you want to mark this order as completed?"
+              onConfirm={() => handleCompleteOrder("completed")}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  width: "fit-content",
+                  margin: "2rem auto",
+                  borderRadius: "2rem",
+                  display: "block",
+                  backgroundColor: "white",
+                  color: "black",
+                  fontWeight: 500,
+                  fontSize: "17px",
+                  padding: "10px 12px 10px",
+                  transition: "0.3s",
+                  border: "1px solid #d7d7d7",
+                  gap: ".5rem",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    opacity: 0.9,
+                    backgroundColor: "#1677ff",
+                    color: "white",
+                    border: "1px solid #1677ff",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Done /> Mark as Completed
+              </Button>
+            </Popconfirm>
+          )}
+          {order.status == "completed" && (
+            <Popconfirm
+              title="Are you sure you want to mark this order as completed?"
+              onConfirm={() => handleCompleteOrder("in process")}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  width: "fit-content",
+                  margin: "2rem auto",
+                  borderRadius: "2rem",
+                  display: "block",
+                  backgroundColor: "white",
+                  color: "black",
+                  fontWeight: 500,
+                  fontSize: "17px",
+                  padding: "10px 12px 10px",
+                  transition: "0.3s",
+                  border: "1px solid #d7d7d7",
+                  gap: ".5rem",
+                  textTransform: "capitalize",
+                  "&:hover": {
+                    opacity: 0.9,
+                    backgroundColor: "#1677ff",
+                    color: "white",
+                    border: "1px solid #1677ff",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <RestartAlt /> Reopen Order
               </Button>
             </Popconfirm>
           )}
@@ -967,7 +1128,7 @@ const AdminOrderDetails = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={openRejectModal} onClose={handleCloseRejectModal}>
+      <Dialog open={openRejectModal} onClose={handleCloseInfRejectModal}>
         <DialogTitle>Reject Order</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -989,6 +1150,32 @@ const AdminOrderDetails = () => {
             Cancel
           </Button>
           <Button onClick={handleConfirmReject} color="error">
+            Reject
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openInfRejectModal} onClose={handleCloseInfRejectModal}>
+        <DialogTitle>Reject Order</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide a remark for rejecting the work.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Remark"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={remarkInf}
+            onChange={(e) => setRemarkInf(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseInfRejectModal} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmRejectInf} color="error">
             Reject
           </Button>
         </DialogActions>

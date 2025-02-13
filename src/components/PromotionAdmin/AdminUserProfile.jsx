@@ -566,6 +566,18 @@ const AdminUserProfile = () => {
                   {loading ? <CircularProgress size={24} /> : "Upload document"}
                 </Button>
               )}
+            {page === "influencer" && (
+              <Button
+                variant="contained"
+                disabled={loading}
+                style={{
+                  marginLeft: "1rem",
+                }}
+                onClick={() => navigate(`/admin-admin-panel/wallet/${id}`)}
+              >
+                {loading ? <CircularProgress size={24} /> : "Wallet"}
+              </Button>
+            )}
             {page === "influencer" &&
               (formData.status == "active" || formData.status == "closed") && (
                 <Button

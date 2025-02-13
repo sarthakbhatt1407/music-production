@@ -233,7 +233,7 @@ const OrderCreator = () => {
                     <TableCell>Influencer</TableCell>
                     <TableCell>Category</TableCell>
                     <TableCell>Social Media </TableCell>
-                    <TableCell>Amount </TableCell>
+
                     <TableCell align="center">Action</TableCell>
                   </TableRow>
                 </TableHead>
@@ -264,7 +264,6 @@ const OrderCreator = () => {
                           <LinkOutlined />
                         </Link>
                       </TableCell>
-                      <TableCell align="center">₹ {influencer.price}</TableCell>
                       <TableCell align="center">
                         <StyledButton
                           variant="contained"
