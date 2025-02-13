@@ -49,6 +49,13 @@ const PromotionAdminDrawerPanel = (props) => {
   const page = props.page;
   const items = [
     {
+      label: <Link to={"/admin-admin-panel/users"}>All Users</Link>,
+      key: "0",
+    },
+    {
+      type: "divider",
+    },
+    {
       label: (
         <span
           onClick={() => {

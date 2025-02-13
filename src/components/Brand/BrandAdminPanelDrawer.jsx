@@ -48,7 +48,7 @@ const BrandDrawerPanel = (props) => {
   const page = props.page;
   const items = [
     {
-      label: <Link to={"/admin-panel/all-users"}>Labels</Link>,
+      label: <Link to={"/promotor-admin-panel/profile"}>Profile</Link>,
       key: "0",
     },
     {
@@ -73,7 +73,7 @@ const BrandDrawerPanel = (props) => {
     if (page === "home") {
       return ["1"];
     }
-    if (page === "new-order") {
+    if (page === "new-order" || page === "new-order-navigation") {
       return ["2"];
     }
 
@@ -172,7 +172,7 @@ const BrandDrawerPanel = (props) => {
               key: "2",
               icon: (
                 <Link
-                  to={"/promotor-admin-panel/new-order"}
+                  to={"/promotor-admin-panel/new-order-navigation"}
                   onClick={() => setCollapsed(true)}
                 >
                   <FormOutlined />

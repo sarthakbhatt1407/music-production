@@ -439,17 +439,6 @@ const InfHome = () => {
                 error={error}
               />
             </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <MetricCard
-                title="Total Earned"
-                value={metrics ? formatCurrency(metrics.paidOrders) : null}
-                icon={BiRupee}
-                color={theme.palette.secondary.main}
-                loading={loading}
-                error={error}
-              />
-            </Grid>
           </Grid>
         )}
     </Container>

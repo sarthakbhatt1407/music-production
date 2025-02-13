@@ -8,6 +8,7 @@ import OrderDetailsPage from "../../components/Brand/OrderDetailsPage";
 import ChatScreen from "../../components/Brand/ChatScreen";
 import ProfilePage from "../../components/Brand/ProfilePage";
 import BrandHome from "../../components/Brand/BrandHome";
+import OrderNavigation from "../../components/Brand/OrderNavigation";
 
 const BrandAdminPanel = () => {
   const page = useParams().page;
@@ -18,7 +19,9 @@ const BrandAdminPanel = () => {
     <div>
       <BrandDrawerPanel page={page}>
         {page === "home" && <BrandHome />}
-        {page === "new-order" && <OrderCreator />}
+        {page === "new-order-navigation" && <OrderNavigation />}
+        {page === "new-order-without-packages" && <OrderCreator />}
+        {page === "new-order-with-packages" && <OrderCreator />}
         {page === "order-history" && <OrdersHistory />}
         {page === "order-details" && id && <OrderDetailsPage />}
         {page === "profile" && <ProfilePage />}

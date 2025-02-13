@@ -23,7 +23,8 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Popconfirm } from "antd";
-import { DeleteOutline } from "@mui/icons-material";
+import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -294,8 +295,23 @@ const InfOrderDetailsPage = () => {
                   Collaboration ID: {brandOrder.collaborationId}
                 </Typography>
                 <Typography variant="subtitle1" color="text.secondary">
-                  Description: {order.campaignDescription}
+                  {order.campaignDescription}
                 </Typography>
+                {order.status == "completed" && (
+                  <Typography
+                    variant="subtitle1"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                    }}
+                  >
+                    Preview:{" "}
+                    <Link to={order.workLink} target="_blank">
+                      <LinkOutlined />
+                    </Link>
+                  </Typography>
+                )}
                 {order.status === "rejected" && (
                   <>
                     <Typography
@@ -529,7 +545,8 @@ const InfOrderDetailsPage = () => {
         <DialogTitle>Complete Order</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please provide the link for completing the order.
+            Please provide the order completion link. For screenshots, upload to
+            Google Drive and share the link.
           </DialogContentText>
           <TextField
             autoFocus

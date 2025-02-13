@@ -4,6 +4,7 @@ import {
   Button,
   Container,
   Paper,
+  Tooltip,
   Table,
   TableBody,
   TableCell,
@@ -15,12 +16,17 @@ import {
   Grid,
   Alert,
   Chip,
+  CardContent,
   Stack,
+  useTheme,
+  Card,
+  styled,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { FaCheck } from "react-icons/fa";
+
 import { FaUserCheck, FaSearch } from "react-icons/fa";
 import { Breadcrumb, message } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { LinkOutlined, LinkSharp, LinkTwoTone } from "@mui/icons-material";
 import MusicLoader from "../Loader/MusicLoader";
 import { useSelector } from "react-redux";
@@ -37,9 +43,27 @@ const StyledButton = styled(Button)(({ theme }) => ({
     transform: "scale(1.02)",
   },
 }));
-
+const StyledCard = styled(Card)(({ theme, isSelected }) => ({
+  height: "100%",
+  transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+  cursor: "pointer",
+  position: "relative",
+  backgroundColor: theme.palette.background.paper,
+  border: isSelected
+    ? `2px solid ${theme.palette.primary.main}`
+    : "1px solid ${theme.palette.divider}",
+  borderRadius: theme.shape.borderRadius * 2,
+  "&:hover": {
+    transform: "translateY(-8px)",
+    boxShadow: "0 12px 24px rgba(0,0,0,0.1)",
+  },
+}));
 const OrderCreator = () => {
   const [loading, setLoading] = useState(false);
+  const page = useParams().page;
+  console.log(page);
+  const [packages, setPackages] = useState([]);
+  const [selectedPackage, setSelectedPackage] = useState(null);
   const userid = useSelector((state) => state.userId);
   const [selectedInfluencers, setSelectedInfluencers] = useState([]);
   const navigate = useNavigate();
@@ -54,6 +78,7 @@ const OrderCreator = () => {
     photos: [],
     campaignUrl: "",
   });
+  const theme = useTheme();
   const [submitted, setSubmitted] = useState(false);
   const [influencers, setInfluencers] = useState([]);
 
@@ -72,6 +97,12 @@ const OrderCreator = () => {
         return [...prev, influencer];
       }
     });
+  };
+
+  const handlePackageSelect = (packageId) => {
+    setSelectedPackage(packageId);
+    const pkg = packages.find((pkg) => pkg.id === packageId);
+    setSelectedInfluencers(pkg.selectedInf);
   };
 
   const handleInputChange = (e) => {
@@ -115,6 +146,7 @@ const OrderCreator = () => {
     };
 
     fetchUsers();
+    getAllPackages();
   }, []);
   const handleRemoveInfluencer = (influencerId) => {
     setSelectedInfluencers((prev) => prev.filter((i) => i.id !== influencerId));
@@ -123,7 +155,7 @@ const OrderCreator = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setLoading(true);
+    // setLoading(true);
 
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("brandName", formData.brandName);
@@ -137,24 +169,46 @@ const OrderCreator = () => {
       formData.campaignDescription
     );
     formDataToSubmit.append("video", formData.videoFile);
+    formDataToSubmit.append("file", formData.audioFile);
 
-    // Append photos if available
     formData.photos.forEach((photo, index) => {
       formDataToSubmit.append(`image`, photo);
     });
-    let idArr = selectedInfluencers.map((influencer) => influencer.id);
-    const influencersAmount = selectedInfluencers.reduce((acc, influencer) => {
-      return acc + influencer.price;
-    }, 0);
 
-    // Append selected influencers
-    formDataToSubmit.append(
-      "selectedInfluencers",
-      JSON.stringify(selectedInfluencers)
-    );
-    formDataToSubmit.append("infIdArr", JSON.stringify(idArr));
-    formDataToSubmit.append("file", formData.audioFile);
-    formDataToSubmit.append("influencersAmount", influencersAmount);
+    if (page === "new-order-without-packages") {
+      let idArr = selectedInfluencers.map((influencer) => influencer.id);
+      const influencersAmount = selectedInfluencers.reduce(
+        (acc, influencer) => {
+          return acc + influencer.price;
+        },
+        0
+      );
+
+      // Append selected influencers
+      formDataToSubmit.append(
+        "selectedInfluencers",
+        JSON.stringify(selectedInfluencers)
+      );
+      formDataToSubmit.append("infIdArr", JSON.stringify(idArr));
+
+      formDataToSubmit.append("influencersAmount", influencersAmount);
+    } else {
+      const pkg = packages.find((pkg) => pkg.id === selectedPackage);
+      let idArr = pkg.selectedInf.map((influencer) => influencer.id);
+      const influencersAmount = pkg.selectedInf.reduce((acc, influencer) => {
+        return acc + influencer.price;
+      }, 0);
+
+      // Append selected influencers
+      formDataToSubmit.append(
+        "selectedInfluencers",
+        JSON.stringify(pkg.selectedInf)
+      );
+      formDataToSubmit.append("infIdArr", JSON.stringify(idArr));
+
+      formDataToSubmit.append("influencersAmount", influencersAmount);
+      formDataToSubmit.append("paymentAmount", pkg.discountedPrice);
+    }
 
     try {
       // Sending the form data to the API
@@ -186,7 +240,25 @@ const OrderCreator = () => {
     }
     setLoading(false);
   };
+  const getAllPackages = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/brand/get-all-packages`
+      );
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add new package.");
+      }
+      setPackages(data.packages);
+      console.log(data);
+    } catch (error) {
+      console.error("Error adding new package:", error);
+    }
+    setLoading(false);
+  };
   return (
     <Container
       maxWidth="xl"
@@ -209,253 +281,558 @@ const OrderCreator = () => {
           },
         ]}
       />
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={7}>
-          <StyledPaper>
-            <Box sx={{ mb: 3 }}>
-              <TextField
-                fullWidth
-                placeholder="Search by name or category"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <FaSearch style={{ marginRight: "8px" }} />,
-                }}
-              />
-            </Box>
+      {page == "new-order-without-packages" && (
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={7}>
+            <StyledPaper>
+              <Box sx={{ mb: 3 }}>
+                <TextField
+                  fullWidth
+                  placeholder="Search by name or category"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: <FaSearch style={{ marginRight: "8px" }} />,
+                  }}
+                />
+              </Box>
 
-            <TableContainer
-              sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
-            >
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Influencer</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell>Social Media </TableCell>
+              <TableContainer
+                sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
+              >
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Influencer</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell>Social Media </TableCell>
 
-                    <TableCell align="center">Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredInfluencers.map((influencer) => (
-                    <TableRow key={influencer.id}>
-                      <TableCell>
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                        >
-                          <img
-                            src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
-                            alt={influencer.name}
-                            style={{
-                              width: "40px",
-                              height: "40px",
-                              borderRadius: "50%",
-                              objectFit: "cover",
+                      <TableCell align="center">Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredInfluencers.map((influencer) => (
+                      <TableRow key={influencer.id}>
+                        <TableCell>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 2,
                             }}
-                          />
+                          >
+                            <img
+                              src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
+                              alt={influencer.name}
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "50%",
+                                objectFit: "cover",
+                              }}
+                            />
 
-                          {influencer.name}
-                        </Box>
-                      </TableCell>
-                      <TableCell>{influencer.profession}</TableCell>{" "}
-                      <TableCell align="center">
-                        <Link to={influencer.socialMediaUrl} target="_blank">
-                          <LinkOutlined />
-                        </Link>
-                      </TableCell>
-                      <TableCell align="center">
-                        <StyledButton
-                          variant="contained"
-                          color={
-                            selectedInfluencers.some(
+                            {influencer.name}
+                          </Box>
+                        </TableCell>
+                        <TableCell>{influencer.profession}</TableCell>{" "}
+                        <TableCell align="center">
+                          <Link to={influencer.socialMediaUrl} target="_blank">
+                            <LinkOutlined />
+                          </Link>
+                        </TableCell>
+                        <TableCell align="center">
+                          <StyledButton
+                            variant="contained"
+                            color={
+                              selectedInfluencers.some(
+                                (i) => i.id === influencer.id
+                              )
+                                ? "success"
+                                : "primary"
+                            }
+                            onClick={() => handleInfluencerSelect(influencer)}
+                            startIcon={<FaUserCheck />}
+                          >
+                            {selectedInfluencers.some(
                               (i) => i.id === influencer.id
                             )
-                              ? "success"
-                              : "primary"
-                          }
-                          onClick={() => handleInfluencerSelect(influencer)}
-                          startIcon={<FaUserCheck />}
-                        >
-                          {selectedInfluencers.some(
-                            (i) => i.id === influencer.id
-                          )
-                            ? "Selected"
-                            : "Select"}
-                        </StyledButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </StyledPaper>
-        </Grid>
+                              ? "Selected"
+                              : "Select"}
+                          </StyledButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </StyledPaper>
+          </Grid>
 
-        <Grid item xs={12} md={5}>
-          <StyledPaper>
-            <Typography variant="h6" gutterBottom>
-              Campaign Details
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label="Brand Name"
-                name="brandName"
-                value={formData.brandName}
-                onChange={handleInputChange}
-                required
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                fullWidth
-                label="Campaign Name"
-                name="campaignName"
-                value={formData.campaignName}
-                onChange={handleInputChange}
-                required
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                fullWidth
-                label="Collaboration ID"
-                name="collaborationId"
-                value={formData.collaborationId}
-                onChange={handleInputChange}
-                required
-                sx={{ mb: 3 }}
-              />
-
-              <TextField
-                fullWidth
-                label="Campaign URL"
-                name="campaignUrl"
-                value={formData.campaignUrl}
-                onChange={handleInputChange}
-                required
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                fullWidth
-                label="Campaign Description"
-                name="campaignDescription"
-                value={formData.campaignDescription}
-                onChange={handleInputChange}
-                required
-                multiline
-                rows={4}
-                sx={{ mb: 3 }}
-              />
-
-              <Typography variant="subtitle1" gutterBottom>
-                Selected Influencers:
+          <Grid item xs={12} md={5}>
+            <StyledPaper>
+              <Typography variant="h6" gutterBottom>
+                Campaign Details
               </Typography>
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{ mb: 3, flexWrap: "wrap", gap: 1 }}
-              >
-                {selectedInfluencers.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    No influencers selected
-                  </Typography>
-                ) : (
-                  selectedInfluencers.map((influencer) => (
-                    <Chip
-                      key={influencer.id}
-                      label={influencer.name}
-                      onDelete={() => handleRemoveInfluencer(influencer.id)}
-                      sx={{ mb: 1 }}
-                    />
-                  ))
-                )}
-              </Stack>
-              <Typography variant="subtitle1" gutterBottom>
-                Select Audio :
-              </Typography>
-              {/* Audio File Input */}
-              <Box sx={{ mb: 3 }}>
+              <form onSubmit={handleSubmit}>
                 <TextField
                   fullWidth
-                  name="audioFile"
-                  type="file"
-                  onChange={handleFileChange}
-                  inputProps={{ accept: ".mp3, .wav" }}
+                  label="Brand Name"
+                  name="brandName"
+                  value={formData.brandName}
+                  onChange={handleInputChange}
+                  required
                   sx={{ mb: 3 }}
                 />
-              </Box>
-              <Typography variant="subtitle1" gutterBottom>
-                Select Video :
-              </Typography>
-              {/* Video File Input */}
-              <Box sx={{ mb: 3 }}>
                 <TextField
                   fullWidth
-                  name="videoFile"
-                  type="file"
-                  onChange={handleFileChange}
-                  inputProps={{ accept: "video/mp4, video/avi, video/mov" }}
+                  label="Campaign Name"
+                  name="campaignName"
+                  value={formData.campaignName}
+                  onChange={handleInputChange}
+                  required
                   sx={{ mb: 3 }}
                 />
-              </Box>
-              <Typography variant="subtitle1" gutterBottom>
-                Select Photos :
-              </Typography>
-              {/* Photo Input */}
-              <Box sx={{ mb: 3 }}>
-                <input
-                  type="file"
-                  name="photos"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileChange}
+                <TextField
+                  fullWidth
+                  label="Collaboration ID"
+                  name="collaborationId"
+                  value={formData.collaborationId}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
                 />
-                <Box sx={{ mt: 2 }}>
-                  {formData.photos.map((photo, index) => (
-                    <img
-                      key={index}
-                      src={URL.createObjectURL(photo)}
-                      alt={`photo-${index}`}
-                      style={{
-                        width: "80px",
-                        height: "80px",
-                        marginRight: "8px",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  ))}
+
+                <TextField
+                  fullWidth
+                  label="Campaign URL"
+                  name="campaignUrl"
+                  value={formData.campaignUrl}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Campaign Description"
+                  name="campaignDescription"
+                  value={formData.campaignDescription}
+                  onChange={handleInputChange}
+                  required
+                  multiline
+                  rows={4}
+                  sx={{ mb: 3 }}
+                />
+
+                <Typography variant="subtitle1" gutterBottom>
+                  Selected Influencers:
+                </Typography>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ mb: 3, flexWrap: "wrap", gap: 1 }}
+                >
+                  {selectedInfluencers.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      No influencers selected
+                    </Typography>
+                  ) : (
+                    selectedInfluencers.map((influencer) => (
+                      <Chip
+                        key={influencer.id}
+                        label={influencer.name}
+                        onDelete={() => handleRemoveInfluencer(influencer.id)}
+                        sx={{ mb: 1 }}
+                      />
+                    ))
+                  )}
+                </Stack>
+                <Typography variant="subtitle1" gutterBottom>
+                  Select Audio :
+                </Typography>
+                {/* Audio File Input */}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    name="audioFile"
+                    type="file"
+                    onChange={handleFileChange}
+                    inputProps={{ accept: ".mp3, .wav" }}
+                    sx={{ mb: 3 }}
+                  />
                 </Box>
-              </Box>
+                <Typography variant="subtitle1" gutterBottom>
+                  Select Video :
+                </Typography>
+                {/* Video File Input */}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    name="videoFile"
+                    type="file"
+                    onChange={handleFileChange}
+                    inputProps={{ accept: "video/mp4, video/avi, video/mov" }}
+                    sx={{ mb: 3 }}
+                  />
+                </Box>
+                <Typography variant="subtitle1" gutterBottom>
+                  Select Photos :
+                </Typography>
+                {/* Photo Input */}
+                <Box sx={{ mb: 3 }}>
+                  <input
+                    type="file"
+                    name="photos"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                  <Box sx={{ mt: 2 }}>
+                    {formData.photos.map((photo, index) => (
+                      <img
+                        key={index}
+                        src={URL.createObjectURL(photo)}
+                        alt={`photo-${index}`}
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          marginRight: "8px",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
 
-              <StyledButton
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                disabled={
-                  !formData.brandName ||
-                  !formData.campaignUrl ||
-                  !formData.campaignName ||
-                  !formData.collaborationId ||
-                  !formData.campaignDescription ||
-                  selectedInfluencers.length === 0 ||
-                  !formData.audioFile ||
-                  !formData.videoFile ||
-                  formData.photos.length === 0
-                }
-              >
-                Submit Campaign
-              </StyledButton>
-            </form>
+                <StyledButton
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  disabled={
+                    !formData.brandName ||
+                    !formData.campaignUrl ||
+                    !formData.campaignName ||
+                    !formData.collaborationId ||
+                    !formData.campaignDescription ||
+                    selectedInfluencers.length === 0 ||
+                    !formData.audioFile ||
+                    !formData.videoFile ||
+                    formData.photos.length === 0
+                  }
+                >
+                  Submit Campaign
+                </StyledButton>
+              </form>
 
-            {submitted && (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                Campaign submitted successfully!
-              </Alert>
-            )}
-          </StyledPaper>
+              {submitted && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  Campaign submitted successfully!
+                </Alert>
+              )}
+            </StyledPaper>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
+      {page == "new-order-with-packages" && (
+        <Grid container spacing={4}>
+          <Container maxWidth="xl">
+            {loading && <MusicLoader />}
+            <Typography
+              variant="h3"
+              align="center"
+              gutterBottom
+              sx={{
+                fontWeight: 700,
+                background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 2,
+              }}
+            >
+              Packages
+            </Typography>
+            <Typography
+              variant="h6"
+              align="center"
+              color="text.secondary"
+              sx={{
+                mb: 6,
+                maxWidth: 600,
+                mx: "auto",
+                lineHeight: 1.6,
+              }}
+            >
+              Add new packages to your platform
+            </Typography>
+
+            <Grid container spacing={4}>
+              {packages.length > 0 &&
+                packages.map((pkg) => (
+                  <Grid item xs={12} sm={6} md={3} key={pkg.id}>
+                    <StyledCard
+                      isSelected={selectedPackage === pkg.id}
+                      onClick={() => handlePackageSelect(pkg.id)}
+                      tabIndex={0}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") handlePackageSelect(pkg.id);
+                      }}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        <Typography
+                          variant="h5"
+                          gutterBottom
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.primary.main,
+                          }}
+                        >
+                          {pkg.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            mb: 3,
+                            minHeight: 48,
+                          }}
+                        >
+                          {pkg.description}
+                        </Typography>
+                        <Box sx={{ mb: 3 }}>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              textDecoration: "line-through",
+                              color: "text.secondary",
+                              fontSize: "0.9rem",
+                            }}
+                          >
+                            ₹{pkg.originalPrice}/month
+                          </Typography>
+                          <Typography
+                            variant="h5"
+                            color="primary"
+                            sx={{
+                              fontWeight: 700,
+                              my: 1,
+                            }}
+                          >
+                            ₹{pkg.discountedPrice}
+                          </Typography>
+                          <Chip
+                            label={`Save ${Number.parseInt(
+                              (pkg.discountedPrice / pkg.originalPrice) * 100
+                            )}%`}
+                            color="primary"
+                            size="small"
+                            sx={{
+                              borderRadius: 1,
+                              fontWeight: 600,
+                            }}
+                          />
+                        </Box>
+                        <Box sx={{ mt: 3 }}>
+                          <Tooltip key={1} title={"Included"}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                my: 1.5,
+                                opacity: 1,
+                                transition: "opacity 0.3s ease",
+                              }}
+                            >
+                              <FaCheck
+                                style={{ color: theme.palette.success.main }}
+                              />
+
+                              <Typography sx={{ ml: 1.5, fontSize: "0.95rem" }}>
+                                {pkg.selectedInf.length} Selected Influencers
+                              </Typography>
+                            </Box>
+                          </Tooltip>
+                        </Box>
+                      </CardContent>
+                    </StyledCard>
+                  </Grid>
+                ))}
+            </Grid>
+          </Container>
+
+          <Grid item xs={12} md={12}>
+            <StyledPaper>
+              <Typography variant="h6" gutterBottom>
+                Campaign Details
+              </Typography>
+              <form onSubmit={handleSubmit}>
+                <TextField
+                  fullWidth
+                  label="Brand Name"
+                  name="brandName"
+                  value={formData.brandName}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Campaign Name"
+                  name="campaignName"
+                  value={formData.campaignName}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Collaboration ID"
+                  name="collaborationId"
+                  value={formData.collaborationId}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Campaign URL"
+                  name="campaignUrl"
+                  value={formData.campaignUrl}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Campaign Description"
+                  name="campaignDescription"
+                  value={formData.campaignDescription}
+                  onChange={handleInputChange}
+                  required
+                  multiline
+                  rows={4}
+                  sx={{ mb: 3 }}
+                />
+
+                {page == "new-order-without-packages" && (
+                  <>
+                    {" "}
+                    <Typography variant="subtitle1" gutterBottom>
+                      Selected Influencers:
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mb: 3, flexWrap: "wrap", gap: 1 }}
+                    >
+                      {selectedInfluencers.length === 0 ? (
+                        <Typography variant="body2" color="text.secondary">
+                          No influencers selected
+                        </Typography>
+                      ) : (
+                        selectedInfluencers.map((influencer) => (
+                          <Chip
+                            key={influencer.id}
+                            label={influencer.name}
+                            onDelete={() =>
+                              handleRemoveInfluencer(influencer.id)
+                            }
+                            sx={{ mb: 1 }}
+                          />
+                        ))
+                      )}
+                    </Stack>
+                  </>
+                )}
+
+                <Typography variant="subtitle1" gutterBottom>
+                  Select Audio :
+                </Typography>
+                {/* Audio File Input */}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    name="audioFile"
+                    type="file"
+                    onChange={handleFileChange}
+                    inputProps={{ accept: ".mp3, .wav" }}
+                    sx={{ mb: 3 }}
+                  />
+                </Box>
+                <Typography variant="subtitle1" gutterBottom>
+                  Select Video :
+                </Typography>
+                {/* Video File Input */}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    name="videoFile"
+                    type="file"
+                    onChange={handleFileChange}
+                    inputProps={{ accept: "video/mp4, video/avi, video/mov" }}
+                    sx={{ mb: 3 }}
+                  />
+                </Box>
+                <Typography variant="subtitle1" gutterBottom>
+                  Select Photos :
+                </Typography>
+                {/* Photo Input */}
+                <Box sx={{ mb: 3 }}>
+                  <input
+                    type="file"
+                    name="photos"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                  <Box sx={{ mt: 2 }}>
+                    {formData.photos.map((photo, index) => (
+                      <img
+                        key={index}
+                        src={URL.createObjectURL(photo)}
+                        alt={`photo-${index}`}
+                        style={{
+                          width: "80px",
+                          height: "80px",
+                          marginRight: "8px",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+
+                <StyledButton
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  disabled={
+                    !formData.brandName ||
+                    !formData.campaignUrl ||
+                    !formData.campaignName ||
+                    !formData.collaborationId ||
+                    !formData.campaignDescription ||
+                    selectedInfluencers.length === 0 ||
+                    !formData.audioFile ||
+                    !formData.videoFile ||
+                    formData.photos.length === 0
+                  }
+                >
+                  Submit Campaign
+                </StyledButton>
+              </form>
+
+              {submitted && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  Campaign submitted successfully!
+                </Alert>
+              )}
+            </StyledPaper>
+          </Grid>
+        </Grid>
+      )}
     </Container>
   );
 };
