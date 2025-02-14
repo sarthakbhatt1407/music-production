@@ -158,7 +158,7 @@ const AdminOrderDetails = () => {
           },
           body: JSON.stringify({
             orderId: id,
-            remark: remarkInf,
+            remark: "Admin - " + remarkInf,
             infId: selInfRej,
           }),
         }
@@ -446,41 +446,43 @@ const AdminOrderDetails = () => {
       {loading && <MusicLoader />}
       {order && (
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <ImageSlider>
-              <SliderImage
-                src={`${process.env.REACT_APP_BASE_URL}/${
-                  order.images.split(", ")[currentImage]
-                }`}
-                alt={`Campaign Image ${currentImage + 1}`}
-                loading="lazy"
-              />
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  left: 8,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "background.paper",
-                }}
-                onClick={handlePrevImage}
-              >
-                <FiChevronLeft />
-              </IconButton>
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  right: 8,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "background.paper",
-                }}
-                onClick={handleNextImage}
-              >
-                <FiChevronRight />
-              </IconButton>
-            </ImageSlider>
-          </Grid>
+          {order.images.length > 2 && (
+            <Grid item xs={12}>
+              <ImageSlider>
+                <SliderImage
+                  src={`${process.env.REACT_APP_BASE_URL}/${
+                    order.images.split(", ")[currentImage]
+                  }`}
+                  alt={`Campaign Image ${currentImage + 1}`}
+                  loading="lazy"
+                />
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    left: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: "background.paper",
+                  }}
+                  onClick={handlePrevImage}
+                >
+                  <FiChevronLeft />
+                </IconButton>
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: "background.paper",
+                  }}
+                  onClick={handleNextImage}
+                >
+                  <FiChevronRight />
+                </IconButton>
+              </ImageSlider>
+            </Grid>
+          )}
           <Grid item xs={12} md={6}>
             <StyledCard>
               <CardContent>
@@ -493,33 +495,50 @@ const AdminOrderDetails = () => {
                 <Typography variant="subtitle1">
                   Campaign: {order.campaignName}
                 </Typography>
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                  }}
+                >
+                  Campaign Url:{" "}
+                  <Link to={order.campaignUrl} target="_blank">
+                    <LinkOutlined />
+                  </Link>
+                </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Collaboration ID: {order.collaborationId}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Description: {order.campaignDescription}
                 </Typography>
-
-                {/* Audio Section */}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    margin: "1rem 0",
-                    gap: "1rem",
-                  }}
-                >
-                  Audio :
-                  <AudioPlayer
-                    src={`${process.env.REACT_APP_BASE_URL}/${order.audio}`}
-                    onPlay={(e) => console.log("onPlay")}
-                    style={{ width: "80%", borderRadius: "8px" }}
-                  />
-                </Typography>
-                <Divider />
-                {/* Video Section */}
+              </CardContent>
+              {order.audio.length > 2 && (
+                <>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      margin: "1rem 0",
+                      gap: "1rem",
+                    }}
+                  >
+                    Audio :
+                    <AudioPlayer
+                      src={`${process.env.REACT_APP_BASE_URL}/${order.audio}`}
+                      onPlay={(e) => console.log("onPlay")}
+                      style={{ width: "80%", borderRadius: "8px" }}
+                    />
+                  </Typography>
+                  <Divider />
+                </>
+              )}
+              {/* Video Section */}
+              {order.video.length > 2 && (
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -542,7 +561,7 @@ const AdminOrderDetails = () => {
                     }}
                   />
                 </Typography>
-              </CardContent>
+              )}
             </StyledCard>
           </Grid>
 

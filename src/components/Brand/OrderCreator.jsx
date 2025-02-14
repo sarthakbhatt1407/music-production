@@ -73,8 +73,8 @@ const OrderCreator = () => {
     campaignName: "",
     collaborationId: "",
     campaignDescription: "",
-    audioFile: null,
-    videoFile: null,
+    audioFile: "",
+    videoFile: "null",
     photos: [],
     campaignUrl: "",
   });
@@ -515,10 +515,10 @@ const OrderCreator = () => {
                     !formData.campaignName ||
                     !formData.collaborationId ||
                     !formData.campaignDescription ||
-                    selectedInfluencers.length === 0 ||
-                    !formData.audioFile ||
-                    !formData.videoFile ||
-                    formData.photos.length === 0
+                    selectedInfluencers.length === 0
+                    // !formData.audioFile ||
+                    // !formData.videoFile ||
+                    // formData.photos.length === 0
                   }
                 >
                   Submit Campaign
@@ -814,10 +814,10 @@ const OrderCreator = () => {
                     !formData.campaignName ||
                     !formData.collaborationId ||
                     !formData.campaignDescription ||
-                    selectedInfluencers.length === 0 ||
-                    !formData.audioFile ||
-                    !formData.videoFile ||
-                    formData.photos.length === 0
+                    selectedInfluencers.length === 0
+                    // !formData.audioFile ||
+                    // !formData.videoFile ||
+                    // formData.photos.length === 0
                   }
                 >
                   Submit Campaign

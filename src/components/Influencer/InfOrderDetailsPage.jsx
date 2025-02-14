@@ -22,7 +22,7 @@ import { styled } from "@mui/system";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
-import { Popconfirm } from "antd";
+import { message, Popconfirm } from "antd";
 import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
@@ -165,6 +165,10 @@ const InfOrderDetailsPage = () => {
   };
 
   const handleConfirmReject = async () => {
+    if (remark.length < 1) {
+      message.error("Please provide a remark for rejecting the order.");
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/inf/edit-order`,
@@ -210,6 +214,10 @@ const InfOrderDetailsPage = () => {
   };
 
   const handleConfirmComplete = async () => {
+    if (link.length < 4) {
+      message.error("Please provide a link to the completed order.");
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/inf/edit-order`,
@@ -244,41 +252,43 @@ const InfOrderDetailsPage = () => {
       {loading && <MusicLoader />}
       {order && brandOrder && (
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <ImageSlider>
-              <SliderImage
-                src={`${process.env.REACT_APP_BASE_URL}/${
-                  order.images.split(", ")[currentImage]
-                }`}
-                alt={`Campaign Image ${currentImage + 1}`}
-                loading="lazy"
-              />
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  left: 8,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "background.paper",
-                }}
-                onClick={handlePrevImage}
-              >
-                <FiChevronLeft />
-              </IconButton>
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  right: 8,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "background.paper",
-                }}
-                onClick={handleNextImage}
-              >
-                <FiChevronRight />
-              </IconButton>
-            </ImageSlider>
-          </Grid>
+          {order.images.length > 2 && (
+            <Grid item xs={12}>
+              <ImageSlider>
+                <SliderImage
+                  src={`${process.env.REACT_APP_BASE_URL}/${
+                    order.images.split(", ")[currentImage]
+                  }`}
+                  alt={`Campaign Image ${currentImage + 1}`}
+                  loading="lazy"
+                />
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    left: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: "background.paper",
+                  }}
+                  onClick={handlePrevImage}
+                >
+                  <FiChevronLeft />
+                </IconButton>
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: "background.paper",
+                  }}
+                  onClick={handleNextImage}
+                >
+                  <FiChevronRight />
+                </IconButton>
+              </ImageSlider>
+            </Grid>
+          )}
           <Grid item xs={12} md={6}>
             <StyledCard>
               <CardContent>
@@ -290,12 +300,19 @@ const InfOrderDetailsPage = () => {
                 </Typography>
                 <Typography variant="subtitle1">
                   Campaign: {order.campaignName}
-                </Typography>
-                <Typography variant="subtitle1" color="text.secondary">
-                  Collaboration ID: {brandOrder.collaborationId}
-                </Typography>
-                <Typography variant="subtitle1" color="text.secondary">
-                  {order.campaignDescription}
+                </Typography>{" "}
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                  }}
+                >
+                  Campaign Url:{" "}
+                  <Link to={brandOrder.campaignUrl} target="_blank">
+                    <LinkOutlined />
+                  </Link>
                 </Typography>
                 {order.status == "completed" && (
                   <Typography
@@ -312,6 +329,12 @@ const InfOrderDetailsPage = () => {
                     </Link>
                   </Typography>
                 )}
+                <Typography variant="subtitle1" color="text.secondary">
+                  Collaboration ID: {brandOrder.collaborationId}
+                </Typography>
+                <Typography variant="subtitle1" color="text.secondary">
+                  {order.campaignDescription}
+                </Typography>
                 {order.status === "rejected" && (
                   <>
                     <Typography
@@ -358,48 +381,85 @@ const InfOrderDetailsPage = () => {
                 Campaign Files
               </Typography>
 
-              {/* Audio Section */}
-              <Typography
-                variant="subtitle1"
-                color="text.secondary"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  margin: "1rem 0",
-                  gap: "1rem",
-                }}
-              >
-                Audio :
-                <AudioPlayer
-                  src={`${process.env.REACT_APP_BASE_URL}/${brandOrder.audio}`}
-                  onPlay={(e) => console.log("onPlay")}
-                  style={{ width: "80%", borderRadius: "8px" }}
-                />
-              </Typography>
-              <Divider />
+              {brandOrder.audio.length > 2 && (
+                <>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      margin: "1rem 0",
+                      gap: "1rem",
+                    }}
+                  >
+                    Audio :
+                    <AudioPlayer
+                      src={`${process.env.REACT_APP_BASE_URL}/${brandOrder.audio}`}
+                      onPlay={(e) => console.log("onPlay")}
+                      style={{ width: "80%", borderRadius: "8px" }}
+                    />
+                  </Typography>
+                  <Divider />
+                </>
+              )}
               {/* Video Section */}
-              <Typography
-                variant="subtitle1"
-                color="text.secondary"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  margin: "1rem 0",
-                  gap: "1rem",
-                }}
-              >
-                Video :
-                <video
-                  src={`${process.env.REACT_APP_BASE_URL}/${brandOrder.video}`}
-                  controls
+              {brandOrder.video.length > 2 && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
                   style={{
-                    width: "80%",
-                    borderRadius: "8px",
-                    height: "10rem",
-                    margin: "1rem 0 ",
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "1rem 0",
+                    gap: "1rem",
                   }}
-                />
-              </Typography>
+                >
+                  Video :
+                  <video
+                    src={`${process.env.REACT_APP_BASE_URL}/${brandOrder.video}`}
+                    controls
+                    style={{
+                      width: "80%",
+                      borderRadius: "8px",
+                      height: "10rem",
+                      margin: "1rem 0 ",
+                    }}
+                  />
+                </Typography>
+              )}
+              {brandOrder.audio.length < 2 && (
+                <>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      margin: "1rem 0",
+                      gap: "1rem",
+                    }}
+                  >
+                    Audio : N/A
+                  </Typography>
+                  <Divider />
+                </>
+              )}
+              {/* Video Section */}
+              {brandOrder.video.length < 2 && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "1rem 0",
+                    gap: "1rem",
+                  }}
+                >
+                  Video : N/A
+                </Typography>
+              )}
             </Paper>
           </Grid>
 
@@ -483,7 +543,7 @@ const InfOrderDetailsPage = () => {
               </Button>
             </Box>
           )}
-          {order.status === "rejected" && (
+          {order.status === "rejected" && order.remark.includes("Admin") && (
             <Box
               sx={{
                 mt: 2,

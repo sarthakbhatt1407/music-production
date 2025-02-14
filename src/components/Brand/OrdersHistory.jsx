@@ -138,24 +138,25 @@ const OrdersHistory = () => {
       width: 70,
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <img
-            src={`${process.env.REACT_APP_BASE_URL}/${
-              params.row.images.split(",")[0]
-            }`}
-            alt="Campaign"
-            style={{
-              width: 40,
-              height: 40,
-              objectFit: "cover",
-              borderRadius: 4,
-            }}
-            onClick={() => setSelectedImage(params.value)}
-            onError={(e) => {
-              e.target.src = `${process.env.REACT_APP_BASE_URL}/${
-                params.images.split(",")[0]
-              }`;
-            }}
-          />
+          {params.row.images.length > 1 && (
+            <img
+              src={`${process.env.REACT_APP_BASE_URL}/${
+                params.row.images.split(",")[0]
+              }`}
+              alt="Campaign"
+              style={{
+                width: 40,
+                height: 40,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+              onError={(e) => {
+                e.target.src = `${process.env.REACT_APP_BASE_URL}/${
+                  params.images.split(",")[0]
+                }`;
+              }}
+            />
+          )}
         </div>
       ),
     },

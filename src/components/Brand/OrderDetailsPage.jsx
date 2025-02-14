@@ -354,41 +354,43 @@ const OrderDetailsPage = () => {
       {loading && <MusicLoader />}
       {order && (
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <ImageSlider>
-              <SliderImage
-                src={`${process.env.REACT_APP_BASE_URL}/${
-                  order.images.split(", ")[currentImage]
-                }`}
-                alt={`Campaign Image ${currentImage + 1}`}
-                loading="lazy"
-              />
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  left: 8,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "background.paper",
-                }}
-                onClick={handlePrevImage}
-              >
-                <FiChevronLeft />
-              </IconButton>
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  right: 8,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "background.paper",
-                }}
-                onClick={handleNextImage}
-              >
-                <FiChevronRight />
-              </IconButton>
-            </ImageSlider>
-          </Grid>
+          {order.images.length > 2 && (
+            <Grid item xs={12}>
+              <ImageSlider>
+                <SliderImage
+                  src={`${process.env.REACT_APP_BASE_URL}/${
+                    order.images.split(", ")[currentImage]
+                  }`}
+                  alt={`Campaign Image ${currentImage + 1}`}
+                  loading="lazy"
+                />
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    left: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: "background.paper",
+                  }}
+                  onClick={handlePrevImage}
+                >
+                  <FiChevronLeft />
+                </IconButton>
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: "background.paper",
+                  }}
+                  onClick={handleNextImage}
+                >
+                  <FiChevronRight />
+                </IconButton>
+              </ImageSlider>
+            </Grid>
+          )}
           <Grid item xs={12} md={6}>
             <StyledCard>
               <CardContent>
@@ -400,6 +402,19 @@ const OrderDetailsPage = () => {
                 </Typography>
                 <Typography variant="subtitle1">
                   Campaign: {order.campaignName}
+                </Typography>{" "}
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                  }}
+                >
+                  Campaign Url:{" "}
+                  <Link to={order.campaignUrl} target="_blank">
+                    <LinkOutlined />
+                  </Link>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Collaboration ID: {order.collaborationId}
@@ -407,49 +422,54 @@ const OrderDetailsPage = () => {
                 <Typography variant="body2" color="text.secondary">
                   Description: {order.campaignDescription}
                 </Typography>
-
                 {/* Audio Section */}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    margin: "1rem 0",
-                    gap: "1rem",
-                  }}
-                >
-                  Audio :
-                  <AudioPlayer
-                    src={`${process.env.REACT_APP_BASE_URL}/${order.audio}`}
-                    onPlay={(e) => console.log("onPlay")}
-                    style={{ width: "80%", borderRadius: "8px" }}
-                  />
-                </Typography>
-                <Divider />
+                {order.audio.length > 2 && (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: "1rem 0",
+                        gap: "1rem",
+                      }}
+                    >
+                      Audio :
+                      <AudioPlayer
+                        src={`${process.env.REACT_APP_BASE_URL}/${order.audio}`}
+                        onPlay={(e) => console.log("onPlay")}
+                        style={{ width: "80%", borderRadius: "8px" }}
+                      />
+                    </Typography>
+                    <Divider />
+                  </>
+                )}
                 {/* Video Section */}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    margin: "1rem 0",
-                    gap: "1rem",
-                  }}
-                >
-                  Video :
-                  <video
-                    src={`${process.env.REACT_APP_BASE_URL}/${order.video}`}
-                    controls
+                {order.video.length > 2 && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
                     style={{
-                      width: "80%",
-                      borderRadius: "8px",
-                      height: "10rem",
-                      margin: "1rem 0 ",
+                      display: "flex",
+                      alignItems: "center",
+                      margin: "1rem 0",
+                      gap: "1rem",
                     }}
-                  />
-                </Typography>
+                  >
+                    Video :
+                    <video
+                      src={`${process.env.REACT_APP_BASE_URL}/${order.video}`}
+                      controls
+                      style={{
+                        width: "80%",
+                        borderRadius: "8px",
+                        height: "10rem",
+                        margin: "1rem 0 ",
+                      }}
+                    />
+                  </Typography>
+                )}
               </CardContent>
             </StyledCard>
           </Grid>
@@ -517,6 +537,7 @@ const OrderDetailsPage = () => {
                         fontWeight: "bold",
                         borderRadius: "8px",
                         padding: "10px 20px",
+                        marginBottom: "1rem",
                         "&:hover": {
                           backgroundColor: "#574dcf",
                         },
@@ -524,6 +545,10 @@ const OrderDetailsPage = () => {
                     >
                       Pay Now
                     </Button>
+                    <Typography variant="body2" color="#d65757">
+                      (If paid, wait for a while to get the payment status
+                      updated or refresh the page)
+                    </Typography>
                   </>
                 )}
               {order.paymentStatus != "completed" &&
