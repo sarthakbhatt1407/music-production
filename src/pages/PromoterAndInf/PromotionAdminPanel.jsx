@@ -9,9 +9,12 @@ import Users from "../../components/PromotionAdmin/Users";
 import AdminUserProfile from "../../components/PromotionAdmin/AdminUserProfile";
 import UserWallet from "../../components/PromotionAdmin/UserWallet";
 import Packages from "../../components/PromotionAdmin/Packages";
+import AdminNoti from "../../components/PromotionAdmin/AdminNoti";
 
 const PromotionAdminPanel = () => {
   const page = useParams().page;
+  console.log(page);
+
   const id = useParams().id;
   const action = useParams().action;
   useEffect(() => {}, [page]);
@@ -25,6 +28,7 @@ const PromotionAdminPanel = () => {
         {page === "users" && <Users />}
         {page === "packages" && <Packages />}
         {page === "wallet" && id && <UserWallet />}
+        {page === "notification" && <AdminNoti />}
         {(page === "influencer" || page == "promoter") && id && (
           <AdminUserProfile />
         )}

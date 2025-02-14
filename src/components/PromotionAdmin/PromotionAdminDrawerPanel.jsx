@@ -7,6 +7,7 @@ import {
   UserOutlined,
   FormOutlined,
   ProfileOutlined,
+  NotificationOutlined,
 } from "@ant-design/icons";
 
 import { Dropdown, Space } from "antd";
@@ -82,7 +83,7 @@ const PromotionAdminDrawerPanel = (props) => {
     if (page === "profile") {
       return ["5"];
     }
-    if (page === "pending-work") {
+    if (page === "notification") {
       return ["6"];
     }
     if (page === "all-users") {
@@ -175,6 +176,18 @@ const PromotionAdminDrawerPanel = (props) => {
                 </Link>
               ),
               label: "Users",
+            },
+            {
+              key: "6",
+              icon: (
+                <Link
+                  to={"/admin-admin-panel/notification"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <NotificationOutlined />
+                </Link>
+              ),
+              label: "Notification",
             },
             {
               key: "5",

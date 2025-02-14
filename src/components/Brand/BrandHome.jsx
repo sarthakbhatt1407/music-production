@@ -20,6 +20,7 @@ import { useState, useEffect } from "react";
 import { Breadcrumb } from "antd";
 import { BiRupee } from "react-icons/bi";
 import { useSelector } from "react-redux";
+import UserNotiBanner from "../UserNotiBanner";
 
 const StyledCard = styled(Card)(({ theme, color }) => ({
   padding: "28px",
@@ -145,6 +146,25 @@ const BrandHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userId = useSelector((state) => state.userId);
+
+  const [noti, setNoti] = useState(null);
+  const fetcher = async () => {
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/brand/get-all-notification`
+    );
+    const data = await res.json();
+
+    if (res.ok) {
+      console.log(data.notifications);
+      setNoti(data.notifications[0]);
+    }
+  };
+
+  useEffect(() => {
+    fetcher();
+
+    return () => {};
+  }, []);
   useEffect(() => {
     const getBrandHomeData = async () => {
       setLoading(true);
@@ -207,6 +227,7 @@ const BrandHome = () => {
           },
         ]}
       />
+      {noti && <UserNotiBanner text={noti.des} />}
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard

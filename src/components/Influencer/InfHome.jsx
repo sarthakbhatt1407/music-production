@@ -23,6 +23,7 @@ import { Breadcrumb } from "antd";
 import { BiRupee } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
+import UserNotiBanner from "../UserNotiBanner";
 
 const StyledCard = styled(Card)(({ theme, color }) => ({
   padding: "28px",
@@ -149,6 +150,25 @@ const InfHome = () => {
   const [error, setError] = useState(null);
   const userId = useSelector((state) => state.userId);
   const [user, setUser] = useState(null);
+
+  const [noti, setNoti] = useState(null);
+  const fetcher = async () => {
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/brand/get-all-notification`
+    );
+    const data = await res.json();
+
+    if (res.ok) {
+      console.log(data.notifications);
+      setNoti(data.notifications[0]);
+    }
+  };
+
+  useEffect(() => {
+    fetcher();
+
+    return () => {};
+  }, []);
   const updatePayment = async (paymentOrderId) => {
     setLoading(true);
     const resPay = await fetch(
@@ -367,7 +387,7 @@ const InfHome = () => {
           },
         ]}
       />
-
+      {noti && <UserNotiBanner text={noti.des} />}
       {user && user.paymentStatus != "completed" && (
         <Alert severity="warning" sx={{ mb: 2 }}>
           Your payment is pending. Please complete the payment to access your
