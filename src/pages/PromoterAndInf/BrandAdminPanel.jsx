@@ -14,6 +14,7 @@ const BrandAdminPanel = () => {
   const page = useParams().page;
   const id = useParams().id;
   const action = useParams().action;
+
   useEffect(() => {}, [page]);
   return (
     <div>

@@ -155,7 +155,7 @@ const OrderCreator = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // setLoading(true);
+    setLoading(true);
 
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("brandName", formData.brandName);
