@@ -169,6 +169,7 @@ const InfOrderDetailsPage = () => {
       message.error("Please provide a remark for rejecting the order.");
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/inf/edit-order`,
@@ -195,6 +196,7 @@ const InfOrderDetailsPage = () => {
     } catch (error) {
       console.error("Error rejecting order:", error);
     }
+    setLoading(false);
   };
 
   const handleReject = () => {
@@ -218,6 +220,7 @@ const InfOrderDetailsPage = () => {
       message.error("Please provide a link to the completed order.");
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/inf/edit-order`,
@@ -242,6 +245,7 @@ const InfOrderDetailsPage = () => {
       console.log(data.order);
       setOpenCompleteModal(false);
     } catch (error) {}
+    setLoading(false);
   };
 
   return (

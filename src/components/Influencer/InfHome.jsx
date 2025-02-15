@@ -459,6 +459,16 @@ const InfHome = () => {
                 error={error}
               />
             </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <MetricCard
+                title="Rejected Order"
+                value={metrics?.rejectOrder}
+                icon={FiRefreshCw}
+                color={theme.palette.info.main}
+                loading={loading}
+                error={error}
+              />
+            </Grid>
           </Grid>
         )}
     </Container>

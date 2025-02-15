@@ -148,6 +148,7 @@ const AdminOrderDetails = () => {
     if (!selInfRej) {
       message.error("Error rejecting influencer.");
     }
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/brand/reject-inf-order`,
@@ -178,6 +179,7 @@ const AdminOrderDetails = () => {
     } catch (error) {
       console.error("Error rejecting order:", error);
     }
+    setLoading(false);
   };
   const fetchOrderById = async () => {
     setLoading(true);

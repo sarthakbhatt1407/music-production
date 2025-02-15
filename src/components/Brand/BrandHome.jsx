@@ -272,6 +272,17 @@ const BrandHome = () => {
             error={error}
           />
         </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <MetricCard
+            title="Rejected Orders"
+            value={metrics?.rejectOrder}
+            icon={FiRefreshCw}
+            color={theme.palette.info.main}
+            loading={loading}
+            error={error}
+          />
+        </Grid>
         {/* 
         <Grid item xs={12} sm={6} md={4}>
           <MetricCard

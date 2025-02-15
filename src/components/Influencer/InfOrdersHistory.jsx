@@ -499,6 +499,7 @@ const InfOrdersHistory = () => {
                       <MenuItem value="pending">Pending</MenuItem>
                       <MenuItem value="in process">In Process</MenuItem>
                       <MenuItem value="completed">Completed</MenuItem>
+                      <MenuItem value="rejected">Rejected</MenuItem>
                     </Select>
                   </FormControl>
                 </FilterContainer>
