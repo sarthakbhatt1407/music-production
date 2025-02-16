@@ -131,8 +131,9 @@ const ProAndInfLogin = () => {
 
   const demoLogin = async () => {
     // const contactNum = "7895603314";
-    const contactNum = "8630435041";
-    // const contactNum = "7088360325";
+    // const contactNum = "8630435041";
+    const contactNum = "8126770620";
+    // const contactNum = "9149354760";
     // const contactNum = "8755684261";
     // const contactNum = "7251890867";
     const res = await fetch(
@@ -246,10 +247,13 @@ const ProAndInfLogin = () => {
           setTimeout(() => {
             dispatch({ type: "log in", data: { ...loginData } });
             if (loginData.user.userType === "promoter") {
-              navigate("/promotor-admin-panel/new-order");
+              navigate("/promotor-admin-panel/home");
             }
             if (loginData.user.userType === "influencer") {
-              navigate("/influencer-admin-panel/orders");
+              navigate("/influencer-admin-panel/home");
+            }
+            if (loginData.user.userType === "admin") {
+              navigate("/admin-admin-panel/home");
             }
           }, 700);
         }
@@ -383,7 +387,7 @@ const ProAndInfLogin = () => {
             }}
             id="otpless-login-page"
           ></div>
-          <button onClick={demoLogin}>demo login</button>
+          {/* <button onClick={demoLogin}>demo login</button> */}
         </>
       )}
 

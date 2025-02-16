@@ -271,10 +271,12 @@ const AdminOrderDetails = () => {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
+      console.log(data);
 
       const uniqueUsers = data.users.filter((user) => {
         return !order.selectedInfluencers.some((inf) => inf.id === user.id);
       });
+      console.log(uniqueUsers);
 
       setInfluencers(uniqueUsers);
     } catch (err) {
