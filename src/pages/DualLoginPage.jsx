@@ -102,7 +102,7 @@ const DualLoginPage = () => {
                 align="center"
                 fontWeight={700}
               >
-                Music Production
+                Music Distribution
               </Typography>
               <Typography
                 variant="body1"

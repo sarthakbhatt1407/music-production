@@ -94,7 +94,7 @@ const OrdersHistory = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("pending");
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -273,11 +273,11 @@ const OrdersHistory = () => {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <MenuItem value="all">All Status</MenuItem>
               <MenuItem value="pending">Pending</MenuItem>
               <MenuItem value="in process">In Process</MenuItem>
               <MenuItem value="completed">Completed</MenuItem>
               <MenuItem value="rejected">Rejected</MenuItem>
+              <MenuItem value="all">All</MenuItem>
             </Select>
           </FormControl>
         </FilterContainer>

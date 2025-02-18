@@ -495,11 +495,11 @@ const InfOrdersHistory = () => {
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
                     >
-                      <MenuItem value="all">All Status</MenuItem>
                       <MenuItem value="pending">Pending</MenuItem>
                       <MenuItem value="in process">In Process</MenuItem>
                       <MenuItem value="completed">Completed</MenuItem>
-                      <MenuItem value="rejected">Rejected</MenuItem>
+                      <MenuItem value="rejected">Rejected</MenuItem>{" "}
+                      <MenuItem value="all">All</MenuItem>
                     </Select>
                   </FormControl>
                 </FilterContainer>
