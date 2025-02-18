@@ -85,7 +85,8 @@ const OrderCreator = () => {
   const filteredInfluencers = influencers.filter(
     (influencer) =>
       influencer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      influencer.category.toLowerCase().includes(searchTerm.toLowerCase())
+      influencer.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      influencer.profession.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleInfluencerSelect = (influencer) => {
@@ -305,6 +306,7 @@ const OrderCreator = () => {
                     <TableRow>
                       <TableCell>Influencer</TableCell>
                       <TableCell>Category</TableCell>
+                      <TableCell>State</TableCell>
                       <TableCell>Social Media </TableCell>
 
                       <TableCell align="center">Action</TableCell>
@@ -336,6 +338,7 @@ const OrderCreator = () => {
                           </Box>
                         </TableCell>
                         <TableCell>{influencer.profession}</TableCell>{" "}
+                        <TableCell>{influencer.state}</TableCell>{" "}
                         <TableCell align="center">
                           <Link to={influencer.socialMediaUrl} target="_blank">
                             <LinkOutlined />

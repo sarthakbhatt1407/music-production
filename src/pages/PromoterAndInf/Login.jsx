@@ -38,8 +38,10 @@ const StyledPaper = styled.div`
 
 const LoginBox = styled.div`
   margin-top: 1rem;
-
-  max-height: fit-content;
+  display: flex;
+  height: 90svh;
+  justify-content: center;
+  align-items: center;
 
   div {
     z-index: 1000000;
@@ -129,13 +131,13 @@ const ProAndInfLogin = () => {
   };
 
   const demoLogin = async () => {
-    // const contactNum = "7895603314";
+    const contactNum = "7895603314";
     // const contactNum = "8630435041";
     // const contactNum = "8126770620";
     // const contactNum = "9149354760";
     // const contactNum = "8755684261";
     // const contactNum = "7251890867";
-    const contactNum = "9149354760";
+    // const contactNum = "9149354760";
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
       {
@@ -419,20 +421,20 @@ const ProAndInfLogin = () => {
     <MainBox>
       {contextHolder}
       {spinning && <MusicLoader />}
-      {userExist && (
-        <>
-          <div
-            style={{
-              zIndex: "1000",
-            }}
-            id="otpless-login-page"
-          ></div>
-          <button onClick={demoLogin}>demo login</button>
-        </>
-      )}
 
-      {!userExist && (
-        <LoginBox>
+      <LoginBox>
+        {userExist && (
+          <>
+            <div
+              style={{
+                zIndex: "1000",
+              }}
+              id="otpless-login-page"
+            ></div>
+            <button onClick={demoLogin}>demo login</button>
+          </>
+        )}
+        {!userExist && (
           <Container maxWidth="sm">
             {spinning && <MusicLoader />}
 
@@ -707,8 +709,9 @@ const ProAndInfLogin = () => {
               </Box>
             </Fade>
           </Container>
-        </LoginBox>
-      )}
+        )}
+      </LoginBox>
+
       <Footer />
     </MainBox>
   );
