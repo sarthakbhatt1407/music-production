@@ -433,7 +433,7 @@ const AdminUserProfile = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Social Media URL"
+                    label="Instagram URL"
                     value={formData.socialMediaUrl}
                     onChange={(e) =>
                       handleInputChange("socialMediaUrl", e.target.value)

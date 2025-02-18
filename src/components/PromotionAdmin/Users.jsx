@@ -187,6 +187,23 @@ const Users = () => {
       ),
     },
     {
+      field: "status",
+      headerName: "Status",
+      width: 200,
+      renderCell: (params) => (
+        <Typography
+          style={{
+            textTransform: "capitalize",
+          }}
+        >
+          {params.value == "closed" && "Inactive"}
+          {params.value == "active" && "Active"}
+          {params.value == "initial" && "Pending For payment"}
+          {params.value == "for admin approval" && "Admin Approval"}
+        </Typography>
+      ),
+    },
+    {
       field: "userSince",
       headerName: "User Since",
       width: 150,

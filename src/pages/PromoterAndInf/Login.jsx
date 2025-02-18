@@ -52,7 +52,6 @@ const LoginBox = styled.div`
 
 const ProAndInfLogin = () => {
   const [userExist, setUserExists] = useState(true);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [contactNum, setContactNum] = useState("");
@@ -318,6 +317,10 @@ const ProAndInfLogin = () => {
       error("Fill all required fields correctly!");
       return;
     }
+    if (role === "influencer" && formData.price == 0) {
+      error("Fill all required fields correctly!");
+      return;
+    }
 
     setSpinning(true);
 
@@ -502,7 +505,7 @@ const ProAndInfLogin = () => {
                           },
                         }}
                       >
-                        <MenuItem value="promoter">Promoter</MenuItem>
+                        <MenuItem value="promoter">Brand</MenuItem>
                         <MenuItem value="influencer">Influencer</MenuItem>
                       </Select>
                     </FormControl>
@@ -549,14 +552,26 @@ const ProAndInfLogin = () => {
                       <>
                         <FormControl fullWidth sx={{ mb: 3 }}>
                           <TextField
-                            label="Social Media URL"
+                            label="Instagram URL"
                             name="socialMediaUrl"
                             value={formData.socialMediaUrl}
                             onChange={handleChange}
                             variant="outlined"
                           />
                         </FormControl>
-                        {/* <FormControl fullWidth sx={{ mb: 3 }}>
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                          <TextField
+                            label="Price per promotion"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleChange}
+                            variant="outlined"
+                            type="number"
+                            required
+                          />
+                        </FormControl>
+                        {/* 
+                        <FormControl fullWidth sx={{ mb: 3 }}>
                           <TextField
                             label="Price per promotion"
                             name="price"
