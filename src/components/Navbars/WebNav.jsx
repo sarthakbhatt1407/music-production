@@ -17,6 +17,7 @@ import { useSelector } from "react-redux";
 function WebNav({ mode, toggleColorMode }) {
   const isAdmin = useSelector((state) => state.isAdmin);
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const type = useSelector((state) => state.type);
   const [open, setOpen] = React.useState(false);
   const [active, setActive] = React.useState("");
   const toggleDrawer = (newOpen) => () => {
@@ -246,13 +247,13 @@ function WebNav({ mode, toggleColorMode }) {
             >
               {!isLoggedIn && (
                 <Link
-                  to={"/login"}
+                  to={"/select-login"}
                   style={{ textDecoration: "none", color: "white" }}
                 >
                   Sign in
                 </Link>
               )}
-              {isLoggedIn && !isAdmin && (
+              {isLoggedIn && !isAdmin && type == "music-user" && (
                 <Link
                   to={"/user-panel/home"}
                   style={{ textDecoration: "none", color: "white" }}
@@ -260,9 +261,33 @@ function WebNav({ mode, toggleColorMode }) {
                   Dashboard
                 </Link>
               )}
-              {isLoggedIn && isAdmin && (
+              {isLoggedIn && isAdmin && type == "music-admin" && (
                 <Link
                   to={"/admin-panel/orders"}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {type == "influencer" && (
+                <Link
+                  to={"/influencer-admin-panel/home"}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {type == "promoter" && (
+                <Link
+                  to={"/promotor-admin-panel/home"}
+                  style={{ textDecoration: "none", color: "white" }}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {type == "promotion-admin" && (
+                <Link
+                  to={"/admin-admin-panel/home"}
                   style={{ textDecoration: "none", color: "white" }}
                 >
                   Dashboard
@@ -349,24 +374,68 @@ function WebNav({ mode, toggleColorMode }) {
                   >
                     {!isLoggedIn && (
                       <Link
-                        to={"/login"}
+                        to={"/select-login"}
                         style={{ textDecoration: "none", color: "white" }}
                       >
                         Sign in
                       </Link>
                     )}
-                    {isLoggedIn && !isAdmin && (
+                    {isLoggedIn && !isAdmin && type == "music-user" && (
                       <Link
                         to={"/user-panel/home"}
-                        style={{ textDecoration: "none", color: "white" }}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          borderColor: "#fa4801",
+                        }}
                       >
                         Dashboard
                       </Link>
                     )}
-                    {isLoggedIn && isAdmin && (
+                    {isLoggedIn && !isAdmin && type == "music-admin" && (
                       <Link
                         to={"/admin-panel/orders"}
-                        style={{ textDecoration: "none", color: "white" }}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          borderColor: "#fa4801",
+                        }}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    {type == "promoter" && (
+                      <Link
+                        to={"/promotor-admin-panel/home"}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          borderColor: "#fa4801",
+                        }}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    {type == "promotion-admin" && (
+                      <Link
+                        to={"/admin-admin-panel/home"}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          borderColor: "#fa4801",
+                        }}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    {type == "influencer" && (
+                      <Link
+                        to={"/influencer-admin-panel/home"}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          borderColor: "#fa4801",
+                        }}
                       >
                         Dashboard
                       </Link>

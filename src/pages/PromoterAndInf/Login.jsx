@@ -132,10 +132,11 @@ const ProAndInfLogin = () => {
   const demoLogin = async () => {
     // const contactNum = "7895603314";
     // const contactNum = "8630435041";
-    const contactNum = "8126770620";
+    // const contactNum = "8126770620";
     // const contactNum = "9149354760";
     // const contactNum = "8755684261";
     // const contactNum = "7251890867";
+    const contactNum = "9149354760";
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
       {
@@ -170,14 +171,27 @@ const ProAndInfLogin = () => {
 
       if (loginData.isloggedIn) {
         setTimeout(() => {
-          dispatch({ type: "log in", data: { ...loginData } });
-          if (loginData.user.userType === "promoter") {
+          if (loginData.user.userType == "promoter") {
+            dispatch({
+              type: "log in",
+              data: { ...loginData, type: "promoter" },
+            });
             navigate("/promotor-admin-panel/home");
           }
-          if (loginData.user.userType === "influencer") {
+          if (loginData.user.userType == "influencer") {
+            dispatch({
+              type: "log in",
+              data: { ...loginData, type: "influencer" },
+            });
             navigate("/influencer-admin-panel/home");
           }
-          if (loginData.user.userType === "admin") {
+          if (loginData.user.userType == "admin") {
+            console.log(loginData.user.userType);
+
+            dispatch({
+              type: "log in",
+              data: { ...loginData, type: "promotion-admin" },
+            });
             navigate("/admin-admin-panel/home");
           }
         }, 700);
@@ -245,14 +259,27 @@ const ProAndInfLogin = () => {
 
         if (loginData.isloggedIn) {
           setTimeout(() => {
-            dispatch({ type: "log in", data: { ...loginData } });
-            if (loginData.user.userType === "promoter") {
+            if (loginData.user.userType == "promoter") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promoter" },
+              });
               navigate("/promotor-admin-panel/home");
             }
-            if (loginData.user.userType === "influencer") {
+            if (loginData.user.userType == "influencer") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "influencer" },
+              });
               navigate("/influencer-admin-panel/home");
             }
-            if (loginData.user.userType === "admin") {
+            if (loginData.user.userType == "admin") {
+              console.log(loginData.user.userType);
+
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promotion-admin" },
+              });
               navigate("/admin-admin-panel/home");
             }
           }, 700);
@@ -356,17 +383,27 @@ const ProAndInfLogin = () => {
 
       if (loginData.isloggedIn) {
         setTimeout(() => {
-          dispatch({
-            type: "log in",
-            data: { ...loginData },
-          });
-          if (loginData.user.userType === "promoter") {
+          if (loginData.user.userType == "promoter") {
+            dispatch({
+              type: "log in",
+              data: { ...loginData, type: "promoter" },
+            });
             navigate("/promotor-admin-panel/home");
           }
-          if (loginData.user.userType === "influencer") {
+          if (loginData.user.userType == "influencer") {
+            dispatch({
+              type: "log in",
+              data: { ...loginData, type: "influencer" },
+            });
             navigate("/influencer-admin-panel/home");
           }
-          if (loginData.user.userType === "admin") {
+          if (loginData.user.userType == "admin") {
+            console.log(loginData.user.userType);
+
+            dispatch({
+              type: "log in",
+              data: { ...loginData, type: "promotion-admin" },
+            });
             navigate("/admin-admin-panel/home");
           }
         }, 700);
@@ -387,7 +424,7 @@ const ProAndInfLogin = () => {
             }}
             id="otpless-login-page"
           ></div>
-          {/* <button onClick={demoLogin}>demo login</button> */}
+          <button onClick={demoLogin}>demo login</button>
         </>
       )}
 

@@ -4,6 +4,7 @@ const defaultState = {
   userId: "",
   isAdmin: false,
   labelName: "",
+  type: "",
 };
 
 const storeReducer = (state = defaultState, action) => {
@@ -11,6 +12,7 @@ const storeReducer = (state = defaultState, action) => {
     const data = action.data;
 
     const user = data.user;
+    console.log("store", data);
 
     const obj = {
       ...state,
@@ -18,6 +20,7 @@ const storeReducer = (state = defaultState, action) => {
       userId: user.id,
       labelName: user.name,
       isAdmin: user.isAdmin,
+      type: data.type,
     };
 
     localStorage.setItem("state", JSON.stringify(obj));
@@ -27,6 +30,7 @@ const storeReducer = (state = defaultState, action) => {
       userId: user.id,
       labelName: user.name,
       isAdmin: user.isAdmin,
+      type: data.type,
     };
   }
 

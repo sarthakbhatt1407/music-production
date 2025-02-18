@@ -13,6 +13,7 @@ import ReadyToLaunch from "../components/ReadyToLaunch";
 import Footer from "../components/Footer";
 import Clients from "../components/Clients";
 import WebNav from "../components/Navbars/WebNav";
+import SocialMediaPromotion from "../components/SocialMediaPromotion";
 
 const Home = () => {
   const [open, setOpen] = useState(false);
@@ -73,6 +74,7 @@ const Home = () => {
         <BannerText />
         <SevicesHeading data={{ para: "SERVICES", heading: "What We Do" }} />
         <Services />
+        <SocialMediaPromotion />
         <SevicesHeading
           data={{ para: "WHAT Artists SAYS", heading: "Artists" }}
         />

@@ -421,11 +421,12 @@ const Login = () => {
       });
 
       setTimeout(() => {
-        dispatch({ type: "log in", data: { ...data } });
         if (!data.user.isAdmin) {
+          dispatch({ type: "log in", data: { ...data, type: "music-user" } });
           navigate("/user-panel/home");
         }
         if (data.user.isAdmin) {
+          dispatch({ type: "log in", data: { ...data, type: "music-admin" } });
           navigate("/admin-panel/orders");
         }
       }, 1000);

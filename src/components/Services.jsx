@@ -8,7 +8,7 @@ import { Check } from "@mui/icons-material";
 
 const MainBox = styled.div`
   display: flex;
-  width: 87%;
+  width: 80%;
   margin: 0 auto;
   gap: 1rem;
   overflow: hidden;

@@ -13,6 +13,7 @@ import ProAndInfLogin from "./pages/PromoterAndInf/Login";
 import BrandAdminPanel from "./pages/PromoterAndInf/BrandAdminPanel";
 import InfAdminPanel from "./pages/PromoterAndInf/InfAdminPanel";
 import PromotionAdminPanel from "./pages/PromoterAndInf/PromotionAdminPanel";
+import DualLoginPage from "./pages/DualLoginPage";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -99,6 +100,7 @@ const App = () => {
           exact
           element={<BrandAdminPanel />}
         />
+        <Route path="/select-login" exact element={<DualLoginPage />} />
         <Route
           path="/promotor-admin-panel/:page/:id"
           exact
