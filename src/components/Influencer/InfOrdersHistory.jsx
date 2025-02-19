@@ -468,7 +468,8 @@ const InfOrdersHistory = () => {
           user.legalDoc.length < 2 && (
             <Alert severity="warning" sx={{ mb: 2 }}>
               Your profile is currently under review by the admin team. Please
-              check after some time.
+              check after some time. Please complete your profile for faster
+              approval.
             </Alert>
           )}
 

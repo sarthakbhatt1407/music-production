@@ -131,12 +131,12 @@ const ProAndInfLogin = () => {
   };
 
   const demoLogin = async () => {
-    const contactNum = "7895603314";
+    // const contactNum = "7895603314";
     // const contactNum = "8630435041";
     // const contactNum = "8126770620";
     // const contactNum = "9149354760";
     // const contactNum = "8755684261";
-    // const contactNum = "7251890867";
+    const contactNum = "7251890867";
     // const contactNum = "9149354760";
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
@@ -328,8 +328,8 @@ const ProAndInfLogin = () => {
 
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
-    formDataToSend.append("contactNum", contactNum);
-    // formDataToSend.append("contactNum", "7251890867");
+    // formDataToSend.append("contactNum", contactNum);
+    formDataToSend.append("contactNum", "7251890867");
     formDataToSend.append("email", formData.email);
     formDataToSend.append("role", role);
     formDataToSend.append("fullAddress", formData.fullAddress);
@@ -378,8 +378,8 @@ const ProAndInfLogin = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            contactNum: contactNum,
-            // contactNum: "7251890867",
+            // contactNum: contactNum,
+            contactNum: "7251890867",
           }),
         }
       );

@@ -77,6 +77,7 @@ const OrderCreator = () => {
     videoFile: "null",
     photos: [],
     campaignUrl: "",
+    noOfNonCre: "",
   });
   const theme = useTheme();
   const [submitted, setSubmitted] = useState(false);
@@ -161,6 +162,7 @@ const OrderCreator = () => {
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("brandName", formData.brandName);
     formDataToSubmit.append("campaignName", formData.campaignName);
+    formDataToSubmit.append("noOfNonCre", formData.noOfNonCre);
     formDataToSubmit.append("userId", userid);
     formDataToSubmit.append("campaignUrl", formData.campaignUrl);
     formDataToSubmit.append("collaborationId", formData.collaborationId);
@@ -289,7 +291,7 @@ const OrderCreator = () => {
               <Box sx={{ mb: 3 }}>
                 <TextField
                   fullWidth
-                  placeholder="Search by name or category"
+                  placeholder="Search by name, category or location"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
@@ -411,6 +413,15 @@ const OrderCreator = () => {
                   label="Campaign URL"
                   name="campaignUrl"
                   value={formData.campaignUrl}
+                  onChange={handleInputChange}
+                  required
+                  sx={{ mb: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="No of Non Creators "
+                  name="noOfNonCre"
+                  value={formData.noOfNonCre}
                   onChange={handleInputChange}
                   required
                   sx={{ mb: 3 }}
@@ -705,6 +716,15 @@ const OrderCreator = () => {
                   onChange={handleInputChange}
                   required
                   sx={{ mb: 3 }}
+                />
+                <TextField
+                  fullWidth
+                  label="No. of Non Creators "
+                  name="noOfNonCre"
+                  value={formData.noOfNonCre}
+                  onChange={handleInputChange}
+                  sx={{ mb: 3 }}
+                  type="number"
                 />
                 <TextField
                   fullWidth

@@ -22,12 +22,15 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import { PhoneOutlined, WhatsAppOutlined } from "@ant-design/icons";
 import { styled } from "@mui/system";
 import { FiEdit2, FiUpload } from "react-icons/fi";
-import { Breadcrumb, message, Popconfirm } from "antd";
+import { Breadcrumb, FloatButton, message, Popconfirm } from "antd";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { useNavigate, useParams } from "react-router";
+import { Link } from "react-router-dom";
+import { ArrowRightAlt, DownloadOutlined } from "@mui/icons-material";
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   width: 150,
@@ -81,6 +84,11 @@ const AdminUserProfile = () => {
     profession: "",
     price: "", // Add price field
     status: "",
+    facebookUrl: " ",
+    youtubeUrl: " ",
+    tikTokUrl: " ",
+    spotifyUrl: " ",
+    jioSaavnUrl: " ",
   });
 
   const handleImageUpload = (event) => {
@@ -192,6 +200,12 @@ const AdminUserProfile = () => {
           profession: user.profession || "",
           price: user.price || "", // Set price field
           status: user.status,
+          legalDoc: user.legalDoc || "", // Set price field
+          facebookUrl: user.facebookUrl || "",
+          youtubeUrl: user.youtubeUrl || "",
+          tikTokUrl: user.tikTokUrl || "",
+          spotifyUrl: user.spotifyUrl || "",
+          jioSaavnUrl: user.jioSaavnUrl || "",
         });
         setUserStatus(user.status === "active" ? true : false); // Set user status
       } else {
@@ -286,9 +300,15 @@ const AdminUserProfile = () => {
   useEffect(() => {
     fetchUserProfile();
   }, [id]);
-
+  const [open, setOpen] = useState(false);
+  const onChange = (checked) => {
+    setOpen(!open);
+  };
   return (
-    <Container maxWidth="xl" sx={{ height: "88vh", overflow: "scroll" }}>
+    <Container
+      maxWidth="xl"
+      sx={{ height: "88vh", overflow: "scroll", position: "relative" }}
+    >
       {loading && <MusicLoader />}
       <Typography variant="h5" gutterBottom sx={{ mb: 2, textAlign: "start" }}>
         Profile
@@ -306,6 +326,36 @@ const AdminUserProfile = () => {
           },
         ]}
       />
+
+      <FloatButton.Group
+        open={open}
+        onClick={onChange}
+        trigger="click"
+        style={{
+          right: "2%",
+          transform: "scale(1.5)",
+          zIndex: 1,
+          bottom: "17%",
+        }}
+        tooltip={<div>Contact us</div>}
+        icon={<WhatsAppOutlined />}
+      >
+        <FloatButton
+          style={{}}
+          onClick={() => {
+            window.open(`https://wa.me/+91${formData.phone}`, "_blank");
+            setOpen(!open);
+          }}
+          tooltip={<div>Whatsapp</div>}
+          icon={
+            <WhatsAppOutlined
+              style={{
+                color: "#50CC5E",
+              }}
+            />
+          }
+        />
+      </FloatButton.Group>
       <Box sx={{ position: "relative" }}>
         <StyledPaper elevation={3}>
           <Box sx={{ position: "relative", mb: 4, textAlign: "center" }}>
@@ -345,18 +395,20 @@ const AdminUserProfile = () => {
               {formError}
             </Alert>
           )}
-          <Box sx={{ mb: 2, textAlign: "right" }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={userStatus}
-                  onChange={handleStatusChange}
-                  color="primary"
-                />
-              }
-              label={userStatus ? "User : Active" : "User : Inactive"}
-            />
-          </Box>
+          {page === "influencer" && (
+            <Box sx={{ mb: 2, textAlign: "right" }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={userStatus}
+                    onChange={handleStatusChange}
+                    color="primary"
+                  />
+                }
+                label={userStatus ? "User : Active" : "User : Inactive"}
+              />
+            </Box>
+          )}
 
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
@@ -430,7 +482,16 @@ const AdminUserProfile = () => {
 
             {page === "influencer" && (
               <>
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
                   <TextField
                     fullWidth
                     label="Instagram URL"
@@ -440,6 +501,160 @@ const AdminUserProfile = () => {
                     }
                     disabled={!editMode}
                   />
+                  {formData.socialMediaUrl.length > 4 && (
+                    <Link to={formData.socialMediaUrl} target="_blank">
+                      <ArrowRightAlt
+                        style={{
+                          transform: "scale(1.2)",
+                        }}
+                      />
+                    </Link>
+                  )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Facebook URL"
+                    value={formData.facebookUrl}
+                    onChange={(e) =>
+                      handleInputChange("facebookUrl", e.target.value)
+                    }
+                    disabled={!editMode}
+                  />
+                  {formData.facebookUrl.length > 4 && (
+                    <Link to={formData.facebookUrl} target="_blank">
+                      <ArrowRightAlt
+                        style={{
+                          transform: "scale(1.2)",
+                        }}
+                      />
+                    </Link>
+                  )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="YouTube URL"
+                    value={formData.youtubeUrl}
+                    onChange={(e) =>
+                      handleInputChange("youtubeUrl", e.target.value)
+                    }
+                    disabled={!editMode}
+                  />{" "}
+                  {formData.youtubeUrl.length > 4 && (
+                    <Link to={formData.youtubeUrl} target="_blank">
+                      <ArrowRightAlt
+                        style={{
+                          transform: "scale(1.2)",
+                        }}
+                      />
+                    </Link>
+                  )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="TikTok URL"
+                    value={formData.tikTokUrl}
+                    onChange={(e) =>
+                      handleInputChange("tikTokUrl", e.target.value)
+                    }
+                    disabled={!editMode}
+                  />
+                  {formData.tikTokUrl.length > 4 && (
+                    <Link to={formData.tikTokUrl} target="_blank">
+                      <ArrowRightAlt
+                        style={{
+                          transform: "scale(1.2)",
+                        }}
+                      />
+                    </Link>
+                  )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Spotify URL"
+                    value={formData.spotifyUrl}
+                    onChange={(e) =>
+                      handleInputChange("spotifyUrl", e.target.value)
+                    }
+                    disabled={!editMode}
+                  />
+                  {formData.spotifyUrl.length > 4 && (
+                    <Link to={formData.spotifyUrl} target="_blank">
+                      <ArrowRightAlt
+                        style={{
+                          transform: "scale(1.2)",
+                        }}
+                      />
+                    </Link>
+                  )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="JioSaavn URL"
+                    value={formData.jioSaavnUrl}
+                    onChange={(e) =>
+                      handleInputChange("jioSaavnUrl", e.target.value)
+                    }
+                    disabled={!editMode}
+                  />
+                  {formData.jioSaavnUrl.length > 4 && (
+                    <Link to={formData.jioSaavnUrl} target="_blank">
+                      <ArrowRightAlt
+                        style={{
+                          transform: "scale(1.2)",
+                        }}
+                      />
+                    </Link>
+                  )}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -516,6 +731,19 @@ const AdminUserProfile = () => {
                     type="number"
                   />
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    Legal Agreement :{" "}
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${formData.legalDoc}`}
+                      target="_blank"
+                    >
+                      <DownloadOutlined style={{ transform: "scale(1.1)" }} />
+                    </Link>{" "}
+                  </Typography>
+                </Grid>
               </>
             )}
           </Grid>
@@ -578,7 +806,7 @@ const AdminUserProfile = () => {
                 {loading ? <CircularProgress size={24} /> : "Wallet"}
               </Button>
             )}
-            {page === "influencer" &&
+            {page == "influencer" &&
               (formData.status == "active" || formData.status == "closed") && (
                 <Button
                   variant="contained"

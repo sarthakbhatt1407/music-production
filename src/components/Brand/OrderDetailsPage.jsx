@@ -31,7 +31,12 @@ import moment from "moment";
 import { useNavigate, useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Divider, message, Popconfirm } from "antd";
-import { DeleteOutline, Done, LinkOutlined } from "@mui/icons-material";
+import {
+  ContentCopyOutlined,
+  DeleteOutline,
+  Done,
+  LinkOutlined,
+} from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -166,6 +171,7 @@ const OrderDetailsPage = () => {
               workLink: ord.workLink,
               status: ord.status,
               remark: ord.remark,
+              screenshot: ord.screenshot,
             };
           }
           if (obj) {
@@ -345,6 +351,14 @@ const OrderDetailsPage = () => {
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
+  const copyToClipBoard = async (txt) => {
+    try {
+      await navigator.clipboard.writeText(txt);
+      message.success("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
 
   return (
     <Container
@@ -416,10 +430,22 @@ const OrderDetailsPage = () => {
                     <LinkOutlined />
                   </Link>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Collaboration ID: {order.collaborationId}
+                {order.noOfNonCre && Number(order.noOfNonCre) > 0 && (
+                  <Typography
+                    variant="subtitle1"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                    }}
+                  >
+                    No. of Non Creators : {order.noOfNonCre}
+                  </Typography>
+                )}
+                <Typography variant="body1" color="text.secondary">
+                  Collaboration ID: {order.collaborationId}{" "}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body1" color="text.secondary">
                   Description: {order.campaignDescription}
                 </Typography>
                 {/* Audio Section */}
@@ -580,6 +606,7 @@ const OrderDetailsPage = () => {
                         <TableCell>Social Media </TableCell>
                         <TableCell>Status</TableCell>
                         <TableCell>Preview</TableCell>
+                        <TableCell>Screenshot</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -642,6 +669,19 @@ const OrderDetailsPage = () => {
                                 Remark : {influencer.remark}
                               </p>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            {influencer.status != "rejected" &&
+                              (influencer.screenshot.length > 4 ? (
+                                <Link
+                                  to={`${process.env.REACT_APP_BASE_URL}/${influencer.screenshot}`}
+                                  target="_blank"
+                                >
+                                  <LinkOutlined />
+                                </Link>
+                              ) : (
+                                "-"
+                              ))}
                           </TableCell>
                         </TableRow>
                       ))}

@@ -23,8 +23,13 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { message, Popconfirm } from "antd";
-import { DeleteOutline, LinkOutlined } from "@mui/icons-material";
+import {
+  ContentCopyOutlined,
+  DeleteOutline,
+  LinkOutlined,
+} from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import OrderCreator from "../Brand/OrderCreator";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -57,6 +62,7 @@ const InfOrderDetailsPage = () => {
   const [openCompleteModal, setOpenCompleteModal] = useState(false);
   const [remark, setRemark] = useState("");
   const [link, setLink] = useState("");
+  const [image, setImage] = useState(null);
 
   const fetchBrandOrderById = async (id) => {
     setLoading(true);
@@ -216,20 +222,27 @@ const InfOrderDetailsPage = () => {
   };
 
   const handleConfirmComplete = async () => {
-    if (link.length < 4) {
-      message.error("Please provide a link to the completed order.");
+    if (link.length < 4 && !image) {
+      message.error("Please provide a link or an image to complete the order.");
       return;
     }
+    console.log("Link:", link);
+
     setLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("orderId", id);
+      formData.append("action", "completed");
+      formData.append("link", link);
+      if (image) {
+        formData.append("image", image);
+      }
+
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/inf/edit-order`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ orderId: id, action: "completed", link }),
+          body: formData,
         }
       );
 
@@ -244,8 +257,18 @@ const InfOrderDetailsPage = () => {
       fetchOrderById();
       console.log(data.order);
       setOpenCompleteModal(false);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error completing order:", error);
+    }
     setLoading(false);
+  };
+  const copyToClipBoard = async (txt) => {
+    try {
+      await navigator.clipboard.writeText(txt);
+      message.success("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
   };
 
   return (
@@ -333,11 +356,62 @@ const InfOrderDetailsPage = () => {
                     </Link>
                   </Typography>
                 )}
-                <Typography variant="subtitle1" color="text.secondary">
-                  Collaboration ID: {brandOrder.collaborationId}
+                {order.status == "completed" && order.screenshot.length > 4 && (
+                  <Typography
+                    variant="subtitle1"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                    }}
+                  >
+                    Screenshot:{" "}
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/${order.screenshot}`}
+                      target="_blank"
+                    >
+                      <LinkOutlined />
+                    </Link>
+                  </Typography>
+                )}
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  Collaboration ID: {order.collaborationId}
+                  <ContentCopyOutlined
+                    style={{
+                      cursor: "pointer",
+                      transform: "scale(.8)",
+                    }}
+                    onClick={copyToClipBoard.bind(this, order.collaborationId)}
+                  />
                 </Typography>
-                <Typography variant="subtitle1" color="text.secondary">
-                  {order.campaignDescription}
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
+                  Description: {order.campaignDescription}
+                  <ContentCopyOutlined
+                    style={{
+                      cursor: "pointer",
+                      transform: "scale(.8)",
+                    }}
+                    onClick={copyToClipBoard.bind(
+                      this,
+                      order.campaignDescription
+                    )}
+                  />
                 </Typography>
                 {order.status === "rejected" && (
                   <>
@@ -609,8 +683,8 @@ const InfOrderDetailsPage = () => {
         <DialogTitle>Complete Order</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please provide the order completion link. For screenshots, upload to
-            Google Drive and share the link.
+            Please provide the order completion link and upload an
+            image(optional).
           </DialogContentText>
           <TextField
             autoFocus
@@ -621,6 +695,21 @@ const InfOrderDetailsPage = () => {
             variant="outlined"
             value={link}
             onChange={(e) => setLink(e.target.value)}
+          />
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            style={{
+              marginTop: "1rem",
+            }}
+          >
+            Image
+          </Typography>
+          <input
+            accept="image/*"
+            type="file"
+            onChange={(e) => setImage(e.target.files[0])}
+            style={{ marginTop: "1rem" }}
           />
         </DialogContent>
         <DialogActions>

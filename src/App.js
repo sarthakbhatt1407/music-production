@@ -17,7 +17,9 @@ import DualLoginPage from "./pages/DualLoginPage";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const type = useSelector((state) => state.type);
   const isAdmin = useSelector((state) => state.isAdmin);
+  console.log(`${process.env.PUBLIC_URL}`);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -26,6 +28,11 @@ const App = () => {
       duration: 650,
     });
     const localStr = JSON.parse(localStorage.getItem("state"));
+
+    if (localStr && !localStr.type) {
+      dispatch({ type: "logout" });
+      return;
+    }
 
     if (localStr) {
       dispatch({ type: "reload", data: { ...localStr } });
@@ -60,10 +67,10 @@ const App = () => {
             exact
             element={<Navigate to="/user-panel/home" />}
           />
-        )}
+        )}{" "}
+        <Route path="/select-login" exact element={<DualLoginPage />} />
         {!isLoggedIn && <Route path="/register" exact element={<Register />} />}
-
-        {isLoggedIn && !isAdmin && (
+        {isLoggedIn && !isAdmin && type == "music-user" && (
           <>
             <Route path="/user-panel/:page" exact element={<UserPanel />} />
             <Route path="/user-panel/order/:id" exact element={<UserPanel />} />
@@ -74,8 +81,7 @@ const App = () => {
             />
           </>
         )}
-
-        {isLoggedIn && isAdmin && (
+        {isLoggedIn && isAdmin && type == "admin-user" && (
           <>
             <Route path="/admin-panel/:page" exact element={<AdminPanel />} />
             <Route
@@ -95,38 +101,51 @@ const App = () => {
             />
           </>
         )}
-        <Route
-          path="/promotor-admin-panel/:page"
-          exact
-          element={<BrandAdminPanel />}
-        />
-        <Route path="/select-login" exact element={<DualLoginPage />} />
-        <Route
-          path="/promotor-admin-panel/:page/:id"
-          exact
-          element={<BrandAdminPanel />}
-        />
-        <Route
-          path="/influencer-admin-panel/:page"
-          exact
-          element={<InfAdminPanel />}
-        />
-        <Route
-          path="/influencer-admin-panel/:page/:id"
-          exact
-          element={<InfAdminPanel />}
-        />
-        <Route
-          path="/admin-admin-panel/:page"
-          exact
-          element={<PromotionAdminPanel />}
-        />
-        <Route
-          path="/admin-admin-panel/:page/:id"
-          exact
-          element={<PromotionAdminPanel />}
-        />
+        {type == "promoter" && (
+          <>
+            <Route
+              path="/promotor-admin-panel/:page"
+              exact
+              element={<BrandAdminPanel />}
+            />
 
+            <Route
+              path="/promotor-admin-panel/:page/:id"
+              exact
+              element={<BrandAdminPanel />}
+            />
+          </>
+        )}
+        {type == "influencer" && (
+          <>
+            {" "}
+            <Route
+              path="/influencer-admin-panel/:page"
+              exact
+              element={<InfAdminPanel />}
+            />
+            <Route
+              path="/influencer-admin-panel/:page/:id"
+              exact
+              element={<InfAdminPanel />}
+            />
+          </>
+        )}
+        {type == "promotion-admin" && (
+          <>
+            {" "}
+            <Route
+              path="/admin-admin-panel/:page"
+              exact
+              element={<PromotionAdminPanel />}
+            />
+            <Route
+              path="/admin-admin-panel/:page/:id"
+              exact
+              element={<PromotionAdminPanel />}
+            />
+          </>
+        )}
         <Route path="*" exact element={<Home />} />
       </Routes>
     </div>

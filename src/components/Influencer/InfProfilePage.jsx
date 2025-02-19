@@ -17,9 +17,11 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FiEdit2, FiUpload } from "react-icons/fi";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, message } from "antd";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
+import { Link } from "react-router-dom";
+import { DownloadOutlined } from "@mui/icons-material";
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   width: 150,
@@ -64,6 +66,11 @@ const InfProfilePage = () => {
     bankName: "",
     profession: "",
     price: "", // Add price field
+    facebookUrl: " ",
+    youtubeUrl: " ",
+    tikTokUrl: " ",
+    spotifyUrl: " ",
+    jioSaavnUrl: " ",
   });
 
   const handleImageUpload = (event) => {
@@ -107,7 +114,13 @@ const InfProfilePage = () => {
       formDataToSend.append("ifscCode", formData.ifscCode);
       formDataToSend.append("bankName", formData.bankName);
       formDataToSend.append("profession", formData.profession);
-      formDataToSend.append("price", formData.price); // Include price field
+      formDataToSend.append("price", formData.price);
+      formDataToSend.append("facebookUrl", formData.facebookUrl);
+      formDataToSend.append("youtubeUrl", formData.youtubeUrl);
+      formDataToSend.append("tikTokUrl", formData.tikTokUrl);
+      formDataToSend.append("spotifyUrl", formData.spotifyUrl);
+      formDataToSend.append("jioSaavnUrl", formData.jioSaavnUrl);
+
       if (previewImage) {
         const fileInput = document.getElementById("image-upload");
         const file = fileInput.files[0];
@@ -126,6 +139,7 @@ const InfProfilePage = () => {
       console.log(data);
 
       if (response.ok && data.success) {
+        message.success("Profile updated successfully");
         setFormData((prev) => ({
           ...prev,
           profileImage: previewImage || formData.profileImage,
@@ -180,7 +194,13 @@ const InfProfilePage = () => {
           ifscCode: user.ifscCode || "",
           bankName: user.bankName || "",
           profession: user.profession || "",
-          price: user.price || "", // Set price field
+          price: user.price || "",
+          legalDoc: user.legalDoc || "",
+          facebookUrl: user.facebookUrl || "",
+          youtubeUrl: user.youtubeUrl || "",
+          tikTokUrl: user.tikTokUrl || "",
+          spotifyUrl: user.spotifyUrl || "",
+          jioSaavnUrl: user.jioSaavnUrl || "",
         });
       } else {
         throw new Error(data.message || "Failed to fetch user profile.");
@@ -338,10 +358,63 @@ const InfProfilePage = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Instagram  URL"
+                label="Instagram URL"
                 value={formData.socialMediaUrl}
                 onChange={(e) =>
                   handleInputChange("socialMediaUrl", e.target.value)
+                }
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Facebook URL"
+                value={formData.facebookUrl}
+                onChange={(e) =>
+                  handleInputChange("facebookUrl", e.target.value)
+                }
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="YouTube URL"
+                value={formData.youtubeUrl}
+                onChange={(e) =>
+                  handleInputChange("youtubeUrl", e.target.value)
+                }
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="TikTok URL"
+                value={formData.tikTokUrl}
+                onChange={(e) => handleInputChange("tikTokUrl", e.target.value)}
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Spotify URL"
+                value={formData.spotifyUrl}
+                onChange={(e) =>
+                  handleInputChange("spotifyUrl", e.target.value)
+                }
+                disabled={!editMode}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="JioSaavn URL"
+                value={formData.jioSaavnUrl}
+                onChange={(e) =>
+                  handleInputChange("jioSaavnUrl", e.target.value)
                 }
                 disabled={!editMode}
               />
@@ -412,6 +485,19 @@ const InfProfilePage = () => {
                 disabled={!editMode}
                 type="number"
               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography
+                style={{ display: "flex", alignItems: "center", gap: 10 }}
+              >
+                Legal Agreement :{" "}
+                <Link
+                  to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${formData.legalDoc}`}
+                  target="_blank"
+                >
+                  <DownloadOutlined style={{ transform: "scale(1.1)" }} />
+                </Link>{" "}
+              </Typography>
             </Grid>
           </Grid>
 

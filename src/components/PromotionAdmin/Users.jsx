@@ -20,6 +20,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router";
 import { Breadcrumb } from "antd";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { LinkOutlined } from "@mui/icons-material";
 
 const Container = styled.div`
   padding: 0.5rem 1rem;
@@ -204,6 +206,24 @@ const Users = () => {
       ),
     },
     {
+      field: "socialMediaUrl",
+      headerName: "Proflie",
+      width: 200,
+      renderCell: (params) => (
+        <Typography
+          style={{
+            textTransform: "capitalize",
+          }}
+        >
+          {params.value && params.value.length > 0 && (
+            <Link to={params.value} target="_blank">
+              <LinkOutlined />
+            </Link>
+          )}
+        </Typography>
+      ),
+    },
+    {
       field: "userSince",
       headerName: "User Since",
       width: 150,
@@ -324,10 +344,13 @@ const Users = () => {
               autoHeight
               disableSelectionOnClick
               getRowId={(row) => row.id} // Ensure unique row IDs
-              onRowClick={(row) => {
-                navigate(`/admin-admin-panel/${row.row.userType}/${row.id}`);
-              }}
+              // onRowClick={(row) => {
+              //   navigate(`/admin-admin-panel/${row.row.userType}/${row.id}`);
+              // }}
               onCellClick={(cell) => {
+                if (cell.field === "socialMediaUrl") {
+                  return;
+                }
                 if (cell.field === "profileImage") {
                   navigate(
                     `/admin-admin-panel/${cell.row.userType}/${cell.id}`

@@ -39,6 +39,7 @@ import MusicLoader from "../Loader/MusicLoader";
 import { Divider, message, Popconfirm } from "antd";
 import {
   Close,
+  ContentCopyOutlined,
   DeleteOutline,
   Done,
   DoneOutline,
@@ -218,6 +219,7 @@ const AdminOrderDetails = () => {
               workLink: ord.workLink,
               status: ord.status,
               remark: ord.remark,
+              screenshot: ord.screenshot,
             };
           }
           if (obj) {
@@ -265,7 +267,7 @@ const AdminOrderDetails = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/inf/user/get-all-inf`
+        `${process.env.REACT_APP_BASE_URL}/inf/user/get-all-inf-inc`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -442,6 +444,14 @@ const AdminOrderDetails = () => {
     }
     setLoading(false);
   };
+  const copyToClipBoard = async (txt) => {
+    try {
+      await navigator.clipboard.writeText(txt);
+      message.success("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
   return (
     <Container
       maxWidth="xl"
@@ -512,11 +522,56 @@ const AdminOrderDetails = () => {
                     <LinkOutlined />
                   </Link>
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                {order.noOfNonCre && Number(order.noOfNonCre) > 0 && (
+                  <Typography
+                    variant="subtitle1"
+                    color="text.secondary"
+                    style={{
+                      display: "flex",
+                      gap: "1rem",
+                    }}
+                  >
+                    No. of Non Creators : {order.noOfNonCre}
+                  </Typography>
+                )}
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
                   Collaboration ID: {order.collaborationId}
+                  <ContentCopyOutlined
+                    style={{
+                      cursor: "pointer",
+                      transform: "scale(.8)",
+                    }}
+                    onClick={copyToClipBoard.bind(this, order.collaborationId)}
+                  />
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                  }}
+                >
                   Description: {order.campaignDescription}
+                  <ContentCopyOutlined
+                    style={{
+                      cursor: "pointer",
+                      transform: "scale(.8)",
+                    }}
+                    onClick={copyToClipBoard.bind(
+                      this,
+                      order.campaignDescription
+                    )}
+                  />
                 </Typography>
               </CardContent>
               {order.audio.length > 2 && (
@@ -711,6 +766,7 @@ const AdminOrderDetails = () => {
                         <TableCell>Amount</TableCell>
                         <TableCell>Status</TableCell>
                         <TableCell>Preview</TableCell>
+                        <TableCell>Screenshot</TableCell>
                         <TableCell align="center">Action</TableCell>
                       </TableRow>
                     </TableHead>
@@ -779,6 +835,19 @@ const AdminOrderDetails = () => {
                                   Remark : {influencer.remark}
                                 </p>
                               )}
+                            </TableCell>{" "}
+                            <TableCell>
+                              {influencer.status != "rejected" &&
+                                (influencer.screenshot.length > 4 ? (
+                                  <Link
+                                    to={`${process.env.REACT_APP_BASE_URL}/${influencer.screenshot}`}
+                                    target="_blank"
+                                  >
+                                    <LinkOutlined />
+                                  </Link>
+                                ) : (
+                                  "-"
+                                ))}
                             </TableCell>
                             <TableCell style={{}}>
                               <div
@@ -1048,6 +1117,7 @@ const AdminOrderDetails = () => {
                   <TableCell>Category</TableCell>
                   <TableCell>Social Media </TableCell>
                   <TableCell>Amount </TableCell>
+                  <TableCell>Status </TableCell>
                   <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -1079,6 +1149,10 @@ const AdminOrderDetails = () => {
                       </Link>
                     </TableCell>
                     <TableCell align="center">₹ {influencer.price}</TableCell>
+                    <TableCell align="center">
+                      {influencer.status == "active" && "Active"}
+                      {influencer.status == "closed" && "Inactive"}
+                    </TableCell>
                     <TableCell align="center">
                       <StyledButton
                         variant="contained"
