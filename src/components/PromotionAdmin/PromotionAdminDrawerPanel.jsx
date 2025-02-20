@@ -32,6 +32,7 @@ import logo from "../../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
 import { Badge } from "@mui/material";
+import { PiPackageDuotone } from "react-icons/pi";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -86,7 +87,7 @@ const PromotionAdminDrawerPanel = (props) => {
     if (page === "notification") {
       return ["6"];
     }
-    if (page === "all-users") {
+    if (page === "packages") {
       return ["7"];
     }
     if (page === "user-queries") {
@@ -188,6 +189,18 @@ const PromotionAdminDrawerPanel = (props) => {
                 </Link>
               ),
               label: "Notification",
+            },
+            {
+              key: "7",
+              icon: (
+                <Link
+                  to={"/admin-admin-panel/packages"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <PiPackageDuotone />
+                </Link>
+              ),
+              label: "Packages",
             },
             {
               key: "5",
