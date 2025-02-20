@@ -38,6 +38,7 @@ import { useNavigate, useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { Divider, message, Popconfirm } from "antd";
 import {
+  AccountCircleOutlined,
   Close,
   ContentCopyOutlined,
   DeleteOutline,
@@ -765,6 +766,7 @@ const AdminOrderDetails = () => {
                         <TableCell>Social Media </TableCell>
                         <TableCell>Amount</TableCell>
                         <TableCell>Status</TableCell>
+                        <TableCell>Profile</TableCell>
                         <TableCell>Preview</TableCell>
                         <TableCell>Screenshot</TableCell>
                         <TableCell align="center">Action</TableCell>
@@ -813,6 +815,15 @@ const AdminOrderDetails = () => {
                                 color={getStatusColor(influencer.status)}
                                 size="small"
                               />
+                            </TableCell>
+                            <TableCell>
+                              {" "}
+                              <Link
+                                to={`/admin-admin-panel/influencer/${influencer.id}`}
+                                target="_blank"
+                              >
+                                <AccountCircleOutlined />
+                              </Link>
                             </TableCell>
                             <TableCell>
                               {influencer.status != "rejected" &&
@@ -906,6 +917,7 @@ const AdminOrderDetails = () => {
                         <TableCell>Category</TableCell>
                         <TableCell>Social Media </TableCell>
                         <TableCell>Amount </TableCell>
+                        <TableCell>Profile </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -942,6 +954,15 @@ const AdminOrderDetails = () => {
                             </Link>
                           </TableCell>
                           <TableCell>₹ {influencer.price}</TableCell>
+                          <TableCell>
+                            {" "}
+                            <Link
+                              to={`/admin-admin-panel/influencer/${influencer.id}`}
+                              target="_blank"
+                            >
+                              <AccountCircleOutlined />
+                            </Link>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

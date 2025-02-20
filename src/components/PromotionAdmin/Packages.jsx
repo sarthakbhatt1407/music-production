@@ -537,6 +537,10 @@ const Packages = () => {
             <MenuItem value="Standard">Standard</MenuItem>
             <MenuItem value="Premium">Premium</MenuItem>
             <MenuItem value="Deluxe">Deluxe</MenuItem>
+            <MenuItem value="BasicPlus">Basic Plus</MenuItem>
+            <MenuItem value="StandardPlus">Standard Plus</MenuItem>
+            <MenuItem value="Premium Plus">Premium Plus</MenuItem>
+            <MenuItem value="Deluxe Plus">Deluxe Plus</MenuItem>
           </TextField>
         </DialogContent>
         <DialogActions>
