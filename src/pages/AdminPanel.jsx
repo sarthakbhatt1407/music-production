@@ -15,6 +15,7 @@ import Notification from "../components/AdminPanel/Notification";
 
 const AdminPanel = () => {
   const page = useParams().page;
+  console.log(page);
   const id = useParams().id;
   const action = useParams().action;
   useEffect(() => {}, [page]);

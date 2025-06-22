@@ -431,7 +431,7 @@ const ProAndInfLogin = () => {
               }}
               id="otpless-login-page"
             ></div>
-            <button onClick={demoLogin}>demo login</button>
+            {/* <button onClick={demoLogin}>demo login</button> */}
           </>
         )}
         {!userExist && (

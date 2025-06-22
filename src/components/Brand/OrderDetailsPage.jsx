@@ -707,7 +707,6 @@ const OrderDetailsPage = () => {
                         <TableCell>Influencer</TableCell>
                         <TableCell>Category</TableCell>
                         <TableCell>Social Media </TableCell>
-                        <TableCell>Amount </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -743,7 +742,6 @@ const OrderDetailsPage = () => {
                               <LinkOutlined />
                             </Link>
                           </TableCell>
-                          <TableCell>₹ {influencer.price}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

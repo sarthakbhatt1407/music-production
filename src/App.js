@@ -81,7 +81,7 @@ const App = () => {
             />
           </>
         )}
-        {isLoggedIn && isAdmin && type == "admin-user" && (
+        {isLoggedIn && isAdmin && type == "music-admin" && (
           <>
             <Route path="/admin-panel/:page" exact element={<AdminPanel />} />
             <Route
