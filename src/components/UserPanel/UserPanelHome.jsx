@@ -389,7 +389,7 @@ const UserPanelHome = () => {
                   </ResponsiveContainer>
                 )}
               </ChartBox>
-              <ChartBox>
+              {/* <ChartBox>
                 <div style={{ padding: "0 1rem" }}>
                   {" "}
                   <h2>Reports</h2>{" "}
@@ -477,7 +477,7 @@ const UserPanelHome = () => {
                     />
                   </BarChart>
                 </ResponsiveContainer>
-              </ChartBox>
+              </ChartBox> */}
             </LeftDiv>
             {/* <RightDiv>
               <h2>Reports Summary</h2>

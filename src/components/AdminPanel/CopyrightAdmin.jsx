@@ -7,6 +7,7 @@ import { message } from "antd";
 import { Empty } from "antd";
 import {
   CheckCircleOutline,
+  ContentCopyOutlined,
   DeleteForeverOutlined,
   InsertLink,
   PersonOutline,
@@ -283,6 +284,14 @@ const CopyrightAdmin = () => {
 
     return () => {};
   }, [userId, refresher]);
+  const copyToClipBoard = async (txt) => {
+    try {
+      await navigator.clipboard.writeText(txt);
+      openNotificationWithIcon("success", "Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
 
   const confirm = async (id) => {
     setIsLoading(true);
@@ -436,16 +445,28 @@ const CopyrightAdmin = () => {
                     <td>
                       <>
                         {status === "pending" && (
-                          <Popconfirm
-                            title="Confirm"
-                            description="Copyright removed?"
-                            onConfirm={confirm.bind(this, id)}
-                            onOpenChange={() => {}}
-                          >
-                            <Link>
-                              <CheckCircleOutline />
-                            </Link>
-                          </Popconfirm>
+                          <>
+                            {" "}
+                            {/* <Popconfirm
+                              title="Confirm"
+                              description="Copyright removed?"
+                              onOpenChange={() => {}}
+                            >
+                              <Link>
+                                <CheckCircleOutline />
+                              </Link>
+                            </Popconfirm> */}
+                            <ContentCopyOutlined
+                              style={{
+                                cursor: "pointer",
+                                transform: "scale(.8)",
+                              }}
+                              onClick={() => {
+                                copyToClipBoard(link);
+                                confirm(id);
+                              }}
+                            />
+                          </>
                         )}
                         {status === "resolved" && <>Resolved</>}
                       </>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Alert, Snackbar } from "@mui/material";
 import MusicLoader from "../components/Loader/MusicLoader";
 import { notification } from "antd";
@@ -26,8 +26,7 @@ const MainBox = styled.div`
   box-shadow: 0.1rem 0.1rem 2rem rgba(161, 161, 161, 0.28);
   border-radius: 0.5rem;
 
-  display: grid;
-  grid-template-columns: 1.5fr 2fr;
+  display: flex;
 
   @media only screen and (max-width: 700px) {
     /* display: none; */
@@ -255,6 +254,9 @@ const PhotosDiv = styled.div`
 `;
 
 const Register = () => {
+  const location = useLocation();
+  const contactNum = location.state?.contactNum;
+
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
@@ -371,8 +373,8 @@ const Register = () => {
   const defaultFields = {
     fullName: "",
     email: "",
-    password: "",
-    contactNum: "",
+    password: "*******",
+    contactNum: contactNum,
     otp: "",
     city: "",
     state: "",
@@ -397,7 +399,7 @@ const Register = () => {
     const fullName = document.querySelector("#fullName").value;
     const email = document.querySelector("#email").value;
     const contactNum = document.querySelector("#contactNum").value;
-    const password = document.querySelector("#password").value;
+    // const password = document.querySelector("#password").value;
     const city = document.querySelector("#city").value;
     const state = document.querySelector("#state").value;
     const country = document.querySelector("#country").value;
@@ -433,8 +435,7 @@ const Register = () => {
       validateEmail(email) &&
       contactNum.length > 9 &&
       inpFields.sign != null &&
-      inpFields.userPic != null &&
-      password.trim().length > 5
+      inpFields.userPic != null
     ) {
       setAllValid(true);
       return;
@@ -446,7 +447,7 @@ const Register = () => {
     const fullName = document.querySelector("#fullName").value;
     const email = document.querySelector("#email").value;
     const contactNum = document.querySelector("#contactNum").value;
-    const password = document.querySelector("#password").value;
+    // const password = document.querySelector("#password").value;
     const city = document.querySelector("#city").value;
     const state = document.querySelector("#state").value;
     const country = document.querySelector("#country").value;
@@ -489,10 +490,6 @@ const Register = () => {
 
     if (id === "contactNum" && contactNum.length < 10) {
       setMobileErr(true);
-      return;
-    }
-    if (id === "password" && password.trim().length < 6) {
-      setPasswordErr(true);
       return;
     }
 
@@ -564,9 +561,6 @@ const Register = () => {
     setIsLoading(false);
   };
   const onSubmitHandler = async () => {
-    if (!allValid) {
-      return;
-    }
     setIsLoading(true);
 
     const reslt = await fetch(
@@ -602,56 +596,39 @@ const Register = () => {
   };
 
   const otpVerifier = async () => {
+    if (!allValid) {
+      return;
+    }
     setIsLoading(true);
-    const reslt = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/verify-otp`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          otpInp: Number(inpFields.otp),
-          email: inpFields.email,
-        }),
-      }
-    );
-    const data = await reslt.json();
-    // alert(data.message);
 
-    if (data.valid === false) {
-      setOtpText(data.message);
-      setOtpErr(true);
+    const formData = new FormData();
+
+    formData.append("name", inpFields.fullName);
+    formData.append("email", inpFields.email);
+    formData.append("password", inpFields.password);
+    formData.append("phone", inpFields.contactNum);
+    formData.append("city", inpFields.city);
+    formData.append("state", inpFields.state);
+    formData.append("country", inpFields.country);
+    formData.append("channelUrl", inpFields.channelUrl);
+    formData.append("sign", inpFields.sign);
+    formData.append("userPic", inpFields.userPic);
+    formData.append("address", inpFields.address);
+    formData.append("pincode", inpFields.pincode);
+
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {
+      method: "POST",
+      body: formData,
+    });
+    const resData = await res.json();
+
+    if (resData.success) {
+      setState({ ...state, open: true });
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
     }
-    if (data.valid) {
-      const formData = new FormData();
 
-      formData.append("name", inpFields.fullName);
-      formData.append("email", inpFields.email);
-      formData.append("password", inpFields.password);
-      formData.append("phone", inpFields.contactNum);
-      formData.append("city", inpFields.city);
-      formData.append("state", inpFields.state);
-      formData.append("country", inpFields.country);
-      formData.append("channelUrl", inpFields.channelUrl);
-      formData.append("sign", inpFields.sign);
-      formData.append("userPic", inpFields.userPic);
-      formData.append("address", inpFields.address);
-      formData.append("pincode", inpFields.pincode);
-
-      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {
-        method: "POST",
-        body: formData,
-      });
-      const resData = await res.json();
-
-      if (resData.success) {
-        setState({ ...state, open: true });
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
-      }
-    }
     setIsLoading(false);
   };
 
@@ -677,8 +654,7 @@ const Register = () => {
       <OuterBox>
         {" "}
         <MainBox>
-          <LeftDiv>
-            {/* <img src={logo} alt="" /> */}
+          {/* <LeftDiv>
             <h1>Welcome Back!</h1>
             <p>
               To keep connected with us please login with your personal info.
@@ -690,7 +666,7 @@ const Register = () => {
             >
               Sign In
             </button>
-          </LeftDiv>
+          </LeftDiv> */}
           <RightDiv>
             <h2>Create Account</h2>
             {emailVer && (
@@ -741,6 +717,7 @@ const Register = () => {
                   type="number"
                   name=""
                   id="contactNum"
+                  disabled={contactNum ? true : false}
                   onBlur={onBlurHandler}
                   onChange={onChangeHandler}
                   placeholder="Mobile number"
@@ -886,7 +863,7 @@ const Register = () => {
                     </Upload>
                   </PhotosDiv>
                 )}
-                <IN.Password
+                {/* <IN.Password
                   type="password"
                   name=""
                   className="inputField inp"
@@ -906,9 +883,9 @@ const Register = () => {
                 />{" "}
                 {passwordErr && (
                   <p>Password is too short (minimun 6 charcters.)</p>
-                )}
+                )} */}
                 {serverErr && <p>{serverTxt}</p>}
-                {showOtp && (
+                {/* {showOtp && (
                   <>
                     <Input
                       type="text"
@@ -930,14 +907,11 @@ const Register = () => {
                       Resend OTP
                     </span>
                   </>
-                )}
-                {showOtp && (
+                )} */}
+                {allValid && (
                   <SubmitButton onClick={otpVerifier}>Submit</SubmitButton>
                 )}
-                {!showOtp && allValid && (
-                  <SubmitButton onClick={onSubmitHandler}>Submit</SubmitButton>
-                )}
-                {!showOtp && !allValid && <DisabledBtn>Submit</DisabledBtn>}
+                {!allValid && <DisabledBtn>Submit</DisabledBtn>}
               </EmailVerificationBox>
             )}
           </RightDiv>

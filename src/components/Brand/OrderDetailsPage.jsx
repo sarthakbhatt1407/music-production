@@ -317,7 +317,7 @@ const OrderDetailsPage = () => {
 
     setLoading(false);
     var options = {
-      key: "rzp_test_gXfTe6otLGAN8Y", // Replace with your Razorpay test/live key
+      key: "rzp_live_Ers1PaVrF4H5gV", // Replace with your Razorpay test/live key
       amount: data.amount, // Amount from backend response
       currency: data.currency, // INR
       order_id: data.order_id, // ✅ Adding order ID here

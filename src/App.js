@@ -14,6 +14,7 @@ import BrandAdminPanel from "./pages/PromoterAndInf/BrandAdminPanel";
 import InfAdminPanel from "./pages/PromoterAndInf/InfAdminPanel";
 import PromotionAdminPanel from "./pages/PromoterAndInf/PromotionAdminPanel";
 import DualLoginPage from "./pages/DualLoginPage";
+import MusicDistLogin from "./pages/MusicDistLogin";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -50,7 +51,9 @@ const App = () => {
     <div>
       <Routes>
         <Route path="/" exact element={<Home />} />
-        {!isLoggedIn && <Route path="/login" exact element={<Login />} />}
+        {!isLoggedIn && (
+          <Route path="/login" exact element={<MusicDistLogin />} />
+        )}
         {!isLoggedIn && (
           <Route path="/promotions/login" exact element={<ProAndInfLogin />} />
         )}
