@@ -615,6 +615,7 @@ const Register = () => {
     formData.append("userPic", inpFields.userPic);
     formData.append("address", inpFields.address);
     formData.append("pincode", inpFields.pincode);
+    // 
 
     const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {
       method: "POST",

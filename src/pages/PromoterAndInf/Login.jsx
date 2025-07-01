@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import { Alert, Flex, Input, message, Spin } from "antd";
@@ -11,6 +10,7 @@ import {
   Typography,
   TextField,
   Button,
+  Link,
   Container,
   FormControl,
   Fade,
@@ -18,44 +18,458 @@ import {
   CircularProgress,
   MenuItem,
   Select,
+  Snackbar,
   InputLabel,
 } from "@mui/material";
-import WebNav from "../../components/Navbars/WebNav";
+import logo from "../../assets/images/logo/ready.png";
+import { styled } from "@mui/system";
 
-const MainBox = styled.div`
-  position: relative;
-  z-index: 1;
-`;
-const StyledPaper = styled.div`
-  padding: 2rem;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.12);
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-`;
+const LoginContainer = styled(Box)({
+  minHeight: "100vh",
+  display: "flex",
+  background: "#f9f9f9",
+  justifyContent: "center",
+  alignItems: "center",
+});
 
-const LoginBox = styled.div`
-  margin-top: 1rem;
-  display: flex;
-  height: 90svh;
-  justify-content: center;
-  align-items: center;
+const LoginCard = styled(Paper)(({ theme }) => ({
+  padding: "2.5rem 2rem",
+  borderRadius: "12px",
+  width: "83%",
+  backgroundColor: "#ffffff",
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  height: "72svh",
+  position: "relative",
+  border: "1px solid rgb(201, 202, 206)",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    padding: "1rem",
+    width: "90%",
+    height: "60svh",
+  },
+  [theme.breakpoints.down("xs")]: {
+    padding: "1.2rem",
+    width: "98%",
+  },
+}));
 
-  div {
-    z-index: 1000000;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 700px) {
-    padding: 1rem;
-    height: 90svh;
-  }
-`;
+const Logo = styled("img")({
+  width: "60px",
+  height: "60px",
+  marginBottom: "1rem",
+  // Responsive styles
+  "@media (max-width: 600px)": {
+    width: "50px",
+    height: "50px",
+    marginBottom: "0.7rem",
+  },
+});
+
+const LogoPlaceholder = styled(Box)(({ theme }) => ({
+  width: "50px",
+  height: "50px",
+
+  borderRadius: "8px",
+  marginBottom: "1rem",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  overflow: "hidden",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    width: "50px",
+    height: "50px",
+    marginBottom: "0.7rem",
+  },
+}));
+
+const Title = styled(Typography)(({ theme }) => ({
+  fontSize: "30px",
+  marginBottom: "0.5rem",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "24px",
+    marginBottom: "0.3rem",
+  },
+}));
+
+const SubTitle = styled(Typography)(({ theme }) => ({
+  fontSize: "16px",
+  fontWeight: 400,
+  color: "#666",
+  marginBottom: "2rem",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "14px",
+    marginBottom: "1.5rem",
+  },
+}));
+
+const PhoneInputContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  width: "100%",
+  marginBottom: "1.5rem",
+  gap: "10px",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    marginBottom: "1.2rem",
+  },
+}));
+
+const CountryCode = styled(FormControl)(({ theme }) => ({
+  width: "80px",
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    height: "55px",
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    width: "90px",
+    "& .MuiOutlinedInput-root": {
+      height: "50px",
+    },
+  },
+}));
+
+const PhoneInput = styled(TextField)(({ theme }) => ({
+  flex: 1,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    height: "55px",
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    "& .MuiOutlinedInput-root": {
+      height: "50px",
+    },
+  },
+}));
+
+const ContinueButton = styled(Button)(({ theme }) => ({
+  width: "100%",
+  height: "50px",
+  borderRadius: "8px",
+  backgroundColor: "#6c8cff",
+  color: "white",
+  textTransform: "none",
+  fontSize: "16px",
+  fontWeight: 600,
+  "&:hover": {
+    backgroundColor: "#5a75d6",
+  },
+  "&.Mui-disabled": {
+    backgroundColor: "#a0afed",
+    color: "white",
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    height: "45px",
+    fontSize: "15px",
+  },
+}));
+
+const OtpContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  width: "100%",
+  marginBottom: "2rem",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    marginBottom: "1.5rem",
+  },
+}));
+
+const OtpInput = styled(TextField)(({ theme }) => ({
+  width: "60px",
+  "& .MuiOutlinedInput-root": {
+    height: "56px",
+    borderRadius: "8px",
+    fontSize: "1.5rem",
+    fontWeight: "600",
+    "& input": {
+      textAlign: "center",
+      padding: "8px",
+    },
+  },
+  "& input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
+    WebkitAppearance: "none",
+    margin: 0,
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    width: "50px",
+    "& .MuiOutlinedInput-root": {
+      height: "50px",
+      fontSize: "1.3rem",
+      "& input": {
+        padding: "6px",
+      },
+    },
+  },
+  [theme.breakpoints.down("xs")]: {
+    width: "45px",
+    "& .MuiOutlinedInput-root": {
+      height: "45px",
+      fontSize: "1.2rem",
+    },
+  },
+}));
+
+const FooterText = styled(Typography)(({ theme }) => ({
+  fontSize: "13px",
+  color: "#666",
+  textAlign: "center",
+  marginTop: "2rem",
+  position: "absolute",
+  bottom: "6%",
+  left: "50%",
+  transform: "translateX(-50%)",
+  width: "100%",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "13px",
+    marginTop: "1.5rem",
+    bottom: "4%",
+  },
+}));
+
+const DemoText = styled(Box)(({ theme }) => ({
+  margin: "12px 0",
+  padding: "12px",
+  background: "#f0f4ff",
+  borderLeft: "3px solid #6c8cff",
+  borderRadius: "4px",
+  width: "100%",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    margin: "10px 0",
+    padding: "10px",
+    fontSize: "13px",
+  },
+}));
+
+const TimerText = styled(Typography)(({ theme }) => ({
+  textAlign: "center",
+  color: "#666",
+  fontSize: "14px",
+  margin: "16px 0",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "13px",
+    margin: "12px 0",
+  },
+}));
+
+const MainBox = styled(Box)({
+  position: "relative",
+  zIndex: 1,
+});
+
+const StyledPaper = styled(Paper)({
+  padding: "2rem",
+  borderRadius: "15px",
+  background: "linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)",
+  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.12)",
+  width: "100%",
+  maxWidth: "1200px",
+  margin: "0 auto",
+});
+
+const LoginBox = styled(Box)(({ theme }) => ({
+  marginTop: "1rem",
+  display: "flex",
+  height: "90svh",
+  justifyContent: "center",
+  alignItems: "center",
+  "& div": {
+    zIndex: 1000000,
+  },
+  [theme.breakpoints.down("sm")]: {
+    padding: "1rem",
+    height: "90svh",
+  },
+}));
 
 const ProAndInfLogin = () => {
-  const [userExist, setUserExists] = useState(true);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // States
+  const [step, setStep] = useState(1); // 1: Mobile input, 2: OTP verification
+  const [mobile, setMobile] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
+  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [mobileError, setMobileError] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [timer, setTimer] = useState(0);
+
+  // Demo OTP is 1234
+  const DEMO_OTP = "1234";
+
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  // Timer effect for OTP resend
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
+  // Handle mobile input change
+  const handleMobileChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setMobile(value);
+      setMobileError("");
+    }
+  };
+
+  // Handle OTP input change
+  const handleOtpChange = (index, value) => {
+    if (/^\d*$/.test(value) && value.length <= 1) {
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
+      setOtpError("");
+
+      // Auto-focus next input field
+      if (value && index < 3) {
+        document.getElementById(`otp-${index + 1}`).focus();
+      }
+    }
+  };
+
+  // Handle mobile submit - just for demo
+  const handleMobileSubmit = () => {
+    if (mobile.length !== 10) {
+      setMobileError("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
+    setLoading(true);
+
+    setTimeout(() => {
+      setStep(2);
+      setTimer(60);
+      success("OTP sent successfully!");
+      setLoading(false);
+    }, 1000);
+  };
+
+  // Handle OTP verification - just for demo
+  const handleVerifyOtp = async () => {
+    const otpValue = otp.join("");
+
+    if (otpValue.length !== 4) {
+      setOtpError("Please enter a valid 4-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+
+    if (otpValue === DEMO_OTP) {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mobile,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contactNum: mobile,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (loginData.user.userType == "promoter") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promoter" },
+              });
+              navigate("/promotor-admin-panel/home");
+            }
+            if (loginData.user.userType == "influencer") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "influencer" },
+              });
+              navigate("/influencer-admin-panel/home");
+            }
+            if (loginData.user.userType == "admin") {
+              console.log(loginData.user.userType);
+
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promotion-admin" },
+              });
+              navigate("/admin-admin-panel/home");
+            }
+          }, 700);
+        }
+      } else {
+        setUserExists(data.exists);
+      }
+      setNotification({
+        open: true,
+        message: "Login successful!",
+        severity: "success",
+      });
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  // Handle OTP resend - just for demo
+  const handleResendOtp = () => {
+    setLoading(true);
+
+    // Simulate API call with timeout
+    setTimeout(() => {
+      setTimer(60);
+      setNotification({
+        open: true,
+        message: "OTP resent successfully",
+        severity: "success",
+      });
+      setLoading(false);
+    }, 1000);
+  };
+
+  const [userExist, setUserExists] = useState(true);
+
   const [contactNum, setContactNum] = useState("");
   const [spinning, setSpinning] = useState(false);
   const [nameErr, setNameErr] = useState(false);
@@ -202,100 +616,100 @@ const ProAndInfLogin = () => {
     }
   };
 
-  useEffect(() => {
-    // Create and append the script
-    const script = document.createElement("script");
-    script.id = "otpless-sdk";
-    script.type = "text/javascript";
-    script.src = "https://otpless.com/v2/auth.js";
-    script.dataset.appid = "UNQNY1ICBAO5OVTGXY24";
-    document.body.appendChild(script);
+  // useEffect(() => {
+  //   // Create and append the script
+  //   const script = document.createElement("script");
+  //   script.id = "otpless-sdk";
+  //   script.type = "text/javascript";
+  //   script.src = "https://otpless.com/v2/auth.js";
+  //   script.dataset.appid = "UNQNY1ICBAO5OVTGXY24";
+  //   document.body.appendChild(script);
 
-    // Initialize the SDK or handle any setup after the script loads
-    script.onload = () => {
-      // Assuming the SDK provides a global object or function
-      // if (window.Otpless) {
-      //   // Initialize or configure Otpless SDK here
-      //   window.Otpless.initialize({
-      //     /* options */
-      //   });
-      // }
-    };
-    window.otpless = async (otplessUser) => {
-      let phoneNumber = otplessUser.identities[0]["identityValue"];
-      const contactNum = phoneNumber.substring(2);
-      setContactNum(contactNum);
+  //   // Initialize the SDK or handle any setup after the script loads
+  //   script.onload = () => {
+  //     // Assuming the SDK provides a global object or function
+  //     // if (window.Otpless) {
+  //     //   // Initialize or configure Otpless SDK here
+  //     //   window.Otpless.initialize({
+  //     //     /* options */
+  //     //   });
+  //     // }
+  //   };
+  //   window.otpless = async (otplessUser) => {
+  //     let phoneNumber = otplessUser.identities[0]["identityValue"];
+  //     const contactNum = phoneNumber.substring(2);
+  //     setContactNum(contactNum);
 
-      setSpinning(true);
-      const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contactNum: contactNum,
-          }),
-        }
-      );
+  //     setSpinning(true);
+  //     const res = await fetch(
+  //       `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           contactNum: contactNum,
+  //         }),
+  //       }
+  //     );
 
-      const data = await res.json();
-      console.log(data);
+  //     const data = await res.json();
+  //     console.log(data);
 
-      if (data.exists) {
-        const loginRes = await fetch(
-          `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              contactNum: contactNum,
-            }),
-          }
-        );
-        const loginData = await loginRes.json();
+  //     if (data.exists) {
+  //       const loginRes = await fetch(
+  //         `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({
+  //             contactNum: contactNum,
+  //           }),
+  //         }
+  //       );
+  //       const loginData = await loginRes.json();
 
-        if (loginData.isloggedIn) {
-          setTimeout(() => {
-            if (loginData.user.userType == "promoter") {
-              dispatch({
-                type: "log in",
-                data: { ...loginData, type: "promoter" },
-              });
-              navigate("/promotor-admin-panel/home");
-            }
-            if (loginData.user.userType == "influencer") {
-              dispatch({
-                type: "log in",
-                data: { ...loginData, type: "influencer" },
-              });
-              navigate("/influencer-admin-panel/home");
-            }
-            if (loginData.user.userType == "admin") {
-              console.log(loginData.user.userType);
+  //       if (loginData.isloggedIn) {
+  //         setTimeout(() => {
+  //           if (loginData.user.userType == "promoter") {
+  //             dispatch({
+  //               type: "log in",
+  //               data: { ...loginData, type: "promoter" },
+  //             });
+  //             navigate("/promotor-admin-panel/home");
+  //           }
+  //           if (loginData.user.userType == "influencer") {
+  //             dispatch({
+  //               type: "log in",
+  //               data: { ...loginData, type: "influencer" },
+  //             });
+  //             navigate("/influencer-admin-panel/home");
+  //           }
+  //           if (loginData.user.userType == "admin") {
+  //             console.log(loginData.user.userType);
 
-              dispatch({
-                type: "log in",
-                data: { ...loginData, type: "promotion-admin" },
-              });
-              navigate("/admin-admin-panel/home");
-            }
-          }, 700);
-        }
-      } else {
-        setUserExists(data.exists);
-      }
-      setSpinning(false);
-    };
+  //             dispatch({
+  //               type: "log in",
+  //               data: { ...loginData, type: "promotion-admin" },
+  //             });
+  //             navigate("/admin-admin-panel/home");
+  //           }
+  //         }, 700);
+  //       }
+  //     } else {
+  //       setUserExists(data.exists);
+  //     }
+  //     setSpinning(false);
+  //   };
 
-    // Clean up by removing the script when the component unmounts
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  //   // Clean up by removing the script when the component unmounts
+  //   return () => {
+  //     document.body.removeChild(script);
+  //   };
+  // }, []);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -328,8 +742,8 @@ const ProAndInfLogin = () => {
 
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
-    formDataToSend.append("contactNum", contactNum);
-    // formDataToSend.append("contactNum", "7251890867");
+    formDataToSend.append("contactNum", mobile);
+
     formDataToSend.append("email", formData.email);
     formDataToSend.append("role", role);
     formDataToSend.append("fullAddress", formData.fullAddress);
@@ -418,100 +832,256 @@ const ProAndInfLogin = () => {
   };
 
   return (
-    <MainBox>
+    <>
       {contextHolder}
-      {spinning && <MusicLoader />}
-
-      <LoginBox>
-        {userExist && (
-          <>
-            <div
-              style={{
-                zIndex: "1000",
-              }}
-              id="otpless-login-page"
-            ></div>
-            {/* <button onClick={demoLogin}>demo login</button> */}
-          </>
-        )}
-        {!userExist && (
-          <Container maxWidth="sm">
-            {spinning && <MusicLoader />}
-
-            <Fade in timeout={800}>
-              <Box
-                sx={{
-                  minHeight: "100vh",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  py: 4,
-                }}
-              >
-                <StyledPaper elevation={6}>
-                  <Typography
-                    variant="h4"
-                    component="h1"
-                    align="center"
-                    gutterBottom
-                    sx={{
-                      fontWeight: 700,
-                      color: "#1a237e",
-                      mb: 4,
+      {userExist && (
+        <>
+          <LoginContainer>
+            <Container maxWidth="xs" sx={{ py: 4 }}>
+              <LoginCard elevation={1}>
+                {/* Logo */}
+                <LogoPlaceholder>
+                  <img
+                    src={logo}
+                    alt="Rivaaz Films Logo"
+                    style={{
+                      width: "100%",
+                      height: "100%",
                     }}
-                  >
-                    Create Account
-                  </Typography>
+                  />
+                </LogoPlaceholder>
 
-                  <form>
-                    <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-                      <FormControl fullWidth>
-                        <TextField
-                          label="Name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
-                          variant="outlined"
-                          error={nameErr}
-                        />
-                      </FormControl>
-                    </Box>
+                {/* Title */}
+                <Title>Rivaaz Films</Title>
+                <SubTitle>
+                  {step === 1 ? "Let's Sign In" : "Verify OTP"}
+                </SubTitle>
 
-                    <FormControl fullWidth sx={{ mb: 3 }}>
-                      <TextField
-                        label="Email Address"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
+                {/* Form */}
+                {step === 1 ? (
+                  <>
+                    <PhoneInputContainer>
+                      <CountryCode variant="outlined">
+                        <Select
+                          value={countryCode}
+                          onChange={(e) => setCountryCode(e.target.value)}
+                          displayEmpty
+                          inputProps={{ "aria-label": "Country Code" }}
+                        >
+                          <MenuItem value="+91">+91</MenuItem>
+                          <MenuItem value="+1">+1</MenuItem>
+                          <MenuItem value="+44">+44</MenuItem>
+                        </Select>
+                      </CountryCode>
+                      <PhoneInput
+                        placeholder="Enter phone"
                         variant="outlined"
+                        value={mobile}
+                        onChange={handleMobileChange}
+                        error={Boolean(mobileError)}
+                        helperText={mobileError}
+                        inputProps={{ maxLength: 10 }}
+                        type="tel"
                       />
-                    </FormControl>
-                    <FormControl fullWidth sx={{ mb: 3 }}>
-                      {role.length < 1 && (
-                        <InputLabel id="role-label">Role</InputLabel>
+                    </PhoneInputContainer>
+
+                    <ContinueButton
+                      onClick={handleMobileSubmit}
+                      disabled={mobile.length !== 10 || loading}
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} color="inherit" />
+                      ) : (
+                        "Continue"
                       )}
-                      <Select
-                        labelId="role-label"
-                        id="role"
-                        value={role}
-                        onChange={handleRoleChange}
-                        required
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              zIndex: 1300,
+                    </ContinueButton>
+
+                    <FooterText>
+                      By signing in, you agree to <Link href="#">Terms</Link>{" "}
+                      and <Link href="#">policy</Link>
+                    </FooterText>
+                  </>
+                ) : (
+                  <>
+                    <Typography sx={{ width: "100%", mb: 1 }}>
+                      Enter the OTP sent to {countryCode} {mobile}
+                    </Typography>
+
+                    <OtpContainer>
+                      {otp.map((digit, index) => (
+                        <OtpInput
+                          key={index}
+                          id={`otp-${index}`}
+                          type="number"
+                          variant="outlined"
+                          value={digit}
+                          onChange={(e) =>
+                            handleOtpChange(index, e.target.value)
+                          }
+                          inputProps={{ maxLength: 1 }}
+                          onKeyDown={(e) => {
+                            // Allow backspace to move to previous input
+                            if (e.key === "Backspace" && !digit && index > 0) {
+                              document
+                                .getElementById(`otp-${index - 1}`)
+                                .focus();
+                            }
+                          }}
+                          autoFocus={index === 0}
+                        />
+                      ))}
+                    </OtpContainer>
+
+                    {otpError && (
+                      <Typography
+                        color="error"
+                        variant="body2"
+                        sx={{ width: "100%", mb: 2, textAlign: "center" }}
+                      >
+                        {otpError}
+                      </Typography>
+                    )}
+
+                    <ContinueButton
+                      onClick={handleVerifyOtp}
+                      disabled={otp.some((digit) => !digit) || loading}
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} color="inherit" />
+                      ) : (
+                        "Verify"
+                      )}
+                    </ContinueButton>
+
+                    <TimerText>
+                      {timer > 0 ? (
+                        `Resend OTP in ${timer} seconds`
+                      ) : (
+                        <Link
+                          component="button"
+                          variant="body2"
+                          onClick={handleResendOtp}
+                          disabled={loading}
+                          sx={{
+                            textDecoration: "none",
+                            fontWeight: 600,
+                            "&:hover": { textDecoration: "underline" },
+                            "&.Mui-disabled": {
+                              color: "#aaa",
                             },
-                          },
+                          }}
+                        >
+                          Resend OTP
+                        </Link>
+                      )}
+                    </TimerText>
+
+                    <Box sx={{ textAlign: "center", width: "100%" }}>
+                      <Link
+                        component="button"
+                        variant="body2"
+                        onClick={() => setStep(1)}
+                        sx={{
+                          textDecoration: "none",
+                          fontWeight: 500,
+                          "&:hover": { textDecoration: "underline" },
                         }}
                       >
-                        <MenuItem value="promoter">Brand</MenuItem>
-                        <MenuItem value="influencer">Influencer</MenuItem>
-                      </Select>
-                    </FormControl>
-                    {/* <FormControl fullWidth sx={{ mb: 3 }}>
+                        Change phone number
+                      </Link>
+                    </Box>
+                  </>
+                )}
+              </LoginCard>
+            </Container>
+          </LoginContainer>
+          {/* <button onClick={demoLogin}>demo login</button> */}
+        </>
+      )}
+      {!userExist && (
+        <MainBox>
+          {contextHolder}
+          {spinning && <MusicLoader />}
+
+          <LoginBox>
+            {!userExist && (
+              <Container maxWidth="sm">
+                {spinning && <MusicLoader />}
+
+                <Fade in timeout={800}>
+                  <Box
+                    sx={{
+                      minHeight: "100vh",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      py: 4,
+                    }}
+                  >
+                    <StyledPaper elevation={6}>
+                      <Typography
+                        variant="h4"
+                        component="h1"
+                        align="center"
+                        gutterBottom
+                        sx={{
+                          fontWeight: 700,
+                          color: "#1a237e",
+                          mb: 4,
+                        }}
+                      >
+                        Create Account
+                      </Typography>
+
+                      <form>
+                        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+                          <FormControl fullWidth>
+                            <TextField
+                              label="Name"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleChange}
+                              required
+                              variant="outlined"
+                              error={nameErr}
+                            />
+                          </FormControl>
+                        </Box>
+
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                          <TextField
+                            label="Email Address"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                            variant="outlined"
+                          />
+                        </FormControl>
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                          {role.length < 1 && (
+                            <InputLabel id="role-label">Role</InputLabel>
+                          )}
+                          <Select
+                            labelId="role-label"
+                            id="role"
+                            value={role}
+                            onChange={handleRoleChange}
+                            required
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  zIndex: 1300,
+                                },
+                              },
+                            }}
+                          >
+                            <MenuItem value="promoter">Brand</MenuItem>
+                            <MenuItem value="influencer">Influencer</MenuItem>
+                          </Select>
+                        </FormControl>
+                        {/* <FormControl fullWidth sx={{ mb: 3 }}>
                       <TextField
                         label="Full Address"
                         name="fullAddress"
@@ -550,29 +1120,29 @@ const ProAndInfLogin = () => {
                         variant="outlined"
                       />
                     </FormControl> */}
-                    {role === "influencer" && (
-                      <>
-                        <FormControl fullWidth sx={{ mb: 3 }}>
-                          <TextField
-                            label="Instagram URL"
-                            name="socialMediaUrl"
-                            value={formData.socialMediaUrl}
-                            onChange={handleChange}
-                            variant="outlined"
-                          />
-                        </FormControl>
-                        <FormControl fullWidth sx={{ mb: 3 }}>
-                          <TextField
-                            label="Price per promotion"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            variant="outlined"
-                            type="number"
-                            required
-                          />
-                        </FormControl>
-                        {/* 
+                        {role === "influencer" && (
+                          <>
+                            <FormControl fullWidth sx={{ mb: 3 }}>
+                              <TextField
+                                label="Instagram URL"
+                                name="socialMediaUrl"
+                                value={formData.socialMediaUrl}
+                                onChange={handleChange}
+                                variant="outlined"
+                              />
+                            </FormControl>
+                            <FormControl fullWidth sx={{ mb: 3 }}>
+                              <TextField
+                                label="Price per promotion"
+                                name="price"
+                                value={formData.price}
+                                onChange={handleChange}
+                                variant="outlined"
+                                type="number"
+                                required
+                              />
+                            </FormControl>
+                            {/* 
                         <FormControl fullWidth sx={{ mb: 3 }}>
                           <TextField
                             label="Price per promotion"
@@ -656,64 +1226,69 @@ const ProAndInfLogin = () => {
                             </MenuItem>
                           </Select>
                         </FormControl> */}
-                      </>
-                    )}
+                          </>
+                        )}
 
-                    <FormControl fullWidth sx={{ mb: 3 }}>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
-                      {imagePreview && (
-                        <img
-                          src={imagePreview}
-                          alt="Profile Preview"
-                          style={{
-                            margin: "0 auto",
-                            marginTop: "15px",
-                            maxWidth: "30%",
-                            display: "block",
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                          {imagePreview && (
+                            <img
+                              src={imagePreview}
+                              alt="Profile Preview"
+                              style={{
+                                margin: "0 auto",
+                                marginTop: "15px",
+                                maxWidth: "30%",
+                                display: "block",
+                              }}
+                            />
+                          )}
+                        </FormControl>
+
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          fullWidth
+                          onClick={onSubmitHandler}
+                          sx={{
+                            py: 1.5,
+                            textTransform: "none",
+                            fontSize: "1.1rem",
+                            fontWeight: 600,
+                            borderRadius: "8px",
+                            background:
+                              "linear-gradient(45deg, #1a237e 30%, #283593 90%)",
+                            "&:hover": {
+                              background:
+                                "linear-gradient(45deg, #283593 30%, #1a237e 90%)",
+                            },
                           }}
-                        />
-                      )}
-                    </FormControl>
+                        >
+                          {spinning ? (
+                            <CircularProgress
+                              size={24}
+                              sx={{ color: "#fff" }}
+                            />
+                          ) : (
+                            "Register"
+                          )}
+                        </Button>
+                      </form>
+                    </StyledPaper>
+                  </Box>
+                </Fade>
+              </Container>
+            )}
+          </LoginBox>
 
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      fullWidth
-                      onClick={onSubmitHandler}
-                      sx={{
-                        py: 1.5,
-                        textTransform: "none",
-                        fontSize: "1.1rem",
-                        fontWeight: 600,
-                        borderRadius: "8px",
-                        background:
-                          "linear-gradient(45deg, #1a237e 30%, #283593 90%)",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(45deg, #283593 30%, #1a237e 90%)",
-                        },
-                      }}
-                    >
-                      {spinning ? (
-                        <CircularProgress size={24} sx={{ color: "#fff" }} />
-                      ) : (
-                        "Register"
-                      )}
-                    </Button>
-                  </form>
-                </StyledPaper>
-              </Box>
-            </Fade>
-          </Container>
-        )}
-      </LoginBox>
-
-      <Footer />
-    </MainBox>
+          <Footer />
+        </MainBox>
+      )}
+    </>
   );
 };
 

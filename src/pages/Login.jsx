@@ -1,830 +1,620 @@
 import React, { useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
-
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { Alert, Snackbar, setRef } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  TextField,
+  Paper,
+  InputAdornment,
+  Link,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import MusicLoader from "../components/Loader/MusicLoader";
-import { Input as IN } from "antd";
-const OuterBox = styled.div`
-  background-color: #f7f7f7;
-  height: 95svh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem 0;
-  @media only screen and (max-width: 1000px) {
-    height: 100svh;
-    overflow: scroll;
-  }
-`;
+import logo from "../assets/images/logo/ready.png";
+// Styled Components
+const LoginContainer = styled(Box)({
+  minHeight: "100vh",
+  display: "flex",
+  background: "#f9f9f9",
+  justifyContent: "center",
+  alignItems: "center",
+});
 
-const MainBox = styled.div`
-  background-color: white;
-  width: 60vw;
-  box-shadow: 0.1rem 0.1rem 2rem rgba(161, 161, 161, 0.28);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  height: fit-content;
-  display: grid;
-  grid-template-columns: 1.5fr 2fr;
+const LoginCard = styled(Paper)(({ theme }) => ({
+  padding: "2.5rem 2rem",
+  borderRadius: "12px",
+  width: "83%",
+  backgroundColor: "#ffffff",
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  height: "72svh",
+  position: "relative",
+  border: "1px solid rgb(201, 202, 206)",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    padding: "1rem",
+    width: "90%",
+    height: "60svh",
+  },
+  [theme.breakpoints.down("xs")]: {
+    padding: "1.2rem",
+    width: "98%",
+  },
+}));
 
-  @media only screen and (max-width: 700px) {
-    /* display: none; */
-    grid-template-columns: 1fr;
-    width: 90vw;
-  }
-`;
+const Logo = styled("img")({
+  width: "60px",
+  height: "60px",
+  marginBottom: "1rem",
+  // Responsive styles
+  "@media (max-width: 600px)": {
+    width: "50px",
+    height: "50px",
+    marginBottom: "0.7rem",
+  },
+});
 
-const LeftDivAni = keyframes`
-    0%{  transform: translateX(100%);
-        z-index: 100;
-        opacity: 0;
+const LogoPlaceholder = styled(Box)(({ theme }) => ({
+  width: "50px",
+  height: "50px",
 
-    }
-    100%{
-        transform: translateX(0);
-        opacity: 1; z-index: 1;
-    }
-`;
-const RightDivAni = keyframes`
-    
-    0%{    transform: translateX(-50%);
-        z-index: -1;
-        opacity: 0;
+  borderRadius: "8px",
+  marginBottom: "1rem",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  overflow: "hidden",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    width: "50px",
+    height: "50px",
+    marginBottom: "0.7rem",
+  },
+}));
 
-    }
-    30%{
-        z-index: -1;
-    }
-    100%{
-        transform: translateX(0);
-        opacity: 1;
-        z-index: 1;
-    }
-`;
-const LeftDiv = styled.div`
-  color: white;
-  background: rgb(235, 76, 13);
-  background: linear-gradient(
-    162deg,
-    rgba(235, 76, 13, 1) 0%,
-    rgba(235, 72, 7, 1) 46%,
-    rgba(233, 70, 6, 0.9080882352941176) 100%
-  );
-  background: rgb(235, 76, 13);
-  background: linear-gradient(
-    162deg,
-    rgba(235, 76, 13, 1) 0%,
-    rgba(235, 72, 7, 1) 46%,
-    rgba(233, 70, 6, 0.9080882352941176) 100%
-  );
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 2rem;
-  transition: all 1s;
-  animation: ${LeftDivAni} 0.6s;
-  word-wrap: break-word;
-  h1 {
-    letter-spacing: 0.09rem;
-    font-weight: bold;
-  }
-  p {
-    font-size: 1.1rem;
-    font-size: 400;
-    letter-spacing: 0.09rem;
-    text-align: center;
-  }
-  button {
-    background-color: transparent;
-    margin: 0 auto;
-    border: 1px solid white;
-    border-radius: 1rem;
-    padding: 1rem 3rem;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1rem;
-    font-weight: bold;
-    color: white;
-  }
-  @media only screen and (max-width: 700px) {
-    padding: 1rem;
-    gap: 1rem;
-    h1 {
-      font-size: 2rem;
-      margin: 0;
-    }
-    p {
-      font-size: 1rem;
-      margin: 0;
-    }
-    button {
-      padding: 0.7rem 1.7rem;
-      font-size: 1rem;
-    }
-  }
-`;
-const RightDiv = styled.div`
-  margin: 0.4rem 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  animation: ${RightDivAni} 0.6s;
-  padding: 1rem;
-  h2 {
-    font-size: 2rem;
-    margin: 0;
-  }
-  h3 {
-    color: #cacaca;
-    font-size: 1.3rem;
-    text-align: center;
-    font-weight: 400;
-  }
-  @media only screen and (max-width: 700px) {
-    padding: 1rem;
-    h2 {
-      margin: 0;
-      font-size: 1.8rem;
-    }
-    h3 {
-      margin: 0;
-      font-size: 1rem;
-    }
-  }
-`;
+const Title = styled(Typography)(({ theme }) => ({
+  fontSize: "30px",
+  marginBottom: "0.5rem",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "24px",
+    marginBottom: "0.3rem",
+  },
+}));
 
-const EmailVerificationBox = styled.div`
-  display: flex;
-  width: 90%;
-  height: fit-content;
+const SubTitle = styled(Typography)(({ theme }) => ({
+  fontSize: "16px",
+  fontWeight: 400,
+  color: "#666",
+  marginBottom: "2rem",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "14px",
+    marginBottom: "1.5rem",
+  },
+}));
 
-  gap: 1rem;
-  flex-direction: column;
-  /* justify-content: center; */
-  align-items: center;
-  position: relative;
+const PhoneInputContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  width: "100%",
+  marginBottom: "1.5rem",
+  gap: "10px",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    marginBottom: "1.2rem",
+  },
+}));
 
-  span {
-    cursor: pointer;
-    color: #df8fa1;
-  }
-  p {
-    width: 100%;
-    color: rgb(221, 57, 57);
-    margin-top: -1rem;
-    letter-spacing: 0.08rem;
-  }
-  a {
-    text-decoration: none;
-  }
-`;
-const LoaderBox = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  border-radius: 0.6rem;
-  z-index: 2;
-  background-color: #f9f8f852;
-`;
+const CountryCode = styled(FormControl)(({ theme }) => ({
+  width: "80px",
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    height: "55px",
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    width: "90px",
+    "& .MuiOutlinedInput-root": {
+      height: "50px",
+    },
+  },
+}));
 
-const Input = styled.input`
-  width: 100%;
-  height: 42px;
-  outline: none;
-  border: 1px solid rgba(166, 166, 166, 0.3);
-  border-radius: 5px;
-  padding: 0px 10px;
-  transition: all 200ms ease-in-out;
-  margin-bottom: 5px;
+const PhoneInput = styled(TextField)(({ theme }) => ({
+  flex: 1,
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    height: "55px",
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    "& .MuiOutlinedInput-root": {
+      height: "50px",
+    },
+  },
+}));
 
-  &::placeholder {
-    color: rgba(200, 200, 200, 1);
-  }
+const ContinueButton = styled(Button)(({ theme }) => ({
+  width: "100%",
+  height: "50px",
+  borderRadius: "8px",
+  backgroundColor: "#6c8cff",
+  color: "white",
+  textTransform: "none",
+  fontSize: "16px",
+  fontWeight: 600,
+  "&:hover": {
+    backgroundColor: "#5a75d6",
+  },
+  "&.Mui-disabled": {
+    backgroundColor: "#a0afed",
+    color: "white",
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    height: "45px",
+    fontSize: "15px",
+  },
+}));
 
-  &:focus {
-    outline: none;
-    border-bottom: 1px solid red;
-  }
-`;
-const SubmitButton = styled.button`
-  width: 100%;
-  max-width: 150px;
-  padding: 10px;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: all 240ms ease-in-out;
-  background: linear-gradient(58deg, red 20%, red 100%);
+const OtpContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  width: "100%",
+  marginBottom: "2rem",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    marginBottom: "1.5rem",
+  },
+}));
 
-  &:hover {
-    filter: brightness(1.03);
-  }
-`;
+const OtpInput = styled(TextField)(({ theme }) => ({
+  width: "60px",
+  "& .MuiOutlinedInput-root": {
+    height: "56px",
+    borderRadius: "8px",
+    fontSize: "1.5rem",
+    fontWeight: "600",
+    "& input": {
+      textAlign: "center",
+      padding: "8px",
+    },
+  },
+  "& input::-webkit-outer-spin-button, input::-webkit-inner-spin-button": {
+    WebkitAppearance: "none",
+    margin: 0,
+  },
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    width: "50px",
+    "& .MuiOutlinedInput-root": {
+      height: "50px",
+      fontSize: "1.3rem",
+      "& input": {
+        padding: "6px",
+      },
+    },
+  },
+  [theme.breakpoints.down("xs")]: {
+    width: "45px",
+    "& .MuiOutlinedInput-root": {
+      height: "45px",
+      fontSize: "1.2rem",
+    },
+  },
+}));
 
-const DisabledBtn = styled.button`
-  width: 100%;
-  max-width: 150px;
-  padding: 10px;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  border: none;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: all 240ms ease-in-out;
-  background: #dbdbdb;
+const FooterText = styled(Typography)(({ theme }) => ({
+  fontSize: "13px",
+  color: "#666",
+  textAlign: "center",
+  marginTop: "2rem",
+  position: "absolute",
+  bottom: "6%",
+  left: "50%",
+  transform: "translateX(-50%)",
+  width: "100%",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "13px",
+    marginTop: "1.5rem",
+    bottom: "4%",
+  },
+}));
 
-  &:hover {
-    filter: brightness(1.03);
-  }
-`;
-const Span = styled.span`
-  text-transform: capitalize;
-`;
+const DemoText = styled(Box)(({ theme }) => ({
+  margin: "12px 0",
+  padding: "12px",
+  background: "#f0f4ff",
+  borderLeft: "3px solid #6c8cff",
+  borderRadius: "4px",
+  width: "100%",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    margin: "10px 0",
+    padding: "10px",
+    fontSize: "13px",
+  },
+}));
 
-const Login = () => {
-  const [forgotEmailSend, setForgotEmailSend] = useState(false);
-  const [forOtpVer, setForOtpVer] = useState(false);
-  const [forEmailValid, setForEmailValid] = useState(false);
-  const [forPassValid, setForPassValid] = useState(false);
-  const [emailVer, setEmailVer] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailErr, setEmailErr] = useState(false);
-  const [mobileErr, setMobileErr] = useState(false);
-  const [passwordErr, setPasswordErr] = useState(false);
-  const [allValid, setAllValid] = useState(false);
-  const [serverErr, setServerErr] = useState(false);
-  const [serverTxt, setServerTxt] = useState("");
+const TimerText = styled(Typography)(({ theme }) => ({
+  textAlign: "center",
+  color: "#666",
+  fontSize: "14px",
+  margin: "16px 0",
+  // Responsive styles
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "13px",
+    margin: "12px 0",
+  },
+}));
+
+const MobileOtpLogin = () => {
   const navigate = useNavigate();
-  const [showMobile, setShowMobile] = useState(false);
   const dispatch = useDispatch();
-  const [name, setName] = useState("");
-  const [showForgot, setShowForgot] = useState(false);
-  const [refresher, setRefresher] = useState(0);
-  const [state, setState] = React.useState({
+
+  // States
+  const [step, setStep] = useState(1); // 1: Mobile input, 2: OTP verification
+  const [mobile, setMobile] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
+  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [loading, setLoading] = useState(false);
+  const [mobileError, setMobileError] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [timer, setTimer] = useState(0);
+
+  // Demo OTP is 1234
+  const DEMO_OTP = "1234";
+
+  const [notification, setNotification] = useState({
     open: false,
-    vertical: "top",
-    horizontal: "center",
-    text: "",
+    message: "",
+    severity: "success",
   });
-  const { vertical, horizontal, open, text } = state;
 
+  // Timer effect for OTP resend
   useEffect(() => {
-    const intv = setInterval(() => {
-      if (!showForgot) {
-        allFieldChecker();
-      }
-    }, 500);
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
 
-    return () => {
-      clearInterval(intv);
-    };
-  }, [showForgot, refresher]);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
 
-  const handleClick = (newState) => () => {
-    setState({ ...newState, open: true });
-  };
-
-  const handleClose = () => {
-    setState({ ...state, open: false });
-  };
-
-  const defaultFields = {
-    fullName: "",
-    email: "",
-    password: "",
-    contactNum: "",
-    otp: "",
-  };
-  const [inpFields, setInpFields] = useState(defaultFields);
-  const validateEmail = (email) => {
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const allFieldChecker = () => {
-    setAllValid(false);
-    const email = document.querySelector("#email");
-    const contactNum = document.querySelector("#contactNum");
-
-    const password = document.querySelector("#password").value;
-    if (contactNum) {
-      if (contactNum.value.length === 10 && password.length > 5) {
-        setAllValid(true);
-      }
-    } else {
-      if (validateEmail(email.value) && password.length > 5) {
-        setAllValid(true);
-      }
+  // Handle mobile input change
+  const handleMobileChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setMobile(value);
+      setMobileError("");
     }
   };
-  const onBlurHandler = (e) => {
-    const id = e.target.id;
-    const val = document.querySelector(`#${e.target.id}`).value;
-    if (id === "email") {
-      if (!validateEmail(val)) {
-        setEmailErr(true);
-      }
-    }
-    if (id === "password") {
-      if (val.trim().length < 6) {
-        setPasswordErr(true);
+
+  // Handle OTP input change
+  const handleOtpChange = (index, value) => {
+    if (/^\d*$/.test(value) && value.length <= 1) {
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
+      setOtpError("");
+
+      // Auto-focus next input field
+      if (value && index < 3) {
+        document.getElementById(`otp-${index + 1}`).focus();
       }
     }
   };
 
-  const onChangeHandler = (e) => {
-    setServerErr(false);
-    const id = e.target.id;
-    const val = e.target.value;
-    allFieldChecker();
-
-    if (id === "email") {
-      setServerErr(false);
-      setServerTxt("");
-      setEmailErr(false);
-    }
-    if (id === "contactNum") {
-      setMobileErr(false);
-    }
-    if (id === "password") {
-      setPasswordErr(false);
-    }
-
-    setInpFields({ ...inpFields, [id]: val });
-  };
-  const onSubmitHandler = async () => {
-    if (!allValid) {
+  // Handle mobile submit - just for demo
+  const handleMobileSubmit = () => {
+    if (mobile.length !== 10) {
+      setMobileError("Please enter a valid 10-digit mobile number");
       return;
     }
-    setIsLoading(true);
-    let res;
-    if (showMobile) {
-      res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contactNum: inpFields.contactNum,
-          password: inpFields.password,
-        }),
-      });
-    }
-    if (!showMobile) {
-      res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: inpFields.email,
-          password: inpFields.password,
-        }),
-      });
-    }
 
-    const data = await res.json();
+    setLoading(true);
 
-    if (!res.ok) {
-      setServerErr(true);
-      setServerTxt(data.message);
-      setInpFields({ ...inpFields, password: "" });
-    }
-    // alert(data.message);
-
-    if (data.success) {
-      setName(data.user.name);
-      setInpFields(defaultFields);
-      setState({
-        ...state,
+    // Simulate API call with timeout
+    setTimeout(() => {
+      setStep(2);
+      setTimer(60);
+      setNotification({
         open: true,
-        text: "Log in successfull. We're thrilled to see you again",
+        message: "OTP sent successfully",
+        severity: "success",
       });
+      setLoading(false);
+    }, 1000);
+  };
 
-      setTimeout(() => {
-        if (!data.user.isAdmin) {
-          dispatch({ type: "log in", data: { ...data, type: "music-user" } });
-          navigate("/user-panel/home");
-        }
-        if (data.user.isAdmin) {
-          dispatch({ type: "log in", data: { ...data, type: "music-admin" } });
-          navigate("/admin-panel/orders");
-        }
-      }, 1000);
+  // Handle OTP verification - just for demo
+  const handleVerifyOtp = async () => {
+    const otpValue = otp.join("");
+
+    if (otpValue.length !== 4) {
+      setOtpError("Please enter a valid 4-digit OTP");
+      return;
     }
 
-    setIsLoading(false);
+    setLoading(true);
+
+    if (otpValue === DEMO_OTP) {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mobile,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: mobile,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        // 9927321330
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (!loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-user" },
+              });
+              navigate("/user-panel/home");
+            }
+            if (loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-admin" },
+              });
+              navigate("/admin-panel/orders");
+            }
+          }, 1000);
+        }
+      } else {
+        navigate("/register", {
+          state: {
+            contactNum: mobile,
+          },
+        });
+      }
+      setNotification({
+        open: true,
+        message: "Login successful!",
+        severity: "success",
+      });
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  // Handle OTP resend - just for demo
+  const handleResendOtp = () => {
+    setLoading(true);
+
+    // Simulate API call with timeout
+    setTimeout(() => {
+      setTimer(60);
+      setNotification({
+        open: true,
+        message: "OTP resent successfully",
+        severity: "success",
+      });
+      setLoading(false);
+    }, 1000);
+  };
+
+  // Handle notification close
+  const handleCloseNotification = () => {
+    setNotification({
+      ...notification,
+      open: false,
+    });
   };
 
   return (
-    <>
+    <LoginContainer>
       <Snackbar
-        open={open}
-        anchorOrigin={{ vertical, horizontal }}
+        open={notification.open}
         autoHideDuration={6000}
-        onClose={handleClose}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
-          onClose={handleClose}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%", top: 0, fontSize: "1rem" }}
+          onClose={handleCloseNotification}
+          severity={notification.severity}
+          sx={{ width: "100%" }}
         >
-          {text} <Span> {name}</Span>.
+          {notification.message}
         </Alert>
       </Snackbar>
-      <OuterBox>
-        {" "}
-        <MainBox>
-          <LeftDiv>
-            {/* <img src={logo} alt="" /> */}
-            <h1>New here?</h1>
-            <p>
-              To get started with your music experience, please create an
-              account.
-            </p>
-            <button
-              onClick={() => {
-                navigate("/register");
+
+      <Container maxWidth="xs" sx={{ py: 4 }}>
+        <LoginCard elevation={1}>
+          {/* Logo */}
+          <LogoPlaceholder>
+            <img
+              src={logo}
+              alt="Rivaaz Films Logo"
+              style={{
+                width: "100%",
+                height: "100%",
               }}
-            >
-              Sign up
-            </button>
-          </LeftDiv>
-          <RightDiv>
-            {!showForgot && (
-              <>
-                <h2>Log In</h2>
-                <h3>Ready to dive back into your music journey?</h3>
-                {emailVer && (
-                  <EmailVerificationBox>
-                    {isLoading && (
-                      <LoaderBox>
-                        <MusicLoader />
-                      </LoaderBox>
-                    )}
-                    {!showMobile && (
-                      <>
-                        <IN
-                          className="inputField inp"
-                          type="text"
-                          name="email"
-                          id="email"
-                          onChange={onChangeHandler}
-                          placeholder="Email"
-                          onBlur={onBlurHandler}
-                          value={inpFields.email}
-                          style={{
-                            border: `${
-                              emailErr
-                                ? "1px solid #d72020"
-                                : "1px solid rgba(166, 166, 166, 0.3)"
-                            }`,
-                          }}
-                        />
-                        {emailErr && <p>Invalid Email</p>}
-                      </>
-                    )}
-                    {showMobile && (
-                      <>
-                        <Input
-                          type="number"
-                          name=""
-                          className="inputField"
-                          id="contactNum"
-                          onBlur={onBlurHandler}
-                          onChange={onChangeHandler}
-                          placeholder="Mobile number"
-                          value={inpFields.contactNum}
-                          style={{
-                            border: `${
-                              mobileErr
-                                ? "1px solid #d72020"
-                                : "1px solid rgba(166, 166, 166, 0.3)"
-                            }`,
-                          }}
-                        />{" "}
-                        {mobileErr && <p>Invalid Contact Number</p>}
-                      </>
-                    )}
-                    {/* <Input
-                      type={showPassword ? "text" : "password"}
-                      name=""
-                      className="inputField"
-                      id="password"
-                      onBlur={onBlurHandler}
-                      value={inpFields.password}
-                      onChange={onChangeHandler}
-                      placeholder="Password"
-                      style={{
-                        border: `${
-                          passwordErr
-                            ? "1px solid #d72020"
-                            : "1px solid rgba(166, 166, 166, 0.3)"
-                        }`,
-                      }}
-                    /> */}
-                    <IN.Password
-                      name=""
-                      className="inputField inp"
-                      id="password"
-                      onBlur={onBlurHandler}
-                      value={inpFields.password}
-                      onChange={onChangeHandler}
-                      placeholder="Password"
-                      style={{
-                        border: `${
-                          passwordErr
-                            ? "1px solid #d72020"
-                            : "1px solid rgba(166, 166, 166, 0.3)"
-                        }`,
-                        color: "#000", // Ensure text color is black (or any desired color)
-                      }}
-                    />
+            />
+          </LogoPlaceholder>
 
-                    {passwordErr && (
-                      <p>Password is too short (minimun 6 charcters.)</p>
-                    )}
-                    {serverErr && <p>{serverTxt}</p>}
-                    {allValid && (
-                      <SubmitButton onClick={onSubmitHandler}>
-                        Submit
-                      </SubmitButton>
-                    )}
-                    {!allValid && <DisabledBtn>Submit</DisabledBtn>}
-                    <p
-                      onClick={() => {
-                        setShowForgot(true);
-                      }}
-                      style={{
-                        textTransform: "capitalize",
-                        textAlign: "center",
+          {/* Title */}
+          <Title>Rivaaz Films</Title>
+          <SubTitle>{step === 1 ? "Let's Sign In" : "Verify OTP"}</SubTitle>
 
-                        margin: "-1.2rem 0",
-                        color: "#e6758d",
-                        padding: "2.6px 1px",
-                        borderBottom: "1px dashed #e6758d",
-                        margin: "0 auto",
-                        width: "fit-content",
-                        cursor: "pointer",
-                      }}
-                    >
-                      forgot password
-                    </p>
-                  </EmailVerificationBox>
+          {/* Form */}
+          {step === 1 ? (
+            <>
+              <PhoneInputContainer>
+                <CountryCode variant="outlined">
+                  <Select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    displayEmpty
+                    inputProps={{ "aria-label": "Country Code" }}
+                  >
+                    <MenuItem value="+91">+91</MenuItem>
+                    <MenuItem value="+1">+1</MenuItem>
+                    <MenuItem value="+44">+44</MenuItem>
+                  </Select>
+                </CountryCode>
+                <PhoneInput
+                  placeholder="Enter phone"
+                  variant="outlined"
+                  value={mobile}
+                  onChange={handleMobileChange}
+                  error={Boolean(mobileError)}
+                  helperText={mobileError}
+                  inputProps={{ maxLength: 10 }}
+                  type="tel"
+                />
+              </PhoneInputContainer>
+
+              <ContinueButton
+                onClick={handleMobileSubmit}
+                disabled={mobile.length !== 10 || loading}
+              >
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Continue"
                 )}
-              </>
-            )}
-            {showForgot && (
-              <>
-                <h2>Forgot Password</h2>
-                <h3>Enter email to reset your password</h3>
-                {emailVer && (
-                  <EmailVerificationBox>
-                    {isLoading && (
-                      <LoaderBox>
-                        <MusicLoader />
-                      </LoaderBox>
-                    )}
-                    {!showMobile && (
-                      <>
-                        {!forgotEmailSend && (
-                          <IN
-                            type="text"
-                            className="inputField inp"
-                            name="email"
-                            id="email"
-                            value={inpFields.email}
-                            onChange={(e) => {
-                              setServerErr(false);
-                              setServerTxt("");
-                              setEmailErr(false);
-                              setInpFields({
-                                ...inpFields,
-                                email: e.target.value,
-                              });
-                              setForEmailValid(false);
-                              if (validateEmail(e.target.value)) {
-                                setForEmailValid(true);
-                              }
-                            }}
-                            placeholder="Email"
-                            onBlur={onBlurHandler}
-                            style={{
-                              border: `${
-                                emailErr
-                                  ? "1px solid #d72020"
-                                  : "1px solid rgba(166, 166, 166, 0.3)"
-                              }`,
-                            }}
-                          />
-                        )}
-                        {emailErr && <p>Invalid Email</p>}
-                      </>
-                    )}
-                    {forgotEmailSend && forOtpVer && (
-                      <IN.Password
-                        name=""
-                        className="inputField inp"
-                        id="password"
-                        onBlur={onBlurHandler}
-                        onChange={(e) => {
-                          setForPassValid(false);
-                          setPasswordErr(false);
-                          if (e.target.value.trim().length < 6) {
-                            return;
-                          } else {
-                            setForPassValid(true);
-                          }
-                          setInpFields({
-                            ...inpFields,
-                            password: e.target.value,
-                          });
-                        }}
-                        placeholder="Password"
-                        style={{
-                          border: `${
-                            passwordErr
-                              ? "1px solid #d72020"
-                              : "1px solid rgba(166, 166, 166, 0.3)"
-                          }`,
-                        }}
-                      />
-                    )}
-                    {passwordErr && (
-                      <p>Password is too short (minimun 6 charcters.)</p>
-                    )}
+              </ContinueButton>
 
-                    {forgotEmailSend && !forOtpVer && (
-                      <Input
-                        type="number"
-                        name=""
-                        className="inputField"
-                        id="otp"
-                        onChange={() => {
-                          setServerErr(false);
-                          setServerTxt("");
-                        }}
-                        placeholder="Enter otp sent to your email"
-                      />
-                    )}
+              <FooterText>
+                By signing in, you agree to <Link href="#">Terms</Link> and{" "}
+                <Link href="#">policy</Link>
+              </FooterText>
+            </>
+          ) : (
+            <>
+              <Typography sx={{ width: "100%", mb: 1 }}>
+                Enter the OTP sent to {countryCode} {mobile}
+              </Typography>
 
-                    {serverErr && <p>{serverTxt}</p>}
+              <OtpContainer>
+                {otp.map((digit, index) => (
+                  <OtpInput
+                    key={index}
+                    id={`otp-${index}`}
+                    type="number"
+                    variant="outlined"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    inputProps={{ maxLength: 1 }}
+                    onKeyDown={(e) => {
+                      // Allow backspace to move to previous input
+                      if (e.key === "Backspace" && !digit && index > 0) {
+                        document.getElementById(`otp-${index - 1}`).focus();
+                      }
+                    }}
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </OtpContainer>
 
-                    {forEmailValid && !forgotEmailSend && (
-                      <SubmitButton
-                        onClick={async () => {
-                          setIsLoading(true);
-                          const reslt = await fetch(
-                            `${process.env.REACT_APP_BASE_URL}/user/forgot-send-email`,
-                            {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify({
-                                email: inpFields.email,
-                              }),
-                            }
-                          );
-                          const data = await reslt.json();
+              {otpError && (
+                <Typography
+                  color="error"
+                  variant="body2"
+                  sx={{ width: "100%", mb: 2, textAlign: "center" }}
+                >
+                  {otpError}
+                </Typography>
+              )}
 
-                          if (reslt.ok) {
-                            setForgotEmailSend(true);
-                          } else {
-                            setServerErr(true);
-                            setServerTxt(data.message);
-                          }
-                          setIsLoading(false);
-                        }}
-                      >
-                        Submit
-                      </SubmitButton>
-                    )}
-                    {forgotEmailSend && !forOtpVer && (
-                      <SubmitButton
-                        onClick={async () => {
-                          setIsLoading(true);
-                          const val = document.querySelector("#otp").value;
-                          const reslt = await fetch(
-                            `${process.env.REACT_APP_BASE_URL}/user/forgot-verify-otp`,
-                            {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify({
-                                otpInp: Number(val),
-                                email: inpFields.email,
-                              }),
-                            }
-                          );
-                          const data = await reslt.json();
-
-                          if (data.valid) {
-                            setForOtpVer(true);
-                          }
-                          if (!data.valid) {
-                            setServerErr(true);
-                            setServerTxt(data.message);
-                          }
-                          setIsLoading(false);
-                        }}
-                      >
-                        Submit
-                      </SubmitButton>
-                    )}
-                    {forgotEmailSend && forOtpVer && forPassValid && (
-                      <SubmitButton
-                        onClick={async () => {
-                          setIsLoading(true);
-
-                          const reslt = await fetch(
-                            `${process.env.REACT_APP_BASE_URL}/user/reset-password`,
-                            {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify({
-                                email: inpFields.email,
-                                password: inpFields.password,
-                              }),
-                            }
-                          );
-                          const data = await reslt.json();
-
-                          if (reslt.ok) {
-                            setState({
-                              ...state,
-                              open: true,
-                              text: "Password has been changed.",
-                            });
-
-                            window.location.reload();
-                          }
-                          if (!data.valid) {
-                            setServerErr(true);
-                            setServerTxt(data.message);
-                          }
-                          setIsLoading(false);
-                        }}
-                      >
-                        Submit
-                      </SubmitButton>
-                    )}
-                    {!forEmailValid && <DisabledBtn>Submit</DisabledBtn>}
-                    {!forPassValid && forgotEmailSend && forOtpVer && (
-                      <DisabledBtn>Submit</DisabledBtn>
-                    )}
-                    <p
-                      onClick={() => {
-                        setShowForgot(false);
-                      }}
-                      style={{
-                        textTransform: "capitalize",
-                        textAlign: "center",
-
-                        margin: "-1.2rem 0",
-                        color: "#e6758d",
-                        padding: "2.6px 1px",
-                        borderBottom: "1px dashed #e6758d",
-                        margin: "0 auto",
-                        width: "fit-content",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Back to login
-                    </p>
-                  </EmailVerificationBox>
+              <ContinueButton
+                onClick={handleVerifyOtp}
+                disabled={otp.some((digit) => !digit) || loading}
+              >
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Verify"
                 )}
-              </>
-            )}
-          </RightDiv>
-        </MainBox>
-      </OuterBox>
-      {/* <Footer /> */}
-    </>
+              </ContinueButton>
+
+              <TimerText>
+                {timer > 0 ? (
+                  `Resend OTP in ${timer} seconds`
+                ) : (
+                  <Link
+                    component="button"
+                    variant="body2"
+                    onClick={handleResendOtp}
+                    disabled={loading}
+                    sx={{
+                      textDecoration: "none",
+                      fontWeight: 600,
+                      "&:hover": { textDecoration: "underline" },
+                      "&.Mui-disabled": {
+                        color: "#aaa",
+                      },
+                    }}
+                  >
+                    Resend OTP
+                  </Link>
+                )}
+              </TimerText>
+
+              <Box sx={{ textAlign: "center", width: "100%" }}>
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => setStep(1)}
+                  sx={{
+                    textDecoration: "none",
+                    fontWeight: 500,
+                    "&:hover": { textDecoration: "underline" },
+                  }}
+                >
+                  Change phone number
+                </Link>
+              </Box>
+            </>
+          )}
+        </LoginCard>
+      </Container>
+    </LoginContainer>
   );
 };
 
-export default Login;
+export default MobileOtpLogin;
