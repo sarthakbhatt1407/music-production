@@ -20,7 +20,7 @@ import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
-// Styled Components
+
 const LoginContainer = styled(Box)({
   minHeight: "100vh",
   display: "flex",
@@ -318,8 +318,10 @@ const MobileOtpLogin = () => {
     }
   };
 
-  // Handle mobile submit - just for demo
-  const handleMobileSubmit = () => {
+  const [generatedOTP, setGeneratedOTP] = useState("");
+
+  // Handle mobile submit with real OTP integration
+  const handleMobileSubmit = async () => {
     if (mobile.length !== 10) {
       setMobileError("Please enter a valid 10-digit mobile number");
       return;
@@ -327,8 +329,25 @@ const MobileOtpLogin = () => {
 
     setLoading(true);
 
-    // Simulate API call with timeout
-    setTimeout(() => {
+    try {
+      // Generate random 4-digit OTP
+      const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+      // Store OTP in state
+      setGeneratedOTP(newOTP);
+
+      // Create OTP message
+      const otpMessage = `Your Rivaaz Films verification code is: ${newOTP}. This OTP is valid for 10 minutes.`;
+
+      // Send real OTP using Authkey.io API
+      const response = await fetch(
+        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&otp=${newOTP}`
+      );
+
+      const data = await response.json();
+      console.log("OTP API response:", data);
+
+      // Update UI state on success
       setStep(2);
       setTimer(60);
       setNotification({
@@ -336,10 +355,104 @@ const MobileOtpLogin = () => {
         message: "OTP sent successfully",
         severity: "success",
       });
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+
+      setNotification({
+        open: true,
+        message: "Failed to send OTP. Please try again.",
+        severity: "error",
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+  // Add state to track resend attempts and resend cooldown times
+  const [resendAttempts, setResendAttempts] = useState(0);
+  const [resendCooldowns] = useState([120, 600, 3600]); // 2min, 10min, 1hr in seconds
+
+  const handleResendOtp = async () => {
+    // Determine the next timer duration based on attempts
+    let nextTimerDuration;
+    if (resendAttempts >= resendCooldowns.length) {
+      // If we've used all cooldowns, use the longest one
+      nextTimerDuration = resendCooldowns[resendCooldowns.length - 1];
+
+      setNotification({
+        open: true,
+        message:
+          "You've reached the maximum OTP resend attempts. Please try again later.",
+        severity: "warning",
+      });
+      return;
+    } else {
+      nextTimerDuration = resendCooldowns[resendAttempts];
+    }
+
+    setLoading(true);
+
+    try {
+      // Generate new random 4-digit OTP
+
+      // Create OTP message
+      const otpMessage = `Your Rivaaz Films verification code is: ${generatedOTP}. This OTP is valid for 10 minutes.`;
+
+      // Send real OTP using Authkey.io API
+      const response = await fetch(
+        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&name=Twinkle&otp=${generatedOTP}`
+      );
+
+      const data = await response.json();
+      console.log("OTP API response:", data);
+
+      // Increment resend attempts counter
+      setResendAttempts((prevAttempts) => prevAttempts + 1);
+
+      // Set the timer to the next duration
+      setTimer(nextTimerDuration);
+
+      // Format the time for display in notification
+      let timeDisplay;
+      if (nextTimerDuration >= 3600) {
+        timeDisplay = "1 hour";
+      } else if (nextTimerDuration >= 600) {
+        timeDisplay = "10 minutes";
+      } else {
+        timeDisplay = "2 minutes";
+      }
+
+      setNotification({
+        open: true,
+        message: `OTP resent successfully. Next resend available in ${timeDisplay}.`,
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+
+      setNotification({
+        open: true,
+        message: "Failed to resend OTP. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Update the timer display to show minutes and seconds when appropriate
+  const formatTimeDisplay = (seconds) => {
+    if (seconds >= 3600) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return `${hours}h ${minutes}m remaining`;
+    } else if (seconds >= 60) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}m ${remainingSeconds}s remaining`;
+    } else {
+      return `${seconds}s remaining`;
+    }
+  };
   // Handle OTP verification - just for demo
   const handleVerifyOtp = async () => {
     const otpValue = otp.join("");
@@ -351,7 +464,7 @@ const MobileOtpLogin = () => {
 
     setLoading(true);
 
-    if (otpValue === DEMO_OTP) {
+    if (otpValue === generatedOTP) {
       const res = await fetch(
         `${process.env.REACT_APP_BASE_URL}/user/check-user`,
         {
@@ -419,22 +532,6 @@ const MobileOtpLogin = () => {
       setOtpError("Invalid OTP. Please try again.");
     }
     setLoading(false);
-  };
-
-  // Handle OTP resend - just for demo
-  const handleResendOtp = () => {
-    setLoading(true);
-
-    // Simulate API call with timeout
-    setTimeout(() => {
-      setTimer(60);
-      setNotification({
-        open: true,
-        message: "OTP resent successfully",
-        severity: "success",
-      });
-      setLoading(false);
-    }, 1000);
   };
 
   // Handle notification close
@@ -574,7 +671,7 @@ const MobileOtpLogin = () => {
 
               <TimerText>
                 {timer > 0 ? (
-                  `Resend OTP in ${timer} seconds`
+                  `Resend OTP in ${formatTimeDisplay(timer)}`
                 ) : (
                   <Link
                     component="button"
