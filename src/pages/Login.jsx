@@ -38,7 +38,7 @@ const LoginCard = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  height: "72svh",
+  height: "500px",
   position: "relative",
   border: "1px solid rgb(201, 202, 206)",
   // Responsive styles
@@ -67,7 +67,7 @@ const Logo = styled("img")({
 
 const LogoPlaceholder = styled(Box)(({ theme }) => ({
   width: "50px",
-  height: "50px",
+  height: "62px",
 
   borderRadius: "8px",
   marginBottom: "1rem",

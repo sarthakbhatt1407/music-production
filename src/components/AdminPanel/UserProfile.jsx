@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import React, { useEffect, useState } from "react";
 import { Breadcrumb, Popconfirm } from "antd";
 import { FloatButton } from "antd";
@@ -603,6 +603,7 @@ const UserProfile = () => {
   let sNo = 0;
 
   const { id } = useParams();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserdata] = useState(null);
   const [showPaid, setShowPaid] = useState(false);
@@ -1597,10 +1598,10 @@ const UserProfile = () => {
           onClick={onChange}
           trigger="click"
           style={{
-            right: 30,
+            right: "2.5%",
             transform: "scale(1.5)",
-            zIndex: 1,
-            bottom: "10%",
+            zIndex: 10000000,
+            bottom: "12%",
           }}
           tooltip={<div>Add Data</div>}
           icon={<UserAddOutlined />}
@@ -1721,7 +1722,15 @@ const UserProfile = () => {
                     <p>Details</p>
                     <div>
                       <span>Label Name</span>
-                      <span>{userData.name}</span>
+                      <a
+                        style={{
+                          textTransform: "none",
+                          color: "black",
+                          fontSize: "1.1rem",
+                        }}
+                      >
+                        {userData.name}
+                      </a>
                     </div>
                     <div>
                       <span>Email</span>
@@ -1877,6 +1886,13 @@ const UserProfile = () => {
                           Number(userData.paidEarning)}
                       </span>
                     </div>
+                    <BankBtn
+                      onClick={() => {
+                        navigate(`/admin-panel/user-wallet/${id}`);
+                      }}
+                    >
+                      Pay
+                    </BankBtn>
 
                     {totalEarningUser > 0 && (
                       <div

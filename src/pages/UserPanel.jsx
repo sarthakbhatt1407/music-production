@@ -16,6 +16,7 @@ import UserNoti from "../components/UserPanel/UserNoti";
 import styled from "styled-components";
 import { FaQuestion } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import UserWalletView from "../components/UserPanel/UserWalletView";
 
 const Modal = styled.div`
   width: 100%;
@@ -423,6 +424,7 @@ const UserPanel = () => {
           {page === "upload" && <Form />}
           {page === "reports" && <Reports />}
           {page === "history" && <History />}
+          {page === "wallet" && <UserWalletView />}
           {page === "notification" && <UserNoti />}
           {page === "copyright" && <CopyRightPage />}
           {page === "legal-document" && <LegalDoc />}

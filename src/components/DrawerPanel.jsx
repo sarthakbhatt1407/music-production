@@ -17,6 +17,7 @@ import {
   HistoryOutlined,
   NotificationsNoneOutlined,
   RestoreFromTrashOutlined,
+  Wallet,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +26,8 @@ import styled from "@emotion/styled";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { IoIosNotifications } from "react-icons/io";
 import { Badge } from "@mui/material";
+import { FaWallet } from "react-icons/fa";
+import { IoWalletOutline } from "react-icons/io5";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -95,6 +98,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "notification") {
       return ["7"];
+    }
+    if (page === "wallet") {
+      return ["8"];
     }
   };
   const userId = useSelector((state) => state.userId);
@@ -250,6 +256,22 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Notifications",
+            },
+            {
+              key: "8",
+              icon: (
+                <Link
+                  to={"/user-panel/wallet"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <IoWalletOutline
+                    style={{
+                      transform: "scale(1.2)",
+                    }}
+                  />
+                </Link>
+              ),
+              label: "Wallet",
             },
           ]}
         />
