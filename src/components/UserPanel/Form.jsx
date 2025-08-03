@@ -1,4 +1,4 @@
-import { DatePicker } from "antd";
+import { AutoComplete, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { UploadOutlined } from "@ant-design/icons";
@@ -306,6 +306,264 @@ const Form = () => {
     subgenre: "Vocal",
     releaseDate: "",
   };
+
+  const [artists, setArtists] = useState([]);
+  const dummyArtists = [
+    {
+      name: "Artist1 Unique",
+      username: "artist1_unique",
+      email: "artist1_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=1",
+      facebookUrl: "https://facebook.com/artist1_unique",
+      instagramUrl: "https://instagram.com/artist1_unique",
+      twitterUrl: "https://twitter.com/artist1_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist2 Unique",
+      username: "artist2_unique",
+      email: "artist2_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=2",
+      facebookUrl: "https://facebook.com/artist2_unique",
+      instagramUrl: "https://instagram.com/artist2_unique",
+      twitterUrl: "https://twitter.com/artist2_unique",
+      role: "composer",
+    },
+    {
+      name: "Artist3 Unique",
+      username: "artist3_unique",
+      email: "artist3_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=3",
+      facebookUrl: "https://facebook.com/artist3_unique",
+      instagramUrl: "https://instagram.com/artist3_unique",
+      twitterUrl: "https://twitter.com/artist3_unique",
+      role: "lyricist",
+    },
+    {
+      name: "Artist4 Unique",
+      username: "artist4_unique",
+      email: "artist4_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=4",
+      facebookUrl: "https://facebook.com/artist4_unique",
+      instagramUrl: "https://instagram.com/artist4_unique",
+      twitterUrl: "https://twitter.com/artist4_unique",
+      role: "musicDirector",
+    },
+    {
+      name: "Artist5 Unique",
+      username: "artist5_unique",
+      email: "artist5_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=5",
+      facebookUrl: "https://facebook.com/artist5_unique",
+      instagramUrl: "https://instagram.com/artist5_unique",
+      twitterUrl: "https://twitter.com/artist5_unique",
+      role: "director",
+    },
+    {
+      name: "Artist6 Unique",
+      username: "artist6_unique",
+      email: "artist6_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=6",
+      facebookUrl: "https://facebook.com/artist6_unique",
+      instagramUrl: "https://instagram.com/artist6_unique",
+      twitterUrl: "https://twitter.com/artist6_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist7 Unique",
+      username: "artist7_unique",
+      email: "artist7_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=7",
+      facebookUrl: "https://facebook.com/artist7_unique",
+      instagramUrl: "https://instagram.com/artist7_unique",
+      twitterUrl: "https://twitter.com/artist7_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist8 Unique",
+      username: "artist8_unique",
+      email: "artist8_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=8",
+      facebookUrl: "https://facebook.com/artist8_unique",
+      instagramUrl: "https://instagram.com/artist8_unique",
+      twitterUrl: "https://twitter.com/artist8_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist9 Unique",
+      username: "artist9_unique",
+      email: "artist9_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=9",
+      facebookUrl: "https://facebook.com/artist9_unique",
+      instagramUrl: "https://instagram.com/artist9_unique",
+      twitterUrl: "https://twitter.com/artist9_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist10 Unique",
+      username: "artist10_unique",
+      email: "artist10_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=10",
+      facebookUrl: "https://facebook.com/artist10_unique",
+      instagramUrl: "https://instagram.com/artist10_unique",
+      twitterUrl: "https://twitter.com/artist10_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist11 Unique",
+      username: "artist11_unique",
+      email: "artist11_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=11",
+      facebookUrl: "https://facebook.com/artist11_unique",
+      instagramUrl: "https://instagram.com/artist11_unique",
+      twitterUrl: "https://twitter.com/artist11_unique",
+      role: "sessionArtist",
+    },
+    {
+      name: "Artist12 Unique",
+      username: "artist12_unique",
+      email: "artist12_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=12",
+      facebookUrl: "https://facebook.com/artist12_unique",
+      instagramUrl: "https://instagram.com/artist12_unique",
+      twitterUrl: "https://twitter.com/artist12_unique",
+      role: "musicAgent",
+    },
+    {
+      name: "Artist13 Unique",
+      username: "artist13_unique",
+      email: "artist13_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=13",
+      facebookUrl: "https://facebook.com/artist13_unique",
+      instagramUrl: "https://instagram.com/artist13_unique",
+      twitterUrl: "https://twitter.com/artist13_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist14 Unique",
+      username: "artist14_unique",
+      email: "artist14_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=14",
+      facebookUrl: "https://facebook.com/artist14_unique",
+      instagramUrl: "https://instagram.com/artist14_unique",
+      twitterUrl: "https://twitter.com/artist14_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist15 Unique",
+      username: "artist15_unique",
+      email: "artist15_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=15",
+      facebookUrl: "https://facebook.com/artist15_unique",
+      instagramUrl: "https://instagram.com/artist15_unique",
+      twitterUrl: "https://twitter.com/artist15_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist16 Unique",
+      username: "artist16_unique",
+      email: "artist16_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=16",
+      facebookUrl: "https://facebook.com/artist16_unique",
+      instagramUrl: "https://instagram.com/artist16_unique",
+      twitterUrl: "https://twitter.com/artist16_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist17 Unique",
+      username: "artist17_unique",
+      email: "artist17_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=17",
+      facebookUrl: "https://facebook.com/artist17_unique",
+      instagramUrl: "https://instagram.com/artist17_unique",
+      twitterUrl: "https://twitter.com/artist17_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist18 Unique",
+      username: "artist18_unique",
+      email: "artist18_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=18",
+      facebookUrl: "https://facebook.com/artist18_unique",
+      instagramUrl: "https://instagram.com/artist18_unique",
+      twitterUrl: "https://twitter.com/artist18_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist19 Unique",
+      username: "artist19_unique",
+      email: "artist19_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=19",
+      facebookUrl: "https://facebook.com/artist19_unique",
+      instagramUrl: "https://instagram.com/artist19_unique",
+      twitterUrl: "https://twitter.com/artist19_unique",
+      role: "singer",
+    },
+    {
+      name: "Artist20 Unique",
+      username: "artist20_unique",
+      email: "artist20_unique@example.com",
+      avatarUrl: "https://i.pravatar.cc/150?img=20",
+      facebookUrl: "https://facebook.com/artist20_unique",
+      instagramUrl: "https://instagram.com/artist20_unique",
+      twitterUrl: "https://twitter.com/artist20_unique",
+      role: "director",
+    },
+  ];
+
+  const fetchArtists = async () => {
+    setIsloading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`
+    );
+    const data = await res.json();
+    console.log(data);
+
+    if (res.ok) {
+      setArtists(data.artists);
+    }
+    setIsloading(false);
+  };
+
+  // State for options
+  const [artistOptions, setArtistOptions] = useState({
+    singer: [],
+    lyricist: [],
+    composer: [],
+    musicDirector: [],
+    director: [],
+    producer: [],
+  });
+  const handleArtistSearch = (role, value) => {
+    if (!value) {
+      setArtistOptions((prev) => ({ ...prev, [role]: [] }));
+      return;
+    }
+    const filtered = artists
+      .filter(
+        (a) =>
+          a.role === role && a.name.toLowerCase().includes(value.toLowerCase())
+      )
+      .map((a) => ({
+        value: a.name,
+        label: a.name,
+        artist: a,
+      }));
+    setArtistOptions((prev) => ({ ...prev, [role]: filtered }));
+  };
+
+  // Handler for selecting an artist and autofilling
+  const handleArtistSelect = (role, value, option) => {
+    const artist = option.artist;
+    setInpFields((prev) => ({
+      ...prev,
+      [role]: artist.name,
+      [`${role}AppleId`]: artist.appleId || "",
+      [`${role}SpotifyId`]: artist.spotifyId || "",
+      [`${role}FacebookUrl`]: artist.facebookUrl || "",
+      [`${role}InstagramUrl`]: artist.instagramUrl || "",
+    }));
+  };
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
   const [isLoading, setIsloading] = useState(false);
@@ -341,6 +599,7 @@ const Form = () => {
   };
   useEffect(() => {
     fetcher();
+    fetchArtists();
     setInpFields({ ...inpFields, labelName: labelNameFromStore });
     return () => {};
   }, [labelNameFromStore]);
@@ -751,39 +1010,87 @@ const Form = () => {
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="composerAppleId">Apple ID</Label>
-                    <ModalInput
-                      type="text"
-                      id="composerAppleId"
-                      onChange={onChangeHandler}
-                      value={inpFields.composerAppleId}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="composerAppleId"
+                        onChange={onChangeHandler}
+                        value={inpFields.composerAppleId}
+                      />
+                      <Link to={inpFields.composerAppleId} target="_blank">
+                        <Apple />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="composerSpotifyId">Spotify ID</Label>
-                    <ModalInput
-                      type="text"
-                      id="composerSpotifyId"
-                      onChange={onChangeHandler}
-                      value={inpFields.composerSpotifyId}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="composerSpotifyId"
+                        onChange={onChangeHandler}
+                        value={inpFields.composerSpotifyId}
+                      />
+                      <Link to={inpFields.composerSpotifyId} target="_blank">
+                        <FaSpotify
+                          style={{
+                            transform: "scale(1.5)",
+                          }}
+                        />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="composerFacebookUrl">Facebook Url </Label>
-                    <ModalInput
-                      type="text"
-                      id="composerFacebookUrl"
-                      onChange={onChangeHandler}
-                      value={inpFields.composerFacebookUrl}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="composerFacebookUrl"
+                        onChange={onChangeHandler}
+                        value={inpFields.composerFacebookUrl}
+                      />
+                      <Link to={inpFields.composerFacebookUrl} target="_blank">
+                        <FacebookOutlined />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="composerInstagramUrl">Instagram Url </Label>
-                    <ModalInput
-                      type="text"
-                      id="composerInstagramUrl"
-                      onChange={onChangeHandler}
-                      value={inpFields.composerInstagramUrl}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="composerInstagramUrl"
+                        onChange={onChangeHandler}
+                        value={inpFields.composerInstagramUrl}
+                      />
+                      <Link to={inpFields.composerInstagramUrl} target="_blank">
+                        <Instagram />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <div></div>
                   <BtnBox>
@@ -832,39 +1139,88 @@ const Form = () => {
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="lyricistAppleId">Apple ID</Label>
-                    <ModalInput
-                      type="text"
-                      id="lyricistAppleId"
-                      onChange={onChangeHandler}
-                      value={inpFields.lyricistAppleId}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="lyricistAppleId"
+                        onChange={onChangeHandler}
+                        value={inpFields.lyricistAppleId}
+                      />
+                      <Link to={inpFields.lyricistAppleId} target="_blank">
+                        <Apple />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="lyricistSpotifyId">Spotify ID</Label>
-                    <ModalInput
-                      type="text"
-                      id="lyricistSpotifyId"
-                      onChange={onChangeHandler}
-                      value={inpFields.lyricistSpotifyId}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="lyricistSpotifyId"
+                        onChange={onChangeHandler}
+                        value={inpFields.lyricistSpotifyId}
+                      />
+                      <Link to={inpFields.lyricistSpotifyId} target="_blank">
+                        <FaSpotify
+                          style={{
+                            transform: "scale(1.5)",
+                            marginLeft: "0.4rem",
+                          }}
+                        />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="lyricistFacebookUrl">Facebook Url </Label>
-                    <ModalInput
-                      type="text"
-                      id="lyricistFacebookUrl"
-                      onChange={onChangeHandler}
-                      value={inpFields.lyricistFacebookUrl}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="lyricistFacebookUrl"
+                        onChange={onChangeHandler}
+                        value={inpFields.lyricistFacebookUrl}
+                      />
+                      <Link to={inpFields.lyricistFacebookUrl} target="_blank">
+                        <FacebookOutlined />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="lyricistInstagramUrl">Instagram Url </Label>
-                    <ModalInput
-                      type="text"
-                      id="lyricistInstagramUrl"
-                      onChange={onChangeHandler}
-                      value={inpFields.lyricistInstagramUrl}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="lyricistInstagramUrl"
+                        onChange={onChangeHandler}
+                        value={inpFields.lyricistInstagramUrl}
+                      />
+                      <Link to={inpFields.lyricistInstagramUrl} target="_blank">
+                        <Instagram />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <div></div>
 
@@ -914,39 +1270,90 @@ const Form = () => {
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="singerAppleId">Apple ID</Label>
-                    <ModalInput
-                      type="text"
-                      id="singerAppleId"
-                      onChange={onChangeHandler}
-                      value={inpFields.singerAppleId}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="singerAppleId"
+                        onChange={onChangeHandler}
+                        value={inpFields.singerAppleId}
+                      />
+                      <Link to={inpFields.singerAppleId} target="_blank">
+                        <Apple />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="singerSpotifyId">Spotify ID</Label>
-                    <ModalInput
-                      type="text"
-                      id="singerSpotifyId"
-                      onChange={onChangeHandler}
-                      value={inpFields.singerSpotifyId}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      {" "}
+                      <ModalInput
+                        type="text"
+                        id="singerSpotifyId"
+                        onChange={onChangeHandler}
+                        value={inpFields.singerSpotifyId}
+                      />
+                      <Link to={inpFields.singerSpotifyId} target="_blank">
+                        <FaSpotify
+                          style={{
+                            transform: "scale(1.5)",
+                            marginLeft: "0.4rem",
+                          }}
+                        />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="singerFacebookUrl">Facebook Url </Label>
-                    <ModalInput
-                      type="text"
-                      id="singerFacebookUrl"
-                      onChange={onChangeHandler}
-                      value={inpFields.singerFacebookUrl}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      {" "}
+                      <ModalInput
+                        type="text"
+                        id="singerFacebookUrl"
+                        onChange={onChangeHandler}
+                        value={inpFields.singerFacebookUrl}
+                      />
+                      <Link to={inpFields.singerFacebookUrl} target="_blank">
+                        <FacebookOutlined />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <LabelInpBox style={{ width: "100%" }}>
                     <Label htmlFor="singerInstagramUrl">Instagram Url </Label>
-                    <ModalInput
-                      type="text"
-                      id="singerInstagramUrl"
-                      onChange={onChangeHandler}
-                      value={inpFields.singerInstagramUrl}
-                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.5rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ModalInput
+                        type="text"
+                        id="singerInstagramUrl"
+                        onChange={onChangeHandler}
+                        value={inpFields.singerInstagramUrl}
+                      />
+                      <Link to={inpFields.singerInstagramUrl} target="_blank">
+                        <Instagram />
+                      </Link>
+                    </div>
                   </LabelInpBox>
                   <div></div>
 
@@ -1337,13 +1744,20 @@ const Form = () => {
                   <Label htmlFor="singer">
                     singer <span style={{ margin: 0 }}>*</span>
                   </Label>
-                  <Input
-                    type="text"
-                    name="singer"
+                  <AutoComplete
                     id="singer"
-                    placeholder="singer name"
-                    onChange={onChangeHandler}
                     value={inpFields.singer}
+                    options={artistOptions.singer}
+                    onSearch={(value) => handleArtistSearch("singer", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("singer", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, singer: value })
+                    }
+                    placeholder="singer name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1392,13 +1806,20 @@ const Form = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="lyricist">lyricist</Label>
-                  <Input
-                    type="text"
-                    name="lyricist"
+                  <AutoComplete
                     id="lyricist"
-                    placeholder=""
-                    onChange={onChangeHandler}
                     value={inpFields.lyricist}
+                    options={artistOptions.lyricist}
+                    onSearch={(value) => handleArtistSearch("lyricist", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("lyricist", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, lyricist: value })
+                    }
+                    placeholder="lyricist name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>{" "}
                 <LabelInpBox>
@@ -1447,13 +1868,20 @@ const Form = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="composer">composer</Label>
-                  <Input
-                    type="text"
-                    name="composer"
+                  <AutoComplete
                     id="composer"
-                    placeholder="composer name"
-                    onChange={onChangeHandler}
                     value={inpFields.composer}
+                    options={artistOptions.composer}
+                    onSearch={(value) => handleArtistSearch("composer", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("composer", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, composer: value })
+                    }
+                    placeholder="composer name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1502,35 +1930,58 @@ const Form = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="musicDirector">music Director</Label>
-                  <Input
-                    type="text"
-                    name="musicDirector"
+                  <AutoComplete
                     id="musicDirector"
-                    placeholder="music Director"
-                    onChange={onChangeHandler}
                     value={inpFields.musicDirector}
+                    options={artistOptions.musicDirector}
+                    onSearch={(value) =>
+                      handleArtistSearch("musicDirector", value)
+                    }
+                    onSelect={(value, option) =>
+                      handleArtistSelect("musicDirector", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, musicDirector: value })
+                    }
+                    placeholder="music director name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="director">director</Label>
-                  <Input
-                    type="text"
-                    name="director"
+                  <AutoComplete
                     id="director"
-                    placeholder="director name"
-                    onChange={onChangeHandler}
                     value={inpFields.director}
+                    options={artistOptions.director}
+                    onSearch={(value) => handleArtistSearch("director", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("director", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, director: value })
+                    }
+                    placeholder="director name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="producer">producer</Label>
-                  <Input
-                    type="text"
-                    name="producer"
+                  <AutoComplete
                     id="producer"
-                    placeholder="producer name"
-                    onChange={onChangeHandler}
                     value={inpFields.producer}
+                    options={artistOptions.producer}
+                    onSearch={(value) => handleArtistSearch("producer", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("producer", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, producer: value })
+                    }
+                    placeholder="producer name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
