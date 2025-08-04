@@ -330,7 +330,7 @@ const MusicUserWallet = () => {
 
       <PageHeader>
         <Box display="flex" alignItems="center">
-          <img
+          {/* <img
             src={userData.userAvatar}
             alt={`${userData.userName}'s avatar`}
             style={{
@@ -340,7 +340,7 @@ const MusicUserWallet = () => {
               borderRadius: "50%",
               objectFit: "cover",
             }}
-          />
+          /> */}
           <Box>
             <Typography variant="h4" fontWeight={600} sx={{ color: "#333333" }}>
               {userData.userName}'s Wallet

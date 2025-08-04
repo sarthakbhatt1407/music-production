@@ -15,8 +15,15 @@ import {
   Card,
   CardContent,
   Chip,
-  Avatar,
   Divider,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import {
@@ -28,11 +35,13 @@ import {
   Event as EventIcon,
   AccessTime as TimeIcon,
   Description as NoteIcon,
+  AttachMoney as MoneyIcon,
 } from "@mui/icons-material";
 import { Breadcrumb } from "antd";
 import { useParams } from "react-router";
 import MusicLoader from "../Loader/MusicLoader";
 import { useSelector } from "react-redux";
+import { FaIndianRupeeSign } from "react-icons/fa6";
 
 const StyledCard = styled(Card)({
   borderRadius: 16,
@@ -115,6 +124,13 @@ const IconWithLabel = styled(Box)({
   },
 });
 
+const ActionButton = styled(Button)({
+  borderRadius: 8,
+  textTransform: "none",
+  fontWeight: 600,
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+});
+
 const UserWalletView = () => {
   const id = useSelector((state) => state.userId);
   const [userData, setUserData] = useState({
@@ -131,6 +147,18 @@ const UserWalletView = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // New state for payment request feature
+  const [paymentRequestOpen, setPaymentRequestOpen] = useState(false);
+  const [requestFormData, setRequestFormData] = useState({
+    amount: "",
+    message: "",
+  });
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({
+    severity: "success",
+    message: "",
+  });
 
   // Fetch wallet and bonus data
   const fetchWalletData = async () => {
@@ -169,7 +197,9 @@ const UserWalletView = () => {
           userAvatar: data.img,
         }));
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error("Error fetching wallet data:", err);
+    }
     setLoading(false);
   };
 
@@ -203,6 +233,77 @@ const UserWalletView = () => {
     setPage(0);
   };
 
+  // Payment request handlers
+  const handleRequestChange = (e) => {
+    const { name, value } = e.target;
+    setRequestFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Update the handleRequestSubmit function to use the correct endpoint and payload structure
+
+  const handleRequestSubmit = async () => {
+    if (
+      !requestFormData.amount ||
+      isNaN(parseFloat(requestFormData.amount)) ||
+      parseFloat(requestFormData.amount) <= 0
+    ) {
+      setAlertInfo({
+        severity: "error",
+        message: "Please enter a valid amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/req-payment`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: id,
+            amount: parseFloat(requestFormData.amount),
+            remark: requestFormData.message || "Payment request",
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.sent) {
+        setAlertInfo({
+          severity: "success",
+          message: "Payment request sent successfully to admin!",
+        });
+        setRequestFormData({ amount: "", message: "" });
+        setPaymentRequestOpen(false);
+      } else {
+        setAlertInfo({
+          severity: "error",
+          message: data.message || "Failed to send payment request",
+        });
+      }
+    } catch (err) {
+      console.error("Error sending payment request:", err);
+      setAlertInfo({
+        severity: "error",
+        message: "An error occurred. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+      setAlertOpen(true);
+    }
+  };
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, height: "87vh", overflow: "auto" }}>
       {loading && <MusicLoader />}
@@ -213,7 +314,7 @@ const UserWalletView = () => {
 
       <PageHeader>
         <Box display="flex" alignItems="center">
-          <img
+          {/* <img
             src={userData.userAvatar}
             alt={`${userData.userName}'s avatar`}
             style={{
@@ -223,7 +324,7 @@ const UserWalletView = () => {
               borderRadius: "50%",
               objectFit: "cover",
             }}
-          />
+          /> */}
           <Box>
             <Typography variant="h4" fontWeight={600} sx={{ color: "#333333" }}>
               {userData.userName}'s Wallet
@@ -233,6 +334,18 @@ const UserWalletView = () => {
             </Typography>
           </Box>
         </Box>
+        <ActionButton
+          variant="contained"
+          color="primary"
+          startIcon={<FaIndianRupeeSign />}
+          onClick={() => setPaymentRequestOpen(true)}
+          sx={{
+            bgcolor: "#ff9800",
+            "&:hover": { bgcolor: "#f57c00" },
+          }}
+        >
+          Request Payment
+        </ActionButton>
       </PageHeader>
 
       <Grid container spacing={3}>
@@ -436,6 +549,98 @@ const UserWalletView = () => {
           </StyledCard>
         </Grid>
       </Grid>
+
+      {/* Payment Request Dialog */}
+      <Dialog
+        open={paymentRequestOpen}
+        onClose={() => setPaymentRequestOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            maxWidth: 500,
+          },
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" fontWeight={600} sx={{ color: "#333333" }}>
+            Request Payment
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 3, color: "#757575" }}>
+            Please specify the amount you would like to request and add a
+            message for the admin.
+          </DialogContentText>
+          <StyledTextField
+            autoFocus
+            margin="dense"
+            name="amount"
+            label="Amount (₹)"
+            type="number"
+            fullWidth
+            value={requestFormData.amount}
+            onChange={handleRequestChange}
+            sx={{ mb: 3 }}
+          />
+          <StyledTextField
+            margin="dense"
+            name="message"
+            label="Message to Admin"
+            type="text"
+            fullWidth
+            value={requestFormData.message}
+            onChange={handleRequestChange}
+            placeholder="Please include any relevant details about your payment request"
+            multiline
+            rows={3}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button
+            onClick={() => setPaymentRequestOpen(false)}
+            variant="outlined"
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              borderColor: "#ff9800",
+              color: "#ff9800",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRequestSubmit}
+            variant="contained"
+            disabled={loading}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              px: 3,
+              bgcolor: "#ff9800",
+              "&:hover": {
+                bgcolor: "#f57c00",
+              },
+            }}
+          >
+            {loading ? "Sending..." : "Send Request"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Alert Snackbar */}
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertInfo.severity}
+          sx={{ width: "100%" }}
+        >
+          {alertInfo.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
