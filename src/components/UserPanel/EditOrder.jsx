@@ -1,4 +1,4 @@
-import { DatePicker } from "antd";
+import { AutoComplete, DatePicker } from "antd";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { UploadOutlined } from "@ant-design/icons";
@@ -12,6 +12,7 @@ import { notification } from "antd";
 import { useSelector } from "react-redux";
 import { Apple, FacebookOutlined, Instagram } from "@mui/icons-material";
 import { FaSpotify } from "react-icons/fa";
+import dayjs from "dayjs";
 
 const OuterBox = styled.div`
   height: 99%;
@@ -20,7 +21,6 @@ const OuterBox = styled.div`
 
 const MainDiv = styled.div`
   height: 99%;
-
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -309,10 +309,62 @@ const EditOrder = () => {
     setIsloading(false);
   };
 
+  // --- ARTIST AUTOCOMPLETE LOGIC (copied from Form) ---
+  const [artists, setArtists] = useState([]);
+  const [artistOptions, setArtistOptions] = useState({
+    singer: [],
+    lyricist: [],
+    composer: [],
+    musicDirector: [],
+    director: [],
+    producer: [],
+  });
+  const fetchArtists = async () => {
+    setIsloading(true);
+    const res = await fetch(
+      `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`
+    );
+    const data = await res.json();
+    if (res.ok) {
+      setArtists(data.artists);
+    }
+    setIsloading(false);
+  };
   useEffect(() => {
     fetcher();
+    fetchArtists();
     return () => {};
+    // eslint-disable-next-line
   }, [id]);
+  const handleArtistSearch = (role, value) => {
+    if (!value) {
+      setArtistOptions((prev) => ({ ...prev, [role]: [] }));
+      return;
+    }
+    const filtered = artists
+      .filter(
+        (a) =>
+          a.role === role && a.name.toLowerCase().includes(value.toLowerCase())
+      )
+      .map((a) => ({
+        value: a.name,
+        label: a.name,
+        artist: a,
+      }));
+    setArtistOptions((prev) => ({ ...prev, [role]: filtered }));
+  };
+  const handleArtistSelect = (role, value, option) => {
+    const artist = option.artist;
+    setInpFields((prev) => ({
+      ...prev,
+      [role]: artist.name,
+      [`${role}AppleId`]: artist.appleId || "",
+      [`${role}SpotifyId`]: artist.spotifyId || "",
+      [`${role}FacebookUrl`]: artist.facebookUrl || "",
+      [`${role}InstagramUrl`]: artist.instagramUrl || "",
+    }));
+  };
+  // ------------------------------------------------------
 
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
@@ -336,30 +388,16 @@ const EditOrder = () => {
       content: msg,
     });
   };
-  useEffect(() => {
-    return () => {};
-  }, []);
 
   const imgReader = (img) => {
     var reader = new FileReader();
-
-    // When the file is loaded, display the image
     reader.onload = function (event) {
-      // Get the image data
       var imageData = event.target.result;
-
-      // Create a new image element
       var image = new Image();
-
-      // Set the image src attribute to the image data
       image.src = imageData;
       image.style.width = "5rem";
-
-      // Add the image to the document body
       document.querySelector("#imgbox").appendChild(image);
     };
-
-    // Read the image file
     reader.readAsDataURL(img);
   };
 
@@ -370,21 +408,16 @@ const EditOrder = () => {
     const fileMb = file.size / 1024 ** 2;
     if (fileMb > 10) {
       message.error(`Image size is greater than 10MB.`);
-      const imgbox = document.getElementById("imgbox");
-      imgbox.innerHTML = "";
       const thmb = document.getElementById("thmb");
       thmb.value = "";
       return;
     }
     var reader = new FileReader();
-
     reader.readAsDataURL(file);
-
     const isValid =
       file.type === "image/png" ||
       file.type === "image/jpeg" ||
       file.type === "image/jpg";
-    console.log(isValid);
     if (!isValid) {
       message.error(`Only png, jpeg, jpg files are allowed.`);
       setIsloading(false);
@@ -392,25 +425,20 @@ const EditOrder = () => {
       thmb.value = "";
       return;
     }
-
     reader.onload = function (e) {
       setIsloading(true);
       var image = new Image();
-
       image.src = e.target.result;
       image.style.width = "2rem";
       let width, height;
-      image.onload = function (event) {
+      image.onload = function () {
         height = this.height;
         width = this.width;
-
         const sixteen = width === 1600 && height === 1600;
         const three = width === 3000 && height === 3000;
-
         if (sixteen === false && three === false) {
           const thmb = document.getElementById("thmb");
           thmb.value = "";
-
           message.error(`Only 1600x1600 or 3000x3000 images are allowed`);
           setInpFields({ ...inpFields, thumbnail: null });
         } else {
@@ -435,7 +463,6 @@ const EditOrder = () => {
     },
     onChange: (info) => {
       const ele = document.querySelector(`#thumbnail`);
-
       ele.style.color = "#9e9e9e";
       let img;
       if (info.fileList[0]) {
@@ -452,18 +479,6 @@ const EditOrder = () => {
         file.type === "audio/wav" ||
         file.type === "audio/mp3" ||
         file.type === "audio/mpeg";
-      // ||
-      // file.type === "audio/aac" ||
-      // file.type === "audio/flac" ||
-      // file.type === "audio/alac" ||
-      // file.type === "audio/wma" ||
-      // file.type === "audio/aiff" ||
-      // file.type === "video/mp4" ||
-      // file.type === "video/x-msvideo" ||
-      // file.type === "video/x-ms-wmv" ||
-      // file.type === "video/x-flv" ||
-      // file.type === "video/quicktime";
-
       if (!isValid) {
         message.error(`Upload valid audio or video file!`);
       }
@@ -471,7 +486,6 @@ const EditOrder = () => {
     },
     onChange: (info) => {
       const ele = document.querySelector(`#file`);
-
       ele.style.color = "#9e9e9e";
       let file;
       if (info.fileList[0]) {
@@ -542,11 +556,10 @@ const EditOrder = () => {
     const id = e.target.id;
     const val = e.target.value;
     const ele = document.querySelector(`#${id}`);
-
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val });
   };
-  const format = "hh:mm:ss";
+  const format = "HH:mm:ss";
   const onSubmitHandler = async () => {
     setIsloading(true);
     if (
@@ -555,15 +568,12 @@ const EditOrder = () => {
       inpFields.dateOfRelease.length === 0 ||
       inpFields.language.length === 0 ||
       inpFields.mood.length === 0 ||
-      inpFields.singer.length === 0 ||
-      inpFields.thumbnail === null ||
-      inpFields.file === null
+      inpFields.singer.length === 0
     ) {
       if (inpFields.labelName.length === 0) {
         const labelName = document.querySelector("#labelName");
         labelName.style.border = "1px solid red";
       }
-
       if (inpFields.title.length === 0) {
         const title = document.querySelector("#title");
         title.style.border = "1px solid red";
@@ -576,7 +586,6 @@ const EditOrder = () => {
         const language = document.querySelector("#language");
         language.style.border = "1px solid red";
       }
-
       if (inpFields.mood.length === 0) {
         const mood = document.querySelector("#mood");
         mood.style.border = "1px solid red";
@@ -585,7 +594,6 @@ const EditOrder = () => {
         const singer = document.querySelector("#singer");
         singer.style.border = "1px solid red";
       }
-
       if (inpFields.thumbnail === null) {
         const thumbnail = document.querySelector("#thumbnail");
         thumbnail.style.color = "red";
@@ -641,12 +649,10 @@ const EditOrder = () => {
     formData.append("composerSpotifyId", inpFields.composerSpotifyId);
     formData.append("composerFacebookUrl", inpFields.composerFacebookUrl);
     formData.append("composerInstagramUrl", inpFields.composerInstagramUrl);
-
     formData.append("lyricistAppleId", inpFields.lyricistAppleId);
     formData.append("lyricistSpotifyId", inpFields.lyricistSpotifyId);
     formData.append("lyricistFacebookUrl", inpFields.lyricistFacebookUrl);
     formData.append("lyricistInstagramUrl", inpFields.lyricistInstagramUrl);
-
     formData.append("file", inpFields.file);
     formData.append("userId", userId);
     formData.append("releaseDate", inpFields.releaseDate);
@@ -672,11 +678,11 @@ const EditOrder = () => {
     }
     setIsloading(false);
   };
+
   return (
     <OuterBox>
       {order && (
         <MainDiv>
-          {" "}
           {showComposerModal && (
             <Modal>
               <ModalBox>
@@ -760,7 +766,6 @@ const EditOrder = () => {
           {showLyricistModal && (
             <Modal>
               <ModalBox>
-                {" "}
                 <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
                   <p style={{ color: "#353434" }}>
                     For Artist profile linking, only Facebook page link and
@@ -818,7 +823,6 @@ const EditOrder = () => {
                     />
                   </LabelInpBox>
                   <div></div>
-
                   <BtnBox>
                     <button
                       onClick={() => {
@@ -842,7 +846,6 @@ const EditOrder = () => {
           {showSingerModal && (
             <Modal>
               <ModalBox>
-                {" "}
                 <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
                   <p style={{ color: "#353434" }}>
                     For Artist profile linking, only Facebook page link and
@@ -900,7 +903,6 @@ const EditOrder = () => {
                     />
                   </LabelInpBox>
                   <div></div>
-
                   <BtnBox>
                     <button
                       onClick={() => {
@@ -939,7 +941,7 @@ const EditOrder = () => {
               },
             ]}
           />
-          <h1>Upload</h1>{" "}
+          <h1>Edit Upload</h1>
           <FormBox>
             {isLoading && <MusicLoader />}
             <FormSeperator>
@@ -1022,9 +1024,16 @@ const EditOrder = () => {
                   <Label htmlFor="dateOfRelease">
                     Date of Live <span style={{ margin: 0 }}>*</span>
                   </Label>
-                  <DatePicker onChange={onDateChanger} id="dateOfRelease" />
+                  <DatePicker
+                    onChange={onDateChanger}
+                    id="dateOfRelease"
+                    value={
+                      inpFields.dateOfRelease
+                        ? dayjs(inpFields.dateOfRelease)
+                        : null
+                    }
+                  />
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label>
                     Album type <span style={{ margin: 0 }}>*</span>
@@ -1042,7 +1051,6 @@ const EditOrder = () => {
                     <Option value={"film"}>film</Option>
                   </Select>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="genre">
                     genre<span style={{ margin: 0 }}>*</span>
@@ -1053,7 +1061,6 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-
                       setInpFields({ ...inpFields, genre: value });
                     }}
                   >
@@ -1082,7 +1089,6 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-
                       setInpFields({ ...inpFields, subgenre: value });
                     }}
                   >
@@ -1100,7 +1106,6 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-
                       setInpFields({ ...inpFields, language: value });
                     }}
                   >
@@ -1116,7 +1121,6 @@ const EditOrder = () => {
                     <Option value={"Urdu"}>Urdu</Option>
                   </Select>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="description">Album description</Label>
                   <Input
@@ -1145,6 +1149,11 @@ const EditOrder = () => {
                       setInpFields({ ...inpFields, releaseDate: dateString });
                     }}
                     id="releaseDate"
+                    value={
+                      inpFields.releaseDate
+                        ? dayjs(inpFields.releaseDate)
+                        : null
+                    }
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1157,7 +1166,6 @@ const EditOrder = () => {
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-
                       setInpFields({ ...inpFields, mood: value });
                     }}
                   >
@@ -1180,20 +1188,11 @@ const EditOrder = () => {
                     <Option value={"Calm"}>Calm</Option>
                   </Select>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="thumbnail" id="thumbnail">
                     Thumbnail (Max. size 10MB){" "}
                     <span style={{ margin: 0 }}>*</span>
                   </Label>
-                  {/* <Upload
-                    method="get"
-                    listType="picture"
-                    {...imgProps}
-                    maxCount={1}
-                  >
-                    <Button icon={<UploadOutlined />}>Upload image</Button>
-                  </Upload> */}
                   <Input
                     type="file"
                     name=""
@@ -1203,7 +1202,6 @@ const EditOrder = () => {
                   />
                   <div id="imgbox" style={{ width: "1rem" }}></div>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="lyrics">Album lyrics (optional)</Label>
                   <TxtArea
@@ -1216,7 +1214,6 @@ const EditOrder = () => {
                 </LabelInpBox>
               </AllInpBox>
             </FormSeperator>
-
             <FormSeperator>
               <h2>CRBT</h2>
               <AllInpBox>
@@ -1234,7 +1231,7 @@ const EditOrder = () => {
                   </Upload>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="upc">isrc</Label>
+                  <Label htmlFor="isrc">isrc</Label>
                   <Input
                     type="text"
                     name="isrc"
@@ -1246,7 +1243,6 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="title">title</Label>
-
                   <Input
                     type="text"
                     name="title"
@@ -1257,7 +1253,6 @@ const EditOrder = () => {
                     value={inpFields.title}
                   />
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="crbt">
                     Time{" "}
@@ -1275,22 +1270,26 @@ const EditOrder = () => {
                     name="crbt"
                     id="crbt"
                     format={format}
+                    value={
+                      inpFields.crbt ? dayjs(inpFields.crbt, format) : null
+                    }
                     onChange={(time) => {
                       if (!time) {
+                        setInpFields({ ...inpFields, crbt: "" });
                         return;
                       }
-                      let res;
-
-                      res = time["$H"] + ":" + time["$m"] + ":" + time["$s"];
-                      console.log(res);
-
+                      const res =
+                        String(time.hour()).padStart(2, "0") +
+                        ":" +
+                        String(time.minute()).padStart(2, "0") +
+                        ":" +
+                        String(time.second()).padStart(2, "0");
                       setInpFields({ ...inpFields, crbt: res });
                     }}
                   />
                 </LabelInpBox>
               </AllInpBox>
             </FormSeperator>
-
             <FormSeperator>
               <h2>Artists</h2>
               <AllInpBox>
@@ -1298,13 +1297,20 @@ const EditOrder = () => {
                   <Label htmlFor="singer">
                     singer <span style={{ margin: 0 }}>*</span>
                   </Label>
-                  <Input
-                    type="text"
-                    name="singer"
+                  <AutoComplete
                     id="singer"
-                    placeholder="singer name"
-                    onChange={onChangeHandler}
                     value={inpFields.singer}
+                    options={artistOptions.singer}
+                    onSearch={(value) => handleArtistSearch("singer", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("singer", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, singer: value })
+                    }
+                    placeholder="singer name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1321,7 +1327,6 @@ const EditOrder = () => {
                         window.open("https://www.facebook.com/", "_blank");
                       }}
                     />
-
                     <Instagram
                       onClick={() => {
                         window.open("https://www.instagram.com/", "_blank");
@@ -1341,7 +1346,6 @@ const EditOrder = () => {
                         window.open("https://open.spotify.com/", "_blank");
                       }}
                     />
-
                     <Input
                       style={{ width: "15%" }}
                       onClick={() => {
@@ -1354,15 +1358,22 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="lyricist">lyricist</Label>
-                  <Input
-                    type="text"
-                    name="lyricist"
+                  <AutoComplete
                     id="lyricist"
-                    placeholder=""
-                    onChange={onChangeHandler}
                     value={inpFields.lyricist}
+                    options={artistOptions.lyricist}
+                    onSearch={(value) => handleArtistSearch("lyricist", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("lyricist", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, lyricist: value })
+                    }
+                    placeholder="lyricist name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
-                </LabelInpBox>{" "}
+                </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="singer">Add Lyricist Profile</Label>
                   <div
@@ -1377,7 +1388,6 @@ const EditOrder = () => {
                         window.open("https://www.facebook.com/", "_blank");
                       }}
                     />
-
                     <Instagram
                       onClick={() => {
                         window.open("https://www.instagram.com/", "_blank");
@@ -1397,7 +1407,6 @@ const EditOrder = () => {
                         window.open("https://open.spotify.com/", "_blank");
                       }}
                     />
-
                     <Input
                       style={{ width: "15%" }}
                       onClick={() => {
@@ -1410,13 +1419,20 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="composer">composer</Label>
-                  <Input
-                    type="text"
-                    name="composer"
+                  <AutoComplete
                     id="composer"
-                    placeholder="composer name"
-                    onChange={onChangeHandler}
                     value={inpFields.composer}
+                    options={artistOptions.composer}
+                    onSearch={(value) => handleArtistSearch("composer", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("composer", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, composer: value })
+                    }
+                    placeholder="composer name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1433,7 +1449,6 @@ const EditOrder = () => {
                         window.open("https://www.facebook.com/", "_blank");
                       }}
                     />
-
                     <Instagram
                       onClick={() => {
                         window.open("https://www.instagram.com/", "_blank");
@@ -1453,7 +1468,6 @@ const EditOrder = () => {
                         window.open("https://open.spotify.com/", "_blank");
                       }}
                     />
-
                     <Input
                       style={{ width: "15%" }}
                       onClick={() => {
@@ -1466,35 +1480,58 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="musicDirector">music Director</Label>
-                  <Input
-                    type="text"
-                    name="musicDirector"
+                  <AutoComplete
                     id="musicDirector"
-                    placeholder="music Director"
-                    onChange={onChangeHandler}
                     value={inpFields.musicDirector}
+                    options={artistOptions.musicDirector}
+                    onSearch={(value) =>
+                      handleArtistSearch("musicDirector", value)
+                    }
+                    onSelect={(value, option) =>
+                      handleArtistSelect("musicDirector", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, musicDirector: value })
+                    }
+                    placeholder="music director name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="director">director</Label>
-                  <Input
-                    type="text"
-                    name="director"
+                  <AutoComplete
                     id="director"
-                    placeholder="director name"
-                    onChange={onChangeHandler}
                     value={inpFields.director}
+                    options={artistOptions.director}
+                    onSearch={(value) => handleArtistSearch("director", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("director", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, director: value })
+                    }
+                    placeholder="director name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="producer">producer</Label>
-                  <Input
-                    type="text"
-                    name="producer"
+                  <AutoComplete
                     id="producer"
-                    placeholder="producer name"
-                    onChange={onChangeHandler}
                     value={inpFields.producer}
+                    options={artistOptions.producer}
+                    onSearch={(value) => handleArtistSearch("producer", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("producer", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, producer: value })
+                    }
+                    placeholder="producer name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
                 </LabelInpBox>
                 <LabelInpBox>

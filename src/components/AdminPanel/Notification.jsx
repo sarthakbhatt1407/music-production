@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Select } from "antd";
+import {
+  Breadcrumb,
+  notification,
+  message,
+  Empty,
+  Table,
+  Space,
+  Modal as AntModal,
+  Button,
+  Input,
+  Typography,
+  Popconfirm,
+} from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
-import { notification } from "antd";
-import { message } from "antd";
-import { Empty } from "antd";
-import { DeleteForeverOutlined, InsertLink } from "@mui/icons-material";
-import { ClockCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
-import { Link } from "react-router-dom";
-import { Popconfirm } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import MusicLoader from "../Loader/MusicLoader";
+
+const { TextArea } = Input;
+const { Title } = Typography;
 
 const MainBox = styled.div`
   width: 100%;
@@ -21,105 +30,21 @@ const MainBox = styled.div`
 const TableBox = styled.div`
   background-color: white;
   width: 100%;
-  height: 100%;
+  height: 80%;
   padding: 1rem;
   border-radius: 0.5rem;
-  overflow: scroll;
+  overflow: scroll; // Changed from potential overflow: scroll
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
-  }
-`;
-const Table = styled.table`
-  width: 100%;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    font-size: 0.8rem;
-    width: 100vw;
+    padding: 0.5rem;
   }
 `;
 
-const TableHead = styled.thead`
-  tr {
-    background-color: #f4f4fb;
-
-    td {
-      text-align: center;
-      padding: 0.4rem 0rem;
-      color: #acaec1;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-      font-weight: bold;
-      @media only screen and (min-width: 0px) and (max-width: 1000px) {
-        font-size: 0.5rem;
-      }
-    }
-  }
-`;
-const TableBody = styled.tbody`
-  tr {
-    td {
-      color: #000000de;
-      text-transform: capitalize;
-      text-align: center;
-      padding: 1rem 0;
-      font-weight: 500;
-      font-size: 1rem;
-
-      @media only screen and (min-width: 0px) and (max-width: 1000px) {
-        font-size: 0.7rem;
-        a {
-          svg {
-            transform: scale(0.8);
-          }
-        }
-      }
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
-        gap: 0.4rem;
-        width: fit-content;
-        margin: 0 auto;
-        /* text-transform: uppercase; */
-        font-size: 0.8rem;
-        font-weight: bold;
-        @media only screen and (min-width: 0px) and (max-width: 1000px) {
-          font-size: 0.5rem;
-          padding: 0.3rem 0.5rem;
-        }
-      }
-      span {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 0.7rem;
-        @media only screen and (min-width: 0px) and (max-width: 1000px) {
-          font-size: 0.5rem;
-        }
-        img {
-          width: 4rem;
-        }
-      }
-    }
-  }
-`;
 const HeaderBox = styled.div`
   display: flex;
   justify-content: space-between;
   padding-right: 1rem;
   align-items: center;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-  }
+  margin-bottom: 20px;
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     flex-direction: column;
     justify-content: start;
@@ -128,131 +53,41 @@ const HeaderBox = styled.div`
     margin-bottom: 1rem;
   }
 `;
-const Modal = styled.div`
+
+const FormItemStyled = styled.div`
+  margin-bottom: 24px;
   width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #00000038;
-  border-radius: 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
 `;
 
-const ModalBox = styled.div`
-  background-color: white;
-  width: 30%;
-  height: fit-content;
-  padding: 2rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  z-index: 20;
-
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 90%;
-  }
-`;
-
-const ModalFormBox = styled.div`
-  background-color: white;
-  width: 90%;
-  height: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-const Option = styled.option`
-  color: #777;
-  font-weight: bold;
-  text-transform: capitalize;
-`;
-
-const BtnBox = styled.div`
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-    &:last-child {
-      background-color: #bbb9b9;
-    }
-  }
-`;
-
-const LabelInpBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  width: 74%;
-  span {
-    color: #ff0000ab;
-    font-size: 0.8rem;
-    margin-left: 0.2rem;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 100%;
-  }
-`;
-const Label = styled.label`
-  font-size: 0.9rem;
-  letter-spacing: 0.06rem;
-  color: #9e9e9e;
-  text-transform: capitalize;
-`;
-
-const Input = styled.textarea`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
-  }
+const DescriptionCell = styled.div`
+  width: 100%;
+  text-align: justify;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-transform: none;
+  padding: 10px;
 `;
 
 const Notification = () => {
-  let c = 0;
-  const defaultF = {
-    link: "",
-    platform: "Youtube",
-  };
-
-  const [api, contextHolderNot] = notification.useNotification({
+  const [notificationApi, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
+
   const openNotificationWithIcon = (type, msg) => {
-    api[type]({
+    notificationApi[type]({
       message: msg,
     });
   };
+
   const [messageApi, contextHolder] = message.useMessage();
+
   const success = (msg) => {
     messageApi.open({
       type: "success",
       content: msg,
     });
   };
+
   const error = (msg) => {
     messageApi.open({
       type: "error",
@@ -260,210 +95,253 @@ const Notification = () => {
     });
   };
 
-  const [inpFields, setInpFields] = useState(defaultF);
+  const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const userId = useSelector((state) => state.userId);
-  const [showModal, setShowModal] = useState(false);
-  const [noti, setNoti] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const [refresher, setRefresher] = useState(0);
-  const fetcher = async () => {
+  const [sortedInfo, setSortedInfo] = useState({});
+
+  const fetchNotifications = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/notification/get-all`
-    );
-    const data = await res.json();
-    console.log(data);
-    if (data.success) {
-      setNoti(data.notifications.reverse());
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/notification/get-all`
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        setNotifications(data.notifications.reverse());
+      } else {
+        error("Failed to fetch notifications");
+      }
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
-    fetcher();
-
-    return () => {};
+    fetchNotifications();
   }, [userId, refresher]);
 
-  const onChangeHandler = (e) => {
-    const id = e.target.id;
-    const val = e.target.value;
-    const ele = document.querySelector(`#${id}`);
-
-    ele.style.border = "1px solid #d7d7d7";
-    setInpFields({ ...inpFields, [id]: val });
-  };
-
-  const onSubmitHandler = async () => {
-    if (inpFields.link.length === 0) {
-      if (inpFields.link.length === 0) {
-        const link = document.querySelector("#link");
-        link.style.border = "1px solid red";
-      }
-
-      openNotificationWithIcon("error", "Fill all require fields.");
+  const handleAddNotification = async () => {
+    if (!description.trim()) {
+      error("Please enter a description");
       return;
     }
+
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/notification/add-notification`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          des: inpFields.link,
-          id: userId,
-        }),
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/notification/add-notification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            des: description,
+            id: userId,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        success(data.message || "Notification added successfully");
+        setDescription("");
+        setIsModalOpen(false);
+        setRefresher((prev) => prev + 1);
+      } else {
+        error(data.message || "Failed to add notification");
       }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      openNotificationWithIcon("success", data.message);
-      setInpFields(defaultF);
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-    if (!res.ok) {
-      openNotificationWithIcon("error", data.message);
-    }
-    setShowModal(false);
-    setRefresher(refresher + 1);
-    setIsLoading(false);
   };
+
+  const handleDeleteNotification = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/notification/delete-notification`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        success(data.message || "Notification deleted successfully");
+        setTimeout(() => {
+          setRefresher((prev) => prev + 1);
+        }, 600);
+      } else {
+        error(data.message || "Failed to delete notification");
+      }
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    setSortedInfo(sorter);
+  };
+
+  const columns = [
+    {
+      title: "#",
+      key: "index",
+      width: 60,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Description",
+      dataIndex: "des",
+      key: "des",
+      width: "50%",
+      render: (text) => <DescriptionCell>{text}</DescriptionCell>,
+    },
+    {
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
+      sortOrder: sortedInfo.columnKey === "date" && sortedInfo.order,
+    },
+
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Popconfirm
+          title="Delete Notification"
+          description="Are you sure you want to delete this notification?"
+          onConfirm={() => handleDeleteNotification(record.id)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button type="text" danger icon={<DeleteOutlined />} />
+        </Popconfirm>
+      ),
+    },
+  ];
 
   return (
     <MainBox>
       {contextHolderNot}
       {contextHolder}
-      {showModal && (
-        <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="link">Description</Label>
-                <Input
-                  rows={14}
-                  type="text"
-                  id="link"
-                  onChange={onChangeHandler}
-                  value={inpFields.link}
-                />
-              </LabelInpBox>
-              <BtnBox>
-                <button onClick={onSubmitHandler}>Submit</button>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
+
       <Breadcrumb
         items={[
           {
-            title: "User Panel",
+            title: "Admin Panel",
           },
           {
-            title: "Notification",
+            title: "Notifications",
           },
         ]}
       />
+
       <HeaderBox>
-        <h1>Notifications</h1>
-        {!showModal && (
-          <button
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Add New Notification
-          </button>
-        )}
+        <Title level={2}>Notifications</Title>
+        <Button type="primary" onClick={() => setIsModalOpen(true)}>
+          Add New Notification
+        </Button>
       </HeaderBox>
 
       <TableBox>
-        {isLoading && <MusicLoader />}
-        <Table cellSpacing={0}>
-          <TableHead>
-            <tr>
-              <td></td>
-              <td>Description</td>
-              <td>Date</td>
-              <td>Time</td>
-
-              <td>Action</td>
-            </tr>
-          </TableHead>
-          <TableBody>
-            {noti &&
-              noti.length > 0 &&
-              noti.map((n) => {
-                c++;
-
-                return (
-                  <tr key={n.id}>
-                    <td>{c}.</td>
-                    <td
-                      style={{
-                        width: "50%",
-                        textAlign: "justify",
-                      }}
-                    >
-                      {n.des}
-                    </td>
-                    <td>{n.date}</td>
-                    <td>{n.time}</td>
-                    <td>
-                      <Popconfirm
-                        title="Confirm"
-                        description="Delete notification?"
-                        onConfirm={async () => {
-                          setIsLoading(true);
-                          const res = await fetch(
-                            `${process.env.REACT_APP_BASE_URL}/notification/delete-notification`,
-                            {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify({
-                                id: n.id,
-                              }),
-                            }
-                          );
-                          const data = await res.json();
-                          if (data.success) {
-                            success(data.message);
-                            setTimeout(() => {
-                              setRefresher((prev) => {
-                                return prev + 1;
-                              });
-                            }, 600);
-                          } else {
-                            error(data.message);
-                          }
-                          setIsLoading(false);
-                        }}
-                      >
-                        <Link>
-                          <DeleteForeverOutlined />
-                        </Link>
-                      </Popconfirm>
-                    </td>
-                  </tr>
-                );
-              })}
-          </TableBody>
-        </Table>
-        {noti && noti.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
+        <Table
+          columns={columns}
+          dataSource={notifications}
+          rowKey="id"
+          loading={isLoading}
+          onChange={handleTableChange}
+          pagination={{
+            pageSize: 6, // Increased from 2 to show more items per page
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ["bottomCenter"],
+          }}
+          rowClassName={(record, index) =>
+            index % 2 === 0 ? "table-row-light" : "table-row-dark"
+          }
+          scroll={{ x: "100%" }} // Changed from fixed 1000px to responsive
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No notifications found"
+              />
+            ),
+          }}
+        />
       </TableBox>
+
+      <AntModal
+        title="Add New Notification"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsModalOpen(false)}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={isLoading}
+            onClick={handleAddNotification}
+          >
+            Submit
+          </Button>,
+        ]}
+        width={700}
+      >
+        <FormItemStyled>
+          <label
+            htmlFor="description"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            Description
+          </label>
+          <TextArea
+            id="description"
+            rows={10}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter notification text here..."
+          />
+        </FormItemStyled>
+      </AntModal>
+
+      <style jsx global>{`
+        .table-row-light {
+          background-color: #ffffff;
+        }
+        .table-row-dark {
+          background-color: #f9f9f9;
+        }
+        .table-row-light:hover,
+        .table-row-dark:hover {
+          background-color: #f0f7ff !important;
+        }
+      `}</style>
     </MainBox>
   );
 };

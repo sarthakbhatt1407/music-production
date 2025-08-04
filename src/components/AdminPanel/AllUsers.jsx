@@ -4,8 +4,19 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { RemoveRedEyeOutlined } from "@mui/icons-material";
 import MusicLoader from "../Loader/MusicLoader";
-import { Breadcrumb, message, Popconfirm } from "antd";
+import {
+  Breadcrumb,
+  message,
+  Modal,
+  Input as AntInput,
+  Button,
+  Table,
+  Space,
+  Tag,
+  Tooltip,
+} from "antd";
 import { MdDeleteOutline } from "react-icons/md";
+import { SearchOutlined } from "@ant-design/icons";
 
 const MainBox = styled.div`
   width: 100%;
@@ -20,279 +31,356 @@ const MainBox = styled.div`
   }
 `;
 
-const TableBox = styled.div`
-  height: 71svh;
-  overflow-y: scroll;
-  /* &::-webkit-scrollbar {
-    display: none;
-  } */
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    display: none;
-  }
-`;
-
-const Table = styled.table`
-  width: 100%;
-`;
-
-const TableHead = styled.thead`
-  tr {
-    background-color: #f4f4fb;
-
-    td {
-      text-align: center;
-      padding: 0.4rem 0rem;
-      color: #acaec1;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-      font-weight: bold;
-    }
-  }
-`;
-const TableBody = styled.tbody`
-  tr {
-    td {
-      color: #000000de;
-      text-transform: capitalize;
-      text-align: center;
-      padding: 1rem 0;
-      font-weight: 500;
-      font-size: 1rem;
-
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
-        gap: 0.4rem;
-        width: fit-content;
-        margin: 0 auto;
-        /* text-transform: uppercase; */
-        font-size: 0.8rem;
-        font-weight: bold;
-      }
-      span {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 0.7rem;
-        img {
-          width: 4rem;
-        }
-      }
-    }
-  }
-`;
 const HeaderBox = styled.div`
   display: flex;
   justify-content: space-between;
   padding-right: 1rem;
   align-items: center;
+  margin-bottom: 20px;
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     flex-direction: column;
     justify-content: start;
     padding: 0;
     align-items: start;
     margin-bottom: 1rem;
-    input {
-      width: 100%;
-    }
-  }
-`;
-const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-  width: 30%;
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
   }
 `;
 
+const OtpInput = styled(AntInput)`
+  margin-bottom: 1rem;
+`;
+
 const AllUsers = () => {
-  let [users, setUsers] = useState(null);
-  let [filteredUsers, setFilteredUsers] = useState(null);
-  const [isLoading, setIsloading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [originalUsers, setOriginalUsers] = useState([]); // Store original list for filtering
+  const [isLoading, setIsLoading] = useState(false);
   const userId = useSelector((state) => state.userId);
-  let c = 0;
   const [refresher, setRefresher] = useState(0);
   const [messageApi, contextHolder] = message.useMessage();
+
+  // States for OTP verification
+  const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [receivedOtp, setReceivedOtp] = useState(null); // Store OTP received from server
+
+  // Set up state for table filtering and sorting
+  const [filteredInfo, setFilteredInfo] = useState({});
+  const [sortedInfo, setSortedInfo] = useState({});
+
   const success = (msg) => {
     messageApi.open({
       type: "success",
       content: msg,
     });
   };
+
   const error = (msg) => {
     messageApi.open({
       type: "error",
       content: msg,
     });
   };
-  const fetcher = async () => {
-    setIsloading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-all-user/?id=${userId}`
-    );
-    const data = await res.json();
 
-    if (res.ok) {
-      const arr = data.users;
-      arr.reverse();
-      setUsers(arr);
-      setFilteredUsers(arr);
-    } else {
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/get-all-user/?id=${userId}`
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        const filteredUsers = data.users
+          .filter((user) => user.id !== userId)
+          .reverse();
+        setUsers(filteredUsers);
+        setOriginalUsers(filteredUsers); // Store original list
+      } else {
+        error("Failed to fetch users");
+      }
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsloading(false);
+  };
+
+  // Function to handle search across multiple fields
+  const handleSearch = (searchText) => {
+    if (!searchText.trim()) {
+      // If search is empty, restore original list
+      setUsers(originalUsers);
+      return;
+    }
+
+    const lowercaseSearch = searchText.toLowerCase().trim();
+
+    // Filter across name, email, and phone
+    const filtered = originalUsers.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(lowercaseSearch) ||
+        user.email?.toLowerCase().includes(lowercaseSearch) ||
+        (user.phone && user.phone.toString().includes(lowercaseSearch))
+    );
+
+    setUsers(filtered);
+  };
+
+  // Function to initiate delete and send OTP
+  const initiateDelete = async (user) => {
+    setIsLoading(true);
+    try {
+      // Connect to the updated OTP endpoint
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/send-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            adminId: userId,
+            userToDeleteId: user.id,
+            userName: user.name,
+          }),
+        }
+      );
+      const data = await res.json();
+
+      if (data.sent) {
+        setReceivedOtp(data.otp); // Store OTP for verification
+        setUserToDelete(user);
+        setIsOtpModalVisible(true);
+        success("OTP sent to your email");
+      } else {
+        error(data.message || "Failed to send OTP");
+      }
+    } catch (err) {
+      error("Error sending OTP");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to verify OTP and delete user
+  const verifyOtpAndDelete = async () => {
+    if (!otp || !userToDelete) return;
+
+    setIsLoading(true);
+    try {
+      // Check if entered OTP matches the one received from server
+      if (otp === receivedOtp.toString()) {
+        // If OTP matches, proceed with deletion
+        const deleteRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/delete-user`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userToDelete.id,
+            }),
+          }
+        );
+
+        const deleteData = await deleteRes.json();
+
+        if (deleteData.success) {
+          success(deleteData.message || "User deleted successfully");
+          setIsOtpModalVisible(false);
+          setOtp("");
+          setUserToDelete(null);
+          setReceivedOtp(null);
+
+          // Refresh the user list
+          setTimeout(() => {
+            setRefresher((prev) => prev + 1);
+          }, 600);
+        } else {
+          error(deleteData.message || "Failed to delete user");
+        }
+      } else {
+        error("Invalid OTP. Please try again.");
+      }
+    } catch (err) {
+      error("Error processing request");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetcher();
-    return () => {};
+    fetchUsers();
   }, [refresher]);
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    setFilteredInfo(filters);
+    setSortedInfo(sorter);
+  };
+
+  // Define table columns
+  const columns = [
+    {
+      title: "#",
+      key: "index",
+      width: 60,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      sorter: (a, b) => a.email.localeCompare(b.email),
+      sortOrder: sortedInfo.columnKey === "email" && sortedInfo.order,
+      render: (text) => <span style={{ textTransform: "none" }}>{text}</span>,
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      sorter: (a, b) => a.phone - b.phone,
+      sortOrder: sortedInfo.columnKey === "phone" && sortedInfo.order,
+    },
+    {
+      title: "Location",
+      key: "location",
+      render: (_, record) => (
+        <span>
+          {record.city}, {record.state}
+        </span>
+      ),
+    },
+    {
+      title: "Since",
+      dataIndex: "userSince",
+      key: "userSince",
+      sorter: (a, b) => new Date(a.userSince) - new Date(b.userSince),
+      sortOrder: sortedInfo.columnKey === "userSince" && sortedInfo.order,
+    },
+    {
+      title: "Password",
+      dataIndex: "password",
+      key: "password",
+      render: (text) => <span style={{ textTransform: "none" }}>{text}</span>,
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 150,
+      render: (_, record) => (
+        <Space size="middle">
+          <Tooltip title="View Profile">
+            <Link to={`/admin-panel/user-profile/${record.id}`}>
+              <Button type="text" icon={<RemoveRedEyeOutlined />} />
+            </Link>
+          </Tooltip>
+          <Tooltip title="Delete User">
+            <Button
+              type="text"
+              danger
+              icon={<MdDeleteOutline style={{ fontSize: "1.2rem" }} />}
+              onClick={() => initiateDelete(record)}
+            />
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <MainBox>
+      {contextHolder}
       <Breadcrumb
         items={[
           {
             title: "Admin Panel",
           },
           {
-            title: "Labels",
+            title: "Users",
           },
         ]}
       />
 
       <HeaderBox>
-        <h1>Labels</h1>
-        <Input
-          type="text"
-          placeholder="search user"
-          onChange={(e) => {
-            const val = e.target.value.trim().toLowerCase();
-            const arr = users.filter((usr) => {
-              return (
-                usr.name.toLowerCase().includes(val) ||
-                usr.phone.toString().includes(val)
-              );
-            });
-            setFilteredUsers(arr);
-          }}
+        <h1>Users</h1>
+        <AntInput
+          placeholder="Search by name, email or phone..."
+          prefix={<SearchOutlined />}
+          style={{ width: 300 }}
+          onChange={(e) => handleSearch(e.target.value)}
+          allowClear
         />
       </HeaderBox>
-      <TableBox>
-        <Table cellSpacing={0}>
-          <TableHead>
-            <tr>
-              <td></td>
-              <td>Name</td>
-              <td>Email</td>
-              <td>Phone</td>
-              <td>Location</td>
-              <td>Since</td>
-              <td>Password</td>
-              <td>View Profile</td>
-              <td>Action</td>
-            </tr>
-          </TableHead>
-          {isLoading && <MusicLoader />}
-          {!isLoading && (
-            <TableBody>
-              {filteredUsers &&
-                filteredUsers.map((user) => {
-                  if (userId === user.id) {
-                    return;
-                  }
-                  const {
-                    id,
-                    name,
-                    email,
-                    phone,
-                    city,
-                    state,
-                    password,
-                    userSince,
-                  } = user;
-                  c++;
-                  return (
-                    <tr key={id}>
-                      <td>{c}</td>
-                      <td>{name}</td>
-                      <td style={{ textTransform: "none" }}>{email}</td>
-                      <td>{phone}</td>
-                      <td>
-                        {city}, {state}
-                      </td>
-                      <td>{userSince}</td>
-                      <td style={{ textTransform: "none" }}>{password}</td>
-                      <td>
-                        <Link to={`/admin-panel/user-profile/${id}`}>
-                          <RemoveRedEyeOutlined />
-                        </Link>
-                      </td>
-                      <td>
-                        <Popconfirm
-                          title="Confirm"
-                          description="Delete User?"
-                          onConfirm={async () => {
-                            setIsloading(true);
-                            const res = await fetch(
-                              `${process.env.REACT_APP_BASE_URL}/user/delete-user`,
-                              {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                  userId: id,
-                                }),
-                              }
-                            );
-                            const data = await res.json();
-                            if (data.success) {
-                              success(data.message);
-                              setTimeout(() => {
-                                setRefresher((prev) => {
-                                  return prev + 1;
-                                });
-                              }, 600);
-                            } else {
-                              error(data.message);
-                            }
-                            setIsloading(false);
-                          }}
-                        >
-                          <Link>
-                            <MdDeleteOutline
-                              style={{
-                                transform: "scale(1.4)",
-                              }}
-                            />
-                          </Link>
-                        </Popconfirm>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </TableBody>
-          )}
-        </Table>
 
-        {/* {filteredOrders && filteredOrders.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )} */}
-      </TableBox>
+      {/* OTP Verification Modal */}
+      <Modal
+        title="Verify OTP"
+        open={isOtpModalVisible}
+        onCancel={() => {
+          setIsOtpModalVisible(false);
+          setOtp("");
+          setUserToDelete(null);
+          setReceivedOtp(null);
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setIsOtpModalVisible(false);
+              setOtp("");
+              setUserToDelete(null);
+              setReceivedOtp(null);
+            }}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={isLoading}
+            onClick={verifyOtpAndDelete}
+          >
+            Verify & Delete
+          </Button>,
+        ]}
+      >
+        <p>
+          An OTP has been sent to the admin email. Please enter it below to
+          confirm deletion of user: <strong>{userToDelete?.name}</strong>
+        </p>
+        <OtpInput
+          placeholder="Enter OTP"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+        />
+      </Modal>
+
+      <Table
+        columns={columns}
+        dataSource={users}
+        rowKey="id"
+        loading={isLoading}
+        onChange={handleTableChange}
+        pagination={{
+          pageSize: 6,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          position: ["bottomCenter"],
+        }}
+        scroll={{ x: 1200 }}
+      />
     </MainBox>
   );
 };

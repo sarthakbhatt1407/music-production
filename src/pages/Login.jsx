@@ -533,6 +533,80 @@ const MobileOtpLogin = () => {
     }
     setLoading(false);
   };
+  const demoHandleVerifyOtp = async () => {
+    setLoading(true);
+    const mob = "7895603314";
+    // const mob = "8126770620";
+
+    if (true) {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mob,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: mob,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        // 9927321330
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (!loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-user" },
+              });
+              navigate("/user-panel/home");
+            }
+            if (loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-admin" },
+              });
+              navigate("/admin-panel/orders");
+            }
+          }, 1000);
+        }
+      } else {
+        navigate("/register", {
+          state: {
+            contactNum: mobile,
+          },
+        });
+      }
+      setNotification({
+        open: true,
+        message: "Login successful!",
+        severity: "success",
+      });
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+    setLoading(false);
+  };
 
   // Handle notification close
   const handleCloseNotification = () => {
@@ -544,6 +618,7 @@ const MobileOtpLogin = () => {
 
   return (
     <LoginContainer>
+      <button onClick={demoHandleVerifyOtp}>Demo login</button>
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}

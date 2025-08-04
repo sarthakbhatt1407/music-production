@@ -26,6 +26,7 @@ import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
+import { BsMusicNoteList } from "react-icons/bs";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -95,6 +96,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "notification") {
       return ["10"];
+    }
+    if (page === "artists") {
+      return ["11"];
     }
   };
 
@@ -214,6 +218,18 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Pending Profiles",
+            },
+            {
+              key: "11",
+              icon: (
+                <Link
+                  to={"/admin-panel/artists"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <BsMusicNoteList />
+                </Link>
+              ),
+              label: "Artists",
             },
             {
               key: "10",

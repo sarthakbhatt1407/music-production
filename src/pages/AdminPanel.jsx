@@ -18,6 +18,7 @@ import { UploadOutlined, DownloadOutlined } from "@ant-design/icons";
 import { IoIosAdd } from "react-icons/io";
 import { HiOutlineDocumentReport } from "react-icons/hi";
 import MusicLoader from "../components/Loader/MusicLoader";
+import ArtistManagement from "../components/AdminPanel/ArtistManagement";
 
 const { Option } = Select;
 
@@ -254,6 +255,7 @@ const AdminPanel = () => {
         {page === "pending-work" && <PendingWork />}
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}
+        {page === "artists" && <ArtistManagement />}
         {page === "all-users" && <AllUsers />}
         {page === "notification" && <Notification />}
         {page === "user-profile" && <UserProfile />}

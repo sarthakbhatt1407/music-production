@@ -213,9 +213,16 @@ const UserWalletView = () => {
 
       <PageHeader>
         <Box display="flex" alignItems="center">
-          <Avatar
+          <img
             src={userData.userAvatar}
-            sx={{ width: 56, height: 56, mr: 2 }}
+            alt={`${userData.userName}'s avatar`}
+            style={{
+              width: 56,
+              height: 56,
+              marginRight: 16,
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
           />
           <Box>
             <Typography variant="h4" fontWeight={600} sx={{ color: "#333333" }}>

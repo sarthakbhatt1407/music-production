@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb } from "antd";
+import {
+  Breadcrumb,
+  notification,
+  message,
+  Empty,
+  Table,
+  Space,
+  Tag,
+  Button,
+  Tooltip,
+} from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
-import { notification } from "antd";
-import { message } from "antd";
-import { Empty } from "antd";
 import {
   CheckCircleOutline,
   ContentCopyOutlined,
@@ -12,9 +19,12 @@ import {
   InsertLink,
   PersonOutline,
 } from "@mui/icons-material";
-import { ClockCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
+import {
+  ClockCircleOutlined,
+  CheckCircleTwoTone,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { Popconfirm } from "antd";
 import MusicLoader from "../Loader/MusicLoader";
 
 const MainBox = styled.div`
@@ -30,91 +40,17 @@ const TableBox = styled.div`
   height: 100%;
   padding: 1rem;
   border-radius: 0.5rem;
-  overflow: scroll;
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
-  }
-`;
-const Table = styled.table`
-  width: 100%;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    font-size: 0.8rem;
-    width: 100vw;
+    padding: 0.5rem;
   }
 `;
 
-const TableHead = styled.thead`
-  tr {
-    background-color: #f4f4fb;
-
-    td {
-      text-align: center;
-      padding: 0.4rem 0rem;
-      color: #acaec1;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-      font-weight: bold;
-      @media only screen and (min-width: 0px) and (max-width: 1000px) {
-        font-size: 0.5rem;
-      }
-    }
-  }
-`;
-const TableBody = styled.tbody`
-  tr {
-    td {
-      color: #000000de;
-      text-transform: capitalize;
-      text-align: center;
-      padding: 1rem 0;
-      font-weight: 500;
-      font-size: 1rem;
-      @media only screen and (min-width: 0px) and (max-width: 1000px) {
-        font-size: 0.7rem;
-        a {
-          svg {
-            transform: scale(0.8);
-          }
-        }
-      }
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
-        gap: 0.4rem;
-        width: fit-content;
-        margin: 0 auto;
-        /* text-transform: uppercase; */
-        font-size: 0.8rem;
-        font-weight: bold;
-        @media only screen and (min-width: 0px) and (max-width: 1000px) {
-          font-size: 0.5rem;
-          padding: 0.3rem 0.5rem;
-        }
-      }
-      span {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 0.7rem;
-        @media only screen and (min-width: 0px) and (max-width: 1000px) {
-          font-size: 0.5rem;
-        }
-        img {
-          width: 4rem;
-        }
-      }
-    }
-  }
-`;
 const HeaderBox = styled.div`
   display: flex;
   justify-content: space-between;
   padding-right: 1rem;
   align-items: center;
+  margin-bottom: 20px;
   button {
     background-color: #1677ff;
     color: white;
@@ -133,106 +69,17 @@ const HeaderBox = styled.div`
     margin-bottom: 1rem;
   }
 `;
-const Modal = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #00000038;
-  border-radius: 0.5rem;
+
+const StatusTag = styled(Tag)`
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 10;
-`;
-
-const ModalBox = styled.div`
-  background-color: white;
-  width: 30%;
-  height: fit-content;
-  padding: 2rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  z-index: 20;
-
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 90%;
-  }
-`;
-
-const ModalFormBox = styled.div`
-  background-color: white;
-  width: 90%;
-  height: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const BtnBox = styled.div`
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-    &:last-child {
-      background-color: #bbb9b9;
-    }
-  }
-`;
-
-const LabelInpBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  width: 74%;
-  span {
-    color: #ff0000ab;
-    font-size: 0.8rem;
-    margin-left: 0.2rem;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 100%;
-  }
-`;
-const Label = styled.label`
-  font-size: 0.9rem;
-  letter-spacing: 0.06rem;
-  color: #9e9e9e;
-  text-transform: capitalize;
-`;
-
-const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
-  }
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
 `;
 
 const CopyrightAdmin = () => {
-  let c = 0;
   const defaultF = {
     link: "",
     platform: "",
@@ -241,18 +88,22 @@ const CopyrightAdmin = () => {
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
+
   const openNotificationWithIcon = (type, msg) => {
     api[type]({
       message: msg,
     });
   };
+
   const [messageApi, contextHolder] = message.useMessage();
+
   const success = (msg) => {
     messageApi.open({
       type: "success",
       content: msg,
     });
   };
+
   const error = (msg) => {
     messageApi.open({
       type: "error",
@@ -263,27 +114,41 @@ const CopyrightAdmin = () => {
   const [inpFields, setInpFields] = useState(defaultF);
   const [isLoading, setIsLoading] = useState(false);
   const userId = useSelector((state) => state.userId);
-  const [showModal, setShowModal] = useState(false);
-  const [queries, setQueries] = useState(null);
+  const [queries, setQueries] = useState([]);
   const [refresher, setRefresher] = useState(0);
+
+  // Set up state for table filtering and sorting
+  const [filteredInfo, setFilteredInfo] = useState({});
+  const [sortedInfo, setSortedInfo] = useState({});
+
   const fetcher = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/get-all-query`
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/copyright/get-all-query`
+      );
+      const data = await res.json();
 
-    if (res.ok) {
-      setQueries(data.cQueries.reverse());
+      if (res.ok) {
+        const filteredQueries = data.cQueries
+          .filter((q) => !q.deleted)
+          .reverse();
+        setQueries(filteredQueries);
+      } else {
+        error("Failed to fetch copyright queries");
+      }
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetcher();
-
-    return () => {};
   }, [userId, refresher]);
+
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
@@ -295,81 +160,160 @@ const CopyrightAdmin = () => {
 
   const confirm = async (id) => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=resolved`,
-      {
-        method: "PATCH",
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      new Promise((resolve) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=resolved`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      if (res.ok) {
+        success("Query marked as resolved");
         setTimeout(() => {
-          resolve(null);
-          setRefresher(refresher + 1);
-          setIsLoading(false);
+          setRefresher((prev) => prev + 1);
         }, 500);
-      });
+      } else {
+        error("Failed to update query status");
+      }
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
-  const onChangeHandler = (e) => {
-    const id = e.target.id;
-    const val = e.target.value;
-    const ele = document.querySelector(`#${id}`);
 
-    ele.style.border = "1px solid #d7d7d7";
-    setInpFields({ ...inpFields, [id]: val.trim() });
+  const handleTableChange = (pagination, filters, sorter) => {
+    setFilteredInfo(filters);
+    setSortedInfo(sorter);
   };
 
-  const onSubmitHandler = async () => {
-    if (inpFields.link.length === 0 || inpFields.platform.length === 0) {
-      if (inpFields.link.length === 0) {
-        const link = document.querySelector("#link");
-        link.style.border = "1px solid red";
-      }
-      if (inpFields.platform.length === 0) {
-        const platform = document.querySelector("#platform");
-        platform.style.border = "1px solid red";
-      }
-      openNotificationWithIcon("error", "Fill all require fields.");
-      return;
-    }
-    setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/create-new-query`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...inpFields,
-          userId: userId,
-        }),
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      openNotificationWithIcon("success", data.message);
-      setInpFields(defaultF);
-    }
-    if (!res.ok) {
-      openNotificationWithIcon("error", data.message);
-    }
-    setShowModal(false);
-    setRefresher(refresher + 1);
-    setIsLoading(false);
-  };
+  // Define columns for the Table
+  const columns = [
+    {
+      title: "#",
+      key: "index",
+      width: 60,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Platform",
+      dataIndex: "platform",
+      key: "platform",
+      sorter: (a, b) => a.platform.localeCompare(b.platform),
+      sortOrder: sortedInfo.columnKey === "platform" && sortedInfo.order,
+      filters: [...new Set(queries.map((q) => q.platform))].map((platform) => ({
+        text: platform,
+        value: platform,
+      })),
+      filteredValue: filteredInfo.platform || null,
+      onFilter: (value, record) => record.platform === value,
+    },
+    {
+      title: "User Name",
+      dataIndex: "userName",
+      key: "userName",
+      sorter: (a, b) => a.userName.localeCompare(b.userName),
+      sortOrder: sortedInfo.columnKey === "userName" && sortedInfo.order,
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      sorter: (a, b) => {
+        // Handle missing phone data safely
+        if (!a.phone) return -1;
+        if (!b.phone) return 1;
+        return a.phone.toString().localeCompare(b.phone.toString());
+      },
+      sortOrder: sortedInfo.columnKey === "phone" && sortedInfo.order,
+      render: (phone) => phone || "N/A", // Display N/A for missing phone data
+      width: 120,
+    },
+    {
+      title: "Created",
+      dataIndex: "created",
+      key: "created",
+      render: (text) => text.split("/")[0],
+      sorter: (a, b) => new Date(a.created) - new Date(b.created),
+      sortOrder: sortedInfo.columnKey === "created" && sortedInfo.order,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) =>
+        status === "pending" ? (
+          <StatusTag color="warning">
+            <ClockCircleOutlined /> Pending
+          </StatusTag>
+        ) : (
+          <StatusTag color="success">
+            <CheckCircleTwoTone twoToneColor="#52c41a" /> Resolved
+          </StatusTag>
+        ),
+      filters: [
+        { text: "Pending", value: "pending" },
+        { text: "Resolved", value: "resolved" },
+      ],
+      filteredValue: filteredInfo.status || null,
+      onFilter: (value, record) => record.status === value,
+    },
+    {
+      title: "User",
+      key: "user",
+      render: (_, record) => (
+        <Tooltip title="View User Profile">
+          <Link to={`/admin-panel/user-profile/${record.userId}`}>
+            <Button type="text" icon={<PersonOutline />} />
+          </Link>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "View Content",
+      key: "content",
+      render: (_, record) => (
+        <Tooltip title="View Content">
+          <Link to={record.link} target="_blank">
+            <Button type="text" icon={<InsertLink />} />
+          </Link>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          {record.status === "pending" ? (
+            <Tooltip title="Copy Link & Mark Resolved">
+              <Button
+                type="text"
+                icon={<ContentCopyOutlined />}
+                onClick={() => {
+                  copyToClipBoard(record.link);
+                  confirm(record.id);
+                }}
+              />
+            </Tooltip>
+          ) : (
+            <span>Resolved</span>
+          )}
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <MainBox>
-      {" "}
       {contextHolderNot}
       {contextHolder}
       <Breadcrumb
         items={[
           {
-            title: "User Panel",
+            title: "Admin Panel",
           },
           {
             title: "Copyright",
@@ -378,107 +322,39 @@ const CopyrightAdmin = () => {
       />
       <HeaderBox>
         <h1>Copyright</h1>
+        <Button
+          type="primary"
+          onClick={() => {
+            setSortedInfo({});
+            setFilteredInfo({});
+          }}
+        >
+          Clear filters
+        </Button>
       </HeaderBox>
       <TableBox>
-        {isLoading && <MusicLoader />}
-        <Table cellSpacing={0}>
-          <TableHead>
-            <tr>
-              <td></td>
-              <td>Platform</td>
-              <td>Created</td>
-              <td>Status</td>
-              <td>User</td>
-              <td>View Content</td>
-              <td>Action</td>
-            </tr>
-          </TableHead>
-          <TableBody>
-            {" "}
-            {queries &&
-              queries.map((q) => {
-                const { platform, created, status, link, id, userId } = q;
-                if (q.deleted === true) {
-                  return;
-                }
-                c++;
-                return (
-                  <tr key={id}>
-                    <td>{c}.</td>
-                    <td>{platform}</td>
-                    <td>{created.split("/")[0]}</td>
-                    {status === "pending" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#FFF2D7",
-                            color: "#FFBC21",
-                          }}
-                        >
-                          <ClockCircleOutlined /> pending
-                        </div>
-                      </td>
-                    )}
-                    {status === "resolved" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#D9EDDB",
-                            color: "#59BB5A",
-                          }}
-                        >
-                          <CheckCircleTwoTone twoToneColor="#52c41a" />
-                          resolved
-                        </div>
-                      </td>
-                    )}
-                    <td>
-                      <Link to={`/admin-panel/user-profile/${userId}`}>
-                        <PersonOutline />
-                      </Link>
-                    </td>
-                    <td>
-                      <Link to={link} target="_blank">
-                        <InsertLink />
-                      </Link>
-                    </td>
-                    <td>
-                      <>
-                        {status === "pending" && (
-                          <>
-                            {" "}
-                            {/* <Popconfirm
-                              title="Confirm"
-                              description="Copyright removed?"
-                              onOpenChange={() => {}}
-                            >
-                              <Link>
-                                <CheckCircleOutline />
-                              </Link>
-                            </Popconfirm> */}
-                            <ContentCopyOutlined
-                              style={{
-                                cursor: "pointer",
-                                transform: "scale(.8)",
-                              }}
-                              onClick={() => {
-                                copyToClipBoard(link);
-                                confirm(id);
-                              }}
-                            />
-                          </>
-                        )}
-                        {status === "resolved" && <>Resolved</>}
-                      </>
-                    </td>
-                  </tr>
-                );
-              })}
-          </TableBody>{" "}
-        </Table>{" "}
-        {queries && queries.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
+        <Table
+          columns={columns}
+          dataSource={queries}
+          rowKey="id"
+          loading={isLoading}
+          onChange={handleTableChange}
+          pagination={{
+            pageSize: 6,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ["bottomCenter"],
+          }}
+          scroll={{ x: 1000 }}
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No copyright queries found"
+              />
+            ),
+          }}
+        />
       </TableBox>
     </MainBox>
   );
