@@ -140,7 +140,7 @@ const DrawerPanel = (props) => {
     }
     setIsLoading(false);
   };
-  const items = 1
+  const items = adminView
     ? [
         {
           label: <Link to={"/user-panel/profile"}>My Account</Link>,
