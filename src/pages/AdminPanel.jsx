@@ -13,25 +13,71 @@ import EditOrder from "../components/AdminPanel/EditOrder";
 import PendingProfiles from "../components/AdminPanel/PendingProfiles";
 import Notification from "../components/AdminPanel/Notification";
 import MusicUserWallet from "../components/AdminPanel/MusicUserWallet";
-import { FloatButton, Modal, Select, Upload, Button, message } from "antd";
-import { UploadOutlined, DownloadOutlined } from "@ant-design/icons";
+import {
+  FloatButton,
+  Modal,
+  Select,
+  Upload,
+  Button,
+  message,
+  Input,
+  Radio,
+  Form,
+  InputNumber,
+} from "antd";
+import {
+  UploadOutlined,
+  DownloadOutlined,
+  DollarOutlined,
+} from "@ant-design/icons";
 import { IoIosAdd } from "react-icons/io";
 import { HiOutlineDocumentReport } from "react-icons/hi";
+import { BsCashCoin } from "react-icons/bs";
 import MusicLoader from "../components/Loader/MusicLoader";
 import ArtistManagement from "../components/AdminPanel/ArtistManagement";
+import { useSelector } from "react-redux";
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 const AdminPanel = () => {
   const [loading, setLoading] = useState(false);
+  const userId = useSelector((state) => state.userId);
+  const [users, setUsers] = useState([]);
   const page = useParams().page;
   const id = useParams().id;
   const action = useParams().action;
   const [open, setOpen] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [paymentModalVisible, setPaymentModalVisible] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [fileList, setFileList] = useState([]);
+  const [paymentForm] = Form.useForm();
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/get-all-user/?id=${userId}`
+      );
+      const data = await res.json();
+      console.log("users", data.users);
+
+      if (res.ok) {
+        setUsers(data.users);
+      } else {
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const onChange = () => {
     setOpen(!open);
@@ -45,6 +91,16 @@ const AdminPanel = () => {
   const handleReportModalCancel = () => {
     setReportModalVisible(false);
     setFileList([]);
+  };
+
+  const handleOpenPaymentModal = () => {
+    setPaymentModalVisible(true);
+    setOpen(false); // Close the float button group
+  };
+
+  const handlePaymentModalCancel = () => {
+    setPaymentModalVisible(false);
+    paymentForm.resetFields();
   };
 
   // Get month name from month number (0-11)
@@ -138,6 +194,58 @@ const AdminPanel = () => {
     setLoading(false);
   };
 
+  // Handle payment submission
+  const handlePaymentSubmit = async (values) => {
+    setLoading(true);
+    try {
+      // Determine action type based on payment type
+      const action = values.paymentType === "payment" ? "wallet" : "bonus";
+
+      // Format the data for the API
+      const paymentData = {
+        remark:
+          values.paymentType === "payment"
+            ? values.description
+            : "Bonus payment",
+        infId: values.userId,
+        amount: values.amount,
+        action: action,
+      };
+
+      // Make API call to process payment
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/add-wallet`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(paymentData),
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        message.success(
+          `${
+            values.paymentType === "payment" ? "Payment" : "Bonus"
+          } added successfully!`
+        );
+        setPaymentModalVisible(false);
+        paymentForm.resetFields();
+      } else {
+        message.error(
+          data.message || `Failed to process ${values.paymentType}.`
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      message.error("Something went wrong while processing payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div>
       <FloatButton.Group
@@ -150,7 +258,7 @@ const AdminPanel = () => {
           zIndex: 1,
           bottom: "20%",
         }}
-        tooltip={<div>Add Reports</div>}
+        tooltip={<div>Admin Actions</div>}
         icon={<IoIosAdd />}
       >
         <FloatButton
@@ -160,6 +268,17 @@ const AdminPanel = () => {
             <HiOutlineDocumentReport
               style={{
                 color: "#2178e9e0",
+              }}
+            />
+          }
+        />
+        <FloatButton
+          onClick={handleOpenPaymentModal}
+          tooltip={<div>Add Payment/Bonus</div>}
+          icon={
+            <BsCashCoin
+              style={{
+                color: "#389e0d",
               }}
             />
           }
@@ -247,6 +366,113 @@ const AdminPanel = () => {
             </Upload>
           </div>
         </div>
+      </Modal>
+
+      {/* Payment Modal */}
+      <Modal
+        title="Add Payment or Bonus"
+        open={paymentModalVisible}
+        onCancel={handlePaymentModalCancel}
+        footer={null}
+        width={500}
+      >
+        <Form
+          form={paymentForm}
+          layout="vertical"
+          onFinish={handlePaymentSubmit}
+          initialValues={{
+            paymentType: "payment",
+            amount: 0,
+          }}
+        >
+          <Form.Item
+            name="userId"
+            label="Select User"
+            rules={[{ required: true, message: "Please select a user" }]}
+          >
+            <Select
+              placeholder="Select user"
+              showSearch
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={users.map((user) => ({
+                value: user._id,
+                label: `${user.name} (${user.email})`,
+              }))}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="paymentType"
+            label="Payment Type"
+            rules={[{ required: true, message: "Please select payment type" }]}
+          >
+            <Radio.Group>
+              <Radio value="payment">Payment</Radio>
+              <Radio value="bonus">Bonus</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          <Form.Item
+            name="amount"
+            label="Amount (₹)"
+            rules={[{ required: true, message: "Please enter amount" }]}
+          >
+            <InputNumber
+              style={{ width: "100%" }}
+              min={1}
+              step={100}
+              formatter={(value) =>
+                `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/₹\s?|(,*)/g, "")}
+            />
+          </Form.Item>
+
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.paymentType !== currentValues.paymentType
+            }
+          >
+            {({ getFieldValue }) =>
+              getFieldValue("paymentType") === "payment" ? (
+                <Form.Item
+                  name="description"
+                  label="Description"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter payment description",
+                    },
+                  ]}
+                >
+                  <TextArea rows={3} placeholder="Enter payment details" />
+                </Form.Item>
+              ) : null
+            }
+          </Form.Item>
+
+          <Form.Item style={{ marginBottom: 0, marginTop: 24 }}>
+            <div
+              style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}
+            >
+              <Button onClick={handlePaymentModalCancel}>Cancel</Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<DollarOutlined />}
+                loading={loading}
+              >
+                Add Transaction
+              </Button>
+            </div>
+          </Form.Item>
+        </Form>
       </Modal>
 
       <AdminDrawerPanel page={page}>
