@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { Apple, FacebookOutlined, Instagram } from "@mui/icons-material";
 import { FaSpotify } from "react-icons/fa";
 import { CloseOutlined } from "@ant-design/icons";
+import moment from "moment";
 // ...existing code...
 
 // Enhanced tag for displaying selected artists with social links
@@ -1950,15 +1951,12 @@ const Form = () => {
                     name="crbt"
                     id="crbt"
                     format={format}
+                    defaultValue={moment("00:00:30", format)}
                     onChange={(time) => {
                       if (!time) {
                         return;
                       }
-                      let res;
-
-                      res = time.format(format); // Use moment's format to ensure correct output
-                      console.log(res);
-
+                      let res = time.format(format); // Use moment's format to ensure correct output
                       setInpFields({ ...inpFields, crbt: res });
                     }}
                   />
