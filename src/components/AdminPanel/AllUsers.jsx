@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { RemoveRedEyeOutlined } from "@mui/icons-material";
 import MusicLoader from "../Loader/MusicLoader";
 import {
@@ -16,7 +16,7 @@ import {
   Tooltip,
 } from "antd";
 import { MdDeleteOutline } from "react-icons/md";
-import { SearchOutlined } from "@ant-design/icons";
+import { LoginOutlined, SearchOutlined } from "@ant-design/icons";
 
 const MainBox = styled.div`
   width: 100%;
@@ -213,6 +213,90 @@ const AllUsers = () => {
       setIsLoading(false);
     }
   };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [mobile, setMobile] = useState("");
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [otpError, setOtpError] = useState("");
+  const demoHandleVerifyOtp = async (mob) => {
+    setIsLoading(true);
+    // const mob = "7895603314";
+    // const mob = "8126770620";
+
+    if (true) {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mob,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: mob,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        // 9927321330
+        // dispatch({ type: "logout" });
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (!loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-user", adminView: true },
+              });
+              navigate("/user-panel/home");
+            }
+            if (loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-admin", adminView: true },
+              });
+              navigate("/admin-panel/orders");
+            }
+          }, 1000);
+        }
+      } else {
+        navigate("/register", {
+          state: {
+            contactNum: mobile,
+          },
+        });
+      }
+      setNotification({
+        open: true,
+        message: "Login successful!",
+        severity: "success",
+      });
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+    setIsLoading(true);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -252,6 +336,22 @@ const AllUsers = () => {
       key: "phone",
       sorter: (a, b) => a.phone - b.phone,
       sortOrder: sortedInfo.columnKey === "phone" && sortedInfo.order,
+      render: (phone, record) => (
+        <Space>
+          {phone}
+          <Tooltip title="Login as this user">
+            <Button
+              type="text"
+              size="small"
+              icon={<LoginOutlined style={{ color: "#1890ff" }} />}
+              onClick={(e) => {
+                e.stopPropagation();
+                demoHandleVerifyOtp(phone);
+              }}
+            />
+          </Tooltip>
+        </Space>
+      ),
     },
     {
       title: "Location",

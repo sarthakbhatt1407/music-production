@@ -28,6 +28,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { Badge } from "@mui/material";
 import { FaWallet } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
+import MusicLoader from "./Loader/MusicLoader";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -50,32 +51,157 @@ const Para = styled.p`
 `;
 
 const DrawerPanel = (props) => {
+  const adminView = useSelector((state) => state.adminView);
+  console.log(adminView);
+
   const dispatch = useDispatch();
   const page = props.page;
   const navigate = useNavigate();
-  const items = [
-    {
-      label: <Link to={"/user-panel/profile"}>My Account</Link>,
-      key: "0",
-    },
-    {
-      type: "divider",
-    },
 
-    {
-      label: (
-        <span
-          onClick={() => {
-            dispatch({ type: "logout" });
-            navigate("/login");
-          }}
-        >
-          Log out
-        </span>
-      ),
-      key: "1",
-    },
-  ];
+  const [mobile, setMobile] = useState("");
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [otpError, setOtpError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const demoHandleVerifyOtp = async () => {
+    setIsLoading(true);
+
+    const mob = "8126770620";
+
+    if (true) {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mob,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: mob,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        // 9927321330
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (!loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-user" },
+              });
+              navigate("/user-panel/home");
+            }
+            if (loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-admin" },
+              });
+              navigate("/admin-panel/orders");
+            }
+          }, 1000);
+        }
+      } else {
+        navigate("/register", {
+          state: {
+            contactNum: mobile,
+          },
+        });
+      }
+      setNotification({
+        open: true,
+        message: "Login successful!",
+        severity: "success",
+      });
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+    setIsLoading(false);
+  };
+  const items = 1
+    ? [
+        {
+          label: <Link to={"/user-panel/profile"}>My Account</Link>,
+          key: "0",
+        },
+        {
+          type: "divider",
+        },
+
+        {
+          label: (
+            <span
+              onClick={() => {
+                dispatch({ type: "logout" });
+                navigate("/login");
+              }}
+            >
+              Log out
+            </span>
+          ),
+          key: "1",
+        },
+        {
+          type: "divider",
+        },
+        {
+          label: (
+            <span
+              onClick={() => {
+                demoHandleVerifyOtp();
+              }}
+            >
+              Admin Panel
+            </span>
+          ),
+          key: "2",
+        },
+      ]
+    : [
+        {
+          label: <Link to={"/user-panel/profile"}>My Account</Link>,
+          key: "0",
+        },
+        {
+          type: "divider",
+        },
+
+        {
+          label: (
+            <span
+              onClick={() => {
+                dispatch({ type: "logout" });
+                navigate("/login");
+              }}
+            >
+              Log out
+            </span>
+          ),
+          key: "1",
+        },
+      ];
   const defaultSelector = (page) => {
     if (page === "home") {
       return ["1"];
@@ -132,7 +258,7 @@ const DrawerPanel = (props) => {
     fetcher();
     const intv = setInterval(() => {
       fetcher();
-    }, 2000);
+    }, 20000);
     return () => {
       clearInterval(intv);
     };
@@ -140,6 +266,7 @@ const DrawerPanel = (props) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
+      {isLoading && <MusicLoader />}
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <LogoDiv>
           <img src={logo} alt="" />

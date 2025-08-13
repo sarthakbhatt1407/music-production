@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DrawerPanel from "../components/DrawerPanel";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import Form from "../components/UserPanel/Form";
 import History from "../components/UserPanel/History";
 import OrderDetailsPage from "../components/UserPanel/OrderDetailsPage";
@@ -15,8 +15,9 @@ import Reports from "../components/UserPanel/Reports";
 import UserNoti from "../components/UserPanel/UserNoti";
 import styled from "styled-components";
 import { FaQuestion } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import UserWalletView from "../components/UserPanel/UserWalletView";
+import MusicLoader from "../components/Loader/MusicLoader";
 
 const Modal = styled.div`
   width: 100%;
@@ -159,7 +160,92 @@ const Btn = styled.button`
     margin: 0 auto;
   }
 `;
+
 const UserPanel = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [mobile, setMobile] = useState("");
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [otpError, setOtpError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const demoHandleVerifyOtp = async () => {
+    setIsLoading(true);
+
+    const mob = "8126770620";
+
+    if (true) {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mob,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: mob,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        // 9927321330
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (!loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-user" },
+              });
+              navigate("/user-panel/home");
+            }
+            if (loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-admin" },
+              });
+              navigate("/admin-panel/orders");
+            }
+          }, 1000);
+        }
+      } else {
+        navigate("/register", {
+          state: {
+            contactNum: mobile,
+          },
+        });
+      }
+      setNotification({
+        open: true,
+        message: "Login successful!",
+        severity: "success",
+      });
+    } else {
+      setOtpError("Invalid OTP. Please try again.");
+    }
+    setIsLoading(false);
+  };
   const defaultField = {
     name: "",
     email: "",
@@ -188,7 +274,7 @@ const UserPanel = () => {
     setIsLoading(false);
   };
   const [messageApi, contextHolder] = message.useMessage();
-  const [isLoading, setIsLoading] = useState(false);
+
   const success = (msg) => {
     messageApi.open({
       type: "success",
@@ -419,6 +505,7 @@ const UserPanel = () => {
           />
         </FloatButton.Group> */}
         <DrawerPanel page={page}>
+          {isLoading && <MusicLoader />}
           {page === "home" && <UserPanelHome />}
           {page === "profile" && <ProfilePage />}
           {page === "upload" && <Form />}

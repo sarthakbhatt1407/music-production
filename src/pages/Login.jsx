@@ -503,14 +503,14 @@ const MobileOtpLogin = () => {
             if (!loginData.user.isAdmin) {
               dispatch({
                 type: "log in",
-                data: { ...loginData, type: "music-user" },
+                data: { ...loginData, type: "music-user", adminView: false },
               });
               navigate("/user-panel/home");
             }
             if (loginData.user.isAdmin) {
               dispatch({
                 type: "log in",
-                data: { ...loginData, type: "music-admin" },
+                data: { ...loginData, type: "music-admin", adminView: false },
               });
               navigate("/admin-panel/orders");
             }

@@ -5,6 +5,7 @@ const defaultState = {
   isAdmin: false,
   labelName: "",
   type: "",
+  adminView: false,
 };
 
 const storeReducer = (state = defaultState, action) => {
@@ -21,6 +22,7 @@ const storeReducer = (state = defaultState, action) => {
       labelName: user.name,
       isAdmin: user.isAdmin,
       type: data.type,
+      adminView: data.adminView ? true : false,
     };
 
     localStorage.setItem("state", JSON.stringify(obj));
@@ -31,6 +33,7 @@ const storeReducer = (state = defaultState, action) => {
       labelName: user.name,
       isAdmin: user.isAdmin,
       type: data.type,
+      adminView: data.adminView ? true : false,
     };
   }
 
@@ -42,6 +45,7 @@ const storeReducer = (state = defaultState, action) => {
   if (action.type === "reload") {
     return {
       ...action.data,
+      adminView: action.data.adminView ? true : false,
     };
   }
 
