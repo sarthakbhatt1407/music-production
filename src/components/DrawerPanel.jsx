@@ -119,7 +119,7 @@ const DrawerPanel = (props) => {
                 type: "log in",
                 data: { ...loginData, type: "music-admin" },
               });
-              navigate("/admin-panel/orders");
+              navigate("/admin-panel/all-users");
             }
           }, 1000);
         }

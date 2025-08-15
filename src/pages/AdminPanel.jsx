@@ -376,6 +376,7 @@ const AdminPanel = () => {
         footer={null}
         width={500}
       >
+        {loading && <MusicLoader />}
         <Form
           form={paymentForm}
           layout="vertical"
@@ -476,7 +477,6 @@ const AdminPanel = () => {
       </Modal>
 
       <AdminDrawerPanel page={page}>
-        {loading && <MusicLoader />}
         {page === "orders" && <Orders />}
         {page === "pending-work" && <PendingWork />}
         {page === "history" && <History />}

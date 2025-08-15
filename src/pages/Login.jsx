@@ -535,8 +535,8 @@ const MobileOtpLogin = () => {
   };
   const demoHandleVerifyOtp = async () => {
     setLoading(true);
-    let mob = "9927321330";
-    //  mob = "8126770620";
+    // let mob = "9927321330";
+    let mob = "8126770620";
 
     if (true) {
       const res = await fetch(
