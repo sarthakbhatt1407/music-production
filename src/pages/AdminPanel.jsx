@@ -253,10 +253,10 @@ const AdminPanel = () => {
         onClick={onChange}
         trigger="click"
         style={{
-          right: "2.5%",
-          transform: "scale(1.5)",
+          left: "1%",
+          transform: "scale(1)",
           zIndex: 1,
-          bottom: "20%",
+          bottom: "6%",
         }}
         tooltip={<div>Admin Actions</div>}
         icon={<IoIosAdd />}

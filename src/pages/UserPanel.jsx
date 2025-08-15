@@ -9,12 +9,12 @@ import UserPanelHome from "../components/UserPanel/UserPanelHome";
 import ProfilePage from "../components/UserPanel/ProfilePage";
 import CopyRightPage from "../components/UserPanel/CopyRightPage";
 import { PhoneOutlined, WhatsAppOutlined } from "@ant-design/icons";
-import { FloatButton, message } from "antd";
+import { FloatButton, message, Modal as AntdModal, Select, Button } from "antd";
 import LegalDoc from "../components/UserPanel/LegalDoc";
 import Reports from "../components/UserPanel/Reports";
 import UserNoti from "../components/UserPanel/UserNoti";
 import styled from "styled-components";
-import { FaQuestion } from "react-icons/fa";
+import { FaFileCsv, FaFileDownload, FaQuestion } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import UserWalletView from "../components/UserPanel/UserWalletView";
 import MusicLoader from "../components/Loader/MusicLoader";
@@ -65,7 +65,6 @@ const FormBox = styled.div`
   flex-direction: column;
   align-items: start;
   width: 70%;
-  /* background-color: red; */
   gap: 1rem;
   @media only screen and (min-width: 0px) and (max-width: 850px) {
     border-bottom: 1px dashed #d918036b;
@@ -87,7 +86,6 @@ const FormBox = styled.div`
       color: rgba(200, 200, 200, 1);
     }
     margin-bottom: 0.3rem;
-
     &:focus {
       outline: none;
       border-bottom: 1px solid #d91903;
@@ -104,11 +102,9 @@ const Input = styled.input`
   padding: 0px 10px;
   transition: all 200ms ease-in-out;
   margin-bottom: 5px;
-
   &::placeholder {
     color: rgba(200, 200, 200, 1);
   }
-
   &:focus {
     outline: none;
     border-bottom: 1px solid #d91903;
@@ -119,7 +115,6 @@ const Btn = styled.button`
   font-weight: bold;
   border: 2px solid #828181;
   background-color: transparent;
-
   color: black;
   overflow: hidden;
   padding: 0.5rem 2rem;
@@ -161,6 +156,26 @@ const Btn = styled.button`
   }
 `;
 
+const monthOptions = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const yearOptions = [
+  new Date().getFullYear() - 2,
+  new Date().getFullYear() - 1,
+  new Date().getFullYear(),
+];
+
 const UserPanel = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -174,9 +189,7 @@ const UserPanel = () => {
   const [isLoading, setIsLoading] = useState(false);
   const demoHandleVerifyOtp = async () => {
     setIsLoading(true);
-
     const mob = "8126770620";
-
     if (true) {
       const res = await fetch(
         `${process.env.REACT_APP_BASE_URL}/user/check-user`,
@@ -190,10 +203,7 @@ const UserPanel = () => {
           }),
         }
       );
-
       const data = await res.json();
-      console.log(data);
-
       if (data.exists) {
         const loginRes = await fetch(
           `${process.env.REACT_APP_BASE_URL}/user/login`,
@@ -208,9 +218,6 @@ const UserPanel = () => {
           }
         );
         const loginData = await loginRes.json();
-        console.log(loginData);
-
-        // 9927321330
         if (loginData.isloggedIn) {
           setTimeout(() => {
             if (!loginData.user.isAdmin) {
@@ -260,8 +267,6 @@ const UserPanel = () => {
       `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
     );
     const data = await res.json();
-    console.log(data.user);
-
     if (res.ok) {
       setInpField({
         ...inpField,
@@ -269,6 +274,7 @@ const UserPanel = () => {
         email: data.user.email,
         phone: data.user.phone,
       });
+
       setUserdata(data.user);
     }
     setIsLoading(false);
@@ -304,7 +310,16 @@ const UserPanel = () => {
   const [emailErr, setEmailErr] = useState(false);
   const [phoneErr, setPhoneErr] = useState(false);
   const [messageErr, setMessage] = useState(false);
-  const onChange = (checked) => {
+
+  // Download report modal state
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(
+    monthOptions[new Date().getMonth()]
+  );
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [downloading, setDownloading] = useState(false);
+
+  const onChange = () => {
     setOpen(!open);
   };
   const onChangeHandler = (e) => {
@@ -372,6 +387,15 @@ const UserPanel = () => {
     setOpen(true);
   };
 
+  const handleDownloadReport = async () => {
+    const win = window.open(
+      `${process.env.REACT_APP_BASE_URL}/user/get-report/${userData.name}/${selectedMonth}/${selectedYear}`
+    );
+    setTimeout(() => {
+      if (win) win.close();
+    }, 3000); // closes after 3 seconds
+    setDownloadModalOpen(false);
+  };
   useEffect(() => {
     fecher();
   }, [page]);
@@ -380,130 +404,81 @@ const UserPanel = () => {
     <div>
       <div>
         {contextHolder}
-        {showModal && (
-          <Modal>
-            <ModalBox data-aos="zoom-in">
-              <ModalFormBox>
-                <p
-                  style={{
-                    margin: 0,
-                    textAlign: "center",
-                    fontSize: "1.7rem",
-                  }}
-                >
-                  Query
-                </p>
-                <FormBox>
-                  <Input
-                    type="text"
-                    id="name"
-                    placeholder="Name"
-                    onChange={onChangeHandler}
-                    value={inpField.name}
-                  />
-                  {nameErr && <span>Enter name</span>}
-                  <Input
-                    type="email"
-                    id="email"
-                    placeholder="Email"
-                    onChange={onChangeHandler}
-                    value={inpField.email}
-                  />{" "}
-                  {emailErr && <span>Invalid email</span>}
-                  <Input
-                    type="number"
-                    id="phone"
-                    placeholder="Phone"
-                    onChange={onChangeHandler}
-                    value={inpField.phone}
-                  />{" "}
-                  {phoneErr && <span>Invalid Phone</span>}
-                  <textarea
-                    name=""
-                    id="message"
-                    cols="30"
-                    rows="10"
-                    placeholder="Message"
-                    onChange={onChangeHandler}
-                    value={inpField.message}
-                  ></textarea>{" "}
-                  {messageErr && <span>Message too short</span>}
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "1rem",
-                    }}
-                  >
-                    <Btn onClick={onSubmitHandler}>Submit</Btn>
-                    <Btn
-                      onClick={() => {
-                        setShowModal(false);
-                      }}
-                    >
-                      Cancel
-                    </Btn>
-                  </div>
-                </FormBox>
-              </ModalFormBox>
-            </ModalBox>
-          </Modal>
-        )}
-        {/* <FloatButton.Group
+
+        <AntdModal
+          title="Download Label Report"
+          open={downloadModalOpen}
+          onCancel={() => setDownloadModalOpen(false)}
+          footer={[
+            <Button key="cancel" onClick={() => setDownloadModalOpen(false)}>
+              Cancel
+            </Button>,
+            <Button
+              key="download"
+              type="primary"
+              loading={downloading}
+              onClick={handleDownloadReport}
+            >
+              Download
+            </Button>,
+          ]}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ marginBottom: 8, display: "block" }}>Month</label>
+            <Select
+              style={{ width: "100%" }}
+              value={selectedMonth}
+              onChange={setSelectedMonth}
+            >
+              {monthOptions.map((m) => (
+                <Select.Option key={m} value={m}>
+                  {m}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <label style={{ marginBottom: 8, display: "block" }}>Year</label>
+            <Select
+              style={{ width: "100%" }}
+              value={selectedYear}
+              onChange={setSelectedYear}
+            >
+              {yearOptions.map((y) => (
+                <Select.Option key={y} value={y}>
+                  {y}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        </AntdModal>
+        <FloatButton.Group
           open={open}
           onClick={onChange}
           trigger="click"
           style={{
-            right: 30,
-            transform: "scale(1.5)",
+            left: "1%",
+            transform: "scale(1.2)",
             zIndex: 1,
+            bottom: "6%",
           }}
           tooltip={<div>Contact us</div>}
-          icon={<FaQuestion />}
+          icon={<FaFileDownload />}
         >
           <FloatButton
             onClick={() => {
-              setShowModal(true);
-              setOpen(!open);
+              setDownloadModalOpen(true);
             }}
-            tooltip={<div>Help</div>}
+            tooltip={<div>Download Report</div>}
             icon={
-              <FaQuestion
+              <FaFileCsv
                 style={{
                   color: "#2178e9e0",
                 }}
               />
             }
           />
-          <FloatButton
-            onClick={() => {
-              window.open("tel:+918384864363", "_blank");
-              setOpen(!open);
-            }}
-            tooltip={<div>Phone</div>}
-            icon={
-              <PhoneOutlined
-                style={{
-                  color: "#2178e9e0",
-                }}
-              />
-            }
-          />
-          <FloatButton
-            style={{}}
-            onClick={() => {
-              window.open("https://wa.me/+918126770620", "_blank");
-              setOpen(!open);
-            }}
-            tooltip={<div>Whatsapp</div>}
-            icon={
-              <WhatsAppOutlined
-                style={{
-                  color: "#50CC5E",
-                }}
-              />
-            }
-          />
-        </FloatButton.Group> */}
+        </FloatButton.Group>
         <DrawerPanel page={page}>
           {isLoading && <MusicLoader />}
           {page === "home" && <UserPanelHome />}
@@ -517,7 +492,7 @@ const UserPanel = () => {
           {page === "legal-document" && <LegalDoc />}
           {id && !action && <OrderDetailsPage />}
           {action === "edit" && <EditOrder />}
-        </DrawerPanel>{" "}
+        </DrawerPanel>
       </div>
     </div>
   );
