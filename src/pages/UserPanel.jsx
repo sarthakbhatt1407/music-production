@@ -393,7 +393,7 @@ const UserPanel = () => {
     );
     setTimeout(() => {
       if (win) win.close();
-    }, 3000); // closes after 3 seconds
+    }, 10000); // closes after 3 seconds
     setDownloadModalOpen(false);
   };
   useEffect(() => {
