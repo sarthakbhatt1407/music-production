@@ -1477,6 +1477,7 @@ const EditOrder = () => {
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>
                   </Label>
+
                   <Select
                     name="language"
                     id="language"
@@ -1486,16 +1487,70 @@ const EditOrder = () => {
                       setInpFields({ ...inpFields, language: value });
                     }}
                   >
-                    <Option value={"Hindi "}>Hindi </Option>
-                    <Option value={"Punjabi"}>Punjabi</Option>
-                    <Option value={"Garhwali"}>Garhwali</Option>
-                    <Option value={"English"}>English</Option>
-                    <Option value={"Nepali"}>Nepali</Option>
-                    <Option value={"Kumauni"}>Kumauni</Option>
-                    <Option value={"Jaunsari"}>Jaunsari</Option>
-                    <Option value={"Himanchali"}>Himanchali</Option>
-                    <Option value={"Haryanvi"}>Haryanvi</Option>
-                    <Option value={"Urdu"}>Urdu</Option>
+                    <Option value="Ahirani">Ahirani</Option>
+                    <Option value="Arabic">Arabic</Option>
+                    <Option value="Assamese">Assamese</Option>
+                    <Option value="Awadhi">Awadhi</Option>
+                    <Option value="Banjara">Banjara</Option>
+                    <Option value="Bengali">Bengali</Option>
+                    <Option value="Bhojpuri">Bhojpuri</Option>
+                    <Option value="Burmese">Burmese</Option>
+                    <Option value="Chhattisgarhi">Chhattisgarhi</Option>
+                    <Option value="Chinese">Chinese</Option>
+                    <Option value="Dogri">Dogri</Option>
+                    <Option value="English">English</Option>
+                    <Option value="French">French</Option>
+                    <Option value="Garhwali">Garhwali</Option>
+                    <Option value="Garo">Garo</Option>
+                    <Option value="Gujarati">Gujarati</Option>
+                    <Option value="Haryanvi">Haryanvi</Option>
+                    <Option value="Himachali">Himachali</Option>
+                    <Option value="Hindi">Hindi</Option>
+                    <Option value="Iban">Iban</Option>
+                    <Option value="Indonesian">Indonesian</Option>
+                    <Option value="Instrumental">Instrumental</Option>
+                    <Option value="Italian">Italian</Option>
+                    <Option value="Japanese">Japanese</Option>
+                    <Option value="Javanese">Javanese</Option>
+                    <Option value="Kannada">Kannada</Option>
+                    <Option value="Kashmiri">Kashmiri</Option>
+                    <Option value="Khasi">Khasi</Option>
+                    <Option value="Kokborok">Kokborok</Option>
+                    <Option value="Konkani">Konkani</Option>
+                    <Option value="Korean">Korean</Option>
+                    <Option value="Kumauni">Kumauni</Option>
+                    <Option value="Latin">Latin</Option>
+                    <Option value="Maithili">Maithili</Option>
+                    <Option value="Malay">Malay</Option>
+                    <Option value="Malayalam">Malayalam</Option>
+                    <Option value="Mandarin">Mandarin</Option>
+                    <Option value="Manipuri">Manipuri</Option>
+                    <Option value="Marathi">Marathi</Option>
+                    <Option value="Marwari">Marwari</Option>
+                    <Option value="Naga">Naga</Option>
+                    <Option value="Nagpuri">Nagpuri</Option>
+                    <Option value="Nepali">Nepali</Option>
+                    <Option value="Odia">Odia</Option>
+                    <Option value="Pali">Pali</Option>
+                    <Option value="Persian">Persian</Option>
+                    <Option value="Punjabi">Punjabi</Option>
+                    <Option value="Rajasthani">Rajasthani</Option>
+                    <Option value="Sambalpuri">Sambalpuri</Option>
+                    <Option value="Sanskrit">Sanskrit</Option>
+                    <Option value="Santali">Santali</Option>
+                    <Option value="Santhili">Santhili</Option>
+                    <Option value="Sindhi">Sindhi</Option>
+                    <Option value="Sinhala">Sinhala</Option>
+                    <Option value="Spanish">Spanish</Option>
+                    <Option value="Swahili">Swahili</Option>
+                    <Option value="Tamil">Tamil</Option>
+                    <Option value="Telugu">Telugu</Option>
+                    <Option value="Thai">Thai</Option>
+                    <Option value="Tibetan">Tibetan</Option>
+                    <Option value="Tulu">Tulu</Option>
+                    <Option value="Turkish">Turkish</Option>
+                    <Option value="Ukrainian">Ukrainian</Option>
+                    <Option value="Urdu">Urdu</Option>
                   </Select>
                 </LabelInpBox>
                 <LabelInpBox>

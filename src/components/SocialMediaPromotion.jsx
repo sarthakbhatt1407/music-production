@@ -33,7 +33,9 @@ import {
 import { BsChatDotsFill } from "react-icons/bs";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-
+import ishika from "../assets/Ishika.jpeg";
+import akash from "../assets/Akash.jpg";
+import himani from "../assets/Himani.jpeg";
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: "#fff",
   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -156,24 +158,24 @@ const SocialMediaPromotion = () => {
 
   const influencers = [
     {
-      name: "Sarah Johnson",
-      followers: "1.2M",
+      name: "Ishika Bisht",
+      followers: "118K",
       expertise: "Lifestyle & Fashion",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      platforms: ["Instagram", "TikTok"],
+      image: ishika,
+      platforms: ["Instagram", "YouTube"],
     },
     {
-      name: "Mike Chen",
-      followers: "850K",
-      expertise: "Tech & Gaming",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-      platforms: ["YouTube", "Twitter"],
+      name: "Akash Negi Bunty",
+      followers: "118K",
+      expertise: "Music",
+      image: akash,
+      platforms: ["YouTube", "Instagram"],
     },
     {
-      name: "Emma Davis",
-      followers: "2.1M",
-      expertise: "Beauty & Wellness",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+      name: "Himani koranga",
+      followers: "185K",
+      expertise: "Music",
+      image: himani,
       platforms: ["Instagram", "YouTube"],
     },
   ];

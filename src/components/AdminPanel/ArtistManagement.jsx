@@ -419,25 +419,24 @@ const ArtistManagement = () => {
           </Form.Item>
 
           {/* Only show social media fields for singer, lyricist, and composer */}
-          {showSocialMediaFields && (
-            <>
-              <Form.Item name="facebookUrl" label="Facebook URL">
-                <Input placeholder="https://facebook.com/profile" />
-              </Form.Item>
 
-              <Form.Item name="instagramUrl" label="Instagram URL">
-                <Input placeholder="https://instagram.com/profile" />
-              </Form.Item>
+          <>
+            <Form.Item name="facebookUrl" label="Facebook URL">
+              <Input placeholder="https://facebook.com/profile" />
+            </Form.Item>
 
-              <Form.Item name="appleId" label="Apple Music URL">
-                <Input placeholder="https://music.apple.com/artist/id" />
-              </Form.Item>
+            <Form.Item name="instagramUrl" label="Instagram URL">
+              <Input placeholder="https://instagram.com/profile" />
+            </Form.Item>
 
-              <Form.Item name="spotifyId" label="Spotify URL">
-                <Input placeholder="https://open.spotify.com/artist/" />
-              </Form.Item>
-            </>
-          )}
+            <Form.Item name="appleId" label="Apple Music URL">
+              <Input placeholder="https://music.apple.com/artist/id" />
+            </Form.Item>
+
+            <Form.Item name="spotifyId" label="Spotify URL">
+              <Input placeholder="https://open.spotify.com/artist/" />
+            </Form.Item>
+          </>
 
           <Form.Item>
             <Space>
