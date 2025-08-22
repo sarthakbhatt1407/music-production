@@ -14,6 +14,7 @@ import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
 import {
   CheckCircleOutline,
+  Close,
   ContentCopyOutlined,
   DeleteForeverOutlined,
   InsertLink,
@@ -183,6 +184,31 @@ const CopyrightAdmin = () => {
       setIsLoading(false);
     }
   };
+  const reject = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=rejected`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      if (res.ok) {
+        success("Query marked as rejected");
+        setTimeout(() => {
+          setRefresher((prev) => prev + 1);
+        }, 500);
+      } else {
+        error("Failed to update query status");
+      }
+    } catch (err) {
+      error("Error connecting to server");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleTableChange = (pagination, filters, sorter) => {
     setFilteredInfo(filters);
@@ -243,19 +269,33 @@ const CopyrightAdmin = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) =>
-        status === "pending" ? (
-          <StatusTag color="warning">
-            <ClockCircleOutlined /> Pending
-          </StatusTag>
-        ) : (
-          <StatusTag color="success">
-            <CheckCircleTwoTone twoToneColor="#52c41a" /> Resolved
-          </StatusTag>
-        ),
+      render: (status) => {
+        if (status === "pending") {
+          return (
+            <StatusTag color="warning">
+              <ClockCircleOutlined /> Pending
+            </StatusTag>
+          );
+        } else if (status === "resolved") {
+          return (
+            <StatusTag color="success">
+              <CheckCircleTwoTone twoToneColor="#52c41a" /> Resolved
+            </StatusTag>
+          );
+        } else if (status === "rejected") {
+          return (
+            <StatusTag color="error">
+              <Close /> Rejected
+            </StatusTag>
+          );
+        } else {
+          return <StatusTag>Unknown</StatusTag>;
+        }
+      },
       filters: [
         { text: "Pending", value: "pending" },
         { text: "Resolved", value: "resolved" },
+        { text: "Rejected", value: "rejected" },
       ],
       filteredValue: filteredInfo.status || null,
       onFilter: (value, record) => record.status === value,
@@ -282,24 +322,42 @@ const CopyrightAdmin = () => {
         </Tooltip>
       ),
     },
+    // ...existing code...
+
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
         <Space size="middle">
           {record.status === "pending" ? (
-            <Tooltip title="Copy Link & Mark Resolved">
-              <Button
-                type="text"
-                icon={<ContentCopyOutlined />}
-                onClick={() => {
-                  copyToClipBoard(record.link);
-                  confirm(record.id);
-                }}
-              />
-            </Tooltip>
-          ) : (
+            <>
+              <Tooltip title="Copy Link & Mark Resolved">
+                <Button
+                  type="text"
+                  icon={<ContentCopyOutlined />}
+                  onClick={() => {
+                    copyToClipBoard(record.link);
+                    confirm(record.id);
+                  }}
+                />
+              </Tooltip>
+              <Tooltip title="Reject">
+                <Button
+                  type="text"
+                  icon={<Close />}
+                  onClick={() => {
+                    copyToClipBoard(record.link);
+                    reject(record.id);
+                  }}
+                />
+              </Tooltip>
+            </>
+          ) : record.status === "resolved" ? (
             <span>Resolved</span>
+          ) : record.status === "rejected" ? (
+            <span style={{ color: "#ff4d4f", fontWeight: 500 }}>Rejected</span>
+          ) : (
+            <span>Unknown</span>
           )}
         </Space>
       ),

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Select } from "antd";
+import { Breadcrumb, Select, Empty } from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
-import { notification } from "antd";
-import { message } from "antd";
-import { Empty } from "antd";
-import { DeleteForeverOutlined, InsertLink } from "@mui/icons-material";
-import { ClockCircleOutlined, CheckCircleTwoTone } from "@ant-design/icons";
+import { notification, message } from "antd";
+import { InsertLink } from "@mui/icons-material";
+import {
+  ClockCircleOutlined,
+  CheckCircleTwoTone,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { Popconfirm } from "antd";
 import MusicLoader from "../Loader/MusicLoader";
 
 const MainBox = styled.div`
@@ -25,9 +26,8 @@ const TableBox = styled.div`
   padding: 1rem;
   border-radius: 0.5rem;
   overflow: scroll;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-  }
 `;
+
 const Table = styled.table`
   width: 100%;
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
@@ -39,7 +39,6 @@ const Table = styled.table`
 const TableHead = styled.thead`
   tr {
     background-color: #f4f4fb;
-
     td {
       text-align: center;
       padding: 0.4rem 0rem;
@@ -54,6 +53,7 @@ const TableHead = styled.thead`
     }
   }
 `;
+
 const TableBody = styled.tbody`
   tr {
     td {
@@ -80,7 +80,6 @@ const TableBody = styled.tbody`
         gap: 0.4rem;
         width: fit-content;
         margin: 0 auto;
-        /* text-transform: uppercase; */
         font-size: 0.8rem;
         font-weight: bold;
         @media only screen and (min-width: 0px) and (max-width: 1000px) {
@@ -104,6 +103,7 @@ const TableBody = styled.tbody`
     }
   }
 `;
+
 const HeaderBox = styled.div`
   display: flex;
   justify-content: space-between;
@@ -127,6 +127,7 @@ const HeaderBox = styled.div`
     margin-bottom: 1rem;
   }
 `;
+
 const Modal = styled.div`
   width: 100%;
   height: 100%;
@@ -152,7 +153,6 @@ const ModalBox = styled.div`
   justify-content: center;
   border-radius: 0.5rem;
   z-index: 20;
-
   @media only screen and (min-width: 0px) and (max-width: 1000px) {
     width: 90%;
   }
@@ -167,6 +167,7 @@ const ModalFormBox = styled.div`
   align-items: center;
   gap: 1rem;
 `;
+
 const Option = styled.option`
   color: #777;
   font-weight: bold;
@@ -206,6 +207,7 @@ const LabelInpBox = styled.div`
     width: 100%;
   }
 `;
+
 const Label = styled.label`
   font-size: 0.9rem;
   letter-spacing: 0.06rem;
@@ -218,7 +220,6 @@ const Input = styled.input`
   border-radius: 0.6rem;
   outline: none;
   border: 1px solid #d7d7d7;
-
   &::placeholder {
     color: #d4cdcd;
     letter-spacing: 0.09rem;
@@ -228,6 +229,18 @@ const Input = styled.input`
     border: 1px solid #c0c0c0;
     box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
   }
+`;
+
+const StatusTag = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  width: fit-content;
+  margin: 0 auto;
 `;
 
 const CopyRightPage = () => {
@@ -241,22 +254,14 @@ const CopyRightPage = () => {
     duration: 1.5,
   });
   const openNotificationWithIcon = (type, msg) => {
-    api[type]({
-      message: msg,
-    });
+    api[type]({ message: msg });
   };
   const [messageApi, contextHolder] = message.useMessage();
   const success = (msg) => {
-    messageApi.open({
-      type: "success",
-      content: msg,
-    });
+    messageApi.open({ type: "success", content: msg });
   };
   const error = (msg) => {
-    messageApi.open({
-      type: "error",
-      content: msg,
-    });
+    messageApi.open({ type: "error", content: msg });
   };
 
   const [inpFields, setInpFields] = useState(defaultF);
@@ -265,13 +270,13 @@ const CopyRightPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [queries, setQueries] = useState(null);
   const [refresher, setRefresher] = useState(0);
+
   const fetcher = async () => {
     setIsLoading(true);
     const res = await fetch(
       `${process.env.REACT_APP_BASE_URL}/copyright/get-all-user-query/?userId=${userId}`
     );
     const data = await res.json();
-
     if (res.ok) {
       setQueries(data.cQueries.reverse());
       setIsLoading(false);
@@ -280,45 +285,21 @@ const CopyRightPage = () => {
 
   useEffect(() => {
     fetcher();
-
     return () => {};
   }, [userId, refresher]);
 
-  const confirm = async (id) => {
-    setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=delete`,
-      {
-        method: "PATCH",
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(null);
-          setRefresher(refresher + 1);
-          setIsLoading(false);
-        }, 500);
-      });
-    }
-  };
   const onChangeHandler = (e) => {
     const id = e.target.id;
     const val = e.target.value;
     const ele = document.querySelector(`#${id}`);
-
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val.trim() });
   };
 
   const onSubmitHandler = async () => {
     if (inpFields.link.length === 0) {
-      if (inpFields.link.length === 0) {
-        const link = document.querySelector("#link");
-        link.style.border = "1px solid red";
-      }
-
+      const link = document.querySelector("#link");
+      link.style.border = "1px solid red";
       openNotificationWithIcon("error", "Fill all require fields.");
       return;
     }
@@ -327,13 +308,8 @@ const CopyRightPage = () => {
       `${process.env.REACT_APP_BASE_URL}/copyright/create-new-query`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...inpFields,
-          userId: userId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...inpFields, userId: userId }),
       }
     );
     const data = await res.json();
@@ -348,16 +324,13 @@ const CopyRightPage = () => {
     setRefresher(refresher + 1);
     setIsLoading(false);
   };
+
   const getSelectedValue = (e) => {
     setInpFields({ ...inpFields, platform: e });
-
-    // const ele = document.querySelector(`#${e.target.id}`);
-    // const value = Number(ele.options[ele.selectedIndex].value);
-    // console.log(value);
   };
+
   return (
     <MainBox>
-      {" "}
       {contextHolderNot}
       {contextHolder}
       {showModal && (
@@ -365,7 +338,6 @@ const CopyRightPage = () => {
           <ModalBox data-aos="zoom-in">
             <ModalFormBox>
               <LabelInpBox>
-                {" "}
                 <Label htmlFor="platform">Platform</Label>
                 <Select
                   name="platform"
@@ -390,38 +362,17 @@ const CopyRightPage = () => {
               </LabelInpBox>
               <BtnBox>
                 <button onClick={onSubmitHandler}>Submit</button>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
+                <button onClick={() => setShowModal(false)}>Cancel</button>
               </BtnBox>
             </ModalFormBox>
           </ModalBox>
         </Modal>
       )}
-      <Breadcrumb
-        items={[
-          {
-            title: "User Panel",
-          },
-          {
-            title: "Copyright",
-          },
-        ]}
-      />
+      <Breadcrumb items={[{ title: "User Panel" }, { title: "Copyright" }]} />
       <HeaderBox>
         <h1>Copyright</h1>
         {!showModal && (
-          <button
-            onClick={() => {
-              setShowModal(true);
-            }}
-          >
-            Add New Query
-          </button>
+          <button onClick={() => setShowModal(true)}>Add New Query</button>
         )}
       </HeaderBox>
       <TableBox>
@@ -429,83 +380,62 @@ const CopyRightPage = () => {
         <Table cellSpacing={0}>
           <TableHead>
             <tr>
-              <td></td>
+              <td>#</td>
               <td>Platform</td>
               <td>Created</td>
               <td>Status</td>
               <td>View Content</td>
-              <td>Action</td>
             </tr>
           </TableHead>
           <TableBody>
-            {" "}
             {queries &&
-              queries.map((q) => {
-                const { platform, created, status, link, id } = q;
-                if (q.deleted === true) {
-                  return;
-                }
+              queries.map((q, idx) => {
+                const { platform, created, status, link, id, deleted } = q;
+                if (deleted === true) return null;
                 c++;
                 return (
                   <tr key={id}>
                     <td>{c}.</td>
                     <td>{platform}</td>
                     <td>{created.split("/")[0]}</td>
-                    {status === "pending" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#FFF2D7",
-                            color: "#FFBC21",
-                          }}
+                    <td>
+                      {status === "pending" ? (
+                        <StatusTag
+                          style={{ background: "#FFF2D7", color: "#FFBC21" }}
                         >
-                          <ClockCircleOutlined /> pending
-                        </div>
-                      </td>
-                    )}
-                    {status === "resolved" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#D9EDDB",
-                            color: "#59BB5A",
-                          }}
+                          <ClockCircleOutlined /> Pending
+                        </StatusTag>
+                      ) : status === "resolved" ? (
+                        <StatusTag
+                          style={{ background: "#D9EDDB", color: "#59BB5A" }}
                         >
-                          <CheckCircleTwoTone twoToneColor="#52c41a" />
-                          resolved
-                        </div>
-                      </td>
-                    )}
+                          <CheckCircleTwoTone twoToneColor="#52c41a" /> Resolved
+                        </StatusTag>
+                      ) : status === "rejected" ? (
+                        <StatusTag
+                          style={{ background: "#FFD6D6", color: "#ff4d4f" }}
+                        >
+                          <CloseCircleOutlined /> Rejected
+                        </StatusTag>
+                      ) : (
+                        <StatusTag>Unknown</StatusTag>
+                      )}
+                    </td>
                     <td>
                       <Link to={link} target="_blank">
                         <InsertLink />
                       </Link>
                     </td>
-                    <td>
-                      <>
-                        {status === "resolved" && <>Resolved</>}
-                        {status !== "resolved" && (
-                          <>
-                            <Popconfirm
-                              title="Confirm"
-                              description="Do you want to delete?"
-                              onConfirm={confirm.bind(this, id)}
-                            >
-                              <Link>
-                                <DeleteForeverOutlined />
-                              </Link>
-                            </Popconfirm>
-                          </>
-                        )}
-                      </>
-                    </td>
                   </tr>
                 );
               })}
-          </TableBody>{" "}
-        </Table>{" "}
+          </TableBody>
+        </Table>
         {queries && queries.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No copyright queries found"
+          />
         )}
       </TableBox>
     </MainBox>

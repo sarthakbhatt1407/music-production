@@ -3,8 +3,9 @@ import styled, { keyframes } from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Alert, Snackbar } from "@mui/material";
 import MusicLoader from "../components/Loader/MusicLoader";
-import { notification } from "antd";
+import { notification, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { Country, State } from "country-state-city";
 import { Button, message, Upload } from "antd";
 import { Input as IN } from "antd";
 const OuterBox = styled.div`
@@ -254,6 +255,45 @@ const PhotosDiv = styled.div`
 `;
 
 const Register = () => {
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [countryList, setCountryList] = useState([]);
+  const [stateList, setStateList] = useState([]);
+
+  useEffect(() => {
+    setCountryList(Country.getAllCountries());
+  }, []);
+
+  useEffect(() => {
+    if (selectedCountry) {
+      setStateList(State.getStatesOfCountry(selectedCountry));
+    } else {
+      setStateList([]);
+    }
+  }, [selectedCountry]);
+  const handleCountryChange = (countryCode) => {
+    setSelectedCountry(countryCode);
+
+    // Find full country name
+    const countryObj = countryList.find((c) => c.isoCode === countryCode);
+    const countryName = countryObj ? countryObj.name : countryCode;
+    console.log(countryName);
+    setInpFields((prev) => ({ ...prev, country: countryName, state: "" }));
+    setSelectedState("");
+  };
+
+  const handleStateChange = (stateCode) => {
+    setSelectedState(stateCode);
+
+    // Find full state name
+    const stateObj = stateList.find(
+      (s) => s.name === stateCode || s.isoCode === stateCode
+    );
+    const stateName = stateObj ? stateObj.name : stateCode;
+    console.log(stateName);
+
+    setInpFields({ ...inpFields, state: stateName });
+  };
   const location = useLocation();
   const contactNum = location.state?.contactNum;
 
@@ -401,8 +441,8 @@ const Register = () => {
     const contactNum = document.querySelector("#contactNum").value;
     // const password = document.querySelector("#password").value;
     const city = document.querySelector("#city").value;
-    const state = document.querySelector("#state").value;
-    const country = document.querySelector("#country").value;
+    // const state = document.querySelector("#state").value;
+    // const country = document.querySelector("#country").value;
     const channelUrl = document.querySelector("#channelUrl").value;
     const address = document.querySelector("#address").value;
     const pincode = document.querySelector("#pincode").value;
@@ -424,14 +464,17 @@ const Register = () => {
     //   setPasswordErr(true);
     //   return;
     // }
+    console.log("co", inpFields, inpFields.country.length > 3);
+    console.log("st", inpFields.state.length > 3);
+
     if (
       fullName.length > 4 &&
       city.length > 3 &&
       pincode.toString().length == 6 &&
       address.length > 4 &&
-      country.length > 3 &&
+      inpFields.country.length > 3 &&
       channelUrl.length > 9 &&
-      state.length > 3 &&
+      inpFields.state.length > 3 &&
       validateEmail(email) &&
       contactNum.length > 9 &&
       inpFields.sign != null &&
@@ -449,8 +492,8 @@ const Register = () => {
     const contactNum = document.querySelector("#contactNum").value;
     // const password = document.querySelector("#password").value;
     const city = document.querySelector("#city").value;
-    const state = document.querySelector("#state").value;
-    const country = document.querySelector("#country").value;
+    // const state = document.querySelector("#state").value;
+    // const country = document.querySelector("#country").value;
     const channelUrl = document.querySelector("#channelUrl").value;
     const address = document.querySelector("#address").value;
     const pincode = document.querySelector("#pincode").value;
@@ -475,11 +518,11 @@ const Register = () => {
       setChannelUrlErr(true);
       return;
     }
-    if (id === "country" && country.length < 4) {
+    if (id === "country" && inpFields.country.length < 4) {
       setCountryErr(true);
       return;
     }
-    if (id === "state" && state.length < 4) {
+    if (id === "state" && inpFields.state.length < 4) {
       setStateErr(true);
       return;
     }
@@ -615,7 +658,7 @@ const Register = () => {
     formData.append("userPic", inpFields.userPic);
     formData.append("address", inpFields.address);
     formData.append("pincode", inpFields.pincode);
-    // 
+    //
 
     const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {
       method: "POST",
@@ -786,42 +829,72 @@ const Register = () => {
                   }}
                 />{" "}
                 {cityErr && <p>Invalid City Name</p>}
-                <IN
-                  className="inputField inp"
-                  type="text"
-                  name=""
-                  id="state"
-                  onBlur={onBlurHandler}
-                  onChange={onChangeHandler}
-                  placeholder="State"
-                  value={inpFields.state}
-                  style={{
-                    border: `${
-                      stateErr
-                        ? "1px solid #d72020"
-                        : "1px solid rgba(166, 166, 166, 0.3)"
-                    }`,
-                  }}
-                />{" "}
-                {stateErr && <p>Invalid State Name</p>}
-                <IN
-                  className="inputField inp"
-                  type="text"
-                  name=""
-                  id="country"
-                  onBlur={onBlurHandler}
-                  onChange={onChangeHandler}
-                  placeholder="Country"
-                  value={inpFields.country}
-                  style={{
-                    border: `${
-                      countryErr
-                        ? "1px solid #d72020"
-                        : "1px solid rgba(166, 166, 166, 0.3)"
-                    }`,
-                  }}
-                />{" "}
-                {countryErr && <p>Invalid Country Name</p>}
+                <div style={{ width: "100%" }}>
+                  <label
+                    style={{
+                      color: "#C8C8C8",
+                      fontSize: ".8rem",
+                      letterSpacing: ".06rem",
+                      marginLeft: ".3rem",
+                    }}
+                  >
+                    Country
+                  </label>
+                  <Select
+                    showSearch
+                    style={{ width: "100%", marginBottom: 8 }}
+                    placeholder="Select country"
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                  >
+                    {countryList.map((country) => (
+                      <Select.Option
+                        key={country.isoCode}
+                        value={country.isoCode}
+                      >
+                        {country.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                  {countryErr && <p>Invalid Country Name</p>}
+                </div>
+                <div style={{ width: "100%" }}>
+                  <label
+                    style={{
+                      color: "#C8C8C8",
+                      fontSize: ".8rem",
+                      letterSpacing: ".06rem",
+                      marginLeft: ".3rem",
+                    }}
+                  >
+                    State
+                  </label>
+                  <Select
+                    showSearch
+                    style={{ width: "100%", marginBottom: 8 }}
+                    placeholder="Select state"
+                    value={selectedState}
+                    onChange={handleStateChange}
+                    disabled={!selectedCountry}
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                  >
+                    {stateList.map((state) => (
+                      <Select.Option key={state.isoCode} value={state.name}>
+                        {state.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                  {stateErr && <p>Invalid State Name</p>}
+                </div>
                 <IN
                   className="inputField inp"
                   type="text"

@@ -462,7 +462,7 @@ const UserPanel = () => {
             zIndex: 1,
             bottom: "6%",
           }}
-          tooltip={<div>Contact us</div>}
+          tooltip={<div>Reports</div>}
           icon={<FaFileDownload />}
         >
           <FloatButton

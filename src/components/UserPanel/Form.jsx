@@ -339,7 +339,7 @@ const Tag = styled.span`
 const Form = () => {
   const userId = useSelector((state) => state.userId);
   const labelNameFromStore = useSelector((state) => state.labelName);
-
+  const [selectedStarCast, setSelectedStarCast] = useState([]);
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
@@ -372,7 +372,7 @@ const Form = () => {
     isrc: "",
     lyricist: "",
     crbt: "00:00:30",
-    genre: "Classical",
+    genre: "",
     singerAppleId: "",
     singerSpotifyId: "",
     singerFacebookUrl: "",
@@ -386,8 +386,10 @@ const Form = () => {
     lyricistFacebookUrl: "",
     lyricistInstagramUrl: "",
     musicDirector: "",
-    subgenre: "Vocal",
+    subgenre: "",
     releaseDate: "",
+    youtubeContentId: "",
+    youtubeMusic: "",
   };
 
   const [filteredArtists, setFilteredArtists] = useState([]);
@@ -404,6 +406,11 @@ const Form = () => {
     setSelectedRole("singer"); // Reset to default role
     form.resetFields();
     setIsModalVisible(true);
+  };
+
+  // Remove function for starCast
+  const removeStarCast = (idx) => {
+    setSelectedStarCast((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const showEditModal = (artist) => {
@@ -516,6 +523,7 @@ const Form = () => {
     musicDirector: [],
     director: [],
     producer: [],
+    starCast: [],
   });
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
@@ -534,6 +542,179 @@ const Form = () => {
   const [showLyricistModal, setShowLyricistModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [userData, setUserdata] = useState(null);
+  const genreSubgenreMap = {
+    Film: [
+      "Devotional",
+      "Dialogue",
+      "Ghazal",
+      "Hip-Hop/ Rap",
+      "Instrumental",
+      "Patriotic",
+      "Remix",
+      "Romantic",
+      "Sad",
+      "Unplugged",
+    ],
+    Pop: [
+      "Acoustic Pop",
+      "Band Songs",
+      "Bedroom Pop",
+      "Chill Pop",
+      "Contemporary Pop",
+      "Country Pop/ Regional Pop",
+      "Dance Pop",
+      "Electro Pop",
+      "Lo-Fi Pop",
+      "Love Songs",
+      "Pop Rap",
+      "Pop Singer-Songwriter",
+      "Sad Songs",
+      "Soft Pop",
+    ],
+    Indie: [
+      "Indian Indie",
+      "Indie Dance",
+      "Indie Folk",
+      "Indie Hip-Hop",
+      "Indie Lo-Fi",
+      "Indie Pop",
+      "Indie Rock",
+      "Indie Singer -Songwriter",
+    ],
+    "Hip-Hop/Rap": [
+      "Alternative Hip-Hop",
+      "Concious Hip-Hop",
+      "Country Rap",
+      "Emo Rap",
+      "Hip-Hop",
+      "Jazz Rap",
+      "Pop Rap",
+      "Trap",
+      "Trap Beats",
+    ],
+    Folk: [
+      "Ainchaliyan",
+      "Alha",
+      "Atulprasadi",
+      "Baalgeet/ Children Song",
+      "Banvarh",
+      "Barhamasa",
+      "Basant Geet",
+      "Baul Geet",
+      "Bhadu Gaan",
+      "Bhagawati",
+      "Bhand",
+      "Bhangra",
+      "Bhatiali",
+      "Bhavageete",
+      "Bhawaiya",
+      "Bhuta song",
+      "Bihugeet",
+      "Birha",
+      "Borgeet",
+      "Burrakatha",
+      "Chappeli",
+      "Daff",
+      "Dandiya Raas",
+      "Dasakathia",
+      "Deijendrageeti",
+      "Deknni",
+      "Dhamal",
+      "Gadhwali",
+      "Gagor",
+      "Garba",
+      "Ghasiyari Geet",
+      "Ghoomar",
+      "Gidda",
+      "Gugga",
+      "Hafiz Nagma",
+      "Heliam",
+      "Hereileu",
+      "Hori",
+      "Jaanapada Geethe",
+      "Jaita",
+      "Jhoori",
+      "Jhora",
+      "Jhumur",
+      "Jugni",
+      "Kajari",
+      "Kajari/ Kajari /Kajri",
+      "Karwa Chauth Songs",
+      "Khor",
+      "Koligeet",
+      "Kumayuni",
+      "Kummi Paatu",
+      "Lagna Geet /Marriage Song",
+      "Lalongeeti",
+      "Lavani",
+      "Lokgeet",
+      "Loor",
+      "Maand",
+      "Madiga Dappu",
+      "Mando",
+      "Mapilla",
+      "Naatupura Paadalgal",
+      "Naqual",
+      "Nati",
+      "Nautanki",
+      "Nazrulgeeti",
+      "Neuleu",
+      "Nyioga",
+      "Oggu Katha",
+      "Paani Hari",
+      "Pai Song",
+      "Pandavani",
+      "Pankhida",
+      "Patua Sangeet",
+      "Phag Dance",
+      "Powada",
+      "Qawwali",
+      "Rabindra Sangeet",
+      "Rajanikantageeti",
+      "Ramprasadi",
+      "Rasiya",
+      "Rasiya Geet",
+      "Raslila",
+      "Raut Nacha",
+      "Saikuthi Zai",
+      "Sana Lamok",
+      "Shakunakhar-Mangalgeet",
+      "Shyama Sangeet",
+      "Sohar",
+      "Sumangali",
+      "Surma",
+      "Suvvi paatalu",
+      "Tappa",
+      "Teej songs",
+      "Tusu Gaan",
+      "Villu Pattu",
+    ],
+    Devotional: [
+      "Aarti",
+      "Bhajan",
+      "Carol",
+      "Chalisa",
+      "Chant",
+      "Geet",
+      "Gospel",
+      "Gurbani",
+      "Hymn",
+      "Kirtan",
+      "Mantra",
+      "Paath",
+      "Qawwals",
+      "Shabd",
+    ],
+    "Hindustani Classical": ["Instrumental", "Vocal"],
+    "Carnatic Classical": ["Instrumental", "Vocal"],
+    "Ambient / Instrumental": [
+      "Soft",
+      "Easy Listening",
+      "Electronic",
+      "Fusion",
+      "Lounge",
+    ],
+  };
   const success = (msg) => {
     messageApi.open({
       type: "success",
@@ -744,6 +925,31 @@ const Form = () => {
         },
       ]);
       setInpFields((prev) => ({ ...prev, producer: "" }));
+    } else if (role === "starCast") {
+      if (
+        selectedStarCast.find(
+          (s) =>
+            s.name === artist.name &&
+            s.appleId === (artist.appleId || "") &&
+            s.spotifyId === (artist.spotifyId || "") &&
+            s.facebookUrl === (artist.facebookUrl || "") &&
+            s.instagramUrl === (artist.instagramUrl || "")
+        )
+      ) {
+        setInpFields((prev) => ({ ...prev, starCast: "" }));
+        return;
+      }
+      setSelectedStarCast((prev) => [
+        ...prev,
+        {
+          name: artist.name,
+          appleId: artist.appleId || "",
+          spotifyId: artist.spotifyId || "",
+          facebookUrl: artist.facebookUrl || "",
+          instagramUrl: artist.instagramUrl || "",
+        },
+      ]);
+      setInpFields((prev) => ({ ...prev, starCast: "" }));
     } else {
       setInpFields((prev) => ({
         ...prev,
@@ -773,7 +979,9 @@ const Form = () => {
 
   const removeDirector = (idx) => {
     setSelectedDirectors((prev) => prev.filter((_, i) => i !== idx));
-  };
+  }; // ...inside your Form component...
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedSubgenre, setSelectedSubgenre] = useState("");
 
   const removeProducer = (idx) => {
     setSelectedProducers((prev) => prev.filter((_, i) => i !== idx));
@@ -950,6 +1158,8 @@ const Form = () => {
 
   const onChangeHandler = (e) => {
     const id = e.target.id;
+    console.log(id);
+
     const val = e.target.value;
     const ele = document.querySelector(`#${id}`);
     ele.style.border = "1px solid #d7d7d7";
@@ -990,10 +1200,27 @@ const Form = () => {
         const mood = document.querySelector("#mood");
         mood.style.border = "1px solid red";
       }
+      if (inpFields.youtubeContentId.length === 0) {
+        const youtubeContentId = document.querySelector("#youtubeContentId");
+        youtubeContentId.style.border = "1px solid red";
+      }
+      if (inpFields.youtubeMusic.length === 0) {
+        const youtubeMusic = document.querySelector("#youtubeMusic");
+        youtubeMusic.style.border = "1px solid red";
+      }
+      if (inpFields.genre.length === 0) {
+        const genre = document.querySelector("#genre");
+        genre.style.border = "1px solid red";
+      }
+      if (inpFields.subgenre.length === 0) {
+        const subgenre = document.querySelector("#subgenre");
+        subgenre.style.border = "1px solid red";
+      }
       if (selectedSingers.length === 0) {
         const singer = document.querySelector("#singer");
         if (singer) singer.style.border = "1px solid red";
       }
+
       if (inpFields.thumbnail === null) {
         const thumbnail = document.querySelector("#thumbnail");
         thumbnail.style.color = "red";
@@ -1051,15 +1278,23 @@ const Form = () => {
       .map((s) => s.instagramUrl)
       .join(", ");
 
-    console.log(singerNames);
-    console.log(
-      singerAppleIds,
-      singerSpotifyIds,
-      singerFacebookUrls,
-      singerInstagramUrls
-    );
+    const starCastNames = selectedStarCast.map((s) => s.name).join(", ");
+
+    const musicDirectorNames = selectedMusicDirectors
+      .map((s) => s.name)
+      .join(", ");
+    console.log(musicDirectorNames);
+
+    const directorNames = selectedDirectors.map((s) => s.name).join(", ");
+    const producerNames = selectedProducers.map((s) => s.name).join(", ");
 
     const formData = new FormData();
+    formData.append(
+      "musicDirector",
+      musicDirectorNames.length > 0 ? musicDirectorNames : ""
+    );
+    formData.append("director", directorNames.length > 0 ? directorNames : "");
+    formData.append("producer", producerNames.length > 0 ? producerNames : "");
     formData.append("labelName", inpFields.labelName);
     formData.append("title", inpFields.title);
     formData.append("dateOfRelease", inpFields.dateOfRelease);
@@ -1069,12 +1304,11 @@ const Form = () => {
     formData.append("description", inpFields.description);
 
     formData.append("singer", singerNames);
-    formData.append("composer", composerNames);
-    formData.append("lyricist", lyricistNames);
+    formData.append("composer", composerNames.length > 0 ? composerNames : "");
+    formData.append("lyricist", lyricistNames.length > 0 ? lyricistNames : "");
+    formData.append("youtubeMusic", inpFields.youtubeMusic);
+    formData.append("youtubeContentId", inpFields.youtubeContentId);
 
-    formData.append("director", inpFields.director);
-    formData.append("producer", inpFields.producer);
-    formData.append("starCast", inpFields.starCast);
     formData.append("lyrics", inpFields.lyrics);
     formData.append("upc", inpFields.upc);
     formData.append("isrc", inpFields.isrc);
@@ -1083,6 +1317,12 @@ const Form = () => {
     formData.append("subLabel2", inpFields.subLabel2);
     formData.append("subLabel3", inpFields.subLabel3);
     formData.append("genre", inpFields.genre);
+    formData.append(
+      "starCast",
+      inpFields.starCast && inpFields.starCastNames.length > 0
+        ? starCastNames
+        : ""
+    );
 
     formData.append("singerAppleId", singerAppleIds);
     formData.append("singerSpotifyId", singerSpotifyIds);
@@ -1098,8 +1338,6 @@ const Form = () => {
     formData.append("lyricistSpotifyId", lyricistSpotifyIds);
     formData.append("lyricistFacebookUrl", lyricistFacebookUrls);
     formData.append("lyricistInstagramUrl", lyricistInstagramUrls);
-
-    formData.append("musicDirector", inpFields.musicDirector);
 
     formData.append("file", inpFields.file);
     formData.append("thumbnail", inpFields.thumbnail);
@@ -1677,56 +1915,65 @@ const Form = () => {
                     value={inpFields.title}
                   />
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="genre">
-                    genre<span style={{ margin: 0 }}>*</span>
+                    Genre <span style={{ margin: 0 }}>*</span>
                   </Label>
                   <Select1
                     name="genre"
                     id="genre"
                     onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
+                      const id = e.target.id;
 
-                      setInpFields({ ...inpFields, genre: value });
+                      const ele = document.querySelector(`#${id}`);
+                      ele.style.border = "1px solid #d7d7d7";
+                      const value = e.target.value;
+                      setSelectedGenre(value);
+                      setInpFields({
+                        ...inpFields,
+                        genre: value,
+                        subgenre: "",
+                      });
                     }}
+                    value={selectedGenre}
                   >
-                    <Option value={"Classical"}>Classical</Option>
-                    <Option value={"Hip-Hop/Rap"}>Hip-Hop/Rap</Option>
-                    <Option value={"Devotional"}>Devotional</Option>
-                    <Option value={"Carnatic Classical"}>
-                      Carnatic Classical
-                    </Option>
-                    <Option value={"Ambient / Instrumental"}>
-                      Ambient / Instrumental
-                    </Option>
-                    <Option value={"Film"}>Film</Option>
-                    <Option value={"Pop"}>Pop</Option>
-                    <Option value={"Indie"}>Indie</Option>
-                    <Option value={"Folk"}>Folk</Option>
+                    <Option value="">Select Genre</Option>
+                    {Object.keys(genreSubgenreMap).map((genre) => (
+                      <Option key={genre} value={genre}>
+                        {genre}
+                      </Option>
+                    ))}
                   </Select1>
                 </LabelInpBox>
 
                 <LabelInpBox>
                   <Label htmlFor="subgenre">
-                    sub genre<span style={{ margin: 0 }}>*</span>
+                    Sub Genre <span style={{ margin: 0 }}>*</span>
                   </Label>
                   <Select1
                     name="subgenre"
                     id="subgenre"
                     onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
+                      const id = e.target.id;
 
+                      const ele = document.querySelector(`#${id}`);
+                      ele.style.border = "1px solid #d7d7d7";
+                      const value = e.target.value;
+                      setSelectedSubgenre(value);
                       setInpFields({ ...inpFields, subgenre: value });
                     }}
+                    value={selectedSubgenre}
+                    disabled={!selectedGenre}
                   >
-                    <Option value={"Vocal"}>Vocal</Option>
-                    <Option value={"Instrument"}>Instrument</Option>
+                    <Option value="">Select Sub Genre</Option>
+                    {selectedGenre &&
+                      genreSubgenreMap[selectedGenre].map((subgenre) => (
+                        <Option key={subgenre} value={subgenre}>
+                          {subgenre}
+                        </Option>
+                      ))}
                   </Select1>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="upc">upc</Label>
                   <Input
@@ -1744,7 +1991,6 @@ const Form = () => {
                   </Label>
                   <DatePicker onChange={onDateChanger} id="dateOfRelease" />
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label>
                     Album type <span style={{ margin: 0 }}>*</span>
@@ -1781,7 +2027,6 @@ const Form = () => {
                     id="releaseDate"
                   />
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="language">
                     Album Language <span style={{ margin: 0 }}>*</span>
@@ -1808,7 +2053,6 @@ const Form = () => {
                     <Option value={"Urdu"}>Urdu</Option>
                   </Select1>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="description">Album description</Label>
                   <Input
@@ -1820,7 +2064,6 @@ const Form = () => {
                     placeholder="description"
                   />
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="mood">
                     Album mood <span style={{ margin: 0 }}>*</span>
@@ -1856,6 +2099,44 @@ const Form = () => {
                 </LabelInpBox>
 
                 <LabelInpBox>
+                  <Label htmlFor="youtubeContentId">
+                    YouTube Content Id <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select1
+                    name="youtubeContentId"
+                    id="youtubeContentId"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, youtubeContentId: value });
+                    }}
+                    value={inpFields.youtubeContentId}
+                  >
+                    <Option value="">Select</Option>
+                    <Option value="Yes">Yes</Option>
+                    <Option value="No">No</Option>
+                  </Select1>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label htmlFor="youtubeMusic">
+                    YouTube Music <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select1
+                    name="youtubeMusic"
+                    id="youtubeMusic"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, youtubeMusic: value });
+                    }}
+                    value={inpFields.youtubeMusic}
+                  >
+                    <Option value="">Select</Option>
+                    <Option value="Yes">Yes</Option>
+                    <Option value="No">No</Option>
+                  </Select1>
+                </LabelInpBox>
+                <LabelInpBox>
                   <Label htmlFor="thumbnail" id="thumbnail">
                     Thumbnail (Max. size 10MB)
                     <span style={{ margin: 0 }}>*</span>
@@ -1877,7 +2158,6 @@ const Form = () => {
                   />
                   <div id="imgbox" style={{ width: "1rem" }}></div>
                 </LabelInpBox>
-
                 <LabelInpBox>
                   <Label htmlFor="lyrics">Album lyrics (optional)</Label>
                   <TxtArea
@@ -2635,14 +2915,113 @@ const Form = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="starCast">starCast</Label>
-                  <Input
-                    type="text"
-                    name="StarCast"
+                  <AutoComplete
                     id="starCast"
-                    placeholder=""
-                    onChange={onChangeHandler}
                     value={inpFields.starCast}
+                    options={artistOptions.starCast}
+                    onSearch={(value) => handleArtistSearch("starCast", value)}
+                    onSelect={(value, option) =>
+                      handleArtistSelect("starCast", value, option)
+                    }
+                    onChange={(value) =>
+                      setInpFields({ ...inpFields, starCast: value })
+                    }
+                    placeholder="Star Cast name"
+                    style={{ width: "100%" }}
+                    filterOption={false}
                   />
+                  {/* Show selected star cast as tags */}
+                  <div style={{ marginTop: "0.5rem" }}>
+                    {selectedStarCast.length === 0 && (
+                      <div
+                        style={{
+                          color: "#bbb",
+                          fontSize: "0.8rem",
+                          fontStyle: "italic",
+                          padding: "0.2rem 0",
+                        }}
+                      >
+                        No Star Cast Selected
+                      </div>
+                    )}
+                    {selectedStarCast.map((s, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
+                          }}
+                        >
+                          {s.name}
+                        </span>
+                        <SocialLinks>
+                          <SocialIcon
+                            active={s.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              s.facebookUrl &&
+                              window.open(s.facebookUrl, "_blank")
+                            }
+                            title={
+                              s.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
+                          >
+                            <FacebookOutlined />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={s.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              s.instagramUrl &&
+                              window.open(s.instagramUrl, "_blank")
+                            }
+                            title={
+                              s.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
+                          >
+                            <Instagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={s.appleId?.trim().length > 0}
+                            onClick={() =>
+                              s.appleId && window.open(s.appleId, "_blank")
+                            }
+                            title={
+                              s.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <Apple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={s.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              s.spotifyId && window.open(s.spotifyId, "_blank")
+                            }
+                            title={
+                              s.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                        <RemoveButton
+                          onClick={() => removeStarCast(idx)}
+                          title="Remove Star Cast"
+                        >
+                          <CloseOutlined />
+                        </RemoveButton>
+                      </ArtistTag>
+                    ))}
+                  </div>
                 </LabelInpBox>
               </AllInpBox>
               <BtnDiv>
