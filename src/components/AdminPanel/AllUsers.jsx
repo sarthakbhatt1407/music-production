@@ -17,6 +17,7 @@ import {
 } from "antd";
 import { MdDeleteOutline } from "react-icons/md";
 import { LoginOutlined, SearchOutlined } from "@ant-design/icons";
+import { FaWhatsapp } from "react-icons/fa";
 
 const MainBox = styled.div`
   width: 100%;
@@ -347,6 +348,20 @@ const AllUsers = () => {
               onClick={(e) => {
                 e.stopPropagation();
                 demoHandleVerifyOtp(phone);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title="Chat on WhatsApp">
+            <Button
+              type="text"
+              size="small"
+              icon={<FaWhatsapp style={{ color: "#0BC144" }} />}
+              onClick={(e) => {
+                e.stopPropagation();
+                // Format phone number (remove any spaces and ensure it has country code)
+                const formattedPhone = phone.toString().replace(/\s+/g, "");
+                // Open WhatsApp web with the phone number
+                window.open(`https://wa.me/${formattedPhone}`, "_blank");
               }}
             />
           </Tooltip>

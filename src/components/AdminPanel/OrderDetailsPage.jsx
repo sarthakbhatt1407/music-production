@@ -1,443 +1,1188 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import MusicLoader from "../Loader/MusicLoader";
-import { Image, Popconfirm } from "antd";
+import {
+  Image,
+  Popconfirm,
+  Typography,
+  Breadcrumb,
+  Button,
+  Divider,
+  message,
+  Tooltip,
+  Tag,
+  Space,
+  notification,
+} from "antd";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { notification } from "antd";
-import { message } from "antd";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+
+// React Icons & Material UI Icons
 import {
-  EditOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
+  FaEdit,
+  FaTrash,
+  FaDownload,
+  FaArrowLeft,
+  FaPlayCircle,
+  FaFileAlt,
+  FaCalendarAlt,
+  FaInfoCircle,
+  FaTag,
+  FaCloudDownloadAlt,
+  FaLink,
+  FaUsers,
+  FaUser,
+  FaShieldAlt,
+  FaApple,
+  FaFacebook,
+  FaInstagram,
+  FaGlobe,
+  FaCheckCircle,
+  FaClock,
+  FaExclamationCircle,
+  FaTimesCircle,
+  FaMusic,
+  FaCopy,
+  FaSpotify,
+} from "react-icons/fa";
+
 import {
-  CloseOutlined,
-  ContentCopyOutlined,
-  DoneOutline,
-  LinkOutlined,
-} from "@mui/icons-material";
-import { saveAs } from "file-saver";
-const OuterBox = styled.div`
+  MdCheckCircleOutline,
+  MdAccessTime,
+  MdSync,
+  MdCancel,
+  MdErrorOutline,
+  MdInfo,
+  MdContentCopy,
+  MdMusicNote,
+  MdClose,
+  MdDone,
+} from "react-icons/md";
+
+const { Title, Text, Paragraph } = Typography;
+
+// Animation keyframes
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const slideUp = keyframes`
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+`;
+
+// Page container
+const PageContainer = styled.div`
   width: 100%;
   height: 99%;
-  overflow-y: scroll;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 24px;
+  animation: ${fadeIn} 0.5s ease;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f2f5;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 10px;
+
+    &:hover {
+      background: #bfbfbf;
+    }
+  }
+
   h1 {
     margin: 0;
+    font-size: 28px;
+    font-weight: 600;
   }
 `;
 
-const MainDiv = styled.div`
-  background-color: white;
-  width: 100%;
-  height: fit-content;
-  border-radius: 0.5rem;
-  position: relative;
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-  /* display: none; */
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    /* grid-template-columns: 1fr; */
-    display: flex;
-    flex-direction: column;
-  }
-`;
-const LeftAni = keyframes`
-    
-    0%{
-        transform: translateX(50%);
-        z-index: 2;
-        opacity:0 ;
-    }
-    
-    100%{
-        transform: translateX(0%);
-        z-index: 2;
-        opacity:1;
-    }
-`;
-const RightAni = keyframes`
-    
-    0%{
-        transform: translateX(-50%);        opacity:0 ;
-    }
-    
-    100%{
-        transform: translateX(0%);        opacity:1 ;
-    }
-`;
-
-const LeftDiv = styled.div`
+const PageHeader = styled.div`
   display: flex;
-
-  animation: ${LeftAni} 0.8s;
-  height: 80svh;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  gap: 1rem;
-  padding: 1rem 3rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+`;
+
+const BreadcrumbContainer = styled.div`
+  margin-bottom: 8px;
+`;
+
+const NavigationRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+`;
+
+const BackButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+// Main content card
+const ContentCard = styled.div`
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  animation: ${slideUp} 0.6s ease;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  min-height: 600px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+`;
+
+// Album section (left side)
+const AlbumSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #f9f9fa 0%, #f1f2f6 100%);
+  border-right: 1px solid #f0f0f0;
+  padding: 40px 30px;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 30px 20px;
+  }
+`;
+
+const AlbumCover = styled.div`
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
 
   img {
-    margin: 0;
-    width: 50%;
-  }
-  h1 {
-    margin: 0;
-    text-transform: capitalize;
-  }
-  p {
-    margin: 0;
-    color: #000000d3;
-    font-size: 1rem;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    padding: 1rem 0.2rem;
-    height: 50svh;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
 
-    img {
-      /* width: 10%; */
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
     }
-    animation: ${LeftAni} 0.5s;
   }
 `;
-const RightDiv = styled.div`
-  animation: ${RightAni} 0.8s;
+
+const AlbumTitle = styled(Title)`
+  text-align: center !important;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+  background: linear-gradient(90deg, #222, #666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const AlbumDescription = styled(Paragraph)`
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+  max-width: 320px;
+  line-height: 1.6;
+  font-size: 15px;
+`;
+
+const StyledAudioPlayer = styled.div`
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  max-width: 320px;
+
+  .rhap_container {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .rhap_main-controls-button {
+    color: #1677ff;
+  }
+
+  .rhap_progress-indicator {
+    background: #1677ff;
+  }
+
+  .rhap_progress-filled {
+    background: #1677ff;
+  }
+
+  .rhap_download-progress {
+    background: #e6f4ff;
+  }
+
+  .rhap_time {
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  .rhap_play-pause-button {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+`;
+
+// Details section (right side)
+const DetailsSection = styled.div`
+  padding: 40px 30px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 
-  padding: 1rem 2rem;
-
-  div {
-    display: grid;
-    margin: 0.5rem 0;
-    grid-template-columns: 1fr 1fr;
-    justify-content: space-between;
-    text-align: justify;
-    text-transform: capitalize;
-
-    span {
-      padding: 0.4rem 1rem;
-      text-overflow: clip;
-      &:first-child {
-        text-transform: capitalize;
-        font-weight: 500;
-      }
-    }
-    &:nth-child(2n) {
-      span {
-        background-color: #fafafc;
-      }
-    }
+  @media (max-width: 1024px) {
+    padding: 30px 20px;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    padding: 1rem 0.2rem;
-    animation: ${RightAni} 0.5s;
-    div {
-      text-justify: auto;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f9f9f9;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+
+    &:hover {
+      background: #bfbfbf;
     }
   }
 `;
 
+const SectionTitle = styled(Title)`
+  margin-bottom: 24px !important;
+  position: relative;
+  padding-bottom: 8px;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #1677ff, #69c0ff);
+    border-radius: 3px;
+  }
+`;
+
+const DetailsGroup = styled.div`
+  margin-bottom: 28px;
+`;
+
+const GroupTitle = styled(Title)`
+  font-size: 16px !important;
+  margin-bottom: 12px !important;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const DetailsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+`;
+
+const DetailRow = styled.div`
+  display: grid;
+  grid-template-columns: 40% 60%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border-color: #e6f7ff;
+  }
+
+  ${(props) =>
+    props.highlighted &&
+    css`
+      background-color: #f0f7ff;
+      border-color: #bae0ff;
+
+      &:hover {
+        box-shadow: 0 2px 12px rgba(24, 144, 255, 0.1);
+      }
+    `}
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const DetailLabel = styled.div`
+  padding: 12px 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  background-color: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    border-bottom: 1px solid #f0f0f0;
+  }
+`;
+
+const DetailValue = styled.div`
+  padding: 12px 16px;
+  color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  word-break: break-word;
+
+  a {
+    color: #1677ff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #4096ff;
+      text-decoration: underline;
+    }
+  }
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+`;
+
+const ActionButton = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 180px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+`;
+
+const EditButton = styled(ActionButton)`
+  background-color: #f0f0f0;
+  color: #333;
+
+  &:hover {
+    background-color: #e0e0e0;
+    color: #111;
+  }
+`;
+
+const ApproveButton = styled(ActionButton)`
+  background-color: #a1da6c;
+  color: white;
+
+  &:hover {
+    background-color: #8bc34a;
+    color: white;
+  }
+`;
+
+const RejectButton = styled(ActionButton)`
+  background-color: #e86464;
+  color: white;
+
+  &:hover {
+    background-color: #d32f2f;
+    color: white;
+  }
+`;
+
+const TakedownButton = styled(ActionButton)`
+  background-color: #e86464;
+  color: white;
+
+  &:hover {
+    background-color: #d32f2f;
+    color: white;
+  }
+`;
+
+const RestoreButton = styled(ActionButton)`
+  background-color: #52c41a;
+  color: white;
+
+  &:hover {
+    background-color: #389e0d;
+    color: white;
+  }
+`;
+
+const StatusTag = styled(Tag)`
+  margin-left: 12px;
+  padding: 2px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  text-transform: capitalize;
+`;
+
+// Artist tag styling - similar to Form.jsx
+const ArtistTag = styled.div`
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #e6f4ff, #f2faff);
+  color: black;
+  border: 1px solid #c2e4ff;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.25rem 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    border-color: #95d2ff;
+  }
+`;
+
+const SocialLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-left: 0.75rem;
+`;
+
+const SocialIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0958d9;
+  opacity: ${(props) => (props.active ? 1 : 0.4)};
+  cursor: ${(props) => (props.active ? "pointer" : "default")};
+  transition: all 0.2s;
+
+  &:hover {
+    transform: ${(props) => (props.active ? "scale(1.1)" : "none")};
+    color: ${(props) => (props.active ? "#0958d9" : "#1677ff")};
+  }
+`;
+
+// Modal
 const Modal = styled.div`
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  background-color: #00000038;
-  border-radius: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 1000;
+  animation: ${fadeIn} 0.3s ease;
 `;
 
 const ModalBox = styled.div`
   background-color: white;
-  width: 30%;
-  height: fit-content;
-  padding: 2rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  z-index: 20;
+  width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: ${slideUp} 0.4s ease;
 
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+  @media (max-width: 480px) {
     width: 90%;
   }
 `;
 
-const ModalFormBox = styled.div`
-  background-color: white;
-  width: 90%;
-  height: 80%;
+const ModalHeader = styled.div`
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
 `;
 
-const BtnBox = styled.div`
+const ModalBody = styled.div`
+  padding: 24px;
+`;
+
+const ModalFooter = styled.div`
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
   display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-    &:last-child {
-      background-color: #bbb9b9;
-    }
-  }
+  justify-content: flex-end;
+  gap: 12px;
 `;
 
-const LabelInpBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  width: 74%;
-  span {
-    color: #ff0000ab;
-    font-size: 0.8rem;
-    margin-left: 0.2rem;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 100%;
-  }
-`;
-const Label = styled.label`
-  font-size: 0.9rem;
-  letter-spacing: 0.06rem;
-  color: #9e9e9e;
-  text-transform: capitalize;
+const StyledLabel = styled.label`
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 `;
 
-const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
+const StyledInput = styled.input`
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
   outline: none;
-  border: 1px solid #d7d7d7;
+  transition: all 0.3s;
 
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
   &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
+    border-color: #1677ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
 `;
+
+// Icons for different field types
+const getFieldIcon = (field) => {
+  const fieldLower = field.toLowerCase();
+
+  if (fieldLower.includes("title")) return <FaFileAlt />;
+  if (fieldLower.includes("date") || fieldLower.includes("time"))
+    return <FaCalendarAlt />;
+  if (fieldLower.includes("type")) return <FaTag />;
+  if (fieldLower.includes("status")) return <FaInfoCircle />;
+  if (fieldLower.includes("label")) return <FaUsers />;
+  if (fieldLower.includes("singer")) return <FaUser />;
+  if (fieldLower.includes("composer")) return <FaMusic />;
+  if (fieldLower.includes("lyricist")) return <FaFileAlt />;
+  if (fieldLower.includes("director")) return <FaUsers />;
+  if (fieldLower.includes("apple")) return <FaApple />;
+  if (fieldLower.includes("facebook")) return <FaFacebook />;
+  if (fieldLower.includes("instagram")) return <FaInstagram />;
+  if (fieldLower.includes("spotify")) return <FaSpotify />;
+  if (fieldLower.includes("file") || fieldLower.includes("thumbnail"))
+    return <FaCloudDownloadAlt />;
+  if (fieldLower.includes("youtube")) return <FaLink />;
+
+  return <FaInfoCircle />;
+};
+
+// Get status info (icon, color, text)
+const getStatusInfo = (status) => {
+  switch (status) {
+    case "completed":
+      return {
+        icon: <MdCheckCircleOutline size={16} />,
+        color: "success",
+        text: "Live",
+      };
+    case "waiting":
+      return {
+        icon: <MdAccessTime size={16} />,
+        color: "warning",
+        text: "Awaiting Approval",
+      };
+    case "processing":
+      return {
+        icon: <MdSync size={16} />,
+        color: "processing",
+        text: "Processing",
+      };
+    case "rejected":
+      return {
+        icon: <MdCancel size={16} />,
+        color: "error",
+        text: "Rejected",
+      };
+    case "takedown":
+      return {
+        icon: <MdErrorOutline size={16} />,
+        color: "error",
+        text: "Taken Down",
+      };
+    default:
+      return {
+        icon: <MdInfo size={16} />,
+        color: "default",
+        text: status,
+      };
+  }
+};
+
+// Social platform icons
+const getSocialIcon = (platform) => {
+  const platformLower = platform.toLowerCase();
+
+  if (platformLower.includes("apple")) return <FaApple />;
+  if (platformLower.includes("facebook")) return <FaFacebook />;
+  if (platformLower.includes("instagram")) return <FaInstagram />;
+  if (platformLower.includes("spotify")) return <FaSpotify />;
+
+  return <FaGlobe />;
+};
+
+// Group fields into categories
+const groupFields = (fields) => {
+  // Initialize groups
+  const groups = {
+    main: [],
+    labels: [],
+    dates: [],
+    singers: [],
+    composers: [],
+    lyricists: [],
+    other: [],
+  };
+
+  fields.forEach((field) => {
+    const fieldName = field.field.toLowerCase();
+
+    // Group by category
+    if (["title", "description", "status", "albumtype"].includes(fieldName)) {
+      groups.main.push(field);
+    } else if (fieldName.includes("label")) {
+      groups.labels.push(field);
+    } else if (fieldName.includes("date") || fieldName.includes("time")) {
+      groups.dates.push(field);
+    } else if (fieldName.includes("singer")) {
+      groups.singers.push(field);
+    } else if (fieldName.includes("composer")) {
+      groups.composers.push(field);
+    } else if (fieldName.includes("lyricist")) {
+      groups.lyricists.push(field);
+    } else {
+      groups.other.push(field);
+    }
+  });
+
+  return groups;
+};
+
+// Function to parse comma-separated artists and their profiles
+const parseArtists = (name, appleId, spotifyId, facebookUrl, instagramUrl) => {
+  if (!name) return [];
+
+  const names = name.split(",").map((n) => n.trim());
+  const appleIds = appleId ? appleId.split(",").map((id) => id.trim()) : [];
+  const spotifyIds = spotifyId
+    ? spotifyId.split(",").map((id) => id.trim())
+    : [];
+  const facebookUrls = facebookUrl
+    ? facebookUrl.split(",").map((url) => url.trim())
+    : [];
+  const instagramUrls = instagramUrl
+    ? instagramUrl.split(",").map((url) => url.trim())
+    : [];
+
+  return names.map((name, index) => ({
+    name,
+    appleId: appleIds[index] || "",
+    spotifyId: spotifyIds[index] || "",
+    facebookUrl: facebookUrls[index] || "",
+    instagramUrl: instagramUrls[index] || "",
+  }));
+};
 
 const OrderDetailsPage = () => {
-  const copyToClipBoard = async (txt) => {
-    try {
-      await navigator.clipboard.writeText(txt);
-      openNotificationWithIcon("success", "Copied to clipboard");
-    } catch (err) {
-      console.error("Failed to copy: ", err);
-    }
-  };
+  const userId = useSelector((state) => state.userId);
+  const id = useParams().id;
+  const [order, setOrder] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [orderLoop, setOrderLoop] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+
+  // States for parsed artists
+  const [parsedSingers, setParsedSingers] = useState([]);
+  const [parsedComposers, setParsedComposers] = useState([]);
+  const [parsedLyricists, setParsedLyricists] = useState([]);
+
+  // Notification API
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
+
   const openNotificationWithIcon = (type, msg) => {
     api[type]({
       message: msg,
     });
   };
+
+  // Message API
   const [messageApi, contextHolder] = message.useMessage();
-  const success = (msg) => {
-    messageApi.open({
-      type: "success",
-      content: msg,
-    });
-  };
-  const error = (msg) => {
-    messageApi.open({
-      type: "error",
-      content: msg,
-    });
-  };
 
-  const userId = useSelector((state) => state.userId);
-
-  const id = useParams().id;
-  const [order, setOrder] = useState(null);
-  const [isLoading, setIsloading] = useState(true);
-  const [orderLoop, setOrderLoop] = useState([]);
-  const [refresher, setRefresher] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
+  // Fetch order data
   const fetcher = async () => {
-    setIsloading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
-    );
-    const data = await res.json();
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+      );
+      const data = await res.json();
 
-    if (!data.order) {
-      navigate("/admin-panel/pending-work");
-    }
-    setOrder(data.order);
-    console.log(`${data.order.thumbnail}`);
-
-    setIsloading(false);
-    let arr = [];
-    for (const key in data.order) {
-      if (
-        key === "_id" ||
-        key === "id" ||
-        key === "userId" ||
-        key === "deleted" ||
-        key === "__v"
-      ) {
-        continue;
-      }
-      if (data.order[key].length === 0) {
-        continue;
+      if (!data.order) {
+        messageApi.error("Order not found");
+        navigate("/admin-panel/pending-work");
+        return;
       }
 
-      const obj = {
-        field: key,
-        value: data.order[key],
-        id: Math.random() * 99999999999,
-      };
-      arr.push(obj);
+      setOrder(data.order);
+
+      // Parse artists data
+      setParsedSingers(
+        parseArtists(
+          data.order.singer,
+          data.order.singerAppleId,
+          data.order.singerSpotifyId,
+          data.order.singerFacebookUrl,
+          data.order.singerInstagramUrl
+        )
+      );
+
+      setParsedComposers(
+        parseArtists(
+          data.order.composer,
+          data.order.composerAppleId,
+          data.order.composerSpotifyId,
+          data.order.composerFacebookUrl,
+          data.order.composerInstagramUrl
+        )
+      );
+
+      setParsedLyricists(
+        parseArtists(
+          data.order.lyricist,
+          data.order.lyricistAppleId,
+          data.order.lyricistSpotifyId,
+          data.order.lyricistFacebookUrl,
+          data.order.lyricistInstagramUrl
+        )
+      );
+
+      // Process order fields
+      let arr = [];
+      for (const key in data.order) {
+        if (
+          key === "_id" ||
+          key === "id" ||
+          key === "userId" ||
+          key === "deleted" ||
+          key === "__v"
+        ) {
+          continue;
+        }
+        if (data.order[key].length === 0) {
+          continue;
+        }
+
+        const obj = {
+          field: key,
+          value: data.order[key],
+          id: Math.random() * 99999999999,
+        };
+        arr.push(obj);
+      }
+      setOrderLoop(arr);
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      messageApi.error("Failed to load order details");
+    } finally {
+      setIsLoading(false);
     }
-    setOrderLoop(arr);
   };
-  const confirm = async () => {
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=statusAccepted&userId=${userId}`,
-      {
-        method: "PATCH",
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      openNotificationWithIcon("success", data.message);
-      new Promise((resolve) => {
+
+  // Approve order confirmation
+  const confirmApprove = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=statusAccepted&userId=${userId}`,
+        {
+          method: "PATCH",
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
         setTimeout(() => {
-          resolve(null);
           navigate("/admin-panel/pending-work");
         }, 500);
-      });
+      }
+    } catch (error) {
+      console.error("Error approving order:", error);
+      messageApi.error("Failed to approve order");
+    }
+  };
+
+  // Reject order (with remark)
+  const onSubmitRejection = async () => {
+    const remarkInput = document.querySelector(`#remark`);
+    const remark = remarkInput?.value?.trim();
+
+    if (!remark) {
+      remarkInput.style.border = "1px solid #ff4d4f";
+      messageApi.error("Please provide a rejection reason");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=statusRejected&userId=${userId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            remark: remark,
+          }),
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+        setTimeout(() => {
+          navigate("/admin-panel/orders");
+        }, 600);
+      } else {
+        openNotificationWithIcon("error", data.message);
+      }
+
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error rejecting order:", error);
+      messageApi.error("Failed to reject order");
+    }
+  };
+
+  // Takedown album
+  const takedownAlbum = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=takedown&userId=${userId}`,
+        {
+          method: "PATCH",
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+        setTimeout(() => {
+          navigate("/admin-panel/history");
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error taking down album:", error);
+      messageApi.error("Failed to take down album");
+    }
+  };
+
+  // Restore album
+  const restoreAlbum = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=completed&userId=${userId}`,
+        {
+          method: "PATCH",
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+        setTimeout(() => {
+          navigate("/admin-panel/history");
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error restoring album:", error);
+      messageApi.error("Failed to restore album");
+    }
+  };
+
+  // Copy to clipboard functionality
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      messageApi.success("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      messageApi.error("Failed to copy text");
     }
   };
 
   useEffect(() => {
     fetcher();
-
-    return () => {};
   }, [id]);
 
-  const onChangeHandler = (e) => {
-    const id = e.target.id;
-    const ele = document.querySelector(`#${id}`);
+  // Format field name for display
+  const formatFieldName = (field) => {
+    // Handle special cases
+    if (field === "youtubeContentId") return "YouTube Content ID";
+    if (field === "youtubeMusic") return "YouTube Music";
+    if (field === "labelName") return "Label Name";
+    if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
+      return "Sub Label";
+    if (field === "dateOfRelease") return "Date of Release";
+    if (field === "AlbumType" || field === "albumType") return "Album Type";
+    if (field === "orderDateAndTime") return "Order Date";
+    if (field === "musicDirector") return "Music Director";
+    if (field === "starCast") return "Star Cast";
+    if (field === "dateLive") return "Date of Live";
 
-    ele.style.border = "1px solid #d7d7d7";
+    // General formatting
+    return field
+      .replace(/([A-Z])/g, " $1") // Insert space before capital letters
+      .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+      .trim();
   };
 
-  const onSubmitHandler = async () => {
-    const ele = document.querySelector(`#remark`);
-    if (ele.value.trim().length === 0) {
-      ele.style.border = "1px solid red";
-      openNotificationWithIcon("error", "Fill all require fields.");
-      return;
+  // Render field value based on field type
+  const renderFieldValue = (field, value) => {
+    const fieldLower = field.toLowerCase();
+
+    // Handle YouTube Content ID and YouTube Music fields specifically
+    if (fieldLower === "youtube content id" || fieldLower === "youtube music") {
+      return (
+        <>
+          <span>{value}</span>
+          <Tooltip title="Copy to clipboard">
+            <Button
+              type="text"
+              size="small"
+              icon={<FaCopy size={14} />}
+              onClick={() => copyToClipboard(value)}
+            />
+          </Tooltip>
+        </>
+      );
     }
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=statusRejected&userId=${userId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          remark: ele.value,
-        }),
-      }
+
+    // URLs and external links
+    if (
+      (fieldLower.includes("url") || fieldLower.includes("id")) &&
+      !fieldLower.includes("_id") &&
+      !fieldLower.includes("userid") &&
+      !fieldLower.includes("youtube")
+    ) {
+      return (
+        <Link to={value} target="_blank">
+          {getSocialIcon(field)} View on{" "}
+          {fieldLower.includes("apple")
+            ? "Apple Music"
+            : fieldLower.includes("facebook")
+            ? "Facebook"
+            : fieldLower.includes("instagram")
+            ? "Instagram"
+            : fieldLower.includes("spotify")
+            ? "Spotify"
+            : "Platform"}
+        </Link>
+      );
+    }
+
+    // File downloads
+    if (field === "thumbnail" || field === "file") {
+      return (
+        <Link
+          to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
+          target="_blank"
+        >
+          <FaDownload /> Download{" "}
+          {field === "thumbnail" ? "Cover Art" : "Audio File"}
+        </Link>
+      );
+    }
+
+    // Status field
+    if (fieldLower === "status") {
+      const statusInfo = getStatusInfo(value);
+      return (
+        <Tag icon={statusInfo.icon} color={statusInfo.color}>
+          {statusInfo.text}
+        </Tag>
+      );
+    }
+
+    // Default text with copy option
+    return (
+      <>
+        <span>{value === "completed" ? "Live" : value}</span>
+        <Tooltip title="Copy to clipboard">
+          <Button
+            type="text"
+            size="small"
+            icon={<FaCopy size={14} />}
+            onClick={() => copyToClipboard(value)}
+          />
+        </Tooltip>
+      </>
     );
-    const data = await res.json();
-
-    if (res.ok) {
-      openNotificationWithIcon("success", data.message);
-      setTimeout(() => {
-        navigate("/admin-panel/orders");
-      }, 600);
-    }
-    if (!res.ok) {
-      openNotificationWithIcon("error", data.message);
-    }
-    setShowModal(false);
   };
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        {contextHolder}
+        {contextHolderNot}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <MusicLoader />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  // Group fields for better organization
+  const groupedFields = groupFields(orderLoop);
+
+  // Get status information
+  const statusInfo = order && order.status ? getStatusInfo(order.status) : null;
 
   return (
-    <OuterBox>
-      {" "}
+    <PageContainer>
+      {contextHolder}
+      {contextHolderNot}
+
+      {/* Rejection modal */}
       {showModal && (
         <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="remark">remark</Label>
-                <Input type="text" id="remark" onChange={onChangeHandler} />
-              </LabelInpBox>
-
-              <BtnBox>
-                <button onClick={onSubmitHandler}>Submit</button>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
+          <ModalBox>
+            <ModalHeader>
+              <h3>Reject Album</h3>
+            </ModalHeader>
+            <ModalBody>
+              <StyledLabel htmlFor="remark">Rejection Reason</StyledLabel>
+              <StyledInput
+                id="remark"
+                placeholder="Please provide a reason for rejection"
+                onChange={(e) => {
+                  e.target.style.border = "1px solid #d9d9d9";
+                }}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={() => setShowModal(false)}>Cancel</Button>
+              <Button type="primary" onClick={onSubmitRejection}>
+                Submit
+              </Button>
+            </ModalFooter>
           </ModalBox>
         </Modal>
       )}
-      {/* <Breadcrumb
-        items={[
-          {
-            title: <Link to={"/user-panel"}>User Panel</Link>,
-          },
-          {
-            title: <Link to={"/user-panel/history"}>History</Link>,
-          },
-          {
-            title: "Order Details",
-          },
-        ]}
-      />{" "} */}
-      <h1>Order Details</h1>
-      <MainDiv>
-        {contextHolderNot}
-        {contextHolder}
-        {isLoading && <MusicLoader />}
-        {!isLoading && order && (
-          <>
-            <LeftDiv>
-              {/* <img src={`${order.thumbnail}`} alt="" /> */}{" "}
+
+      {/* Page header */}
+      <PageHeader>
+        <div>
+          <BreadcrumbContainer>
+            <Breadcrumb
+              items={[
+                { title: <Link to="/admin-panel">Dashboard</Link> },
+                { title: <Link to="/admin-panel/orders">All Albums</Link> },
+                { title: "Album Details" },
+              ]}
+            />
+          </BreadcrumbContainer>
+
+          <NavigationRow>
+            <Space>
+              <Title level={2} style={{ margin: 0 }}>
+                Album Details
+              </Title>
+              {statusInfo && (
+                <StatusTag icon={statusInfo.icon} color={statusInfo.color}>
+                  {statusInfo.text}
+                </StatusTag>
+              )}
+            </Space>
+
+            <BackButton
+              onClick={() => navigate("/admin-panel/orders")}
+              icon={<FaArrowLeft />}
+            >
+              Back to Albums
+            </BackButton>
+          </NavigationRow>
+        </div>
+      </PageHeader>
+
+      {/* Main content */}
+      {order && (
+        <ContentCard>
+          {/* Album section (left side) */}
+          <AlbumSection>
+            <AlbumCover>
               <Image
-                width={200}
+                width={240}
                 src={
                   order.thumbnail.includes("cloudinary")
                     ? order.thumbnail
@@ -446,504 +1191,655 @@ const OrderDetailsPage = () => {
                 placeholder={
                   <Image
                     preview={false}
-                    src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
-                    width={200}
+                    src={
+                      order.thumbnail.includes("cloudinary")
+                        ? order.thumbnail
+                        : `${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`
+                    }
+                    width={240}
                   />
                 }
               />
-              <h1>{order.title}</h1>
+            </AlbumCover>
+
+            <AlbumTitle level={3}>{order.title}</AlbumTitle>
+
+            <StyledAudioPlayer>
               <AudioPlayer
                 src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
+                autoPlayAfterSrcChange={false}
+                showJumpControls={false}
+                customAdditionalControls={[]}
+                layout="stacked-reverse"
                 onPlay={(e) => console.log("onPlay")}
-                // other props here
               />
-              <p>{order.description}</p>
-            </LeftDiv>
-            <RightDiv>
-              {orderLoop.length > 0 &&
-                orderLoop.map((obj) => {
-                  let { field, value, id } = obj;
-                  if (field === "labelName") {
-                    field = "Label name";
-                  }
-                  if (field === "subLabel1") {
-                    field = "sub label";
-                  }
-                  if (field === "subLabel2") {
-                    field = "sub label";
-                  }
-                  if (field === "subLabel3") {
-                    field = "sub label";
-                  }
-                  if (field === "dateOfRelease") {
-                    field = "date of release";
-                  }
-                  if (field === "AlbumType") {
-                    field = "Album Type";
-                  }
-                  if (field === "albumType") {
-                    field = "Album Type";
-                  }
-                  if (field === "orderDateAndTime") {
-                    field = "order Date";
-                    value = value.split("/")[0];
-                  }
-                  if (field === "singerAppleId") {
-                    field = "singer Apple Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
+            </StyledAudioPlayer>
 
-                  if (field === "singerFacebookUrl") {
-                    field = "singer Facebook Url";
+            {order.description && (
+              <AlbumDescription>{order.description}</AlbumDescription>
+            )}
+          </AlbumSection>
+
+          {/* Details section (right side) */}
+          <DetailsSection>
+            <SectionTitle level={4}>Album Information</SectionTitle>
+
+            {/* Main information group */}
+            {groupedFields.main.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaInfoCircle /> Basic Information
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.main.map(({ field, value, id }) => {
+                    // Skip fields already displayed in the left panel
+                    if (field === "title" || field === "description")
+                      return null;
+
+                    const formattedField = formatFieldName(field);
+
                     return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "singerInstagramUrl") {
-                    field = "singer Instagram Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "releaseDate" && value.length > 0) {
-                    field = "release Date";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>{value}</span>
-                      </div>
-                    );
-                  }
-                  if (field === "singerSpotifyId") {
-                    field = "singer Spotify Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerAppleId") {
-                    field = "composer Apple Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerFacebookUrl") {
-                    field = "composer Facebook Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerSpotifyId") {
-                    field = "composer Spotify Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerInstagramUrl") {
-                    field = "composer Instagram Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistAppleId") {
-                    field = "lyricist Apple Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistFacebookUrl") {
-                    field = "lyricist Facebook Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistInstagramUrl") {
-                    field = "lyricist Instagram Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistSpotifyId") {
-                    field = "lyricist Spotify Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "starCast") {
-                    field = "star Cast";
-                  }
-                  if (field === "thumbnail") {
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link
-                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
-                            target="_blank"
-                          >
-                            <DownloadOutlined
-                              style={{ transform: "scale(1.5)" }}
-                            />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "musicDirector") {
-                    field = "Music Director";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          {value}
-                          <ContentCopyOutlined
-                            style={{
-                              cursor: "pointer",
-                              transform: "scale(.8)",
-                            }}
-                            onClick={copyToClipBoard.bind(this, value)}
-                          />
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "file") {
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link
-                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
-                            target="_blank"
-                          >
-                            <DownloadOutlined
-                              style={{ transform: "scale(1.5)" }}
-                            />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  return (
-                    <div key={id}>
-                      <span>
-                        {field == "dateLive" ? "Date of Live" : field}
-                      </span>
-                      <span
-                        style={{
-                          overflowWrap: "anywhere",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          gap: "2rem",
-                        }}
+                      <DetailRow
+                        key={id}
+                        highlighted={field.toLowerCase() === "status"}
                       >
-                        {value === "completed" ? "live" : value}{" "}
-                        <ContentCopyOutlined
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Dates group */}
+            {groupedFields.dates.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaCalendarAlt /> Dates
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.dates.map(({ field, value, id }) => {
+                    const formattedField = formatFieldName(field);
+                    let displayValue = value;
+
+                    if (field === "orderDateAndTime") {
+                      displayValue = value.split("/")[0];
+                    }
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, displayValue)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Labels group */}
+            {groupedFields.labels.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaUsers /> Label Information
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.labels.map(({ field, value, id }) => {
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Artists section */}
+            <DetailsGroup>
+              <GroupTitle level={5}>
+                <FaUser /> Artists
+              </GroupTitle>
+
+              {/* Singers */}
+              {parsedSingers.length > 0 && (
+                <>
+                  <Text
+                    type="secondary"
+                    style={{ marginBottom: "8px", display: "block" }}
+                  >
+                    Singer
+                  </Text>
+                  <div style={{ marginBottom: "16px" }}>
+                    {parsedSingers.map((singer, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
                           style={{
-                            cursor: "pointer",
-                            transform: "scale(.8)",
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
                           }}
-                          onClick={copyToClipBoard.bind(this, value)}
-                        />
-                      </span>
-                    </div>
-                  );
+                        >
+                          {singer.name}
+                        </span>
+                        <SocialLinks>
+                          <SocialIcon
+                            active={singer.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              singer.facebookUrl &&
+                              window.open(singer.facebookUrl, "_blank")
+                            }
+                            title={
+                              singer.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
+                          >
+                            <FaFacebook />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={singer.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              singer.instagramUrl &&
+                              window.open(singer.instagramUrl, "_blank")
+                            }
+                            title={
+                              singer.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
+                          >
+                            <FaInstagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={singer.appleId?.trim().length > 0}
+                            onClick={() =>
+                              singer.appleId &&
+                              window.open(singer.appleId, "_blank")
+                            }
+                            title={
+                              singer.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <FaApple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={singer.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              singer.spotifyId &&
+                              window.open(singer.spotifyId, "_blank")
+                            }
+                            title={
+                              singer.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                      </ArtistTag>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Composers */}
+              {parsedComposers.length > 0 && (
+                <>
+                  <Text
+                    type="secondary"
+                    style={{ margin: "16px 0 8px", display: "block" }}
+                  >
+                    Composer
+                  </Text>
+                  <div style={{ marginBottom: "16px" }}>
+                    {parsedComposers.map((composer, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
+                          }}
+                        >
+                          {composer.name}
+                        </span>
+                        <SocialLinks>
+                          <SocialIcon
+                            active={composer.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              composer.facebookUrl &&
+                              window.open(composer.facebookUrl, "_blank")
+                            }
+                            title={
+                              composer.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
+                          >
+                            <FaFacebook />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={composer.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              composer.instagramUrl &&
+                              window.open(composer.instagramUrl, "_blank")
+                            }
+                            title={
+                              composer.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
+                          >
+                            <FaInstagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={composer.appleId?.trim().length > 0}
+                            onClick={() =>
+                              composer.appleId &&
+                              window.open(composer.appleId, "_blank")
+                            }
+                            title={
+                              composer.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <FaApple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={composer.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              composer.spotifyId &&
+                              window.open(composer.spotifyId, "_blank")
+                            }
+                            title={
+                              composer.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                      </ArtistTag>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Lyricists */}
+              {parsedLyricists.length > 0 && (
+                <>
+                  <Text
+                    type="secondary"
+                    style={{ margin: "16px 0 8px", display: "block" }}
+                  >
+                    Lyricist
+                  </Text>
+                  <div style={{ marginBottom: "16px" }}>
+                    {parsedLyricists.map((lyricist, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
+                          }}
+                        >
+                          {lyricist.name}
+                        </span>
+                        <SocialLinks>
+                          <SocialIcon
+                            active={lyricist.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.facebookUrl &&
+                              window.open(lyricist.facebookUrl, "_blank")
+                            }
+                            title={
+                              lyricist.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
+                          >
+                            <FaFacebook />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={lyricist.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.instagramUrl &&
+                              window.open(lyricist.instagramUrl, "_blank")
+                            }
+                            title={
+                              lyricist.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
+                          >
+                            <FaInstagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={lyricist.appleId?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.appleId &&
+                              window.open(lyricist.appleId, "_blank")
+                            }
+                            title={
+                              lyricist.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <FaApple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={lyricist.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.spotifyId &&
+                              window.open(lyricist.spotifyId, "_blank")
+                            }
+                            title={
+                              lyricist.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                      </ArtistTag>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Other artist fields in regular format */}
+              {order.musicDirector && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaMusic />
+                    Music Director
+                  </DetailLabel>
+                  <DetailValue>
+                    {order.musicDirector}
+                    <Tooltip title="Copy to clipboard">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<FaCopy size={14} />}
+                        onClick={() => copyToClipboard(order.musicDirector)}
+                      />
+                    </Tooltip>
+                  </DetailValue>
+                </DetailRow>
+              )}
+
+              {order.director && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaUsers />
+                    Director
+                  </DetailLabel>
+                  <DetailValue>
+                    {order.director}
+                    <Tooltip title="Copy to clipboard">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<FaCopy size={14} />}
+                        onClick={() => copyToClipboard(order.director)}
+                      />
+                    </Tooltip>
+                  </DetailValue>
+                </DetailRow>
+              )}
+
+              {order.producer && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaUsers />
+                    Producer
+                  </DetailLabel>
+                  <DetailValue>
+                    {order.producer}
+                    <Tooltip title="Copy to clipboard">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<FaCopy size={14} />}
+                        onClick={() => copyToClipboard(order.producer)}
+                      />
+                    </Tooltip>
+                  </DetailValue>
+                </DetailRow>
+              )}
+
+              {order.starCast && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaUsers />
+                    Star Cast
+                  </DetailLabel>
+                  <DetailValue>
+                    {order.starCast}
+                    <Tooltip title="Copy to clipboard">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<FaCopy size={14} />}
+                        onClick={() => copyToClipboard(order.starCast)}
+                      />
+                    </Tooltip>
+                  </DetailValue>
+                </DetailRow>
+              )}
+            </DetailsGroup>
+
+            {/* YouTube Content ID and other social/platform links */}
+            <DetailsGroup>
+              <GroupTitle level={5}>
+                <FaLink /> Platform Links
+              </GroupTitle>
+              <DetailsList>
+                {/* YouTube fields */}
+                {orderLoop.map(({ field, value, id }) => {
+                  if (
+                    (field === "youtubeContentId" ||
+                      field === "youtubeMusic") &&
+                    value.trim().length > 0
+                  ) {
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  }
+                  return null;
                 })}
-              {order.status === "completed" && (
-                <>
-                  <div>
-                    <span style={{ backgroundColor: "white" }}>
-                      {" "}
-                      <Popconfirm
-                        title="Confirm"
-                        description="Do you want to takedown album?"
-                        onConfirm={async () => {
-                          const res = await fetch(
-                            `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=takedown&userId=${userId}`,
-                            {
-                              method: "PATCH",
-                            }
-                          );
-                          const data = await res.json();
-                          if (res.ok) {
-                            openNotificationWithIcon("success", data.message);
-                            new Promise((resolve) => {
-                              setTimeout(() => {
-                                resolve(null);
-                                navigate("/admin-panel/history");
-                              }, 500);
-                            });
-                          }
-                        }}
-                        onOpenChange={() => {}}
-                      >
-                        <Link
-                          style={{
-                            backgroundColor: "#e86464",
-                            color: "white",
-                            padding: ".4rem .7rem",
-                            gap: ".3rem",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            width: "48%",
-                            borderRadius: ".5rem",
-                          }}
-                        >
-                          Takedown
-                        </Link>
-                      </Popconfirm>
-                    </span>
-                  </div>{" "}
-                  <div>
-                    <span>
-                      <Link
-                        style={{
-                          backgroundColor: "#acadab",
-                          color: "white",
-                          padding: ".4rem .2rem",
-                          gap: ".3rem",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          width: "48%",
-                          borderRadius: ".5rem",
-                        }}
-                        to={`/admin-panel/order/${order._id}/edit`}
-                      >
-                        <EditOutlined
-                          style={{ backgroundColor: "transparent" }}
-                        />{" "}
-                        Edit
-                      </Link>
-                    </span>
-                  </div>
-                </>
-              )}
-              {order.status === "takedown" && (
-                <>
-                  <div>
-                    <span style={{ backgroundColor: "white" }}>
-                      {" "}
-                      <Popconfirm
-                        title="Confirm"
-                        description="Do you want to restore this album?"
-                        onConfirm={async () => {
-                          const res = await fetch(
-                            `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=completed&userId=${userId}`,
-                            {
-                              method: "PATCH",
-                            }
-                          );
-                          const data = await res.json();
-                          if (res.ok) {
-                            openNotificationWithIcon("success", data.message);
-                            new Promise((resolve) => {
-                              setTimeout(() => {
-                                resolve(null);
-                                navigate("/admin-panel/history");
-                              }, 500);
-                            });
-                          }
-                        }}
-                        onOpenChange={() => {}}
-                      >
-                        <Link
-                          style={{
-                            backgroundColor: "#e86464",
-                            color: "white",
-                            padding: ".4rem .7rem",
-                            gap: ".3rem",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            width: "48%",
-                            borderRadius: ".5rem",
-                          }}
-                        >
-                          Restore
-                        </Link>
-                      </Popconfirm>{" "}
-                    </span>{" "}
-                  </div>
-                  <div>
-                    <span>
-                      <Link
-                        style={{
-                          backgroundColor: "#acadab",
-                          color: "white",
-                          padding: ".4rem .2rem",
-                          gap: ".3rem",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          width: "48%",
-                          borderRadius: ".5rem",
-                        }}
-                        to={`/admin-panel/order/${order._id}/edit`}
-                      >
-                        <EditOutlined
-                          style={{ backgroundColor: "transparent" }}
-                        />{" "}
-                        Edit
-                      </Link>
-                    </span>
-                  </div>
-                </>
-              )}
+              </DetailsList>
+            </DetailsGroup>
+
+            {/* Other information */}
+            {groupedFields.other.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaShieldAlt /> Additional Information
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.other.map(({ field, value, id }) => {
+                    // Skip fields that are handled elsewhere
+                    if (
+                      field === "file" ||
+                      field === "thumbnail" ||
+                      field === "musicDirector" ||
+                      field === "director" ||
+                      field === "producer" ||
+                      field === "starCast" ||
+                      field === "youtubeContentId" ||
+                      field === "youtubeMusic" ||
+                      field.includes("singer") ||
+                      field.includes("composer") ||
+                      field.includes("lyricist")
+                    )
+                      return null;
+
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Downloads section */}
+            <DetailsGroup>
+              <GroupTitle level={5}>
+                <FaCloudDownloadAlt /> Downloads
+              </GroupTitle>
+              <DetailsList>
+                <DetailRow>
+                  <DetailLabel>
+                    <FaCloudDownloadAlt />
+                    Cover Art
+                  </DetailLabel>
+                  <DetailValue>
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}`}
+                      target="_blank"
+                    >
+                      <FaDownload /> Download Image
+                    </Link>
+                  </DetailValue>
+                </DetailRow>
+                <DetailRow>
+                  <DetailLabel>
+                    <MdMusicNote size={16} style={{ marginRight: "8px" }} />
+                    Audio File
+                  </DetailLabel>
+                  <DetailValue>
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}`}
+                      target="_blank"
+                    >
+                      <FaDownload /> Download Audio
+                    </Link>
+                  </DetailValue>
+                </DetailRow>
+              </DetailsList>
+            </DetailsGroup>
+
+            {/* Action buttons based on status */}
+            <ActionButtons>
               {order.status === "waiting" && (
                 <>
-                  <div>
-                    <span>
-                      {" "}
-                      <Popconfirm
-                        title="Confirm"
-                        description="Do you want to approve?"
-                        onConfirm={confirm}
-                        onOpenChange={() => {}}
-                      >
-                        <Link
-                          style={{
-                            backgroundColor: "#a1da6c",
-                            color: "white",
-                            padding: ".4rem .7rem",
-                            gap: ".3rem",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            width: "48%",
-                            borderRadius: ".5rem",
-                          }}
-                        >
-                          <DoneOutline />
-                          Approve
-                        </Link>
-                      </Popconfirm>
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ backgroundColor: "white" }}>
-                      {" "}
-                      <Popconfirm
-                        title="Confirm"
-                        description="Do you want to reject?"
-                        onConfirm={() => {
-                          setShowModal(true);
-                        }}
-                        onOpenChange={() => {}}
-                      >
-                        <Link
-                          style={{
-                            backgroundColor: "#e86464",
-                            color: "white",
-                            padding: ".4rem .7rem",
-                            gap: ".3rem",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            width: "48%",
-                            borderRadius: ".5rem",
-                          }}
-                        >
-                          <CloseOutlined />
-                          Reject
-                        </Link>
-                      </Popconfirm>
-                    </span>
-                  </div>
+                  <Popconfirm
+                    title="Approve Album"
+                    description="Are you sure you want to approve this album?"
+                    onConfirm={confirmApprove}
+                    okText="Yes, Approve"
+                    cancelText="Cancel"
+                  >
+                    <ApproveButton as="button">
+                      <MdDone size={16} /> Approve
+                    </ApproveButton>
+                  </Popconfirm>
+
+                  <RejectButton as="button" onClick={() => setShowModal(true)}>
+                    <MdClose size={16} /> Reject
+                  </RejectButton>
                 </>
-              )}{" "}
-            </RightDiv>
-          </>
-        )}
-      </MainDiv>
-    </OuterBox>
+              )}
+
+              {order.status === "completed" && (
+                <>
+                  <Popconfirm
+                    title="Takedown Album"
+                    description="Are you sure you want to take down this album?"
+                    onConfirm={takedownAlbum}
+                    okText="Yes, Takedown"
+                    cancelText="Cancel"
+                  >
+                    <TakedownButton as="button">
+                      <FaTimesCircle size={16} /> Takedown
+                    </TakedownButton>
+                  </Popconfirm>
+
+                  <EditButton to={`/admin-panel/order/${order._id}/edit`}>
+                    <FaEdit size={16} /> Edit
+                  </EditButton>
+                </>
+              )}
+
+              {order.status === "takedown" && (
+                <>
+                  <Popconfirm
+                    title="Restore Album"
+                    description="Are you sure you want to restore this album?"
+                    onConfirm={restoreAlbum}
+                    okText="Yes, Restore"
+                    cancelText="Cancel"
+                  >
+                    <RestoreButton as="button">
+                      <FaCheckCircle size={16} /> Restore
+                    </RestoreButton>
+                  </Popconfirm>
+
+                  <EditButton to={`/admin-panel/order/${order._id}/edit`}>
+                    <FaEdit size={16} /> Edit
+                  </EditButton>
+                </>
+              )}
+            </ActionButtons>
+          </DetailsSection>
+        </ContentCard>
+      )}
+    </PageContainer>
   );
 };
 

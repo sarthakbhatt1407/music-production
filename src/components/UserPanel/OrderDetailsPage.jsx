@@ -1,258 +1,948 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import MusicLoader from "../Loader/MusicLoader";
-import { Image, Popconfirm } from "antd";
+import {
+  Image,
+  Popconfirm,
+  Typography,
+  Breadcrumb,
+  Button,
+  Divider,
+  message,
+  Tooltip,
+  Tag,
+  Space,
+} from "antd";
 import { Link } from "react-router-dom";
 import AudioPlayer from "react-h5-audio-player";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
+import "react-h5-audio-player/lib/styles.css";
 import { saveAs } from "file-saver";
-import { LinkOutlined } from "@mui/icons-material";
-const OuterBox = styled.div`
+
+// React Icons
+import {
+  FaEdit,
+  FaTrash,
+  FaDownload,
+  FaArrowLeft,
+  FaPlayCircle,
+  FaFileAlt,
+  FaCalendarAlt,
+  FaInfoCircle,
+  FaTag,
+  FaCloudDownloadAlt,
+  FaLink,
+  FaUsers,
+  FaUser,
+  FaShieldAlt,
+  FaApple,
+  FaFacebook,
+  FaInstagram,
+  FaGlobe,
+  FaCheckCircle,
+  FaClock,
+  FaExclamationCircle,
+  FaTimesCircle,
+  FaMusic,
+  FaCopy,
+  FaSpotify,
+} from "react-icons/fa";
+
+import {
+  MdCheckCircleOutline,
+  MdAccessTime,
+  MdSync,
+  MdCancel,
+  MdErrorOutline,
+  MdInfo,
+  MdContentCopy,
+  MdMusicNote,
+} from "react-icons/md";
+
+const { Title, Text, Paragraph } = Typography;
+
+// Animation keyframes
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const slideUp = keyframes`
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+`;
+
+// Page container
+const PageContainer = styled.div`
   width: 100%;
   height: 99%;
-  overflow-y: scroll;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 24px;
+  animation: ${fadeIn} 0.5s ease;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f0f2f5;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 10px;
+
+    &:hover {
+      background: #bfbfbf;
+    }
+  }
+
   h1 {
     margin: 0;
+    font-size: 28px;
+    font-weight: 600;
   }
 `;
 
-const MainDiv = styled.div`
-  background-color: white;
-  width: 100%;
-  height: fit-content;
-  border-radius: 0.5rem;
-  position: relative;
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-  /* display: none; */
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    /* grid-template-columns: 1fr; */
-    display: flex;
-    flex-direction: column;
-  }
-`;
-const LeftAni = keyframes`
-    
-    0%{
-        transform: translateX(50%);
-        z-index: 2;
-        opacity:0 ;
-    }
-    
-    100%{
-        transform: translateX(0%);
-        z-index: 2;
-        opacity:1;
-    }
-`;
-const RightAni = keyframes`
-    
-    0%{
-        transform: translateX(-50%);        opacity:0 ;
-    }
-    
-    100%{
-        transform: translateX(0%);        opacity:1 ;
-    }
-`;
-
-const LeftDiv = styled.div`
+const PageHeader = styled.div`
   display: flex;
-
-  animation: ${LeftAni} 0.8s;
-  height: 80svh;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  gap: 1rem;
-  padding: 1rem 3rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+`;
+
+const BreadcrumbContainer = styled.div`
+  margin-bottom: 8px;
+`;
+
+const NavigationRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+`;
+
+const BackButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+// Main content card
+const ContentCard = styled.div`
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  animation: ${slideUp} 0.6s ease;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  min-height: 600px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+`;
+
+// Album section (left side)
+const AlbumSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #f9f9fa 0%, #f1f2f6 100%);
+  border-right: 1px solid #f0f0f0;
+  padding: 40px 30px;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 30px 20px;
+  }
+`;
+
+const AlbumCover = styled.div`
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
 
   img {
-    margin: 0;
-    width: 50%;
-  }
-  h1 {
-    margin: 0;
-    text-transform: capitalize;
-  }
-  p {
-    margin: 0;
-    color: #000000d3;
-    font-size: 1rem;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    padding: 1rem 0.2rem;
-    height: 50svh;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
 
-    img {
-      /* width: 10%; */
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
     }
-    animation: ${LeftAni} 0.5s;
   }
 `;
-const RightDiv = styled.div`
-  animation: ${RightAni} 0.8s;
+
+const AlbumTitle = styled(Title)`
+  text-align: center !important;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+  background: linear-gradient(90deg, #222, #666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const AlbumDescription = styled(Paragraph)`
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+  max-width: 320px;
+  line-height: 1.6;
+  font-size: 15px;
+`;
+
+const StyledAudioPlayer = styled.div`
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+
+  .rhap_container {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .rhap_main-controls-button {
+    color: #1677ff;
+  }
+
+  .rhap_progress-indicator {
+    background: #1677ff;
+  }
+
+  .rhap_progress-filled {
+    background: #1677ff;
+  }
+
+  .rhap_download-progress {
+    background: #e6f4ff;
+  }
+
+  .rhap_time {
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  .rhap_play-pause-button {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+`;
+
+// Details section (right side)
+const DetailsSection = styled.div`
+  padding: 40px 30px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 
-  padding: 1rem 2rem;
-
-  div {
-    display: grid;
-    margin: 0.5rem 0;
-    grid-template-columns: 1fr 1fr;
-    justify-content: space-between;
-    text-align: justify;
-    text-transform: capitalize;
-
-    span {
-      padding: 0.4rem 1rem;
-      text-overflow: clip;
-      &:first-child {
-        text-transform: capitalize;
-        font-weight: 500;
-      }
-    }
-    &:nth-child(2n) {
-      span {
-        background-color: #fafafc;
-      }
-    }
+  @media (max-width: 1024px) {
+    padding: 30px 20px;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    padding: 1rem 0.2rem;
-    animation: ${RightAni} 0.5s;
-    div {
-      text-justify: auto;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f9f9f9;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+
+    &:hover {
+      background: #bfbfbf;
     }
   }
 `;
-const BtnBox = styled.div`
-  padding: 0.3rem 0.7rem;
+
+const SectionTitle = styled(Title)`
+  margin-bottom: 24px !important;
+  position: relative;
+  padding-bottom: 8px;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #1677ff, #69c0ff);
+    border-radius: 3px;
+  }
+`;
+
+const DetailsGroup = styled.div`
+  margin-bottom: 28px;
+`;
+
+const GroupTitle = styled(Title)`
+  font-size: 16px !important;
+  margin-bottom: 12px !important;
+  color: #555;
   display: flex;
-  justify-content: center;
-  gap: 1rem;
+  align-items: center;
+  gap: 8px;
+`;
+
+const DetailsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+`;
+
+const DetailRow = styled.div`
+  display: grid;
+  grid-template-columns: 40% 60%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    border-color: #e6f7ff;
+  }
+
+  ${(props) =>
+    props.highlighted &&
+    css`
+      background-color: #f0f7ff;
+      border-color: #bae0ff;
+
+      &:hover {
+        box-shadow: 0 2px 12px rgba(24, 144, 255, 0.1);
+      }
+    `}
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const DetailLabel = styled.div`
+  padding: 12px 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  background-color: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    border-bottom: 1px solid #f0f0f0;
+  }
+`;
+
+const DetailValue = styled.div`
+  padding: 12px 16px;
+  color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  word-break: break-word;
 
   a {
-    background-color: #e9e9e9;
-    width: 40%;
-    margin: 0 auto;
-    text-align: center;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    color: black;
+    color: #1677ff;
     display: flex;
     align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+
     &:hover {
-      box-shadow: 0.2rem 0.2rem 0.6rem #bfbfbf;
-    }
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    a {
-      width: 100%;
+      color: #4096ff;
+      text-decoration: underline;
     }
   }
 `;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+`;
+
+const ActionButton = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 180px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+`;
+
+const EditButton = styled(ActionButton)`
+  background-color: #f0f0f0;
+  color: #333;
+
+  &:hover {
+    background-color: #e0e0e0;
+    color: #111;
+  }
+`;
+
+const DeleteButton = styled(ActionButton)`
+  background-color: #fff1f0;
+  color: #ff4d4f;
+  border: 1px solid #ffa39e;
+
+  &:hover {
+    background-color: #fff1f0;
+    color: #cf1322;
+    border-color: #ff4d4f;
+  }
+`;
+
+const StatusTag = styled(Tag)`
+  margin-left: 12px;
+  padding: 2px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  text-transform: capitalize;
+`;
+
+// Artist tag styling - similar to Form.jsx
+const ArtistTag = styled.div`
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #e6f4ff, #f2faff);
+  color: black;
+  border: 1px solid #c2e4ff;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0.25rem 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    border-color: #95d2ff;
+  }
+`;
+
+const SocialLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-left: 0.75rem;
+`;
+
+const SocialIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0958d9;
+  opacity: ${(props) => (props.active ? 1 : 0.4)};
+  cursor: ${(props) => (props.active ? "pointer" : "default")};
+  transition: all 0.2s;
+
+  &:hover {
+    transform: ${(props) => (props.active ? "scale(1.1)" : "none")};
+    color: ${(props) => (props.active ? "#0958d9" : "#1677ff")};
+  }
+`;
+
+// Icons for different field types
+const getFieldIcon = (field) => {
+  const fieldLower = field.toLowerCase();
+
+  if (fieldLower.includes("title")) return <FaFileAlt />;
+  if (fieldLower.includes("date") || fieldLower.includes("time"))
+    return <FaCalendarAlt />;
+  if (fieldLower.includes("type")) return <FaTag />;
+  if (fieldLower.includes("status")) return <FaInfoCircle />;
+  if (fieldLower.includes("label")) return <FaUsers />;
+  if (fieldLower.includes("singer")) return <FaUser />;
+  if (fieldLower.includes("composer")) return <FaMusic />;
+  if (fieldLower.includes("lyricist")) return <FaFileAlt />;
+  if (fieldLower.includes("director")) return <FaUsers />;
+  if (fieldLower.includes("apple")) return <FaApple />;
+  if (fieldLower.includes("facebook")) return <FaFacebook />;
+  if (fieldLower.includes("instagram")) return <FaInstagram />;
+  if (fieldLower.includes("spotify")) return <FaPlayCircle />;
+  if (fieldLower.includes("file") || fieldLower.includes("thumbnail"))
+    return <FaCloudDownloadAlt />;
+
+  return <FaInfoCircle />;
+};
+
+const getStatusInfo = (status) => {
+  switch (status) {
+    case "completed":
+      return {
+        icon: <MdCheckCircleOutline size={16} />,
+        color: "success",
+        text: "Live",
+      };
+    case "waiting":
+      return {
+        icon: <MdAccessTime size={16} />,
+        color: "warning",
+        text: "Awaiting Approval",
+      };
+    case "processing":
+      return {
+        icon: <MdSync size={16} />,
+        color: "processing",
+        text: "Processing",
+      };
+    case "rejected":
+      return {
+        icon: <MdCancel size={16} />,
+        color: "error",
+        text: "Rejected",
+      };
+    case "takedown":
+      return {
+        icon: <MdErrorOutline size={16} />,
+        color: "error",
+        text: "Taken Down",
+      };
+    default:
+      return {
+        icon: <MdInfo size={16} />,
+        color: "default",
+        text: status,
+      };
+  }
+};
+
+// Social platform icons
+const getSocialIcon = (platform) => {
+  const platformLower = platform.toLowerCase();
+
+  if (platformLower.includes("apple")) return <FaApple />;
+  if (platformLower.includes("facebook")) return <FaFacebook />;
+  if (platformLower.includes("instagram")) return <FaInstagram />;
+  if (platformLower.includes("spotify")) return <FaSpotify />;
+
+  return <FaGlobe />;
+};
+
+// Group fields into categories
+const groupFields = (fields) => {
+  // Initialize groups
+  const groups = {
+    main: [],
+    labels: [],
+    dates: [],
+    singers: [],
+    composers: [],
+    lyricists: [],
+    other: [],
+  };
+
+  fields.forEach((field) => {
+    const fieldName = field.field.toLowerCase();
+
+    // Group by category
+    if (["title", "description", "status", "albumtype"].includes(fieldName)) {
+      groups.main.push(field);
+    } else if (fieldName.includes("label")) {
+      groups.labels.push(field);
+    } else if (fieldName.includes("date") || fieldName.includes("time")) {
+      groups.dates.push(field);
+    } else if (fieldName.includes("singer")) {
+      groups.singers.push(field);
+    } else if (fieldName.includes("composer")) {
+      groups.composers.push(field);
+    } else if (fieldName.includes("lyricist")) {
+      groups.lyricists.push(field);
+    } else {
+      groups.other.push(field);
+    }
+  });
+
+  return groups;
+};
+
+// Function to parse comma-separated artists and their profiles
+const parseArtists = (name, appleId, spotifyId, facebookUrl, instagramUrl) => {
+  if (!name) return [];
+
+  const names = name.split(",").map((n) => n.trim());
+  const appleIds = appleId ? appleId.split(",").map((id) => id.trim()) : [];
+  const spotifyIds = spotifyId
+    ? spotifyId.split(",").map((id) => id.trim())
+    : [];
+  const facebookUrls = facebookUrl
+    ? facebookUrl.split(",").map((url) => url.trim())
+    : [];
+  const instagramUrls = instagramUrl
+    ? instagramUrl.split(",").map((url) => url.trim())
+    : [];
+
+  return names.map((name, index) => ({
+    name,
+    appleId: appleIds[index] || "",
+    spotifyId: spotifyIds[index] || "",
+    facebookUrl: facebookUrls[index] || "",
+    instagramUrl: instagramUrls[index] || "",
+  }));
+};
 
 const OrderDetailsPage = () => {
   const id = useParams().id;
   const [order, setOrder] = useState(null);
-  const [isLoading, setIsloading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [orderLoop, setOrderLoop] = useState([]);
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
+
+  // States for parsed artists
+  const [parsedSingers, setParsedSingers] = useState([]);
+  const [parsedComposers, setParsedComposers] = useState([]);
+  const [parsedLyricists, setParsedLyricists] = useState([]);
+
+  // Fetch order data
   const fetcher = async () => {
-    setIsloading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
-    );
-    const data = await res.json();
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+      );
+      const data = await res.json();
 
-    setOrder(data.order);
-    console.log(`${data.order.thumbnail}`);
-
-    setIsloading(false);
-    let arr = [];
-    for (const key in data.order) {
-      if (
-        key === "_id" ||
-        key === "id" ||
-        key === "userId" ||
-        key === "deleted" ||
-        key === "__v"
-      ) {
-        continue;
-      }
-      if (data.order[key].length === 0) {
-        continue;
+      if (!data.order) {
+        messageApi.error("Order not found");
+        navigate("/user-panel/history");
+        return;
       }
 
-      const obj = {
-        field: key,
-        value: data.order[key],
-        id: Math.random() * 99999999999,
-      };
-      arr.push(obj);
+      setOrder(data.order);
+
+      // Parse artists data
+      setParsedSingers(
+        parseArtists(
+          data.order.singer,
+          data.order.singerAppleId,
+          data.order.singerSpotifyId,
+          data.order.singerFacebookUrl,
+          data.order.singerInstagramUrl
+        )
+      );
+
+      setParsedComposers(
+        parseArtists(
+          data.order.composer,
+          data.order.composerAppleId,
+          data.order.composerSpotifyId,
+          data.order.composerFacebookUrl,
+          data.order.composerInstagramUrl
+        )
+      );
+
+      setParsedLyricists(
+        parseArtists(
+          data.order.lyricist,
+          data.order.lyricistAppleId,
+          data.order.lyricistSpotifyId,
+          data.order.lyricistFacebookUrl,
+          data.order.lyricistInstagramUrl
+        )
+      );
+
+      // Process order fields
+      let arr = [];
+      for (const key in data.order) {
+        if (
+          key === "_id" ||
+          key === "id" ||
+          key === "userId" ||
+          key === "deleted" ||
+          key === "__v"
+        ) {
+          continue;
+        }
+        if (data.order[key].length === 0) {
+          continue;
+        }
+
+        const obj = {
+          field: key,
+          value: data.order[key],
+          id: Math.random() * 99999999999,
+        };
+        arr.push(obj);
+      }
+      setOrderLoop(arr);
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      messageApi.error("Failed to load order details");
+    } finally {
+      setIsLoading(false);
     }
-    setOrderLoop(arr);
   };
+
+  // Delete order confirmation
   const confirm = async () => {
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=delete`,
-      {
-        method: "PATCH",
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      new Promise((resolve) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=delete`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      if (res.ok) {
+        messageApi.success("Order deleted successfully");
         setTimeout(() => {
-          resolve(null);
           navigate("/user-panel/history");
-        }, 500);
-      });
+        }, 1000);
+      } else {
+        messageApi.error("Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      messageApi.error("An error occurred");
+    }
+  };
+
+  // Copy to clipboard functionality
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      messageApi.success("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      messageApi.error("Failed to copy text");
     }
   };
 
   useEffect(() => {
     fetcher();
-    return () => {};
   }, [id]);
 
+  // Format field name for display
+  const formatFieldName = (field) => {
+    // Handle special cases
+    if (field === "labelName") return "Label Name";
+    if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
+      return "Sub Label";
+    if (field === "dateOfRelease") return "Date of Release";
+    if (field === "AlbumType" || field === "albumType") return "Album Type";
+    if (field === "orderDateAndTime") return "Order Date";
+    if (field === "musicDirector") return "Music Director";
+    if (field === "starCast") return "Star Cast";
+    if (field === "dateLive") return "Date of Live";
+
+    // General formatting
+    return field
+      .replace(/([A-Z])/g, " $1") // Insert space before capital letters
+      .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+      .trim();
+  };
+  // Render field value based on field type
+  const renderFieldValue = (field, value) => {
+    const fieldLower = field.toLowerCase();
+
+    // Handle YouTube Content ID and YouTube Music fields specifically
+    if (fieldLower === "youtube content id" || fieldLower === "youtube music") {
+      return (
+        <>
+          <span>{value}</span>
+          <Tooltip title="Copy to clipboard">
+            <Button
+              type="text"
+              size="small"
+              icon={<FaCopy size={14} />}
+              onClick={() => copyToClipboard(value)}
+            />
+          </Tooltip>
+        </>
+      );
+    }
+
+    // URLs and external links
+    if (
+      (fieldLower.includes("url") || fieldLower.includes("id")) &&
+      !fieldLower.includes("_id") &&
+      !fieldLower.includes("userid") &&
+      !fieldLower.includes("youtube")
+    ) {
+      return (
+        <Link to={value} target="_blank">
+          {getSocialIcon(field)} View on{" "}
+          {fieldLower.includes("apple")
+            ? "Apple Music"
+            : fieldLower.includes("facebook")
+            ? "Facebook"
+            : fieldLower.includes("instagram")
+            ? "Instagram"
+            : fieldLower.includes("spotify")
+            ? "Spotify"
+            : "Platform"}
+        </Link>
+      );
+    }
+
+    // File downloads
+    if (field === "thumbnail" || field === "file") {
+      return (
+        <Link
+          to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
+          target="_blank"
+        >
+          <FaDownload /> Download{" "}
+          {field === "thumbnail" ? "Cover Art" : "Audio File"}
+        </Link>
+      );
+    }
+
+    // Status field
+    if (fieldLower === "status") {
+      const statusInfo = getStatusInfo(value);
+      return (
+        <Tag icon={statusInfo.icon} color={statusInfo.color}>
+          {statusInfo.text}
+        </Tag>
+      );
+    }
+
+    // Default text with copy option
+    return (
+      <>
+        <span>{value === "completed" ? "Live" : value}</span>
+        <Tooltip title="Copy to clipboard">
+          <Button
+            type="text"
+            size="small"
+            icon={<FaCopy size={14} />}
+            onClick={() => copyToClipboard(value)}
+          />
+        </Tooltip>
+      </>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        {contextHolder}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80vh",
+          }}
+        >
+          <MusicLoader />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  // Group fields for better organization
+  const groupedFields = groupFields(orderLoop);
+
+  // Get status information
+  const statusInfo = order && order.status ? getStatusInfo(order.status) : null;
+
   return (
-    <OuterBox>
-      {/* <Breadcrumb
-        items={[
-          {
-            title: <Link to={"/user-panel"}>User Panel</Link>,
-          },
-          {
-            title: <Link to={"/user-panel/history"}>History</Link>,
-          },
-          {
-            title: "Order Details",
-          },
-        ]}
-      />{" "} */}
-      <h1>Order Details</h1>
-      <MainDiv>
-        {isLoading && <MusicLoader />}
-        {!isLoading && order && (
-          <>
-            <LeftDiv>
-              {/* <img src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`} alt="" /> */}{" "}
+    <PageContainer>
+      {contextHolder}
+
+      {/* Page header */}
+      <PageHeader>
+        <div>
+          <BreadcrumbContainer>
+            <Breadcrumb
+              items={[
+                { title: <Link to="/user-panel">Dashboard</Link> },
+                { title: <Link to="/user-panel/history">My Albums</Link> },
+                { title: "Album Details" },
+              ]}
+            />
+          </BreadcrumbContainer>
+
+          <NavigationRow>
+            <Space>
+              <Title level={2} style={{ margin: 0 }}>
+                Album Details
+              </Title>
+              {statusInfo && (
+                <StatusTag icon={statusInfo.icon} color={statusInfo.color}>
+                  {statusInfo.text}
+                </StatusTag>
+              )}
+            </Space>
+
+            <BackButton
+              onClick={() => navigate("/user-panel/history")}
+              icon={<FaArrowLeft />}
+            >
+              Back to Albums
+            </BackButton>
+          </NavigationRow>
+        </div>
+      </PageHeader>
+
+      {/* Main content */}
+      {order && (
+        <ContentCard>
+          {/* Album section (left side) */}
+          <AlbumSection>
+            <AlbumCover>
               <Image
-                width={200}
-                src={`${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`}
+                width={240}
+                src={
+                  order.thumbnail.includes("cloudinary")
+                    ? order.thumbnail
+                    : `${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`
+                }
                 placeholder={
                   <Image
                     preview={false}
@@ -261,302 +951,537 @@ const OrderDetailsPage = () => {
                         ? order.thumbnail
                         : `${process.env.REACT_APP_BASE_URL}/${order.thumbnail}`
                     }
-                    width={200}
+                    width={240}
                   />
                 }
               />
-              <h1>{order.title}</h1>
+            </AlbumCover>
+
+            <AlbumTitle level={3}>{order.title}</AlbumTitle>
+
+            <StyledAudioPlayer>
               <AudioPlayer
                 src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
-                onPlay={(e) => console.log("onPlay")}
-                // other props here
+                autoPlayAfterSrcChange={false}
+                showJumpControls={false}
+                customAdditionalControls={[]}
+                layout="stacked-reverse"
               />
-              <p>{order.description}</p>
-            </LeftDiv>
-            <RightDiv>
-              {orderLoop.length > 0 &&
-                orderLoop.map((obj) => {
-                  let { field, value, id } = obj;
-                  if (field === "labelName") {
-                    field = "Label name";
-                  }
-                  if (field === "subLabel1") {
-                    field = "sub label";
-                  }
-                  if (field === "subLabel2") {
-                    field = "sub label";
-                  }
-                  if (field === "subLabel3") {
-                    field = "sub label";
-                  }
-                  if (field === "dateOfRelease") {
-                    field = "date of release";
-                  }
-                  if (field === "AlbumType") {
-                    field = "Album Type";
-                  }
-                  if (field === "albumType") {
-                    field = "Album Type";
-                  }
-                  if (field === "orderDateAndTime") {
-                    field = "order Date";
-                    value = value.split("/")[0];
-                  }
-                  if (field === "singerAppleId") {
-                    field = "singer Apple Id";
+            </StyledAudioPlayer>
+
+            {order.description && (
+              <AlbumDescription>{order.description}</AlbumDescription>
+            )}
+          </AlbumSection>
+
+          {/* Details section (right side) */}
+          <DetailsSection>
+            <SectionTitle level={4}>Album Information</SectionTitle>
+
+            {/* Main information group */}
+            {groupedFields.main.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaInfoCircle /> Basic Information
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.main.map(({ field, value, id }) => {
+                    // Skip fields already displayed in the left panel
+                    if (field === "title" || field === "description")
+                      return null;
+
+                    const formattedField = formatFieldName(field);
+
                     return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
+                      <DetailRow
+                        key={id}
+                        highlighted={field.toLowerCase() === "status"}
+                      >
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Dates group */}
+            {groupedFields.dates.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaCalendarAlt /> Dates
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.dates.map(({ field, value, id }) => {
+                    if (field === "dateLive") return null;
+
+                    const formattedField = formatFieldName(field);
+                    let displayValue = value;
+
+                    if (field === "orderDateAndTime") {
+                      displayValue = value.split("/")[0];
+                    }
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, displayValue)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Labels group */}
+            {groupedFields.labels.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaUsers /> Label Information
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.labels.map(({ field, value, id }) => {
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Artists section */}
+            <DetailsGroup>
+              <GroupTitle level={5}>
+                <FaUser /> Artists
+              </GroupTitle>
+
+              {/* Singers */}
+              {parsedSingers.length > 0 && (
+                <>
+                  <Text
+                    type="secondary"
+                    style={{ marginBottom: "8px", display: "block" }}
+                  >
+                    Singer
+                  </Text>
+                  <div style={{ marginBottom: "16px" }}>
+                    {parsedSingers.map((singer, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
+                          }}
+                        >
+                          {singer.name}
                         </span>
-                      </div>
-                    );
-                  }
-                  if (field === "dateLive") {
-                    return;
-                  }
-                  if (field === "releaseDate" && value.length > 0) {
-                    field = "release Date";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>{value}</span>
-                      </div>
-                    );
-                  }
-                  if (field === "singerFacebookUrl") {
-                    field = "singer Facebook Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "singerInstagramUrl") {
-                    field = "singer Instagram Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "singerSpotifyId") {
-                    field = "singer Spotify Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerAppleId") {
-                    field = "composer Apple Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerFacebookUrl") {
-                    field = "composer Facebook Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerSpotifyId") {
-                    field = "composer Spotify Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "composerInstagramUrl") {
-                    field = "composer Instagram Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistAppleId") {
-                    field = "lyricist Apple Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistFacebookUrl") {
-                    field = "lyricist Facebook Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistInstagramUrl") {
-                    field = "lyricist Instagram Url";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "lyricistSpotifyId") {
-                    field = "lyricist Spotify Id";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link to={value} target="_blank">
-                            <LinkOutlined />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "musicDirector") {
-                    field = "Music Director";
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>{value}</span>
-                      </div>
-                    );
-                  }
-                  if (field === "starCast") {
-                    field = "star Cast";
-                  }
-                  if (field === "thumbnail") {
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link
-                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
-                            target="_blank"
+                        <SocialLinks>
+                          <SocialIcon
+                            active={singer.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              singer.facebookUrl &&
+                              window.open(singer.facebookUrl, "_blank")
+                            }
+                            title={
+                              singer.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
                           >
-                            <DownloadOutlined
-                              style={{ transform: "scale(1.5)" }}
-                            />
-                          </Link>
-                        </span>
-                      </div>
-                    );
-                  }
-                  if (field === "file") {
-                    return (
-                      <div key={id}>
-                        <span>{field}</span>
-                        <span>
-                          <Link
-                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
-                            target="_blank"
+                            <FaFacebook />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={singer.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              singer.instagramUrl &&
+                              window.open(singer.instagramUrl, "_blank")
+                            }
+                            title={
+                              singer.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
                           >
-                            <DownloadOutlined
-                              style={{ transform: "scale(1.5)" }}
-                            />
-                          </Link>
+                            <FaInstagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={singer.appleId?.trim().length > 0}
+                            onClick={() =>
+                              singer.appleId &&
+                              window.open(singer.appleId, "_blank")
+                            }
+                            title={
+                              singer.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <FaApple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={singer.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              singer.spotifyId &&
+                              window.open(singer.spotifyId, "_blank")
+                            }
+                            title={
+                              singer.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                      </ArtistTag>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Composers */}
+              {parsedComposers.length > 0 && (
+                <>
+                  <Text
+                    type="secondary"
+                    style={{ margin: "16px 0 8px", display: "block" }}
+                  >
+                    Composer
+                  </Text>
+                  <div style={{ marginBottom: "16px" }}>
+                    {parsedComposers.map((composer, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
+                          }}
+                        >
+                          {composer.name}
                         </span>
-                      </div>
+                        <SocialLinks>
+                          <SocialIcon
+                            active={composer.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              composer.facebookUrl &&
+                              window.open(composer.facebookUrl, "_blank")
+                            }
+                            title={
+                              composer.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
+                          >
+                            <FaFacebook />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={composer.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              composer.instagramUrl &&
+                              window.open(composer.instagramUrl, "_blank")
+                            }
+                            title={
+                              composer.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
+                          >
+                            <FaInstagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={composer.appleId?.trim().length > 0}
+                            onClick={() =>
+                              composer.appleId &&
+                              window.open(composer.appleId, "_blank")
+                            }
+                            title={
+                              composer.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <FaApple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={composer.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              composer.spotifyId &&
+                              window.open(composer.spotifyId, "_blank")
+                            }
+                            title={
+                              composer.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                      </ArtistTag>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Lyricists */}
+              {parsedLyricists.length > 0 && (
+                <>
+                  <Text
+                    type="secondary"
+                    style={{ margin: "16px 0 8px", display: "block" }}
+                  >
+                    Lyricist
+                  </Text>
+                  <div style={{ marginBottom: "16px" }}>
+                    {parsedLyricists.map((lyricist, idx) => (
+                      <ArtistTag key={idx}>
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize: ".8rem",
+                            marginRight: "auto",
+                            color: "black",
+                            letterSpacing: ".06rem",
+                          }}
+                        >
+                          {lyricist.name}
+                        </span>
+                        <SocialLinks>
+                          <SocialIcon
+                            active={lyricist.facebookUrl?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.facebookUrl &&
+                              window.open(lyricist.facebookUrl, "_blank")
+                            }
+                            title={
+                              lyricist.facebookUrl
+                                ? "Visit Facebook profile"
+                                : "No Facebook profile"
+                            }
+                          >
+                            <FaFacebook />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={lyricist.instagramUrl?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.instagramUrl &&
+                              window.open(lyricist.instagramUrl, "_blank")
+                            }
+                            title={
+                              lyricist.instagramUrl
+                                ? "Visit Instagram profile"
+                                : "No Instagram profile"
+                            }
+                          >
+                            <FaInstagram />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={lyricist.appleId?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.appleId &&
+                              window.open(lyricist.appleId, "_blank")
+                            }
+                            title={
+                              lyricist.appleId
+                                ? "Visit Apple Music profile"
+                                : "No Apple Music profile"
+                            }
+                          >
+                            <FaApple />
+                          </SocialIcon>
+                          <SocialIcon
+                            active={lyricist.spotifyId?.trim().length > 0}
+                            onClick={() =>
+                              lyricist.spotifyId &&
+                              window.open(lyricist.spotifyId, "_blank")
+                            }
+                            title={
+                              lyricist.spotifyId
+                                ? "Visit Spotify profile"
+                                : "No Spotify profile"
+                            }
+                          >
+                            <FaSpotify style={{ fontSize: "1.1rem" }} />
+                          </SocialIcon>
+                        </SocialLinks>
+                      </ArtistTag>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Other artist fields in regular format */}
+              {order.musicDirector && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaMusic />
+                    Music Director
+                  </DetailLabel>
+                  <DetailValue>{order.musicDirector}</DetailValue>
+                </DetailRow>
+              )}
+
+              {order.director && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaUsers />
+                    Director
+                  </DetailLabel>
+                  <DetailValue>{order.director}</DetailValue>
+                </DetailRow>
+              )}
+
+              {order.producer && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaUsers />
+                    Producer
+                  </DetailLabel>
+                  <DetailValue>{order.producer}</DetailValue>
+                </DetailRow>
+              )}
+
+              {order.starCast && (
+                <DetailRow>
+                  <DetailLabel>
+                    <FaUsers />
+                    Star Cast
+                  </DetailLabel>
+                  <DetailValue>{order.starCast}</DetailValue>
+                </DetailRow>
+              )}
+            </DetailsGroup>
+
+            {/* Other information */}
+            {groupedFields.other.length > 0 && (
+              <DetailsGroup>
+                <GroupTitle level={5}>
+                  <FaShieldAlt /> Additional Information
+                </GroupTitle>
+                <DetailsList>
+                  {groupedFields.other.map(({ field, value, id }) => {
+                    // Skip artist fields as they're handled separately
+                    if (
+                      field === "file" ||
+                      field === "thumbnail" ||
+                      field.includes("singer") ||
+                      field.includes("composer") ||
+                      field.includes("lyricist") ||
+                      field === "musicDirector" ||
+                      field === "director" ||
+                      field === "producer" ||
+                      field === "starCast"
+                    )
+                      return null;
+
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
                     );
-                  }
-                  return (
-                    <div key={id}>
-                      <span>{field}</span>
-                      <span style={{ overflowWrap: "anywhere" }}>
-                        {value === "completed" ? "live" : value}
-                      </span>
-                    </div>
-                  );
-                })}
-              {(order.status === "waiting" || order.status === "rejected") &&
-                order.deleted === false && (
-                  <BtnBox>
-                    {" "}
-                    <Popconfirm
-                      title="Confirm"
-                      description="Do you want to delete?"
-                      onConfirm={confirm}
+                  })}
+                </DetailsList>
+              </DetailsGroup>
+            )}
+
+            {/* Downloads section */}
+            <DetailsGroup>
+              <GroupTitle level={5}>
+                <FaCloudDownloadAlt /> Downloads
+              </GroupTitle>
+              <DetailsList>
+                <DetailRow>
+                  <DetailLabel>
+                    <FaCloudDownloadAlt />
+                    Cover Art
+                  </DetailLabel>
+                  <DetailValue>
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}`}
+                      target="_blank"
                     >
-                      <Link>
-                        <DeleteOutlined
-                          style={{ backgroundColor: "transparent" }}
-                        />
-                        Delete
-                      </Link>
-                    </Popconfirm>
-                    {/* <Link to={`/user-panel/order/${order._id}/edit`}>
-                    <EditOutlined /> Edit
-                  </Link> */}
-                    <Link to={`/user-panel/order/${order._id}/edit`}>
-                      <EditOutlined
-                        style={{ backgroundColor: "transparent" }}
-                      />{" "}
-                      Edit
+                      <FaDownload /> Download Image
                     </Link>
-                  </BtnBox>
-                )}
-            </RightDiv>
-          </>
-        )}
-      </MainDiv>
-    </OuterBox>
+                  </DetailValue>
+                </DetailRow>
+                <DetailRow>
+                  <DetailLabel>
+                    <MdMusicNote size={16} style={{ marginRight: "8px" }} />
+                    Audio File
+                  </DetailLabel>
+                  <DetailValue>
+                    <Link
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}`}
+                      target="_blank"
+                    >
+                      <FaDownload /> Download Audio
+                    </Link>
+                  </DetailValue>
+                </DetailRow>
+              </DetailsList>
+            </DetailsGroup>
+
+            {/* Action buttons */}
+            {(order.status === "waiting" || order.status === "rejected") &&
+              order.deleted === false && (
+                <ActionButtons>
+                  <Popconfirm
+                    title="Delete this album?"
+                    description="This action cannot be undone."
+                    onConfirm={confirm}
+                    okText="Yes, Delete"
+                    cancelText="Cancel"
+                    placement="top"
+                  >
+                    <DeleteButton>
+                      <FaTrash /> Delete
+                    </DeleteButton>
+                  </Popconfirm>
+
+                  <EditButton to={`/user-panel/order/${order._id}/edit`}>
+                    <FaEdit /> Edit
+                  </EditButton>
+                </ActionButtons>
+              )}
+          </DetailsSection>
+        </ContentCard>
+      )}
+    </PageContainer>
   );
 };
 

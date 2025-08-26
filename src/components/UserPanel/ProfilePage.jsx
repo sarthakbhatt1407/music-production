@@ -1,277 +1,399 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Tabs, Progress, Tooltip, Avatar, Badge } from "antd";
 import styled from "@emotion/styled";
-import { saveAs } from "file-saver";
+import { motion } from "framer-motion";
 import {
   ContentCopyOutlined,
   DownloadOutlined,
   LinkOutlined,
+  EditOutlined,
+  AccountBalanceOutlined,
+  PersonOutlineOutlined,
+  VerifiedUserOutlined,
+  EmailOutlined,
+  PhoneAndroidOutlined,
+  LocationOnOutlined,
+  PublicOutlined,
+  HomeOutlined,
+  CloudUploadOutlined,
 } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { notification } from "antd";
-import { Button, message, Upload } from "antd";
+import { Button, message, Upload, Divider } from "antd";
 import { Link } from "react-router-dom";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, BankOutlined, CopyOutlined } from "@ant-design/icons";
 
-const MainDiv = styled.div`
+const { TabPane } = Tabs;
+
+const MainDiv = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 1.5rem;
   position: relative;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
-  gap: 0.7rem;
+  overflow-y: auto;
+  gap: 1.5rem;
+  background-color: #f7f9fc;
+
   h1 {
     margin: 0;
     margin-bottom: 1rem;
+    font-weight: 700;
+    color: #333;
+    font-size: 2rem;
   }
+
   @media only screen and (max-width: 1000px) {
-    padding: 0;
+    padding: 1rem;
   }
 `;
 
-const ContentDiv = styled.div`
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
-  padding: 1rem;
-  gap: 2rem;
-  width: 100%;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: 0.5rem;
-  @media only screen and (max-width: 1000px) {
-    grid-template-columns: 1fr;
-    padding: 0;
-    background-color: transparent;
-  }
-`;
-
-const LeftDiv = styled.div`
+const ProfileHeader = styled.div`
   display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  overflow: hidden;
-  border-radius: 0.5rem;
-  gap: 1rem;
-  img {
-    width: 82%;
-    height: 60%;
-    margin: 0 auto;
-    border-radius: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+
+  .header-title {
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    p {
+      color: #666;
+      margin: 0.25rem 0 0 0;
+    }
   }
-  div {
+
+  .completion-indicator {
     display: flex;
-    /* background-color: red; */
-    width: 100%;
+    align-items: center;
+    gap: 1rem;
 
     span {
-      width: 50%;
-      letter-spacing: 0.09rem;
-      text-transform: capitalize;
-      &:first-child {
-        margin-right: 0.8rem;
-      }
-      &:not(:first-child) {
-        margin-left: 0.8rem;
-      }
-      padding: 0.5rem 0.6rem 0.5rem 0.2rem;
-      font-size: 1.2rem;
-      border-bottom: 1px solid #dadada;
-    }
-  }
-  @media only screen and (max-width: 1000px) {
-    padding: 0rem 0rem 0.4rem 0rem;
-    background-color: white;
-    img {
-    }
-    div {
-      padding: 0 0.2rem;
-      span {
-        font-size: 1rem;
-        padding: 0.5rem 0;
-        letter-spacing: 0;
-      }
+      color: #555;
+      font-size: 0.9rem;
     }
   }
 `;
 
-const RightDiv = styled.div`
+const ContentDiv = styled(motion.div)`
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  width: 100%;
+  margin: 0 auto;
+
+  @media only screen and (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ProfileCard = styled(motion.div)`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  gap: 1rem;
+  align-items: center;
+  padding: 2rem;
+  position: relative;
 
-  div {
-    background-color: white;
+  .avatar-container {
+    position: relative;
+    margin-bottom: 1.5rem;
 
-    &:first-child {
-      border-radius: 0.5rem;
-      height: 100%;
-    }
-    padding: 1rem;
-    p {
-      text-transform: capitalize;
-      border-bottom: 1px solid #e7e7ee;
-      font-size: 1.3rem;
-      margin: 0.5rem 0;
-      padding: 0.6rem 0.4rem;
-
-      color: black;
-      font-weight: 500;
-    }
-    div {
+    .edit-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: #1677ff;
+      color: white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
 
-      span {
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.2rem 0;
-        &:not(:first-child) {
-          color: black;
-          font-weight: 500;
-          text-transform: uppercase;
-        }
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #666;
+
+      svg {
+        font-size: 1.2rem;
+        color: #1677ff;
       }
     }
   }
 `;
 
-const BankBtn = styled.button`
-  padding: 0.8rem 2rem;
-  border: none;
-  border-radius: 1rem;
-  background-color: #1677ff;
-  color: white;
-  text-transform: capitalize;
-  /* font-size: 1rem; */
-  font-weight: bold;
-  letter-spacing: 0.09rem;
+const DetailsTabs = styled(Tabs)`
+  .ant-tabs-nav {
+    margin-bottom: 1rem;
+  }
+
+  .ant-tabs-tab {
+    padding: 12px 16px;
+
+    &.ant-tabs-tab-active .ant-tabs-tab-btn {
+      color: #1677ff;
+      font-weight: 600;
+    }
+  }
 `;
-const Modal = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
+
+const DetailSection = styled(motion.div)`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  .section-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      svg {
+        color: #1677ff;
+      }
+    }
+  }
+
+  .section-content {
+    padding: 1.5rem;
+  }
+`;
+
+const InfoRow = styled.div`
+  display: flex;
+  margin-bottom: 1.25rem;
+  align-items: center;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-label {
+    flex: 0 0 35%;
+    font-size: 0.95rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    svg {
+      font-size: 1.1rem;
+      color: #1677ff;
+    }
+  }
+
+  .info-value {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .copy-icon {
+      color: #999;
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #1677ff;
+      }
+    }
+
+    .link-icon,
+    .download-icon {
+      color: #1677ff;
+      cursor: pointer;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+`;
+
+const ActionButton = styled(motion.button)`
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  background: ${(props) => (props.secondary ? "transparent" : "#1677ff")};
+  color: ${(props) => (props.secondary ? "#1677ff" : "white")};
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: ${(props) => (props.secondary ? "1px solid #1677ff" : "none")};
+
+  &:hover {
+    background: ${(props) =>
+      props.secondary ? "rgba(22, 119, 255, 0.1)" : "#0e5edb"};
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const ModalOverlay = styled(motion.div)`
+  position: fixed;
   top: 0;
   left: 0;
-  background-color: #00000038;
-  border-radius: 0.5rem;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-`;
-
-const ModalBox = styled.div`
-  background-color: white;
-  width: 30%;
-  height: fit-content;
-  padding: 2rem 0;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 0.5rem;
-  z-index: 20;
-
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 90%;
-  }
+  z-index: 1000;
 `;
 
-const ModalFormBox = styled.div`
-  background-color: white;
-  width: 90%;
-  height: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
+const ModalContent = styled(motion.div)`
+  background: white;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 500px;
+  overflow: hidden;
 
-const BtnBox = styled.div`
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-    &:last-child {
-      background-color: #bbb9b9;
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
     }
   }
+
+  .modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .modal-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
 `;
 
-const LabelInpBox = styled.div`
+const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  width: 74%;
-  span {
-    color: #ff0000ab;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #666;
+  }
+
+  .error-message {
+    color: #f44336;
     font-size: 0.8rem;
-    margin-left: 0.2rem;
+    margin-top: 0.25rem;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 100%;
-  }
-`;
-const Label = styled.label`
-  font-size: 0.9rem;
-  letter-spacing: 0.06rem;
-  color: #9e9e9e;
-  text-transform: capitalize;
 `;
 
 const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
   outline: none;
-  border: 1px solid #d7d7d7;
+  font-size: 1rem;
+  transition: border 0.2s, box-shadow 0.2s;
 
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
   &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
+    border-color: #1677ff;
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2);
+  }
+
+  &.error {
+    border-color: #f44336;
   }
 `;
 
 const ProfilePage = () => {
   const [api, contextHolderNot] = notification.useNotification({
-    duration: 1.5,
+    duration: 2.5,
   });
+
   const openNotificationWithIcon = (type, msg) => {
     api[type]({
-      message: msg,
+      message: type === "success" ? "Success" : "Error",
+      description: msg,
+      placement: "topRight",
     });
   };
+
   const [messageApi, contextHolder] = message.useMessage();
+
   const success = (msg) => {
     messageApi.open({
       type: "success",
       content: msg,
     });
   };
+
   const error = (msg) => {
     messageApi.open({
       type: "error",
       content: msg,
     });
   };
+
   const profilePicProps = {
     beforeUpload: (file) => {
       let isValid =
@@ -290,8 +412,6 @@ const ProfilePage = () => {
     },
     onChange: (info) => {
       let img;
-      const userPicLabel = document.querySelector("#userPicLabel");
-      userPicLabel.style.color = "#9e9e9e";
       if (info.fileList[0]) {
         img = info.fileList[0].originFileObj;
         setUserProfile({ ...userProfile, userPic: img });
@@ -309,12 +429,64 @@ const ProfilePage = () => {
   const [inpFields, setInpFields] = useState({});
   const [showEditModal, setShowEditModal] = useState(false);
   const [totalEarningUser, setTotalEarningUser] = useState(0);
+  const [activeTab, setActiveTab] = useState("1");
+  const [profileCompletion, setProfileCompletion] = useState(0);
+  const [formErrors, setFormErrors] = useState({});
+
   const [userProfile, setUserProfile] = useState({
     name: "",
     phone: "",
     channelUrl: "",
+    email: "",
     userPic: null,
   });
+
+  const calculateProfileCompletion = (user) => {
+    if (!user) return 0;
+
+    let completedFields = 0;
+    let totalFields = 0;
+
+    // Personal info
+    const personalFields = ["name", "email", "phone", "channelUrl", "userPic"];
+    personalFields.forEach((field) => {
+      totalFields++;
+      if (user[field] && user[field].length > 0) completedFields++;
+    });
+
+    // Address
+    const addressFields = ["address", "city", "state", "country", "pincode"];
+    addressFields.forEach((field) => {
+      totalFields++;
+      if (user[field] && user[field].length > 0) completedFields++;
+    });
+
+    // Bank details
+    const bankFields = ["accountNo", "ifsc", "bankName", "upi"];
+    bankFields.forEach((field) => {
+      totalFields++;
+      if (
+        user.bankDetails &&
+        user.bankDetails[0] &&
+        user.bankDetails[0][field] &&
+        user.bankDetails[0][field].length > 0
+      )
+        completedFields++;
+    });
+
+    // Documents
+    if (user.docs) {
+      totalFields++;
+      completedFields++;
+    }
+
+    if (user.sign) {
+      totalFields++;
+      completedFields++;
+    }
+
+    return Math.round((completedFields / totalFields) * 100);
+  };
 
   const totalPaymentReporter = (report) => {
     let totalPayment = 0;
@@ -330,152 +502,295 @@ const ProfilePage = () => {
 
   const fecher = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+      );
+      const data = await res.json();
 
-    if (res.ok) {
-      setUserdata(data.user);
-      setUserProfile({
-        name: data.user.name,
-        phone: data.user.phone,
-        channelUrl: data.user.channelUrl,
-        userPic: null,
-      });
-      totalPaymentReporter(data.user.finacialReport[0]);
-      setInpFields(data.user.bankDetails[0]);
+      if (res.ok) {
+        setUserdata(data.user);
+        setUserProfile({
+          name: data.user.name,
+          phone: data.user.phone,
+          channelUrl: data.user.channelUrl,
+          email: data.user.email,
+          userPic: null,
+        });
+        totalPaymentReporter(data.user.finacialReport[0]);
+        setInpFields(data.user.bankDetails[0]);
+        setProfileCompletion(calculateProfileCompletion(data.user));
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      error("Failed to load profile data. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
+
   useEffect(() => {
     fecher();
-
-    return () => {};
+    // eslint-disable-next-line
   }, [refresher]);
 
   const onChangeHandler = (e) => {
     const id = e.target.id;
     const val = e.target.value;
-    const ele = document.querySelector(`#${id}`);
 
-    ele.style.border = "1px solid #d7d7d7";
+    // Clear error when user types
+    setFormErrors({
+      ...formErrors,
+      [id]: null,
+    });
+
     setInpFields({ ...inpFields, [id]: val.trim() });
   };
+
   const userProfileChangerHandler = (e) => {
     const id = e.target.id;
     const val = e.target.value;
-    const ele = document.querySelector(`#${id}`);
 
-    ele.style.border = "1px solid #d7d7d7";
+    // Clear error when user types
+    setFormErrors({
+      ...formErrors,
+      [id]: null,
+    });
+
     setUserProfile({ ...userProfile, [id]: val.trim() });
   };
 
+  const validateBankForm = () => {
+    const errors = {};
+
+    if (!inpFields.accountNo || inpFields.accountNo.length < 10) {
+      errors.accountNo = "Account number must be at least 10 characters";
+    }
+
+    if (!inpFields.ifsc || inpFields.ifsc.length === 0) {
+      errors.ifsc = "IFSC code is required";
+    }
+
+    if (!inpFields.bankName || inpFields.bankName.length === 0) {
+      errors.bankName = "Bank name is required";
+    }
+
+    if (!inpFields.upi || inpFields.upi.length === 0) {
+      errors.upi = "UPI ID is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateProfileForm = () => {
+    const errors = {};
+
+    if (!userProfile.name || userProfile.name.length < 3) {
+      errors.name = "Name must be at least 3 characters";
+    }
+
+    if (!userProfile.phone || userProfile.phone.toString().length !== 10) {
+      errors.phone = "Phone number must be 10 digits";
+    }
+
+    if (!userProfile.channelUrl || userProfile.channelUrl.length < 10) {
+      errors.channelUrl = "Channel URL must be at least 10 characters";
+    }
+
+    const emailRegex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!userProfile.email || !emailRegex.test(userProfile.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const onSubmitHandler = async () => {
-    if (
-      inpFields.accountNo.length < 10 ||
-      inpFields.ifsc.length === 0 ||
-      inpFields.bankName.length === 0 ||
-      inpFields.upi.length === 0
-    ) {
-      if (inpFields.accountNo.length < 10) {
-        const accountNo = document.querySelector("#accountNo");
-        accountNo.style.border = "1px solid red";
-      }
-      if (inpFields.ifsc.length === 0) {
-        const ifsc = document.querySelector("#ifsc");
-        ifsc.style.border = "1px solid red";
-      }
-      if (inpFields.bankName.length === 0) {
-        const bankName = document.querySelector("#bankName");
-        bankName.style.border = "1px solid red";
-      }
-      if (inpFields.upi.length === 0) {
-        const upi = document.querySelector("#upi");
-        upi.style.border = "1px solid red";
-      }
-      openNotificationWithIcon("error", "Fill all require fields.");
-      return;
-    }
+    if (!validateBankForm()) return;
+
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/user-bank-detail`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...inpFields,
-          userId: userId,
-        }),
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/user-bank-detail`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...inpFields,
+            userId: userId,
+          }),
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+        setShowModal(false);
+        setRefresher(refresher + 1);
+      } else {
+        openNotificationWithIcon("error", data.message);
       }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      openNotificationWithIcon("success", data.message);
+    } catch (err) {
+      console.error("Error updating bank details:", err);
+      openNotificationWithIcon(
+        "error",
+        "Failed to update bank details. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
-    if (!res.ok) {
-      openNotificationWithIcon("error", data.message);
+  };
+
+  const onProfileSubmitHandler = async () => {
+    if (!validateProfileForm()) return;
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("name", userProfile.name);
+      formData.append("phone", userProfile.phone);
+      formData.append("email", userProfile.email);
+      formData.append("channelUrl", userProfile.channelUrl);
+      if (userProfile.userPic) {
+        formData.append("userPic", userProfile.userPic);
+      }
+      formData.append("userId", userId);
+
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/edit-profile`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const resData = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", resData.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        openNotificationWithIcon("error", resData.message);
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      openNotificationWithIcon(
+        "error",
+        "Failed to update profile. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
-    setShowModal(false);
-    setRefresher(refresher + 1);
-    setIsLoading(false);
   };
 
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
-      openNotificationWithIcon("success", "Copied to clipboard");
+      success("Copied to clipboard");
     } catch (err) {
       console.error("Failed to copy: ", err);
+      error("Failed to copy to clipboard");
     }
+  };
+
+  const getProgressColor = (percent) => {
+    if (percent < 40) return "#f5222d";
+    if (percent < 70) return "#faad14";
+    return "#52c41a";
   };
 
   return (
     <>
-      {" "}
       {isLoading && <MusicLoader />}
+      {contextHolderNot}
+      {contextHolder}
+
+      {/* Edit Profile Modal */}
       {showEditModal && (
-        <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="name">Label Name</Label>
+        <ModalOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <ModalContent
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ type: "spring", damping: 20 }}
+          >
+            <div className="modal-header">
+              <h2>Edit Profile</h2>
+            </div>
+            <div className="modal-body">
+              <FormGroup>
+                <label htmlFor="name">Label Name</label>
                 <Input
                   type="text"
                   id="name"
                   onChange={userProfileChangerHandler}
                   value={userProfile.name}
-                  placeholder="Label Name"
+                  placeholder="Enter label name"
+                  className={formErrors.name ? "error" : ""}
                 />
-              </LabelInpBox>
-              <LabelInpBox>
-                <Label htmlFor="phone">Contact Number</Label>
+                {formErrors.name && (
+                  <div className="error-message">{formErrors.name}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="phone">Contact Number</label>
                 <Input
                   type="number"
                   id="phone"
                   onChange={userProfileChangerHandler}
                   value={userProfile.phone}
-                  placeholder="phone"
+                  placeholder="Enter phone number"
+                  className={formErrors.phone ? "error" : ""}
                 />
-              </LabelInpBox>
+                {formErrors.phone && (
+                  <div className="error-message">{formErrors.phone}</div>
+                )}
+              </FormGroup>
 
-              <LabelInpBox>
-                <Label htmlFor="channelUrl">channel Url</Label>
+              <FormGroup>
+                <label htmlFor="email">Email</label>
+                <Input
+                  type="email"
+                  id="email"
+                  onChange={userProfileChangerHandler}
+                  value={userProfile.email}
+                  placeholder="Enter email address"
+                  className={formErrors.email ? "error" : ""}
+                />
+                {formErrors.email && (
+                  <div className="error-message">{formErrors.email}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="channelUrl">Channel URL</label>
                 <Input
                   type="text"
                   id="channelUrl"
                   onChange={userProfileChangerHandler}
                   value={userProfile.channelUrl}
-                  placeholder="Url"
+                  placeholder="Enter channel URL"
+                  className={formErrors.channelUrl ? "error" : ""}
                 />
-              </LabelInpBox>
-              <LabelInpBox>
-                {" "}
-                <Label id="userPicLabel" htmlFor="">
-                  Channel Logo (Max. size 2MB)
-                </Label>
+                {formErrors.channelUrl && (
+                  <div className="error-message">{formErrors.channelUrl}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label>Channel Logo (Max. size 2MB)</label>
                 <Upload
                   method="get"
                   listType="picture"
@@ -484,391 +799,540 @@ const ProfilePage = () => {
                 >
                   <Button icon={<UploadOutlined />}>Upload Channel Logo</Button>
                 </Upload>
-              </LabelInpBox>
-
-              <BtnBox>
-                <button
-                  onClick={async () => {
-                    if (
-                      userProfile.name.length < 3 ||
-                      userProfile.phone.toString().length < 10 ||
-                      userProfile.phone.toString().length > 10 ||
-                      userProfile.channelUrl.length < 10 ||
-                      userProfile.userPic === null
-                    ) {
-                      if (userProfile.name.length < 3) {
-                        const name = document.querySelector("#name");
-                        name.style.border = "1px solid red";
-                      }
-
-                      if (
-                        userProfile.phone.toString().length < 10 ||
-                        userProfile.phone.toString().length > 10
-                      ) {
-                        const phone = document.querySelector("#phone");
-                        phone.style.border = "1px solid red";
-                      }
-                      if (userProfile.channelUrl.length < 10) {
-                        const channelUrl =
-                          document.querySelector("#channelUrl");
-                        channelUrl.style.border = "1px solid red";
-                      }
-                      if (userProfile.userPic === null) {
-                        const userPicLabel =
-                          document.querySelector("#userPicLabel");
-                        userPicLabel.style.color = "red";
-                      }
-
-                      openNotificationWithIcon(
-                        "error",
-                        "Fill all require fields."
-                      );
-                      return;
-                    }
-                    setIsLoading(true);
-                    const formData = new FormData();
-                    formData.append("name", userProfile.name);
-                    formData.append("phone", userProfile.phone);
-                    formData.append("channelUrl", userProfile.channelUrl);
-                    formData.append("userPic", userProfile.userPic);
-                    formData.append("userId", userId);
-
-                    const res = await fetch(
-                      `${process.env.REACT_APP_BASE_URL}/user/edit-profile`,
-                      {
-                        method: "POST",
-                        body: formData,
-                      }
-                    );
-
-                    const resData = await res.json();
-                    console.log(resData);
-
-                    if (res.ok) {
-                      openNotificationWithIcon("success", resData.message);
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 1000);
-                    } else {
-                      openNotificationWithIcon("error", resData.message);
-                    }
-                    setIsLoading(false);
-                  }}
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
+              </FormGroup>
+            </div>
+            <div className="modal-footer">
+              <ActionButton
+                secondary
+                onClick={() => setShowEditModal(false)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Cancel
+              </ActionButton>
+              <ActionButton
+                onClick={onProfileSubmitHandler}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <CloudUploadOutlined style={{ fontSize: "1.2rem" }} />
+                Save Changes
+              </ActionButton>
+            </div>
+          </ModalContent>
+        </ModalOverlay>
       )}
+
+      {/* Bank Details Modal */}
       {showModal && (
-        <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="accountNo">Account Number</Label>
+        <ModalOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <ModalContent
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ type: "spring", damping: 20 }}
+          >
+            <div className="modal-header">
+              <h2>Bank Account Details</h2>
+            </div>
+            <div className="modal-body">
+              <FormGroup>
+                <label htmlFor="accountNo">Account Number</label>
                 <Input
                   type="number"
                   id="accountNo"
                   onChange={onChangeHandler}
                   value={inpFields.accountNo}
+                  placeholder="Enter account number"
+                  className={formErrors.accountNo ? "error" : ""}
                 />
-              </LabelInpBox>
-              <LabelInpBox>
-                <Label htmlFor="ifsc">IFSC</Label>
+                {formErrors.accountNo && (
+                  <div className="error-message">{formErrors.accountNo}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="ifsc">IFSC Code</label>
                 <Input
                   type="text"
                   id="ifsc"
                   onChange={onChangeHandler}
                   value={inpFields.ifsc}
+                  placeholder="Enter IFSC code"
+                  className={formErrors.ifsc ? "error" : ""}
                 />
-              </LabelInpBox>
-              <LabelInpBox>
-                <Label htmlFor="bankName">Bank Name</Label>
+                {formErrors.ifsc && (
+                  <div className="error-message">{formErrors.ifsc}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="bankName">Bank Name</label>
                 <Input
                   type="text"
                   id="bankName"
                   onChange={onChangeHandler}
                   value={inpFields.bankName}
+                  placeholder="Enter bank name"
+                  className={formErrors.bankName ? "error" : ""}
                 />
-              </LabelInpBox>
-              <LabelInpBox>
-                <Label htmlFor="upi">UPI id</Label>
+                {formErrors.bankName && (
+                  <div className="error-message">{formErrors.bankName}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="upi">UPI ID</label>
                 <Input
                   type="text"
                   id="upi"
                   onChange={onChangeHandler}
                   value={inpFields.upi}
+                  placeholder="Enter UPI ID"
+                  className={formErrors.upi ? "error" : ""}
                 />
-              </LabelInpBox>
-              <BtnBox>
-                <button onClick={onSubmitHandler}>Submit</button>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
+                {formErrors.upi && (
+                  <div className="error-message">{formErrors.upi}</div>
+                )}
+              </FormGroup>
+            </div>
+            <div className="modal-footer">
+              <ActionButton
+                secondary
+                onClick={() => setShowModal(false)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Cancel
+              </ActionButton>
+              <ActionButton
+                onClick={onSubmitHandler}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <BankOutlined style={{ fontSize: "1.2rem" }} />
+                Save Bank Details
+              </ActionButton>
+            </div>
+          </ModalContent>
+        </ModalOverlay>
       )}
-      <MainDiv>
-        {" "}
-        {contextHolderNot}
-        {contextHolder}
+
+      <MainDiv
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <Breadcrumb
           items={[
             {
-              title: "User Panel",
+              title: (
+                <Link to="/">
+                  <HomeOutlined />
+                </Link>
+              ),
             },
-            {
-              title: "Profile",
-            },
+            { title: "User Panel" },
+            { title: "Profile" },
           ]}
+          style={{ marginBottom: "1rem" }}
         />
-        <h1>My Account</h1>
+
+        <ProfileHeader>
+          <div className="header-title">
+            <h1>My Account</h1>
+            <p>Manage your personal information and payment details</p>
+          </div>
+
+          {/* <div className="completion-indicator">
+            <span>Profile Completion</span>
+            <Progress
+              type="circle"
+              percent={profileCompletion}
+              width={50}
+              strokeColor={getProgressColor(profileCompletion)}
+            />
+          </div> */}
+        </ProfileHeader>
+
         {userData && (
-          <ContentDiv>
-            <LeftDiv>
-              <img
-                // src={`${process.env.REACT_APP_BASE_URL}/${userData.userPic}`}
-                src={
-                  userData.userPic.includes("cloudinary")
-                    ? `${userData.userPic}`
-                    : `${process.env.REACT_APP_BASE_URL}/${userData.userPic}`
-                }
-                alt=""
-              />
-              <div>
-                <span>{userData.name}</span>
-                <span>+91-{userData.phone}</span>
-              </div>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-              >
-                <span
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem 2rem 0.5rem 0.2rem",
-                    margin: "0 0 0 0",
-                    textTransform: "none",
-                  }}
+          <ContentDiv
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
+            <ProfileCard
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+            >
+              <div className="avatar-container">
+                <Badge
+                  count={
+                    <div
+                      className="edit-overlay"
+                      onClick={() => setShowEditModal(true)}
+                    >
+                      <EditOutlined />
+                    </div>
+                  }
+                  offset={[-5, 5]}
                 >
-                  {userData.email}
-                </span>
+                  <Avatar
+                    size={120}
+                    src={
+                      userData.userPic.includes("cloudinary")
+                        ? `${userData.userPic}`
+                        : `${process.env.REACT_APP_BASE_URL}/${userData.userPic}`
+                    }
+                  />
+                </Badge>
               </div>
-              <BankBtn
-                onClick={() => {
-                  setShowEditModal(true);
-                }}
-                style={{ width: "fit-content" }}
-              >
-                Edit Profile
-              </BankBtn>
-            </LeftDiv>
-            <RightDiv>
-              <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-                <p>Details</p>
-                <div>
-                  <span>Label Name</span>
-                  <span>{userData.name}</span>
-                </div>
-                <div>
-                  <span>Email</span>
-                  <span style={{ textTransform: "none" }}>
-                    {userData.email}
-                  </span>
-                </div>
-                <div>
-                  <span>Phone</span>
+
+              <h2 className="profile-name">{userData.name}</h2>
+
+              <div className="profile-contact">
+                <div className="contact-item">
+                  <PhoneAndroidOutlined />
                   <span>+91-{userData.phone}</span>
                 </div>
-                <div>
-                  <span>Channel URL</span>
-                  <span>
-                    <Link to={`${userData.channelUrl}`} target="_blank">
-                      <LinkOutlined />
-                    </Link>
-                  </span>
+                <div className="contact-item">
+                  <EmailOutlined />
+                  <span>{userData.email}</span>
                 </div>
-                <div
-                  style={{
-                    padding: ".5rem 0 .5rem 1rem",
-                  }}
-                >
-                  <span>Address</span>
-                  <span
-                    style={{
-                      fontSize: ".9rem",
-                      width: "fit-content",
-                      maxWidth: "70%",
-                    }}
-                  >
-                    {userData.address &&
-                      userData.address.length > 0 &&
-                      userData.address + ","}
-                    {userData.city}
-                  </span>
-                </div>
-                {userData.pincode && (
-                  <div>
-                    <span>Pincode</span>
-                    <span>{userData.pincode}</span>
-                  </div>
-                )}
+              </div>
 
-                <div>
-                  <span>State</span>
-                  <span>{userData.state}</span>
-                </div>
-                <div>
-                  <span>Country</span>
-                  <span>{userData.country}</span>
-                </div>
-                {userData.docs && (
-                  <div>
-                    <span>Agreement</span>
-                    <span>
-                      <Link
-                        to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.docs}`}
-                        target="_blank"
-                      >
-                        <DownloadOutlined style={{ transform: "scale(1.5)" }} />
-                      </Link>
-                    </span>
-                  </div>
-                )}
-                <div>
-                  <span>Signature</span>
+              <ActionButton
+                onClick={() => setShowEditModal(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <EditOutlined />
+                Edit Profile
+              </ActionButton>
+            </ProfileCard>
+
+            <DetailsTabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              tabPosition="top"
+            >
+              <TabPane
+                tab={
                   <span>
-                    <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.sign}`}
-                      target="_blank"
-                    >
-                      <DownloadOutlined style={{ transform: "scale(1.2)" }} />
-                    </Link>
+                    <PersonOutlineOutlined style={{ marginRight: 8 }} />
+                    Personal Details
                   </span>
-                </div>
-              </div>
-            </RightDiv>
-            <RightDiv>
-              <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-                <p>Bank</p>
-                <div>
-                  <span>Account No.</span>
-                  <span>
-                    {userData.bankDetails[0].accountNo.length === 0
-                      ? "-"
-                      : userData.bankDetails[0].accountNo}
-                    {userData.bankDetails[0].accountNo.length !== 0 && (
-                      <ContentCopyOutlined
-                        style={{ cursor: "pointer", transform: "scale(.8)" }}
-                        onClick={copyToClipBoard.bind(
-                          this,
-                          userData.bankDetails[0].accountNo
-                        )}
-                      />
-                    )}
-                  </span>
-                </div>
-                <div>
-                  <span>IFSC</span>
-                  <span>
-                    {userData.bankDetails[0].ifsc.length !== 0
-                      ? userData.bankDetails[0].ifsc
-                      : "-"}
-                    {userData.bankDetails[0].ifsc.length !== 0 && (
-                      <ContentCopyOutlined
-                        style={{ cursor: "pointer", transform: "scale(.8)" }}
-                        onClick={copyToClipBoard.bind(
-                          this,
-                          userData.bankDetails[0].ifsc
-                        )}
-                      />
-                    )}
-                  </span>
-                </div>
-                <div>
-                  <span>Bank Name</span>
-                  <span>
-                    {userData.bankDetails[0].bankName.length !== 0
-                      ? userData.bankDetails[0].bankName
-                      : "-"}
-                  </span>
-                </div>
-                <div>
-                  <span>UPI</span>
-                  <span style={{ textTransform: "none" }}>
-                    {userData.bankDetails[0].upi.length !== 0
-                      ? userData.bankDetails[0].upi
-                      : "-"}
-                    {userData.bankDetails[0].upi > 0 && (
-                      <ContentCopyOutlined
-                        style={{ cursor: "pointer", transform: "scale(.8)" }}
-                        onClick={copyToClipBoard.bind(
-                          this,
-                          userData.bankDetails[0].upi
-                        )}
-                      />
-                    )}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
+                }
+                key="1"
+              >
+                <DetailSection
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
                 >
-                  {userData.bankDetails[0].accountNo.length === 0 && (
-                    <BankBtn
-                      onClick={() => {
-                        setShowModal(true);
-                      }}
-                    >
-                      Add
-                    </BankBtn>
-                  )}
-                  {userData.bankDetails[0].accountNo.length > 0 && (
-                    <BankBtn
-                      onClick={() => {
-                        setShowModal(true);
-                      }}
-                    >
-                      Edit
-                    </BankBtn>
-                  )}
-                </div>
-              </div>
-              <div style={{ boxShadow: " 0.2rem 0.2rem 1rem #d8d8d8" }}>
-                <p>Wallet</p>
-                <div>
-                  <span>Total Earnings</span>
-                  <span> ₹ {totalEarningUser}</span>
-                </div>
-                <div>
-                  <span>Paid</span>
-                  <span> ₹ {userData.paidEarning}</span>
-                </div>
-                <div>
-                  <span>Remaining</span>
+                  <div className="section-header">
+                    <h3>
+                      <PersonOutlineOutlined />
+                      Personal Information
+                    </h3>
+                  </div>
+
+                  <div className="section-content">
+                    <InfoRow>
+                      <div className="info-label">
+                        <PersonOutlineOutlined />
+                        Label Name
+                      </div>
+                      <div className="info-value">{userData.name}</div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <EmailOutlined />
+                        Email
+                      </div>
+                      <div className="info-value">{userData.email}</div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <PhoneAndroidOutlined />
+                        Phone
+                      </div>
+                      <div className="info-value">+91-{userData.phone}</div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <LinkOutlined />
+                        Channel URL
+                      </div>
+                      <div className="info-value">
+                        <Tooltip title="Open channel URL">
+                          <Link
+                            to={`${userData.channelUrl}`}
+                            target="_blank"
+                            className="link-icon"
+                          >
+                            <LinkOutlined />
+                          </Link>
+                        </Tooltip>
+                      </div>
+                    </InfoRow>
+                  </div>
+                </DetailSection>
+
+                <Divider style={{ margin: "1.5rem 0" }} />
+
+                <DetailSection
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.3 }}
+                >
+                  <div className="section-header">
+                    <h3>
+                      <LocationOnOutlined />
+                      Address Details
+                    </h3>
+                  </div>
+
+                  <div className="section-content">
+                    <InfoRow>
+                      <div className="info-label">
+                        <LocationOnOutlined />
+                        Address
+                      </div>
+                      <div className="info-value">
+                        {userData.address && userData.address.length > 0
+                          ? `${userData.address}, ${userData.city}`
+                          : userData.city}
+                      </div>
+                    </InfoRow>
+
+                    {userData.pincode && (
+                      <InfoRow>
+                        <div className="info-label">
+                          <LocationOnOutlined />
+                          Pincode
+                        </div>
+                        <div className="info-value">{userData.pincode}</div>
+                      </InfoRow>
+                    )}
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <LocationOnOutlined />
+                        State
+                      </div>
+                      <div className="info-value">{userData.state}</div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <PublicOutlined />
+                        Country
+                      </div>
+                      <div className="info-value">{userData.country}</div>
+                    </InfoRow>
+                  </div>
+                </DetailSection>
+              </TabPane>
+
+              <TabPane
+                tab={
                   <span>
-                    {" "}
-                    ₹ {Number(totalEarningUser) - Number(userData.paidEarning)}
+                    <AccountBalanceOutlined style={{ marginRight: 8 }} />
+                    Bank Details
                   </span>
-                </div>
-              </div>
-            </RightDiv>
+                }
+                key="2"
+              >
+                <DetailSection
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
+                >
+                  <div className="section-header">
+                    <h3>
+                      <AccountBalanceOutlined />
+                      Bank Account Information
+                    </h3>
+
+                    {userData.bankDetails[0].accountNo.length === 0 ? (
+                      <ActionButton
+                        onClick={() => setShowModal(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <BankOutlined />
+                        Add Bank Details
+                      </ActionButton>
+                    ) : (
+                      <ActionButton
+                        onClick={() => setShowModal(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <EditOutlined />
+                        Edit Bank Details
+                      </ActionButton>
+                    )}
+                  </div>
+
+                  <div className="section-content">
+                    <InfoRow>
+                      <div className="info-label">
+                        <AccountBalanceOutlined />
+                        Account Number
+                      </div>
+                      <div className="info-value">
+                        {userData.bankDetails[0].accountNo.length === 0
+                          ? "Not provided"
+                          : userData.bankDetails[0].accountNo}
+                        {userData.bankDetails[0].accountNo.length !== 0 && (
+                          <Tooltip title="Copy to clipboard">
+                            <CopyOutlined
+                              className="copy-icon"
+                              onClick={() =>
+                                copyToClipBoard(
+                                  userData.bankDetails[0].accountNo
+                                )
+                              }
+                            />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <AccountBalanceOutlined />
+                        IFSC Code
+                      </div>
+                      <div className="info-value">
+                        {userData.bankDetails[0].ifsc.length === 0
+                          ? "Not provided"
+                          : userData.bankDetails[0].ifsc}
+                        {userData.bankDetails[0].ifsc.length !== 0 && (
+                          <Tooltip title="Copy to clipboard">
+                            <CopyOutlined
+                              className="copy-icon"
+                              onClick={() =>
+                                copyToClipBoard(userData.bankDetails[0].ifsc)
+                              }
+                            />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <AccountBalanceOutlined />
+                        Bank Name
+                      </div>
+                      <div className="info-value">
+                        {userData.bankDetails[0].bankName.length === 0
+                          ? "Not provided"
+                          : userData.bankDetails[0].bankName}
+                      </div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <AccountBalanceOutlined />
+                        UPI ID
+                      </div>
+                      <div className="info-value">
+                        {userData.bankDetails[0].upi.length === 0
+                          ? "Not provided"
+                          : userData.bankDetails[0].upi}
+                        {userData.bankDetails[0].upi.length !== 0 && (
+                          <Tooltip title="Copy to clipboard">
+                            <CopyOutlined
+                              className="copy-icon"
+                              onClick={() =>
+                                copyToClipBoard(userData.bankDetails[0].upi)
+                              }
+                            />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </InfoRow>
+                  </div>
+                </DetailSection>
+              </TabPane>
+
+              <TabPane
+                tab={
+                  <span>
+                    <VerifiedUserOutlined style={{ marginRight: 8 }} />
+                    Documents
+                  </span>
+                }
+                key="3"
+              >
+                <DetailSection
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
+                >
+                  <div className="section-header">
+                    <h3>
+                      <VerifiedUserOutlined />
+                      Legal Documents
+                    </h3>
+                  </div>
+
+                  <div className="section-content">
+                    {userData.docs && (
+                      <InfoRow>
+                        <div className="info-label">
+                          <VerifiedUserOutlined />
+                          Agreement
+                        </div>
+                        <div className="info-value">
+                          <Tooltip title="Download document">
+                            <Link
+                              to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.docs}`}
+                              target="_blank"
+                              className="download-icon"
+                            >
+                              <DownloadOutlined
+                                style={{ fontSize: "1.5rem" }}
+                              />
+                            </Link>
+                          </Tooltip>
+                        </div>
+                      </InfoRow>
+                    )}
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <VerifiedUserOutlined />
+                        Signature
+                      </div>
+                      <div className="info-value">
+                        <Tooltip title="Download signature">
+                          <Link
+                            to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${userData.sign}`}
+                            target="_blank"
+                            className="download-icon"
+                          >
+                            <DownloadOutlined style={{ fontSize: "1.5rem" }} />
+                          </Link>
+                        </Tooltip>
+                      </div>
+                    </InfoRow>
+                  </div>
+                </DetailSection>
+              </TabPane>
+            </DetailsTabs>
           </ContentDiv>
         )}
       </MainDiv>

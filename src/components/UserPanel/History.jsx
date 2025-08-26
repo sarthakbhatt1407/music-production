@@ -1,181 +1,250 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import {
   EyeOutlined,
   ClockCircleOutlined,
-  CheckCircleTwoTone,
+  CheckCircleOutlined,
   EditOutlined,
   CloseOutlined,
+  HomeOutlined,
+  HistoryOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import MusicLoader from "../Loader/MusicLoader";
-import { Breadcrumb } from "antd";
+import {
+  Breadcrumb,
+  Empty,
+  Input,
+  Card,
+  Tag,
+  Space,
+  Avatar,
+  Badge,
+  Typography,
+} from "antd";
 import { Link } from "react-router-dom";
-import { Empty } from "antd";
 import { useSelector } from "react-redux";
 import UserOrdersStatus from "../UserOrdersStatus";
-const MainBox = styled.div`
+
+const { Title, Text } = Typography;
+
+const MainContainer = styled.div`
   width: 100%;
   height: 100%;
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 1rem;
+  background-color: #f7f9fc;
+  border-radius: 12px;
+  padding: 1.5rem;
   position: relative;
+  overflow-y: auto;
+
   a {
-    color: black;
+    color: inherit;
     text-decoration: none;
   }
-`;
 
-const TableBox = styled.div`
-  height: 71svh;
-  overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    display: none;
+  @media (max-width: 768px) {
+    padding: 1rem;
   }
 `;
 
-const Table = styled.table`
+const PageHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+`;
+
+const HeaderTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const SearchContainer = styled.div`
+  width: 300px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const TableContainer = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+
+  .ant-card-body {
+    padding: 0;
+  }
+
+  @media (max-width: 1000px) {
+    display: none;
+  }
+`;
+
+const StyledTable = styled.table`
   width: 100%;
+  border-collapse: collapse;
 `;
 
 const TableHead = styled.thead`
   tr {
-    background-color: #f4f4fb;
+    background-color: #f4f6f9;
 
     td {
       text-align: center;
-      padding: 0.4rem 0rem;
-      color: #acaec1;
-      font-size: 0.7rem;
+      padding: 1rem 0.5rem;
+      color: #6c757d;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.05rem;
-      font-weight: bold;
+      font-weight: 600;
     }
   }
 `;
+
 const TableBody = styled.tbody`
   tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f8fafc !important;
+    }
+
     td {
-      color: #000000de;
+      color: #3c4858;
       text-transform: capitalize;
       text-align: center;
-      padding: 1rem 0;
+      padding: 1rem 0.5rem;
       font-weight: 500;
-      font-size: 1rem;
+      font-size: 0.9rem;
 
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
-        gap: 0.4rem;
-        width: fit-content;
-        margin: 0 auto;
-        /* text-transform: uppercase; */
-        font-size: 0.8rem;
-        font-weight: bold;
-      }
-      span {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 0.7rem;
-        img {
-          width: 4rem;
-        }
+      img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
     }
   }
 `;
-const HeaderBox = styled.div`
+
+const StatusTag = styled(Tag)`
   display: flex;
-  justify-content: space-between;
-  padding-right: 1rem;
   align-items: center;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    flex-direction: column;
-    justify-content: start;
-    padding: 0;
-    align-items: start;
-    margin-bottom: 1rem;
-    input {
-      width: 100%;
-    }
-  }
-`;
-const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-  width: 30%;
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
-  }
+  justify-content: center;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  gap: 0.4rem;
+  width: fit-content;
+  margin: 0 auto;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: none;
 `;
 
-const MobileBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  height: 70svh;
-  overflow-y: scroll;
-  padding-bottom: 2rem;
-  @media only screen and (min-width: 1001px) and (max-width: 5000px) {
+const MobileContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+
+  @media (min-width: 1001px) {
     display: none;
   }
 `;
 
-const MobileOrderBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0.2rem 0.2rem 0.6rem #e7e7ee;
-  border-radius: 0.5rem;
-  padding: 1rem 0;
-  img {
-    width: 70%;
-    margin: 0 auto;
-    margin-bottom: 0.5rem;
+const AlbumCard = styled(Card)`
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .ant-card-cover {
+    height: 180px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  &:hover .ant-card-cover img {
+    transform: scale(1.05);
+  }
+
+  .ant-card-body {
+    padding: 1rem;
   }
 `;
-const TextBox = styled.div`
+
+const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const CardItem = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 0.3rem 0.8rem;
-  text-align: justify;
-  &:nth-child(2n) {
-    background-color: #fafafc;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
   }
-  width: 100%;
+`;
+
+const ItemLabel = styled(Text)`
+  color: #6c757d;
+  font-weight: 500;
+`;
+
+const ItemValue = styled(Text)`
+  color: #3c4858;
+  font-weight: 500;
   text-transform: capitalize;
-  span {
-    &:first-child {
-      color: black;
-      font-weight: 500;
-    }
+`;
+
+const ViewButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1677ff;
+  border: 1px solid #1677ff;
+  border-radius: 20px;
+  padding: 0.3rem 0.6rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #1677ff;
+    color: white;
   }
 `;
 
 const History = () => {
   const userId = useSelector((state) => state.userId);
-
   const [orders, setOrders] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState(null);
   const [isLoading, setIsloading] = useState(true);
   let sNo = 0;
+
   const fetcher = async () => {
     setIsloading(true);
     const res = await fetch(
@@ -208,49 +277,109 @@ const History = () => {
     setFilteredOrders(arr);
   };
 
+  const renderStatus = (status) => {
+    switch (status) {
+      case "waiting":
+        return (
+          <StatusTag color="#FFF2D7" style={{ color: "#FFBC21" }}>
+            <ClockCircleOutlined /> Waiting for approval
+          </StatusTag>
+        );
+      case "processing":
+        return (
+          <StatusTag color="#D8F2FF" style={{ color: "#42C3FF" }}>
+            <EditOutlined /> Processing
+          </StatusTag>
+        );
+      case "completed":
+        return (
+          <StatusTag color="#D9EDDB" style={{ color: "#59BB5A" }}>
+            <CheckCircleOutlined style={{ color: "#59BB5A" }} /> Live
+          </StatusTag>
+        );
+      case "rejected":
+        return (
+          <StatusTag color="#FFE6E6" style={{ color: "#FF4D4F" }}>
+            <CloseOutlined /> Rejected
+          </StatusTag>
+        );
+      case "takedown":
+        return (
+          <StatusTag color="#FFE6E6" style={{ color: "#FF4D4F" }}>
+            <CloseOutlined /> Removed
+          </StatusTag>
+        );
+      default:
+        return <StatusTag>{status}</StatusTag>;
+    }
+  };
+
   return (
-    <MainBox>
+    <MainContainer>
       <Breadcrumb
         items={[
           {
-            title: "User Panel",
+            title: (
+              <Link to="/">
+                <HomeOutlined />
+              </Link>
+            ),
           },
-          {
-            title: "History",
-          },
+          { title: "User Panel" },
+          { title: "History" },
         ]}
+        style={{ marginBottom: "1rem" }}
       />
-      <HeaderBox>
-        <h1>Order History</h1>
-        <Input
-          type="text"
-          placeholder="search album"
-          onChange={onCHangeHandler}
-        />
-      </HeaderBox>{" "}
+
+      <PageHeader>
+        <HeaderTitle>
+          <Title level={4} style={{ margin: 0 }}>
+            <HistoryOutlined /> Order History
+          </Title>
+          {filteredOrders && (
+            <Badge
+              count={filteredOrders.filter((o) => !o.deleted).length}
+              style={{ backgroundColor: "#1677ff" }}
+            />
+          )}
+        </HeaderTitle>
+
+        <SearchContainer>
+          <Input
+            placeholder="Search by album title"
+            prefix={<SearchOutlined />}
+            onChange={onCHangeHandler}
+            allowClear
+          />
+        </SearchContainer>
+      </PageHeader>
+
       {isLoading && <MusicLoader />}
-      <TableBox>
+
+      <TableContainer>
         {orders && (
-          <Table cellSpacing={0}>
+          <StyledTable cellSpacing={0}>
             <TableHead>
               <tr>
-                <td></td>
+                <td>#</td>
                 <td>Thumbnail</td>
                 <td>Album</td>
-                <td>label Name</td>
+                <td>Label</td>
                 <td>Album Type</td>
                 <td>Language</td>
                 <td>Created</td>
-                <td>Date Of release</td>
+                <td>Release Date</td>
                 <td>Status</td>
                 <td>View</td>
               </tr>
-            </TableHead>{" "}
+            </TableHead>
+
             <TableBody>
               {filteredOrders.map((ord) => {
                 if (ord.deleted === true) {
-                  return;
+                  return null;
                 }
+
                 const {
                   title,
                   labelName,
@@ -267,23 +396,21 @@ const History = () => {
                 const th = thumbnail.includes("cloudinary")
                   ? thumbnail
                   : `${process.env.REACT_APP_BASE_URL}/${thumbnail}`;
+
                 sNo++;
+
                 return (
                   <tr
-                    key={ord.id}
+                    key={id}
                     style={{
                       backgroundColor: sNo % 2 === 0 ? "#FAFAFC" : "white",
                     }}
                   >
                     <td>{sNo}</td>
                     <td>
-                      <span>
-                        <img src={th} alt="" />
-                      </span>
+                      <img src={th} alt={title} />
                     </td>
-                    <td>
-                      <span>{title}</span>
-                    </td>
+                    <td>{title}</td>
                     <td>{labelName}</td>
                     <td>{albumType}</td>
                     <td>{language}</td>
@@ -293,77 +420,35 @@ const History = () => {
                         ? dateLive
                         : dateOfRelease}
                     </td>
-                    {status === "waiting" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#FFF2D7",
-                            color: "#FFBC21",
-                          }}
-                        >
-                          <ClockCircleOutlined /> waiting for approval
-                        </div>
-                      </td>
-                    )}
-                    {status === "processing" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#D8F2FF",
-                            color: "#42C3FF",
-                          }}
-                        >
-                          <EditOutlined /> processing
-                        </div>
-                      </td>
-                    )}
-                    {status === "completed" && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#D9EDDB",
-                            color: "#59BB5A",
-                          }}
-                        >
-                          <CheckCircleTwoTone twoToneColor="#52c41a" />
-                          Live
-                        </div>
-                      </td>
-                    )}
-                    {(status === "rejected" || status === "takedown") && (
-                      <td>
-                        <div
-                          style={{
-                            backgroundColor: "#e9dede",
-                            color: "#ff0000",
-                          }}
-                        >
-                          <CloseOutlined />
-                          {status === "rejected" ? "rejected" : "removed"}
-                        </div>
-                      </td>
-                    )}
+                    <td>{renderStatus(status)}</td>
                     <td>
-                      <Link to={`/user-panel/order/${id}`}>
+                      <ViewButton to={`/user-panel/order/${id}`}>
                         <EyeOutlined />
-                      </Link>
+                      </ViewButton>
                     </td>
                   </tr>
                 );
               })}
             </TableBody>
-          </Table>
+          </StyledTable>
         )}
+
         {filteredOrders && filteredOrders.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No orders found"
+            style={{ padding: "3rem 0" }}
+          />
         )}
-      </TableBox>
-      <MobileBox>
+      </TableContainer>
+
+      <MobileContainer>
         {filteredOrders &&
           filteredOrders.map((order) => {
             if (order.deleted === true) {
-              return;
+              return null;
             }
+
             const {
               title,
               language,
@@ -374,49 +459,87 @@ const History = () => {
               thumbnail,
               labelName,
               id,
+              dateLive,
             } = order;
 
+            const thumbSrc = thumbnail.includes("cloudinary")
+              ? thumbnail
+              : `${process.env.REACT_APP_BASE_URL}/${thumbnail}`;
+
             return (
-              <Link to={`/user-panel/order/${id}`}>
-                <MobileOrderBox>
-                  <img src={`${thumbnail}`} alt="" />
-                  <TextBox>
-                    <span>Title</span>
-                    <span>{title}</span>
-                  </TextBox>{" "}
-                  <TextBox>
-                    <span>Label</span>
-                    <span>{labelName}</span>
-                  </TextBox>
-                  <TextBox>
-                    <span>status</span>
-                    <span>{status === "completed" ? "live" : status}</span>
-                  </TextBox>
-                  <TextBox>
-                    <span>Date of release</span>
-                    <span>{dateOfRelease}</span>
-                  </TextBox>
-                  <TextBox>
-                    <span>language</span>
-                    <span>{language}</span>
-                  </TextBox>
-                  <TextBox>
-                    <span>album Type</span>
-                    <span>{albumType}</span>
-                  </TextBox>
-                  <TextBox>
-                    <span>Created</span>
-                    <span>{orderDateAndTime.split("/")[0]}</span>
-                  </TextBox>
-                </MobileOrderBox>
-              </Link>
+              <AlbumCard
+                key={id}
+                cover={<img alt={title} src={thumbSrc} />}
+                hoverable
+              >
+                <Title level={5} style={{ margin: 0, marginBottom: "1rem" }}>
+                  {title}
+                </Title>
+
+                <CardContent>
+                  <CardItem>
+                    <ItemLabel>Status</ItemLabel>
+                    <div>{renderStatus(status)}</div>
+                  </CardItem>
+
+                  <CardItem>
+                    <ItemLabel>Label</ItemLabel>
+                    <ItemValue>{labelName}</ItemValue>
+                  </CardItem>
+
+                  <CardItem>
+                    <ItemLabel>Album Type</ItemLabel>
+                    <ItemValue>{albumType}</ItemValue>
+                  </CardItem>
+
+                  <CardItem>
+                    <ItemLabel>Language</ItemLabel>
+                    <ItemValue>{language}</ItemValue>
+                  </CardItem>
+
+                  <CardItem>
+                    <ItemLabel>Release Date</ItemLabel>
+                    <ItemValue>
+                      {dateLive && dateLive.length > 2
+                        ? dateLive
+                        : dateOfRelease}
+                    </ItemValue>
+                  </CardItem>
+
+                  <CardItem>
+                    <ItemLabel>Created</ItemLabel>
+                    <ItemValue>{orderDateAndTime.split("/")[0]}</ItemValue>
+                  </CardItem>
+
+                  <Space
+                    style={{
+                      marginTop: "0.5rem",
+                      justifyContent: "flex-end",
+                      width: "100%",
+                    }}
+                  >
+                    <Link to={`/user-panel/order/${id}`}>
+                      <ViewButton>
+                        <Space>
+                          <EyeOutlined /> View Details
+                        </Space>
+                      </ViewButton>
+                    </Link>
+                  </Space>
+                </CardContent>
+              </AlbumCard>
             );
-          })}{" "}
+          })}
+
         {filteredOrders && filteredOrders.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No orders found"
+            style={{ gridColumn: "1 / -1", padding: "3rem 0" }}
+          />
         )}
-      </MobileBox>
-    </MainBox>
+      </MobileContainer>
+    </MainContainer>
   );
 };
 

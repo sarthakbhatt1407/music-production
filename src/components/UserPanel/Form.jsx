@@ -388,8 +388,8 @@ const Form = () => {
     musicDirector: "",
     subgenre: "",
     releaseDate: "",
-    youtubeContentId: "",
-    youtubeMusic: "",
+    youtubeContentId: "Yes",
+    youtubeMusic: "Yes",
   };
 
   const [filteredArtists, setFilteredArtists] = useState([]);
@@ -1177,6 +1177,8 @@ const Form = () => {
       inpFields.language.length === 0 ||
       inpFields.mood.length === 0 ||
       selectedSingers.length === 0 ||
+      selectedLyricists.length === 0 ||
+      selectedComposers.length === 0 ||
       inpFields.thumbnail === null ||
       inpFields.file === null
     ) {
@@ -1219,6 +1221,14 @@ const Form = () => {
       if (selectedSingers.length === 0) {
         const singer = document.querySelector("#singer");
         if (singer) singer.style.border = "1px solid red";
+      }
+      if (selectedComposers.length === 0) {
+        const composer = document.querySelector("#composer");
+        if (composer) composer.style.border = "1px solid red";
+      }
+      if (selectedLyricists.length === 0) {
+        const lyricist = document.querySelector("#lyricist");
+        if (lyricist) lyricist.style.border = "1px solid red";
       }
 
       if (inpFields.thumbnail === null) {
@@ -2346,9 +2356,12 @@ const Form = () => {
                     onSelect={(value, option) =>
                       handleArtistSelect("singer", value, option)
                     }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, singer: value })
-                    }
+                    onChange={(value) => {
+                      const ele = document.querySelector(`#singer`);
+
+                      ele.style.border = "1px solid white";
+                      setInpFields({ ...inpFields, singer: value });
+                    }}
                     placeholder="Singer name"
                     style={{ width: "100%" }}
                     filterOption={false}
@@ -2499,9 +2512,11 @@ const Form = () => {
                     onSelect={(value, option) =>
                       handleArtistSelect("lyricist", value, option)
                     }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, lyricist: value })
-                    }
+                    onChange={(value) => {
+                      const ele = document.querySelector(`#lyricist`);
+                      ele.style.border = "1px solid white";
+                      setInpFields({ ...inpFields, lyricist: value });
+                    }}
                     placeholder="Lyricist name"
                     style={{ width: "100%" }}
                     filterOption={false}
@@ -2653,9 +2668,11 @@ const Form = () => {
                     onSelect={(value, option) =>
                       handleArtistSelect("composer", value, option)
                     }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, composer: value })
-                    }
+                    onChange={(value) => {
+                      const ele = document.querySelector(`#composer`);
+                      ele.style.border = "1px solid white";
+                      setInpFields({ ...inpFields, composer: value });
+                    }}
                     placeholder="Composer name"
                     style={{ width: "100%" }}
                     filterOption={false}

@@ -9,6 +9,8 @@ import {
   Tag,
   Button,
   Tooltip,
+  Modal,
+  Input as AntInput,
 } from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
@@ -122,6 +124,11 @@ const CopyrightAdmin = () => {
   const [filteredInfo, setFilteredInfo] = useState({});
   const [sortedInfo, setSortedInfo] = useState({});
 
+  // Modal state for rejection with remark
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectRemark, setRejectRemark] = useState("");
+  const [rejectId, setRejectId] = useState(null);
+
   const fetcher = async () => {
     setIsLoading(true);
     try {
@@ -184,18 +191,35 @@ const CopyrightAdmin = () => {
       setIsLoading(false);
     }
   };
-  const reject = async (id) => {
+
+  // Modal logic for reject with remark
+  const handleReject = (id) => {
+    setRejectId(id);
+    setIsRejectModalOpen(true);
+  };
+
+  const submitReject = async () => {
+    if (!rejectRemark.trim()) {
+      error("Please enter a remark.");
+      return;
+    }
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=rejected`,
+        `${
+          process.env.REACT_APP_BASE_URL
+        }/copyright/update-query/?id=${rejectId}&action=rejected&remark=${encodeURIComponent(
+          rejectRemark
+        )}`,
         {
           method: "PATCH",
         }
       );
-
       if (res.ok) {
         success("Query marked as rejected");
+        setIsRejectModalOpen(false);
+        setRejectRemark("");
+        setRejectId(null);
         setTimeout(() => {
           setRefresher((prev) => prev + 1);
         }, 500);
@@ -248,13 +272,12 @@ const CopyrightAdmin = () => {
       dataIndex: "phone",
       key: "phone",
       sorter: (a, b) => {
-        // Handle missing phone data safely
         if (!a.phone) return -1;
         if (!b.phone) return 1;
         return a.phone.toString().localeCompare(b.phone.toString());
       },
       sortOrder: sortedInfo.columnKey === "phone" && sortedInfo.order,
-      render: (phone) => phone || "N/A", // Display N/A for missing phone data
+      render: (phone) => phone || "N/A",
       width: 120,
     },
     {
@@ -322,8 +345,6 @@ const CopyrightAdmin = () => {
         </Tooltip>
       ),
     },
-    // ...existing code...
-
     {
       title: "Action",
       key: "action",
@@ -347,7 +368,7 @@ const CopyrightAdmin = () => {
                   icon={<Close />}
                   onClick={() => {
                     copyToClipBoard(record.link);
-                    reject(record.id);
+                    handleReject(record.id);
                   }}
                 />
               </Tooltip>
@@ -380,15 +401,6 @@ const CopyrightAdmin = () => {
       />
       <HeaderBox>
         <h1>Copyright</h1>
-        <Button
-          type="primary"
-          onClick={() => {
-            setSortedInfo({});
-            setFilteredInfo({});
-          }}
-        >
-          Clear filters
-        </Button>
       </HeaderBox>
       <TableBox>
         <Table
@@ -414,6 +426,42 @@ const CopyrightAdmin = () => {
           }}
         />
       </TableBox>
+      <Modal
+        title="Reject Query"
+        open={isRejectModalOpen}
+        onCancel={() => {
+          setIsRejectModalOpen(false);
+          setRejectRemark("");
+          setRejectId(null);
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setIsRejectModalOpen(false);
+              setRejectRemark("");
+              setRejectId(null);
+            }}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={isLoading}
+            onClick={submitReject}
+          >
+            Reject
+          </Button>,
+        ]}
+      >
+        <AntInput.TextArea
+          rows={4}
+          placeholder="Enter remark for rejection"
+          value={rejectRemark}
+          onChange={(e) => setRejectRemark(e.target.value)}
+        />
+      </Modal>
     </MainBox>
   );
 };

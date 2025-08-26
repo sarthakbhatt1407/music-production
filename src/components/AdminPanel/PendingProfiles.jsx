@@ -2,482 +2,478 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Done, RemoveRedEyeOutlined } from "@mui/icons-material";
+import {
+  CheckCircleOutlined,
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  FileAddOutlined,
+} from "@ant-design/icons";
 import MusicLoader from "../Loader/MusicLoader";
-import { Breadcrumb, Button, Empty, message, Popconfirm } from "antd";
-import { ImCross } from "react-icons/im";
+import {
+  Breadcrumb,
+  Button,
+  Empty,
+  message,
+  Popconfirm,
+  Table,
+  Input as AntInput,
+  Card,
+  Avatar,
+  Upload,
+  Modal as AntModal,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
+
+const { Title, Text } = Typography;
+const { Search } = AntInput;
 
 const MainBox = styled.div`
   width: 100%;
-  height: 100%;
   background-color: white;
-  border-radius: 0.5rem;
-  padding: 1rem;
+  border-radius: 12px;
+  padding: 24px;
   position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
   a {
-    color: black;
+    color: #1677ff;
     text-decoration: none;
-  }
-`;
+    transition: color 0.2s;
 
-const TableBox = styled.div`
-  height: 71svh;
-  overflow-y: scroll;
-  /* &::-webkit-scrollbar {
-    display: none;
-  } */
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    display: none;
-  }
-`;
-
-const Table = styled.table`
-  width: 100%;
-`;
-
-const TableHead = styled.thead`
-  tr {
-    background-color: #f4f4fb;
-    td {
-      text-align: center;
-      padding: 0.4rem 0rem;
-      color: #acaec1;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-      font-weight: bold;
+    &:hover {
+      color: #4096ff;
     }
   }
 `;
-const TableBody = styled.tbody`
-  tr {
-    td {
-      color: #000000de;
-      text-transform: capitalize;
-      text-align: center;
-      padding: 1rem 0;
-      font-weight: 500;
-      font-size: 1rem;
 
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
-        gap: 0.4rem;
-        width: fit-content;
-        margin: 0 auto;
-        font-size: 0.8rem;
-        font-weight: bold;
-      }
-      span {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 0.7rem;
-        img {
-          width: 4rem;
-        }
-      }
-    }
-  }
-`;
 const HeaderBox = styled.div`
   display: flex;
   justify-content: space-between;
-  padding-right: 1rem;
   align-items: center;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+  margin-bottom: 24px;
+
+  @media only screen and (max-width: 768px) {
     flex-direction: column;
-    justify-content: start;
-    padding: 0;
-    align-items: start;
-    margin-bottom: 1rem;
-    input {
-      width: 100%;
-    }
-  }
-`;
-const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-  width: 30%;
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
+    align-items: flex-start;
+    gap: 16px;
   }
 `;
 
-const Modal = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #00000038;
-  border-radius: 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-`;
+const StyledSearch = styled(Search)`
+  width: 300px;
 
-const ModalBox = styled.div`
-  background-color: white;
-  width: 30%;
-  height: fit-content;
-  padding: 2rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  z-index: 20;
-
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 90%;
-  }
-`;
-
-const ModalFormBox = styled.div`
-  background-color: white;
-  width: 90%;
-  height: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const BtnBox = styled.div`
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-    &:last-child {
-      background-color: #bbb9b9;
-    }
-  }
-`;
-const ModalInput = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
-  }
-`;
-
-const LabelInpBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  width: 74%;
-  span {
-    color: #ff0000ab;
-    font-size: 0.8rem;
-    margin-left: 0.2rem;
-  }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+  @media only screen and (max-width: 768px) {
     width: 100%;
   }
 `;
-const Label = styled.label`
-  font-size: 0.9rem;
-  letter-spacing: 0.06rem;
-  color: #9e9e9e;
-  text-transform: capitalize;
+
+const MobileCardView = styled.div`
+  display: none;
+
+  @media only screen and (max-width: 1000px) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+`;
+
+const UserCard = styled(Card)`
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .ant-card-meta-title {
+    margin-bottom: 4px;
+  }
+
+  .ant-card-actions {
+    border-radius: 0 0 8px 8px;
+  }
+`;
+
+const TableContainer = styled.div`
+  @media only screen and (max-width: 1000px) {
+    display: none;
+  }
+`;
+
+const UploadContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+`;
+
+const StyledUpload = styled(Upload)`
+  width: 100%;
+
+  .ant-upload {
+    width: 100%;
+  }
 `;
 
 const PendingProfile = () => {
   const [messageApi, contextHolder] = message.useMessage();
-  const success = (msg) => {
-    messageApi.open({
-      type: "success",
-      content: msg,
-    });
-  };
-  const error = (msg) => {
-    messageApi.open({
-      type: "error",
-      content: msg,
-    });
-  };
-  let [users, setUsers] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [pdfFile, setPdfFile] = useState(null); // Store PDF file
-  let [filteredUsers, setFilteredUsers] = useState(null);
-  const [selUser, setSelUser] = useState("");
-  const [isLoading, setIsloading] = useState(true);
-  const userId = useSelector((state) => state.userId);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [pdfFile, setPdfFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [refresher, setRefresher] = useState(0);
-  let c = 0;
+  const userId = useSelector((state) => state.userId);
 
-  const fetcher = async () => {
-    setIsloading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-pending-user/?id=${userId}`
+  const showSuccess = (msg) => {
+    messageApi.success(msg);
+  };
+
+  const showError = (msg) => {
+    messageApi.error(msg);
+  };
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/get-pending-user/?id=${userId}`
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        const sortedUsers = data.users.reverse();
+        setUsers(sortedUsers);
+        setFilteredUsers(sortedUsers);
+      } else {
+        showError("Failed to fetch users");
+      }
+    } catch (error) {
+      showError("Network error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = (value) => {
+    const searchTerm = value.trim().toLowerCase();
+    if (!searchTerm) {
+      setFilteredUsers(users);
+      return;
+    }
+
+    const filtered = users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.phone.toString().includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm)
     );
-    const data = await res.json();
-
-    if (res.ok) {
-      setUsers(data.users.reverse());
-      setFilteredUsers(data.users.reverse());
-    } else {
-    }
-    setIsloading(false);
+    setFilteredUsers(filtered);
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === "application/pdf") {
-      setPdfFile(file); // Store the selected PDF in state
-    } else {
-      alert("Please upload a valid PDF file.");
+  const handleApproveUser = (userId) => {
+    setSelectedUser(userId);
+    setIsModalVisible(true);
+  };
+
+  const handleDeleteUser = async (userId) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/delete-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        showSuccess(data.message);
+        setRefresher((prev) => prev + 1);
+      } else {
+        showError(data.message);
+      }
+    } catch (error) {
+      showError("Network error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleUploadDocument = async () => {
+    if (!pdfFile) {
+      showError("Please select a PDF file");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("doc", pdfFile);
+      formData.append("userId", selectedUser);
+      formData.append("adminId", userId);
+
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/legal-doc`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        showSuccess(data.message);
+        setIsModalVisible(false);
+        setRefresher((prev) => prev + 1);
+      } else {
+        showError(data.message);
+      }
+    } catch (error) {
+      showError("Upload failed. Please try again.");
+    } finally {
+      setPdfFile(null);
+      setIsLoading(false);
+    }
+  };
+
+  const beforeUpload = (file) => {
+    const isPDF = file.type === "application/pdf";
+    if (!isPDF) {
+      showError("You can only upload PDF files!");
+      return Upload.LIST_IGNORE;
+    }
+    setPdfFile(file);
+    return false;
+  };
+
+  const columns = [
+    {
+      title: "#",
+      key: "index",
+      width: 60,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (email) => <span style={{ textTransform: "none" }}>{email}</span>,
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Location",
+      key: "location",
+      render: (_, record) => (
+        <Tooltip title={`${record.address}, ${record.city}, ${record.state}`}>
+          <span>
+            {record.city}, {record.state}
+          </span>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "Since",
+      dataIndex: "userSince",
+      key: "userSince",
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space size="middle">
+          <Tooltip title="View Profile">
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              href={`/admin-panel/user-profile/${record.id}`}
+            />
+          </Tooltip>
+          <Tooltip title="Approve">
+            <Button
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              onClick={() => handleApproveUser(record.id)}
+            />
+          </Tooltip>
+          <Popconfirm
+            title="Delete User"
+            description="Are you sure you want to delete this user?"
+            onConfirm={() => handleDeleteUser(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
   useEffect(() => {
-    fetcher();
-    return () => {};
+    fetchUsers();
   }, [refresher]);
+
+  const renderUserCards = () => {
+    if (isLoading) return <MusicLoader />;
+    if (!filteredUsers.length)
+      return <Empty description="No pending labels found" />;
+
+    return filteredUsers.map((user) => {
+      if (userId === user.id) return null;
+
+      return (
+        <UserCard
+          key={user.id}
+          actions={[
+            <Tooltip title="View Profile">
+              <Link to={`/admin-panel/user-profile/${user.id}`}>
+                <EyeOutlined key="view" />
+              </Link>
+            </Tooltip>,
+            <Tooltip title="Approve">
+              <CheckCircleOutlined
+                key="approve"
+                onClick={() => handleApproveUser(user.id)}
+                style={{ color: "#52c41a" }}
+              />
+            </Tooltip>,
+            <Popconfirm
+              title="Delete User"
+              description="Are you sure you want to delete this user?"
+              onConfirm={() => handleDeleteUser(user.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <DeleteOutlined key="delete" style={{ color: "#ff4d4f" }} />
+            </Popconfirm>,
+          ]}
+        >
+          <Card.Meta
+            avatar={<Avatar>{user.name[0]}</Avatar>}
+            title={user.name}
+            description={
+              <Space direction="vertical" size={1}>
+                <Text type="secondary">{user.email}</Text>
+                <Text type="secondary">{user.phone}</Text>
+                <Text type="secondary">
+                  {user.city}, {user.state}
+                </Text>
+                <Text type="secondary">Since: {user.userSince}</Text>
+              </Space>
+            }
+          />
+        </UserCard>
+      );
+    });
+  };
 
   return (
     <MainBox>
       {contextHolder}
-      {showModal && (
-        <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="accountNo">Legal Document</Label>
-                <ModalInput
-                  type="file"
-                  id="doc"
-                  accept="application/pdf"
-                  onChange={handleFileChange} // Handle file input
-                />
-              </LabelInpBox>
-
-              <BtnBox>
-                <button
-                  onClick={async () => {
-                    setIsloading(true);
-                    if (pdfFile) {
-                      const formdata = new FormData();
-                      formdata.append("doc", pdfFile);
-                      formdata.append("userId", selUser);
-                      formdata.append("adminId", userId);
-                      const res = await fetch(
-                        `${process.env.REACT_APP_BASE_URL}/user/legal-doc`,
-                        {
-                          method: "POST",
-
-                          body: formdata,
-                        }
-                      );
-                      const data = await res.json();
-
-                      if (res.ok) {
-                        success(data.message);
-                        setTimeout(() => {
-                          setRefresher((prev) => {
-                            return prev + 1;
-                          });
-                          setShowModal(false);
-                        }, 600);
-                      } else {
-                        error(data.message);
-                      }
-                    } else {
-                      error("Please select a PDF file.");
-                    }
-                    setIsloading(false);
-                  }}
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={() => {
-                    setSelUser("");
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
       <Breadcrumb
         items={[
-          {
-            title: "Admin Panel",
-          },
-          {
-            title: "Labels",
-          },
+          { title: <Link to="/admin-panel">Admin Panel</Link> },
+          { title: "Labels" },
         ]}
       />
+
       <HeaderBox>
-        <h1>Labels</h1>
-        <Input
-          type="text"
-          placeholder="search user"
-          onChange={(e) => {
-            const val = e.target.value.trim().toLowerCase();
-            const arr = users.filter((usr) => {
-              return (
-                usr.name.toLowerCase().includes(val) ||
-                usr.phone.toString().includes(val)
-              );
-            });
-            setFilteredUsers(arr);
-          }}
+        <Title level={2}>Pending Labels</Title>
+        <StyledSearch
+          placeholder="Search by name, email, or phone"
+          allowClear
+          enterButton={<SearchOutlined />}
+          size="large"
+          onSearch={handleSearch}
+          onChange={(e) => handleSearch(e.target.value)}
         />
       </HeaderBox>
-      <TableBox>
-        <Table cellSpacing={0}>
-          <TableHead>
-            <tr>
-              <td></td>
-              <td>Name</td>
-              <td>Email</td>
-              <td>Phone</td>
-              <td>Location</td>
-              <td>Since</td>
 
-              <td>View Profile</td>
-              <td>Action</td>
-            </tr>
-          </TableHead>
-          {isLoading && <MusicLoader />}
-          {!isLoading && (
-            <TableBody>
-              {filteredUsers &&
-                filteredUsers.map((user) => {
-                  if (userId === user.id) {
-                    return;
-                  }
-                  const {
-                    id,
-                    name,
-                    email,
-                    phone,
-                    city,
-                    state,
-                    password,
-                    userSince,
-                    address,
-                  } = user;
-                  c++;
-                  return (
-                    <tr key={id}>
-                      <td>{c}</td>
-                      <td>{name}</td>
-                      <td style={{ textTransform: "none" }}>{email}</td>
-                      <td>{phone}</td>
-                      <td>
-                        {address}, {city}, {state}
-                      </td>
-                      <td>{userSince}</td>
-                      {/* <td style={{ textTransform: "none" }}>{password}</td> */}
-                      <td>
-                        <Link to={`/admin-panel/user-profile/${id}`}>
-                          <RemoveRedEyeOutlined />
-                        </Link>
-                      </td>
-                      <td
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          gap: "1rem",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Button
-                          onClick={() => {
-                            setSelUser(id);
-                            setShowModal(true);
-                          }}
-                        >
-                          <Done />
-                        </Button>
-                        <Popconfirm
-                          title="Confirm"
-                          description="Delete User?"
-                          onConfirm={async () => {
-                            setIsloading(true);
-                            const res = await fetch(
-                              `${process.env.REACT_APP_BASE_URL}/user/delete-user`,
-                              {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                  userId: id,
-                                }),
-                              }
-                            );
-                            const data = await res.json();
-                            if (data.success) {
-                              success(data.message);
-                              setTimeout(() => {
-                                setRefresher((prev) => {
-                                  return prev + 1;
-                                });
-                              }, 600);
-                            } else {
-                              error(data.message);
-                            }
-                            setIsloading(false);
-                          }}
-                        >
-                          <Link>
-                            <ImCross />
-                          </Link>
-                        </Popconfirm>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </TableBody>
-          )}
-        </Table>
-        {!isLoading && users.length === 0 && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )}
-        {/* {filteredOrders && filteredOrders.length === 0 && !isLoading && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        )} */}
-      </TableBox>
+      <TableContainer>
+        <Table
+          columns={columns}
+          dataSource={filteredUsers.filter((user) => user.id !== userId)}
+          rowKey="id"
+          loading={isLoading}
+          pagination={{ pageSize: 5 }}
+          scroll={{ x: "max-content" }}
+        />
+      </TableContainer>
+
+      <MobileCardView>{renderUserCards()}</MobileCardView>
+
+      <AntModal
+        title="Upload Legal Document"
+        open={isModalVisible}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setPdfFile(null);
+        }}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setIsModalVisible(false);
+              setPdfFile(null);
+            }}
+          >
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={isLoading}
+            onClick={handleUploadDocument}
+            disabled={!pdfFile}
+          >
+            Submit
+          </Button>,
+        ]}
+      >
+        <UploadContainer>
+          <StyledUpload
+            name="doc"
+            beforeUpload={beforeUpload}
+            maxCount={1}
+            accept="application/pdf"
+            showUploadList={{
+              showRemoveIcon: true,
+              removeIcon: <DeleteOutlined />,
+            }}
+            onRemove={() => setPdfFile(null)}
+          >
+            <Button icon={<FileAddOutlined />} size="large" block>
+              {pdfFile ? "Change PDF File" : "Select PDF File"}
+            </Button>
+          </StyledUpload>
+          <Text type="secondary">
+            Please upload the legal document in PDF format
+          </Text>
+        </UploadContainer>
+      </AntModal>
     </MainBox>
   );
 };

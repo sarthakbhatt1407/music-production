@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
+  Modal as AntdModal,
+  Select as AntdSelect,
+  Button as AntdButton,
+} from "antd";
+
+import {
   Box,
   Typography,
   Container,
@@ -36,12 +42,12 @@ import {
   AccessTime as TimeIcon,
   Description as NoteIcon,
   AttachMoney as MoneyIcon,
+  Download as DownloadIcon,
 } from "@mui/icons-material";
-import { Breadcrumb } from "antd";
-import { useParams } from "react-router";
-import MusicLoader from "../Loader/MusicLoader";
+import { Breadcrumb, Select } from "antd";
 import { useSelector } from "react-redux";
 import { FaIndianRupeeSign } from "react-icons/fa6";
+import MusicLoader from "../Loader/MusicLoader";
 
 const StyledCard = styled(Card)({
   borderRadius: 16,
@@ -129,7 +135,28 @@ const ActionButton = styled(Button)({
   textTransform: "none",
   fontWeight: 600,
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+  marginLeft: 16,
 });
+
+const monthOptions = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const yearOptions = [
+  new Date().getFullYear() - 2,
+  new Date().getFullYear() - 1,
+  new Date().getFullYear(),
+];
 
 const UserWalletView = () => {
   const id = useSelector((state) => state.userId);
@@ -148,7 +175,7 @@ const UserWalletView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // New state for payment request feature
+  // Payment request feature
   const [paymentRequestOpen, setPaymentRequestOpen] = useState(false);
   const [requestFormData, setRequestFormData] = useState({
     amount: "",
@@ -159,6 +186,14 @@ const UserWalletView = () => {
     severity: "success",
     message: "",
   });
+
+  // Download report modal state
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(
+    monthOptions[new Date().getMonth()]
+  );
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [downloading, setDownloading] = useState(false);
 
   // Fetch wallet and bonus data
   const fetchWalletData = async () => {
@@ -242,8 +277,6 @@ const UserWalletView = () => {
     }));
   };
 
-  // Update the handleRequestSubmit function to use the correct endpoint and payload structure
-
   const handleRequestSubmit = async () => {
     if (
       !requestFormData.amount ||
@@ -304,6 +337,19 @@ const UserWalletView = () => {
     setAlertOpen(false);
   };
 
+  // Download report handler
+  const handleDownloadReport = async () => {
+    // setDownloading(true);
+    const win = window.open(
+      `${process.env.REACT_APP_BASE_URL}/user/get-report/${userData.userName}/${selectedMonth}/${selectedYear}`
+    );
+    setTimeout(() => {
+      if (win) win.close();
+      setDownloading(false);
+    }, 10000);
+    setDownloadModalOpen(false);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, height: "87vh", overflow: "auto" }}>
       {loading && <MusicLoader />}
@@ -314,17 +360,6 @@ const UserWalletView = () => {
 
       <PageHeader>
         <Box display="flex" alignItems="center">
-          {/* <img
-            src={userData.userAvatar}
-            alt={`${userData.userName}'s avatar`}
-            style={{
-              width: 56,
-              height: 56,
-              marginRight: 16,
-              borderRadius: "50%",
-              objectFit: "cover",
-            }}
-          /> */}
           <Box>
             <Typography variant="h4" fontWeight={600} sx={{ color: "#333333" }}>
               {userData.userName}'s Wallet
@@ -334,18 +369,33 @@ const UserWalletView = () => {
             </Typography>
           </Box>
         </Box>
-        <ActionButton
-          variant="contained"
-          color="primary"
-          startIcon={<FaIndianRupeeSign />}
-          onClick={() => setPaymentRequestOpen(true)}
-          sx={{
-            bgcolor: "#ff9800",
-            "&:hover": { bgcolor: "#f57c00" },
-          }}
-        >
-          Request Payment
-        </ActionButton>
+        <Box>
+          <ActionButton
+            variant="contained"
+            color="primary"
+            startIcon={<FaIndianRupeeSign />}
+            onClick={() => setPaymentRequestOpen(true)}
+            sx={{
+              bgcolor: "#ff9800",
+              "&:hover": { bgcolor: "#f57c00" },
+            }}
+          >
+            Request Payment
+          </ActionButton>
+          <ActionButton
+            variant="contained"
+            color="secondary"
+            startIcon={<DownloadIcon />}
+            onClick={() => setDownloadModalOpen(true)}
+            sx={{
+              bgcolor: "#1976d2",
+              "&:hover": { bgcolor: "#1565c0" },
+              marginLeft: 2,
+            }}
+          >
+            Download Report
+          </ActionButton>
+        </Box>
       </PageHeader>
 
       <Grid container spacing={3}>
@@ -626,6 +676,54 @@ const UserWalletView = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <AntdModal
+        title="Download Label Report"
+        open={downloadModalOpen}
+        onCancel={() => setDownloadModalOpen(false)}
+        footer={[
+          <AntdButton key="cancel" onClick={() => setDownloadModalOpen(false)}>
+            Cancel
+          </AntdButton>,
+          <AntdButton
+            key="download"
+            type="primary"
+            loading={downloading}
+            onClick={handleDownloadReport}
+          >
+            Download
+          </AntdButton>,
+        ]}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ marginBottom: 8, display: "block" }}>Month</label>
+          <AntdSelect
+            style={{ width: "100%" }}
+            value={selectedMonth}
+            onChange={setSelectedMonth}
+          >
+            {monthOptions.map((m) => (
+              <AntdSelect.Option key={m} value={m}>
+                {m}
+              </AntdSelect.Option>
+            ))}
+          </AntdSelect>
+        </div>
+        <div>
+          <label style={{ marginBottom: 8, display: "block" }}>Year</label>
+          <AntdSelect
+            style={{ width: "100%" }}
+            value={selectedYear}
+            onChange={setSelectedYear}
+          >
+            {yearOptions.map((y) => (
+              <AntdSelect.Option key={y} value={y}>
+                {y}
+              </AntdSelect.Option>
+            ))}
+          </AntdSelect>
+        </div>
+      </AntdModal>
 
       {/* Alert Snackbar */}
       <Snackbar

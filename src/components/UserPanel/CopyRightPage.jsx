@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Select, Empty } from "antd";
+import {
+  Breadcrumb,
+  Select,
+  Empty,
+  Table,
+  Tag,
+  Button,
+  Modal,
+  Form,
+  Input as AntInput,
+  notification,
+  message,
+  Tooltip,
+  Space,
+  Card,
+  Popconfirm,
+} from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
-import { notification, message } from "antd";
-import { InsertLink } from "@mui/icons-material";
+import { Delete, OpenInNew } from "@mui/icons-material";
 import {
   ClockCircleOutlined,
-  CheckCircleTwoTone,
+  CheckCircleOutlined,
   CloseCircleOutlined,
+  PlusOutlined,
+  HomeOutlined,
+  CopyrightOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import MusicLoader from "../Loader/MusicLoader";
@@ -16,428 +34,461 @@ const MainBox = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-  overflow-y: hidden;
-`;
+  padding: 1.5rem;
+  background-color: #f7f9fc;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 
-const TableBox = styled.div`
-  background-color: white;
-  width: 100%;
-  height: 100%;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  overflow: scroll;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    font-size: 0.8rem;
-    width: 100vw;
+  @media only screen and (max-width: 1000px) {
+    padding: 1rem;
   }
 `;
 
-const TableHead = styled.thead`
-  tr {
-    background-color: #f4f4fb;
-    td {
-      text-align: center;
-      padding: 0.4rem 0rem;
-      color: #acaec1;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-      font-weight: bold;
-      @media only screen and (min-width: 0px) and (max-width: 1000px) {
-        font-size: 0.5rem;
-      }
-    }
-  }
-`;
-
-const TableBody = styled.tbody`
-  tr {
-    td {
-      color: #000000de;
-      text-transform: capitalize;
-      text-align: center;
-      padding: 1rem 0;
-      font-weight: 500;
-      font-size: 1rem;
-      @media only screen and (min-width: 0px) and (max-width: 1000px) {
-        font-size: 0.7rem;
-        a {
-          svg {
-            transform: scale(0.8);
-          }
-        }
-      }
-      div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.3rem 0.8rem;
-        border-radius: 1rem;
-        gap: 0.4rem;
-        width: fit-content;
-        margin: 0 auto;
-        font-size: 0.8rem;
-        font-weight: bold;
-        @media only screen and (min-width: 0px) and (max-width: 1000px) {
-          font-size: 0.5rem;
-          padding: 0.3rem 0.5rem;
-        }
-      }
-      span {
-        display: flex;
-        align-items: center;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 0.7rem;
-        @media only screen and (min-width: 0px) and (max-width: 1000px) {
-          font-size: 0.5rem;
-        }
-        img {
-          width: 4rem;
-        }
-      }
-    }
-  }
-`;
-
-const HeaderBox = styled.div`
+const PageHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  padding-right: 1rem;
   align-items: center;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
+  margin-bottom: 0.5rem;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+
+  @media only screen and (max-width: 768px) {
     flex-direction: column;
-    justify-content: start;
-    padding: 0;
-    align-items: start;
-    margin-bottom: 1rem;
-  }
-`;
+    align-items: flex-start;
+    gap: 1rem;
 
-const Modal = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #00000038;
-  border-radius: 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-`;
-
-const ModalBox = styled.div`
-  background-color: white;
-  width: 30%;
-  height: fit-content;
-  padding: 2rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  z-index: 20;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 90%;
-  }
-`;
-
-const ModalFormBox = styled.div`
-  background-color: white;
-  width: 90%;
-  height: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const Option = styled.option`
-  color: #777;
-  font-weight: bold;
-  text-transform: capitalize;
-`;
-
-const BtnBox = styled.div`
-  display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  button {
-    background-color: #1677ff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 0.09rem;
-    &:last-child {
-      background-color: #bbb9b9;
+    h1 {
+      font-size: 1.5rem;
     }
   }
 `;
 
-const LabelInpBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  width: 74%;
-  span {
-    color: #ff0000ab;
-    font-size: 0.8rem;
-    margin-left: 0.2rem;
+const ContentCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  .ant-card-body {
+    padding: 0;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 100%;
+
+  .ant-table-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: #f4f6f9;
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background-color: #f8fafc;
+  }
+
+  .ant-empty {
+    padding: 2.5rem 0;
   }
 `;
 
-const Label = styled.label`
-  font-size: 0.9rem;
-  letter-spacing: 0.06rem;
-  color: #9e9e9e;
-  text-transform: capitalize;
-`;
-
-const Input = styled.input`
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  outline: none;
-  border: 1px solid #d7d7d7;
-  &::placeholder {
-    color: #d4cdcd;
-    letter-spacing: 0.09rem;
-    text-transform: capitalize;
-  }
-  &:focus {
-    border: 1px solid #c0c0c0;
-    box-shadow: 0.1rem 0.1rem 0.5rem #c0c0c0;
-  }
-`;
-
-const StatusTag = styled.div`
+const ActionButton = styled(Button)`
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  border-radius: 1rem;
-  width: fit-content;
-  margin: 0 auto;
+  gap: 8px;
+  border-radius: 8px;
+
+  &.ant-btn-primary {
+    background-color: #1677ff;
+    border-color: #1677ff;
+
+    &:hover {
+      background-color: #0958d9;
+      border-color: #0958d9;
+    }
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .ant-modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .ant-modal-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .ant-form-item-label > label {
+    font-weight: 500;
+  }
 `;
 
 const CopyRightPage = () => {
-  let c = 0;
-  const defaultF = {
-    link: "",
-    platform: "Youtube",
-  };
-
-  const [api, contextHolderNot] = notification.useNotification({
-    duration: 1.5,
-  });
-  const openNotificationWithIcon = (type, msg) => {
-    api[type]({ message: msg });
-  };
+  const [form] = Form.useForm();
+  const [api, contextHolderNot] = notification.useNotification();
   const [messageApi, contextHolder] = message.useMessage();
-  const success = (msg) => {
-    messageApi.open({ type: "success", content: msg });
-  };
-  const error = (msg) => {
-    messageApi.open({ type: "error", content: msg });
+
+  const openNotificationWithIcon = (type, msg) => {
+    api[type]({
+      message: type === "success" ? "Success" : "Error",
+      description: msg,
+      placement: "topRight",
+    });
   };
 
-  const [inpFields, setInpFields] = useState(defaultF);
+  const success = (msg) => {
+    messageApi.open({
+      type: "success",
+      content: msg,
+    });
+  };
+
+  const error = (msg) => {
+    messageApi.open({
+      type: "error",
+      content: msg,
+    });
+  };
+
   const [isLoading, setIsLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const userId = useSelector((state) => state.userId);
   const [showModal, setShowModal] = useState(false);
-  const [queries, setQueries] = useState(null);
+  const [queries, setQueries] = useState([]);
   const [refresher, setRefresher] = useState(0);
 
   const fetcher = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/get-all-user-query/?userId=${userId}`
-    );
-    const data = await res.json();
-    if (res.ok) {
-      setQueries(data.cQueries.reverse());
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/copyright/get-all-user-query/?userId=${userId}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        const activeQueries = data.cQueries.filter((q) => q.deleted !== true);
+        setQueries(activeQueries.reverse());
+      } else {
+        error("Failed to load copyright queries");
+      }
+    } catch (err) {
+      console.error("Error fetching queries:", err);
+      error("Failed to load copyright queries");
+    } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetcher();
-    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, refresher]);
 
-  const onChangeHandler = (e) => {
-    const id = e.target.id;
-    const val = e.target.value;
-    const ele = document.querySelector(`#${id}`);
-    ele.style.border = "1px solid #d7d7d7";
-    setInpFields({ ...inpFields, [id]: val.trim() });
+  const handleOpenModal = () => {
+    form.resetFields();
+    setShowModal(true);
   };
 
-  const onSubmitHandler = async () => {
-    if (inpFields.link.length === 0) {
-      const link = document.querySelector("#link");
-      link.style.border = "1px solid red";
-      openNotificationWithIcon("error", "Fill all require fields.");
-      return;
-    }
-    setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/copyright/create-new-query`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...inpFields, userId: userId }),
-      }
-    );
-    const data = await res.json();
-    if (res.ok) {
-      openNotificationWithIcon("success", data.message);
-      setInpFields(defaultF);
-    }
-    if (!res.ok) {
-      openNotificationWithIcon("error", data.message);
-    }
+  const handleCloseModal = () => {
     setShowModal(false);
-    setRefresher(refresher + 1);
-    setIsLoading(false);
   };
 
-  const getSelectedValue = (e) => {
-    setInpFields({ ...inpFields, platform: e });
+  const handleSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/copyright/create-new-query`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...values, userId: userId }),
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+        form.resetFields();
+        setShowModal(false);
+        setRefresher((prev) => prev + 1);
+      } else {
+        openNotificationWithIcon(
+          "error",
+          data.message || "Failed to create query"
+        );
+      }
+    } catch (err) {
+      console.error("Error submitting query:", err);
+      openNotificationWithIcon(
+        "error",
+        "An error occurred while submitting your query"
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const handleDelete = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/copyright/update-query/?id=${id}&action=delete`,
+        { method: "PATCH" }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        success(data.message || "Claim deleted");
+        setRefresher((prev) => prev + 1);
+      } else {
+        error(data.message || "Failed to delete claim");
+      }
+    } catch (err) {
+      error("Error deleting claim");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const columns = [
+    {
+      title: "#",
+      dataIndex: "index",
+      key: "index",
+      width: 60,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Platform",
+      dataIndex: "platform",
+      key: "platform",
+      render: (platform) => (
+        <Tag
+          color={platform === "Youtube" ? "red" : "blue"}
+          style={{ padding: "4px 12px", borderRadius: "4px" }}
+        >
+          {platform}
+        </Tag>
+      ),
+    },
+    {
+      title: "Created",
+      dataIndex: "created",
+      key: "created",
+      render: (created) => created.split("/")[0],
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        let color, icon, text;
+
+        switch (status) {
+          case "pending":
+            color = "gold";
+            icon = <ClockCircleOutlined />;
+            text = "Pending";
+            break;
+          case "resolved":
+            color = "green";
+            icon = <CheckCircleOutlined />;
+            text = "Resolved";
+            break;
+          case "rejected":
+            color = "red";
+            icon = <CloseCircleOutlined />;
+            text = "Rejected";
+            break;
+          default:
+            color = "default";
+            text = "Unknown";
+        }
+
+        return (
+          <Tag
+            color={color}
+            style={{ padding: "4px 12px", borderRadius: "4px" }}
+          >
+            <Space>
+              {icon}
+              {text}
+            </Space>
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Remark",
+      dataIndex: "remark",
+      key: "remark",
+      render: (remark, record) =>
+        record.status === "rejected" && remark ? (
+          <span style={{ color: "#ff4d4f" }}>{remark}</span>
+        ) : (
+          "-"
+        ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="View Content">
+            <Link to={record.link} target="_blank">
+              <Button type="text" icon={<OpenInNew />} />
+            </Link>
+          </Tooltip>
+          <Popconfirm
+            title="Delete Claim"
+            description="Are you sure you want to delete this claim?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger type="text">
+              <Button type="text" icon={<Delete />} />
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const tableData = queries
+    .filter((q) => q.deleted !== true)
+    .map((q, index) => ({
+      key: q.id,
+      ...q,
+    }));
 
   return (
     <MainBox>
       {contextHolderNot}
       {contextHolder}
-      {showModal && (
-        <Modal>
-          <ModalBox data-aos="zoom-in">
-            <ModalFormBox>
-              <LabelInpBox>
-                <Label htmlFor="platform">Platform</Label>
-                <Select
-                  name="platform"
-                  id="platform"
-                  onChange={getSelectedValue}
-                  value={inpFields.platform}
-                >
-                  <Option defaultValue value={"Youtube"}>
-                    Youtube
-                  </Option>
-                  <Option value={"Facebook"}>Facebook</Option>
-                </Select>
-              </LabelInpBox>
-              <LabelInpBox>
-                <Label htmlFor="link">Link</Label>
-                <Input
-                  type="text"
-                  id="link"
-                  onChange={onChangeHandler}
-                  value={inpFields.link}
+
+      <Breadcrumb
+        items={[
+          {
+            title: (
+              <Link to="/">
+                <HomeOutlined />
+              </Link>
+            ),
+          },
+          { title: "User Panel" },
+          { title: "Copyright" },
+        ]}
+        style={{ marginBottom: "0.5rem" }}
+      />
+
+      <PageHeader>
+        <h1>
+          <CopyrightOutlined />
+          Copyright Claims
+        </h1>
+        <ActionButton
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleOpenModal}
+        >
+          New Claim
+        </ActionButton>
+      </PageHeader>
+
+      <ContentCard>
+        {isLoading ? (
+          <div
+            style={{
+              padding: "2rem",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <MusicLoader />
+          </div>
+        ) : (
+          <Table
+            columns={columns}
+            dataSource={tableData}
+            rowKey="key"
+            pagination={{
+              pageSize: 10,
+              hideOnSinglePage: true,
+              showSizeChanger: false,
+            }}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No copyright claims found"
                 />
-              </LabelInpBox>
-              <BtnBox>
-                <button onClick={onSubmitHandler}>Submit</button>
-                <button onClick={() => setShowModal(false)}>Cancel</button>
-              </BtnBox>
-            </ModalFormBox>
-          </ModalBox>
-        </Modal>
-      )}
-      <Breadcrumb items={[{ title: "User Panel" }, { title: "Copyright" }]} />
-      <HeaderBox>
-        <h1>Copyright</h1>
-        {!showModal && (
-          <button onClick={() => setShowModal(true)}>Add New Query</button>
-        )}
-      </HeaderBox>
-      <TableBox>
-        {isLoading && <MusicLoader />}
-        <Table cellSpacing={0}>
-          <TableHead>
-            <tr>
-              <td>#</td>
-              <td>Platform</td>
-              <td>Created</td>
-              <td>Status</td>
-              <td>View Content</td>
-            </tr>
-          </TableHead>
-          <TableBody>
-            {queries &&
-              queries.map((q, idx) => {
-                const { platform, created, status, link, id, deleted } = q;
-                if (deleted === true) return null;
-                c++;
-                return (
-                  <tr key={id}>
-                    <td>{c}.</td>
-                    <td>{platform}</td>
-                    <td>{created.split("/")[0]}</td>
-                    <td>
-                      {status === "pending" ? (
-                        <StatusTag
-                          style={{ background: "#FFF2D7", color: "#FFBC21" }}
-                        >
-                          <ClockCircleOutlined /> Pending
-                        </StatusTag>
-                      ) : status === "resolved" ? (
-                        <StatusTag
-                          style={{ background: "#D9EDDB", color: "#59BB5A" }}
-                        >
-                          <CheckCircleTwoTone twoToneColor="#52c41a" /> Resolved
-                        </StatusTag>
-                      ) : status === "rejected" ? (
-                        <StatusTag
-                          style={{ background: "#FFD6D6", color: "#ff4d4f" }}
-                        >
-                          <CloseCircleOutlined /> Rejected
-                        </StatusTag>
-                      ) : (
-                        <StatusTag>Unknown</StatusTag>
-                      )}
-                    </td>
-                    <td>
-                      <Link to={link} target="_blank">
-                        <InsertLink />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-          </TableBody>
-        </Table>
-        {queries && queries.length === 0 && !isLoading && (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="No copyright queries found"
+              ),
+            }}
           />
         )}
-      </TableBox>
+      </ContentCard>
+
+      <StyledModal
+        title="Create New Copyright Claim"
+        open={showModal}
+        onCancel={handleCloseModal}
+        footer={null}
+        destroyOnClose
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ platform: "Youtube", link: "" }}
+          onFinish={handleSubmit}
+        >
+          <Form.Item
+            name="platform"
+            label="Platform"
+            rules={[{ required: true, message: "Please select a platform" }]}
+          >
+            <Select>
+              <Select.Option value="Youtube">Youtube</Select.Option>
+              <Select.Option value="Facebook">Facebook</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="link"
+            label="Content Link"
+            rules={[
+              { required: true, message: "Please enter a valid link" },
+              { type: "url", message: "Please enter a valid URL" },
+            ]}
+          >
+            <AntInput placeholder="https://..." />
+          </Form.Item>
+
+          <Form.Item style={{ marginBottom: 0, marginTop: "1.5rem" }}>
+            <Space style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button onClick={handleCloseModal}>Cancel</Button>
+              <Button type="primary" htmlType="submit" loading={submitting}>
+                Submit
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </StyledModal>
     </MainBox>
   );
 };

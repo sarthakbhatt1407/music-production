@@ -1,68 +1,148 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import styled from "styled-components";
+import styled from "@emotion/styled";
+import {
+  DashboardOutlined,
+  ClockCircleOutlined,
+  SyncOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
+import { Typography, Skeleton } from "antd";
 
-const MainBox = styled.div`
+const { Title, Text } = Typography;
+
+const StatusCard = styled.div`
   background-color: white;
-  padding: 1.7rem 1rem;
-  margin: 1rem 0;
-  border-radius: 0.4rem;
-  box-shadow: 0.2rem 0.2rem 0.4rem #ececec;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3rem;
-  align-items: center;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    padding: 1rem 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.09);
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
   }
 `;
-const OrderBox = styled.div`
+
+const WelcomeSection = styled.div`
   display: flex;
-  justify-content: space-evenly;
   align-items: center;
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
     flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.5rem;
   }
 `;
-const TextBox = styled.div`
-  display: flex;
-  gap: 0.4rem;
-  align-items: center;
-  justify-content: center;
-  span {
-    font-size: 1.9rem;
+
+const UserName = styled(Title)`
+  margin: 0 0.5rem !important;
+  background: linear-gradient(90deg, #1677ff, #52c41a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: capitalize;
+
+  @media (max-width: 768px) {
+    margin: 0 !important;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    flex-direction: column;
-    span {
-      font-size: 1.3rem;
+`;
+
+// Updated StatsGrid to display in a single line
+const StatsGrid = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 8px;
+
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  /* Ensure cards have equal width */
+  & > div {
+    flex: 0 0 calc(25% - 12px);
+    min-width: 240px;
+  }
+
+  @media (max-width: 1024px) {
+    & > div {
+      flex: 0 0 280px;
     }
   }
 `;
 
-const OrderStatusBox = styled.div`
+const StatCard = styled.div`
+  background: ${(props) => props.background || "#fff"};
+  background: ${(props) => props.gradient || ""};
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
   color: white;
   display: flex;
   flex-direction: column;
-  width: 22%;
-  padding: 1.5rem 1rem;
-  padding-top: 0.5rem;
-  border-radius: 0.4rem;
-  justify-content: start;
-  align-items: start;
-  text-align: center;
-  p {
-    font-size: 1.3rem;
+  justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
-  span {
-    font-size: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 1.25rem;
   }
-  @media only screen and (min-width: 0px) and (max-width: 1000px) {
-    width: 80%;
-    margin: auto;
-  }
+`;
+
+const StatHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const StatIcon = styled.div`
+  font-size: 1.75rem;
+  margin-right: 0.75rem;
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StatTitle = styled(Text)`
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+`;
+
+const StatValue = styled(Title)`
+  font-size: 2.5rem !important;
+  margin: 0 !important;
+  color: white !important;
+`;
+
+const StatLabel = styled(Text)`
+  font-size: 0.9rem;
+  opacity: 0.8;
+  color: white;
 `;
 
 const UserOrdersStatus = () => {
@@ -73,98 +153,145 @@ const UserOrdersStatus = () => {
   const [processingOrd, setProcessingOrd] = useState(null);
   const [compOrd, setCompOrd] = useState(null);
   const [totalOrd, setTotalOrd] = useState(null);
-  const [isLoading, setIsloading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetcher = async () => {
-    setIsloading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/user-all-orders/?user=${userId}`
-    );
-    const data = await res.json();
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/user-all-orders/?user=${userId}`
+      );
+      const data = await res.json();
 
-    if (res.ok) {
-      const arr = data.orders;
-      const com = arr.filter((ord) => {
-        return (
-          ord.status === "pending" ||
-          ord.status === "completed" ||
-          ord.status === "processing"
-        );
-      });
+      if (res.ok) {
+        const arr = data.orders;
+        const com = arr.filter((ord) => {
+          return (
+            ord.status === "pending" ||
+            ord.status === "completed" ||
+            ord.status === "processing"
+          );
+        });
 
-      const pending = arr.filter((ord) => {
-        return ord.status === "pending" && ord.deleted != true;
-      });
-      const comp = arr.filter((ord) => {
-        return ord.status === "completed" && ord.deleted != true;
-      });
-      const proc = arr.filter((ord) => {
-        return ord.status === "processing" && ord.deleted != true;
-      });
-      setTotalOrd(com);
-      setProcessingOrd(proc);
-      setCompOrd(comp);
-      setPendingOrd(pending);
-    } else {
+        const pending = arr.filter((ord) => {
+          return ord.status === "pending" && ord.deleted !== true;
+        });
+        const comp = arr.filter((ord) => {
+          return ord.status === "completed" && ord.deleted !== true;
+        });
+        const proc = arr.filter((ord) => {
+          return ord.status === "processing" && ord.deleted !== true;
+        });
+        setTotalOrd(com);
+        setProcessingOrd(proc);
+        setCompOrd(comp);
+        setPendingOrd(pending);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsloading(false);
   };
 
   useEffect(() => {
     fetcher();
-    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
-    <MainBox>
-      <TextBox>
-        <span>Hi</span>
-        <span
-          style={{
-            fontWeight: "bold",
-            fontSize: "2rem",
-            letterSpacing: ".07rem",
-            textTransform: "capitalize",
-          }}
-        >
-          {labelName},
-        </span>
-        <span>Welcome to the Rivaaz Films.</span>
-      </TextBox>
-      <OrderBox>
-        <OrderStatusBox
-          style={{
-            backgroundColor: "#3224DB",
-          }}
-        >
-          <p>Total Albums</p>
-          <span> Albums - {totalOrd && totalOrd.length}</span>
-        </OrderStatusBox>
-        <OrderStatusBox
-          style={{
-            backgroundColor: "#3399FF",
-          }}
-        >
-          <p>Pending for Aprroval</p>
-          <span>Albums - {pendingOrd && pendingOrd.length}</span>
-        </OrderStatusBox>
-        <OrderStatusBox
-          style={{
-            backgroundColor: "#E55353",
-          }}
-        >
-          <p>Processing</p>
-          <span>Albums - {processingOrd && processingOrd.length}</span>
-        </OrderStatusBox>
-        <OrderStatusBox
-          style={{
-            backgroundColor: "#3BDF95",
-          }}
-        >
-          <p>Completed</p>
-          <span>Albums - {compOrd && compOrd.length}</span>
-        </OrderStatusBox>
-      </OrderBox>
-    </MainBox>
+    <StatusCard>
+      {isLoading ? (
+        <>
+          <Skeleton active paragraph={{ rows: 1 }} />
+          <Skeleton.Button
+            active
+            block
+            style={{ height: "160px", marginTop: "1rem" }}
+          />
+        </>
+      ) : (
+        <>
+          <WelcomeSection>
+            <Text style={{ fontSize: "1.25rem" }}>Hi,</Text>
+            <UserName level={3}>{labelName}</UserName>
+            <Text style={{ fontSize: "1.25rem" }}>
+              Welcome to Rivaaz Films!
+            </Text>
+          </WelcomeSection>
+
+          <StatsGrid>
+            <div>
+              <StatCard gradient="linear-gradient(120deg, #4776E6, #8E54E9)">
+                <StatHeader>
+                  <StatIcon>
+                    <DashboardOutlined />
+                  </StatIcon>
+                  <StatTitle>Total Albums</StatTitle>
+                </StatHeader>
+                <div>
+                  <StatValue level={2}>
+                    {totalOrd ? totalOrd.length : 0}
+                  </StatValue>
+                  <StatLabel>Albums in your catalog</StatLabel>
+                </div>
+              </StatCard>
+            </div>
+
+            <div>
+              <StatCard gradient="linear-gradient(120deg, #48c6ef, #6f86d6)">
+                <StatHeader>
+                  <StatIcon>
+                    <ClockCircleOutlined />
+                  </StatIcon>
+                  <StatTitle>Pending</StatTitle>
+                </StatHeader>
+                <div>
+                  <StatValue level={2}>
+                    {pendingOrd ? pendingOrd.length : 0}
+                  </StatValue>
+                  <StatLabel>Awaiting approval</StatLabel>
+                </div>
+              </StatCard>
+            </div>
+
+            <div>
+              <StatCard gradient="linear-gradient(120deg, #f5576c, #f093fb)">
+                <StatHeader>
+                  <StatIcon>
+                    <SyncOutlined spin />
+                  </StatIcon>
+                  <StatTitle>Processing</StatTitle>
+                </StatHeader>
+                <div>
+                  <StatValue level={2}>
+                    {processingOrd ? processingOrd.length : 0}
+                  </StatValue>
+                  <StatLabel>Being prepared</StatLabel>
+                </div>
+              </StatCard>
+            </div>
+
+            <div>
+              <StatCard gradient="linear-gradient(120deg, #43e97b, #38f9d7)">
+                <StatHeader>
+                  <StatIcon>
+                    <CheckCircleOutlined />
+                  </StatIcon>
+                  <StatTitle>Completed</StatTitle>
+                </StatHeader>
+                <div>
+                  <StatValue level={2}>
+                    {compOrd ? compOrd.length : 0}
+                  </StatValue>
+                  <StatLabel>Live and active</StatLabel>
+                </div>
+              </StatCard>
+            </div>
+          </StatsGrid>
+        </>
+      )}
+    </StatusCard>
   );
 };
 

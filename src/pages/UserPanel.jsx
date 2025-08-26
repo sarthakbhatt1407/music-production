@@ -452,7 +452,7 @@ const UserPanel = () => {
             </Select>
           </div>
         </AntdModal>
-        <FloatButton.Group
+        {/* <FloatButton.Group
           open={open}
           onClick={onChange}
           trigger="click"
@@ -478,7 +478,7 @@ const UserPanel = () => {
               />
             }
           />
-        </FloatButton.Group>
+        </FloatButton.Group> */}
         <DrawerPanel page={page}>
           {isLoading && <MusicLoader />}
           {page === "home" && <UserPanelHome />}

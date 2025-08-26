@@ -1,8 +1,18 @@
-import styled from "@emotion/styled";
-
-import { Breadcrumb } from "antd";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import styled from "@emotion/styled";
+import {
+  Breadcrumb,
+  Card,
+  Select,
+  Typography,
+  Skeleton,
+  Statistic,
+  Row,
+  Col,
+  Divider,
+  Space,
+  Badge,
+} from "antd";
 import {
   AreaChart,
   Area,
@@ -11,139 +21,154 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
+  PieChart,
+  Pie,
+  Cell,
   Legend,
   Bar,
-  Rectangle,
-  Pie,
-  PieChart,
-  Cell,
+  BarChart,
 } from "recharts";
+import {
+  HomeOutlined,
+  DashboardOutlined,
+  DollarOutlined,
+  RiseOutlined,
+  CalendarOutlined,
+  BarChartOutlined,
+} from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import UserOrdersStatus from "../UserOrdersStatus";
 
-const MainDiv = styled.div`
+const { Title, Text } = Typography;
+const { Option } = Select;
+
+const MainContainer = styled.div`
+  width: 100%;
+  height: 100%;
   position: relative;
-  width: 100%;
-  height: 100%;
-  background-color: #f5f5f5;
-  border-radius: 0.5rem;
-  padding: 1rem 1rem;
-  overflow-y: scroll;
-  h1 {
-    margin: 0.5rem 0;
-  }
-  @media only screen and (max-width: 1000px) {
-    padding: 0.5rem 0.2rem;
-  }
-`;
-const ContentDiv = styled.div`
-  display: grid;
-  /* grid-template-columns: 2fr 0.8fr; */
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #f7f9fc;
+  border-radius: 12px;
+  overflow-y: auto;
 
-  height: fit-content;
-  @media only screen and (max-width: 1000px) {
-    grid-template-columns: 1fr;
+  @media (max-width: 768px) {
+    padding: 1rem;
   }
 `;
 
-const LeftDiv = styled.div`
+const HeaderSection = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+const PageTitle = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
 `;
 
-const ChartBox = styled.div`
-  background-color: white;
-  box-shadow: 0.2rem 0.2rem 0.8rem #d1d1d1;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    h2 {
-      color: #0000008e;
-      font-weight: 500;
+const DashboardGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+`;
+
+const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .ant-card-head {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 0 24px;
+  }
+
+  .ant-card-head-title {
+    padding: 16px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3c4858;
+  }
+
+  .ant-card-body {
+    padding: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-card-body {
+      padding: 16px;
     }
   }
-  @media only screen and (max-width: 1000px) {
-    padding: 0.5rem 0.2rem;
-  }
 `;
 
-const RightDiv = styled.div`
-  height: 100%;
-  background-color: white;
-  box-shadow: 0.2rem 0.2rem 0.8rem #d1d1d1;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  h2 {
-    color: #0000008e;
-    font-weight: 500;
-    text-align: center;
-  }
-  @media only screen and (max-width: 1000px) {
-    padding: 0.3rem 0.2rem;
-  }
-`;
-const Select = styled.select`
-  padding: 0.4rem;
-  border: none;
-  color: #777;
-  background-color: white;
-  border-radius: 0.6rem;
-  font-size: 0.9rem;
-  letter-spacing: 0.04rem;
-  border: 1px solid #777;
-  border-style: dotted;
-  text-transform: capitalize;
-  &:focus {
-    outline: none;
-    border: none;
-    border: 1px solid #777;
-    border-style: dotted;
-  }
-  @media only screen and (max-width: 1099px) {
-    padding: 1rem 0;
-  }
-`;
-const Option = styled.option`
-  color: #777;
-  font-weight: bold;
-  text-transform: capitalize;
+const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 `;
 
-const Table = styled.table`
+const ChartContainer = styled.div`
   width: 100%;
-  text-transform: capitalize;
-  text-align: center;
+  height: 300px;
+  margin-top: 1rem;
+`;
 
-  thead {
-    tr {
-      td {
-        font-weight: 600;
-        color: #0000009e;
-        padding: 0.4rem 0;
-        background-color: #f3f3f3;
-      }
-    }
+const StatGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+`;
+
+const StatCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: 100%;
+
+  .ant-card-body {
+    padding: 1.5rem;
   }
-  tbody {
-    tr {
-      td {
-        font-size: 1rem;
-        padding: 0.3rem 0;
-        div {
-          width: 1rem;
-          height: 1rem;
-        }
-      }
-    }
+
+  .ant-statistic-title {
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .ant-statistic-content {
+    color: #3c4858;
   }
 `;
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div
+        style={{
+          background: "white",
+          padding: "10px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <p style={{ margin: 0, fontWeight: 500 }}>{`${label}`}</p>
+        <p style={{ margin: 0, color: "#1677ff" }}>
+          {`Amount: $${payload[0].value.toFixed(2)}`}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const COLORSSTREAM = {
   Spotify: "#25D865",
@@ -203,6 +228,7 @@ const UserPanelHome = () => {
     Hungama: 0,
     Other: 0,
   };
+
   const date = new Date();
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth();
@@ -216,72 +242,95 @@ const UserPanelHome = () => {
   const [isLoading, setIsLoading] = useState(false);
   const userId = useSelector((state) => state.userId);
 
+  // Calculate total earnings for the selected year
+  const calculateTotalEarnings = () => {
+    if (!earningData) return 0;
+    return earningData.reduce((total, item) => total + item.amount, 0);
+  };
+
+  // Calculate current month earnings
+  const getCurrentMonthEarnings = () => {
+    if (!earningData) return 0;
+    const currentMonthData = earningData.find(
+      (item) => item.name === months[currentMonth]
+    );
+    return currentMonthData ? currentMonthData.amount : 0;
+  };
+
+  // Calculate average monthly earnings
+  const getAverageMonthlyEarnings = () => {
+    const total = calculateTotalEarnings();
+    return earningData ? total / earningData.length : 0;
+  };
+
   const fecher = async () => {
     setIsLoading(true);
-    const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+      );
+      const data = await res.json();
 
-    if (res.ok) {
-      setUserdata(data.user);
+      if (res.ok) {
+        setUserdata(data.user);
 
-      // for analytics
-      let resArr;
-      if (data.user.analytics[0][reportSelectedYear]) {
-        resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
-      }
-      let arr = [];
-
-      for (const key in resArr) {
-        if (key === "Other") {
-          continue;
+        // for analytics
+        let resArr;
+        if (data.user.analytics[0][reportSelectedYear]) {
+          resArr = data.user.analytics[0][reportSelectedYear][selectedMonth];
         }
-        const obj = {
-          name: key,
-          views: resArr[key],
-        };
-        arr.push(obj);
-      }
-      arr.sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
-      for (const key in resArr) {
-        if (key === "Other") {
+        let arr = [];
+
+        for (const key in resArr) {
+          if (key === "Other") {
+            continue;
+          }
           const obj = {
             name: key,
             views: resArr[key],
           };
           arr.push(obj);
         }
-        continue;
-      }
+        arr.sort((a, b) => {
+          return a.name.localeCompare(b.name);
+        });
+        for (const key in resArr) {
+          if (key === "Other") {
+            const obj = {
+              name: key,
+              views: resArr[key],
+            };
+            arr.push(obj);
+          }
+          continue;
+        }
 
-      setReportData(arr);
-      //   for earning
-      resArr = data.user.finacialReport[0][earningSelectedYear];
-      arr = [];
-      for (const key in resArr) {
-        const obj = {
-          name: key,
-          amount: resArr[key],
-        };
-        arr.push(obj);
+        setReportData(arr);
+        //   for earning
+        resArr = data.user.finacialReport[0][earningSelectedYear];
+        arr = [];
+        for (const key in resArr) {
+          const obj = {
+            name: key,
+            amount: resArr[key],
+          };
+          arr.push(obj);
+        }
+        setEarningData(arr);
       }
-      setEarningData(arr);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fecher();
-
-    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getSelectedValue = (e) => {
-    const ele = document.querySelector(`#${e.target.id}`);
-    const value = ele.options[ele.selectedIndex].value;
+  const getSelectedValue = (value) => {
     setEarningSelectedYear(Number(value));
     let resArr = userData.finacialReport[0][value];
     if (!resArr) {
@@ -297,10 +346,8 @@ const UserPanelHome = () => {
     }
     setEarningData(arr);
   };
-  const reportsYearChanger = (e) => {
-    const ele = document.querySelector(`#${e.target.id}`);
-    const value = ele.options[ele.selectedIndex].value;
 
+  const reportsYearChanger = (value) => {
     setReportSelectedYear(Number(value));
 
     let resArr;
@@ -322,36 +369,167 @@ const UserPanelHome = () => {
     setReportData(arr);
   };
 
+  const handleMonthChange = (value) => {
+    setSelectedMonth(value);
+    let resArr;
+    if ((resArr = userData.analytics[0][reportSelectedYear])) {
+      resArr = userData.analytics[0][reportSelectedYear][value];
+    }
+    if (!resArr) {
+      resArr = defaultReports;
+    }
+    let arr = [];
+    for (const key in resArr) {
+      const obj = {
+        name: key,
+        views: resArr[key],
+      };
+      arr.push(obj);
+    }
+
+    setReportData(arr);
+  };
+
+  const renderStats = () => {
+    if (!earningData) return null;
+
+    return (
+      <StatGrid>
+        <StatCard>
+          <Statistic
+            title="Total Earnings (Year)"
+            value={calculateTotalEarnings()}
+            prefix="$"
+            precision={2}
+            valueStyle={{ color: "#3f8600", fontSize: "1.5rem" }}
+            suffix={<RiseOutlined />}
+          />
+          <Text
+            type="secondary"
+            style={{ marginTop: "0.5rem", display: "block" }}
+          >
+            For {earningSelectedYear}
+          </Text>
+        </StatCard>
+
+        <StatCard>
+          <Statistic
+            title="Current Month Earnings"
+            value={getCurrentMonthEarnings()}
+            prefix="$"
+            precision={2}
+            valueStyle={{ color: "#1677ff", fontSize: "1.5rem" }}
+          />
+          <Text
+            type="secondary"
+            style={{ marginTop: "0.5rem", display: "block" }}
+          >
+            {months[currentMonth]} {earningSelectedYear}
+          </Text>
+        </StatCard>
+
+        <StatCard>
+          <Statistic
+            title="Monthly Average"
+            value={getAverageMonthlyEarnings()}
+            prefix="$"
+            precision={2}
+            valueStyle={{ fontSize: "1.5rem" }}
+          />
+          <Text
+            type="secondary"
+            style={{ marginTop: "0.5rem", display: "block" }}
+          >
+            Based on monthly data
+          </Text>
+        </StatCard>
+      </StatGrid>
+    );
+  };
+
   return (
-    <>
-      <MainDiv>
-        {isLoading && <MusicLoader />}
+    <MainContainer>
+      <HeaderSection>
         <Breadcrumb
           items={[
             {
-              title: "User Panel",
+              title: (
+                <Link to="/">
+                  <HomeOutlined />
+                </Link>
+              ),
             },
-            {
-              title: "Home",
-            },
+            { title: "User Panel" },
+            { title: "Dashboard" },
           ]}
         />
-        <h1>
-          <span>Overview</span>
-        </h1>{" "}
-        <UserOrdersStatus />
-        {userData && !isLoading && (
-          <ContentDiv>
-            <LeftDiv>
-              {" "}
-              <ChartBox>
-                <div style={{ padding: "0 1rem" }}>
-                  {" "}
-                  <h2>Earning</h2>{" "}
+
+        <PageTitle>
+          <Title level={3} style={{ margin: 0 }}>
+            <DashboardOutlined /> Dashboard Overview
+          </Title>
+          {userData && (
+            <Badge count="Live" style={{ backgroundColor: "#52c41a" }} />
+          )}
+        </PageTitle>
+      </HeaderSection>
+
+      {isLoading ? (
+        <>
+          <Skeleton
+            active
+            paragraph={{ rows: 2 }}
+            style={{ marginBottom: "1rem" }}
+          />
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={8}>
+              <Skeleton.Button
+                active
+                style={{ width: "100%", height: "120px" }}
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <Skeleton.Button
+                active
+                style={{ width: "100%", height: "120px" }}
+              />
+            </Col>
+            <Col xs={24} sm={8}>
+              <Skeleton.Button
+                active
+                style={{ width: "100%", height: "120px" }}
+              />
+            </Col>
+          </Row>
+          <Skeleton.Button
+            active
+            style={{ width: "100%", height: "400px", marginTop: "1.5rem" }}
+          />
+        </>
+      ) : (
+        <>
+          <UserOrdersStatus />
+
+          {userData && (
+            <DashboardGrid>
+              {/* {renderStats()} */}
+
+              <StyledCard>
+                <CardHeader>
+                  <Space align="center">
+                    <DollarOutlined
+                      style={{ fontSize: "1.25rem", color: "#1677ff" }}
+                    />
+                    <Title level={4} style={{ margin: 0 }}>
+                      Earnings
+                    </Title>
+                  </Space>
+
                   <Select
-                    name="category"
-                    id="category"
+                    defaultValue={`${currentYear}`}
+                    style={{ width: 120 }}
                     onChange={getSelectedValue}
+                    suffixIcon={<CalendarOutlined />}
                   >
                     <Option value={`${currentYear}`}>{currentYear}</Option>
                     <Option value={`${currentYear - 1}`}>
@@ -361,85 +539,92 @@ const UserPanelHome = () => {
                       {currentYear - 2}
                     </Option>
                   </Select>
-                </div>
-                {earningData && (
-                  <ResponsiveContainer width={"100%"} height={300}>
-                    <AreaChart
-                      width={500}
-                      height={400}
-                      data={earningData}
-                      margin={{
-                        top: 10,
-                        right: 10,
-                        left: 0,
-                        bottom: 0,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="1 1" />
-                      <XAxis dataKey="name" style={{ fontSize: ".8rem" }} />
-                      <YAxis />
-                      <Tooltip />
-                      <Area
-                        type="monotone"
-                        dataKey="amount"
-                        stroke="#8884d8"
-                        fill="#1677FF"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
-              </ChartBox>
-              {/* <ChartBox>
-                <div style={{ padding: "0 1rem" }}>
-                  {" "}
-                  <h2>Reports</h2>{" "}
-                  <div style={{ display: "flex", gap: "1rem" }}>
-                    <Select
-                      name="reportMonth"
-                      id="reportMonth"
-                      onChange={(e) => {
-                        const ele = document.querySelector(`#${e.target.id}`);
-                        const value = ele.options[ele.selectedIndex].value;
-                        setSelectedMonth(value);
-                        let resArr;
-                        if (
-                          (resArr = userData.analytics[0][reportSelectedYear])
-                        ) {
-                          resArr =
-                            userData.analytics[0][reportSelectedYear][value];
-                        }
-                        if (!resArr) {
-                          resArr = defaultReports;
-                        }
-                        let arr = [];
-                        for (const key in resArr) {
-                          const obj = {
-                            name: key,
-                            views: resArr[key],
-                          };
-                          arr.push(obj);
-                        }
+                </CardHeader>
 
-                        setReportData(arr);
-                      }}
-                    >
-                      <Option value={`${months[currentMonth]}`}>
-                        {months[currentMonth]}
-                      </Option>
-                      {months.map((m) => {
-                        if (m === months[currentMonth]) {
-                          return;
-                        }
-                        return (
-                          <Option key={m} value={`${m}`}>
-                            {m}
-                          </Option>
-                        );
-                      })}
-                    </Select>
+                <Divider style={{ margin: "0.5rem 0 1.5rem" }} />
+
+                {earningData && (
+                  <ChartContainer>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={earningData}
+                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                      >
+                        <defs>
+                          <linearGradient
+                            id="colorAmount"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#1677ff"
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#1677ff"
+                              stopOpacity={0.1}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis
+                          dataKey="name"
+                          axisLine={false}
+                          tickLine={false}
+                          style={{ fontSize: "0.8rem" }}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          style={{ fontSize: "0.8rem" }}
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Area
+                          type="monotone"
+                          dataKey="amount"
+                          stroke="#1677ff"
+                          strokeWidth={2}
+                          fill="url(#colorAmount)"
+                          activeDot={{ r: 6 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                )}
+              </StyledCard>
+
+              {/* Uncomment this section if you want to re-enable the reports chart */}
+              <StyledCard>
+                <CardHeader>
+                  <Space align="center">
+                    <BarChartOutlined
+                      style={{ fontSize: "1.25rem", color: "#52c41a" }}
+                    />
+                    <Title level={4} style={{ margin: 0 }}>
+                      Reports
+                    </Title>
+                  </Space>
+
+                  <Space>
                     <Select
-                      name="reportsYear"
-                      id="reportsYear"
+                      defaultValue={selectedMonth}
+                      style={{ width: 100 }}
+                      onChange={handleMonthChange}
+                    >
+                      {months.map((month) => (
+                        <Option key={month} value={month}>
+                          {month}
+                        </Option>
+                      ))}
+                    </Select>
+
+                    <Select
+                      defaultValue={`${currentYear}`}
+                      style={{ width: 100 }}
                       onChange={reportsYearChanger}
                     >
                       <Option value={`${currentYear}`}>{currentYear}</Option>
@@ -450,101 +635,174 @@ const UserPanelHome = () => {
                         {currentYear - 2}
                       </Option>
                     </Select>
-                  </div>
-                </div>
-                <ResponsiveContainer width={"100%"} height={300}>
-                  <BarChart
-                    width={500}
-                    height={400}
-                    data={reportData}
-                    margin={{
-                      top: 10,
-                      right: 10,
-                      left: 0,
-                      bottom: 0,
+                  </Space>
+                </CardHeader>
+
+                <Divider style={{ margin: "0.5rem 0 1.5rem" }} />
+
+                {reportData && reportData.length > 0 ? (
+                  <Row gutter={16}>
+                    <Col xs={24} md={16}>
+                      <ChartContainer>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={reportData}
+                            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                          >
+                            <defs>
+                              {Object.entries(COLORSSTREAM).map(
+                                ([name, color]) => (
+                                  <linearGradient
+                                    key={name}
+                                    id={`color-${name}`}
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1"
+                                  >
+                                    <stop
+                                      offset="0%"
+                                      stopColor={color}
+                                      stopOpacity={0.8}
+                                    />
+                                    <stop
+                                      offset="95%"
+                                      stopColor={color}
+                                      stopOpacity={0.2}
+                                    />
+                                  </linearGradient>
+                                )
+                              )}
+                            </defs>
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              stroke="#f0f0f0"
+                              vertical={false}
+                            />
+                            <XAxis
+                              dataKey="name"
+                              axisLine={false}
+                              tickLine={false}
+                              style={{ fontSize: "0.8rem" }}
+                            />
+                            <YAxis
+                              axisLine={false}
+                              tickLine={false}
+                              style={{ fontSize: "0.8rem" }}
+                            />
+                            <Tooltip
+                              cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
+                              contentStyle={{
+                                borderRadius: "8px",
+                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                border: "none",
+                              }}
+                            />
+                            <Legend
+                              wrapperStyle={{
+                                paddingTop: "10px",
+                              }}
+                            />
+                            <Bar
+                              dataKey="views"
+                              name="Views"
+                              radius={[4, 4, 0, 0]}
+                              barSize={30}
+                              animationDuration={1500}
+                            >
+                              {reportData.map((entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={`url(#color-${entry.name})`}
+                                />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </ChartContainer>
+                    </Col>
+
+                    <Col xs={24} md={8}>
+                      <ChartContainer>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={reportData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              paddingAngle={5}
+                              dataKey="views"
+                              nameKey="name"
+                              label={({ name, percent }) =>
+                                `${name}: ${(percent * 100).toFixed(0)}%`
+                              }
+                              labelLine={false}
+                              animationDuration={1500}
+                            >
+                              {reportData.map((entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={COLORSSTREAM[entry.name]}
+                                />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              formatter={(value, name) => [
+                                `${value} views`,
+                                name,
+                              ]}
+                              contentStyle={{
+                                borderRadius: "8px",
+                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                border: "none",
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </ChartContainer>
+                    </Col>
+                  </Row>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "2rem",
+                      minHeight: "300px",
                     }}
                   >
-                    <CartesianGrid strokeDasharray="1 1" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-
-                    <Bar
-                      dataKey="views"
-                      fill="#82ca9d"
-                      activeBar={<Rectangle fill="gold" stroke="purple" />}
+                    <BarChartOutlined
+                      style={{
+                        fontSize: "3rem",
+                        color: "#d9d9d9",
+                        marginBottom: "1rem",
+                      }}
                     />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartBox> */}
-            </LeftDiv>
-            {/* <RightDiv>
-              <h2>Reports Summary</h2>
+                    <Text type="secondary" style={{ fontSize: "1rem" }}>
+                      No streaming data available for {selectedMonth}{" "}
+                      {reportSelectedYear}
+                    </Text>
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}
+                    >
+                      Try selecting a different month or year
+                    </Text>
+                  </div>
+                )}
+              </StyledCard>
+            </DashboardGrid>
+          )}
+        </>
+      )}
 
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart width={1000} height={400}>
-                  <Pie
-                    dataKey="views"
-                    isAnimationActive={true}
-                    data={reportData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={120}
-                    fill="#8884d8"
-                    label
-                  >
-                    {reportData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORSSTREAM[entry["name"]]}
-                      />
-                    ))}
-                  </Pie>
-
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <Table>
-                <thead>
-                  <tr>
-                    <td></td>
-                    <td>platform</td>
-                    <td>Views</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reportData.map((obj) => {
-                    const { name, views } = obj;
-                    return (
-                      <tr key={name}>
-                        <td
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            gap: ".4rem",
-                            alignItems: "center",
-                            width: "100%",
-                          }}
-                        >
-                          <div
-                            style={{
-                              backgroundColor: `${COLORSSTREAM[name]}`,
-                            }}
-                          ></div>
-                        </td>
-                        <td>{name}</td>
-                        <td>{views}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
-            </RightDiv> */}
-          </ContentDiv>
-        )}
-      </MainDiv>
-    </>
+      {isLoading && <MusicLoader />}
+    </MainContainer>
   );
 };
 
