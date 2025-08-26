@@ -578,7 +578,7 @@ const PendingWork = () => {
           loading={isLoading}
           onChange={handleTableChange}
           pagination={{
-            pageSize: 6,
+            pageSize: 5,
             showSizeChanger: true,
             pageSizeOptions: ["10", "20", "50"],
             showTotal: (total) => `Total ${total} orders`,

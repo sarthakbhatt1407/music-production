@@ -428,7 +428,7 @@ const CopyRightPage = () => {
             dataSource={tableData}
             rowKey="key"
             pagination={{
-              pageSize: 10,
+              pageSize: 5,
               hideOnSinglePage: true,
               showSizeChanger: false,
             }}

@@ -410,7 +410,7 @@ const CopyrightAdmin = () => {
           loading={isLoading}
           onChange={handleTableChange}
           pagination={{
-            pageSize: 6,
+            pageSize: 5,
             showSizeChanger: true,
             showQuickJumper: true,
             position: ["bottomCenter"],
