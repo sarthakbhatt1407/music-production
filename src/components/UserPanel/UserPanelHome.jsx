@@ -162,7 +162,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       >
         <p style={{ margin: 0, fontWeight: 500 }}>{`${label}`}</p>
         <p style={{ margin: 0, color: "#1677ff" }}>
-          {`Amount: $${payload[0].value.toFixed(2)}`}
+          {`Amount: ₹${payload[0].value.toFixed(2)}`}
         </p>
       </div>
     );
