@@ -36,6 +36,7 @@ import { BsCashCoin } from "react-icons/bs";
 import MusicLoader from "../components/Loader/MusicLoader";
 import ArtistManagement from "../components/AdminPanel/ArtistManagement";
 import { useSelector } from "react-redux";
+import AdminHome from "../components/AdminPanel/AdminHome";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -256,7 +257,7 @@ const AdminPanel = () => {
           left: "1%",
           transform: "scale(1)",
           zIndex: 1,
-          bottom: "6%",
+          bottom: "4%",
         }}
         tooltip={<div>Admin Actions</div>}
         icon={<IoIosAdd />}
@@ -478,6 +479,7 @@ const AdminPanel = () => {
 
       <AdminDrawerPanel page={page}>
         {page === "orders" && <Orders />}
+        {page === "home" && <AdminHome />}
         {page === "pending-work" && <PendingWork />}
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}

@@ -155,6 +155,7 @@ const Orders = () => {
         `${process.env.REACT_APP_BASE_URL}/order/get-all-orders/?userId=${userId}`
       );
       const data = await res.json();
+      console.log(data);
 
       if (res.ok) {
         const sortedOrders = data.orders.reverse();

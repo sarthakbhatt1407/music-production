@@ -123,18 +123,22 @@ const DrawerPanel = (props) => {
           }}
           defaultSelectedKeys={defaultSelector(page)}
           items={[
-            // {
-            //   key: "1",
-            //   icon: (
-            //     <Link
-            //       to={"/admin-panel/home"}
-            //       onClick={() => setCollapsed(true)}
-            //     >
-            //       <HomeOutlined />
-            //     </Link>
-            //   ),
-            //   label: "Home",
-            // },
+            {
+              key: "1",
+              icon: (
+                <Link
+                  to={"/admin-panel/home"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <HomeOutlined
+                    style={{
+                      transform: "scale(1.1)",
+                    }}
+                  />
+                </Link>
+              ),
+              label: "Home",
+            },
             {
               key: "2",
               icon: (

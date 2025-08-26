@@ -522,7 +522,7 @@ const MobileOtpLogin = () => {
                 type: "log in",
                 data: { ...loginData, type: "music-admin", adminView: false },
               });
-              navigate("/admin-panel/orders");
+              navigate("/admin-panel/home");
             }
           }, 1000);
         }
