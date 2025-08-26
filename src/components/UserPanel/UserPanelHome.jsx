@@ -150,6 +150,10 @@ const StatCard = styled(Card)`
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    // Check if the value is a number and handle it safely
+    const value = payload[0].value;
+    const formattedValue = typeof value === "number" ? value.toFixed(2) : value;
+
     return (
       <div
         style={{
@@ -162,7 +166,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       >
         <p style={{ margin: 0, fontWeight: 500 }}>{`${label}`}</p>
         <p style={{ margin: 0, color: "#1677ff" }}>
-          {`Amount: ₹${payload[0].value.toFixed(2)}`}
+          {`Amount: ₹${formattedValue}`}
         </p>
       </div>
     );
