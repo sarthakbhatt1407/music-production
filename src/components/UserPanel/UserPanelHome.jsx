@@ -521,9 +521,6 @@ const UserPanelHome = () => {
               <StyledCard>
                 <CardHeader>
                   <Space align="center">
-                    <DollarOutlined
-                      style={{ fontSize: "1.25rem", color: "#1677ff" }}
-                    />
                     <Title level={4} style={{ margin: 0 }}>
                       Earnings
                     </Title>

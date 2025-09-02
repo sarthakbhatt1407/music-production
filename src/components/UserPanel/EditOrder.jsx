@@ -961,7 +961,6 @@ const EditOrder = () => {
     const directorNames = selectedDirectors.map((s) => s.name).join(", ");
     const producerNames = selectedProducers.map((s) => s.name).join(", ");
     const starCastNames = selectedStarCast.map((s) => s.name).join(", ");
-    console.log(starCastNames);
 
     const formData = new FormData();
 

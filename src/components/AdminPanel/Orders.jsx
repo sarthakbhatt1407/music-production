@@ -11,6 +11,7 @@ import {
   SearchOutlined,
   ReloadOutlined,
   FilterOutlined,
+  FileExcelOutlined,
 } from "@ant-design/icons";
 import MusicLoader from "../Loader/MusicLoader";
 import {
@@ -432,14 +433,32 @@ const Orders = () => {
         <h1 style={{ fontSize: "1.5rem", fontWeight: 600, margin: 0 }}>
           Pending Orders
         </h1>
-        <Input
-          placeholder="Search by album, label, language..."
-          prefix={<SearchOutlined />}
-          style={{ width: 300 }}
-          value={searchText}
-          onChange={handleSearch}
-          allowClear
-        />
+        <Space>
+          <Input
+            placeholder="Search by album, label, language..."
+            prefix={<SearchOutlined />}
+            style={{ width: 300 }}
+            value={searchText}
+            onChange={handleSearch}
+            allowClear
+          />
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            style={{
+              background: "#52c41a",
+              borderColor: "#52c41a",
+            }}
+            onClick={() => {
+              window.open(
+                `${process.env.REACT_APP_BASE_URL}/order/get/export/waiting`,
+                "_blank"
+              );
+            }}
+          >
+            Export to Excel
+          </Button>
+        </Space>
       </HeaderBox>
 
       {/* Search and Control Buttons */}

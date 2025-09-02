@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import intro from "../assets/images/intro.webp";
 import introMobile from "../assets/images/introMobile.webp";
+import { useNavigate } from "react-router";
 
 const MainBox = styled.div`
   height: 98vh;
@@ -179,6 +180,7 @@ const scrollToSection = (sectionId) => {
   }
 };
 const IntroBox = () => {
+  const navigate = useNavigate();
   return (
     <MainBox id="intro" intro={intro} introMobile={introMobile}>
       <TextBox>
@@ -194,9 +196,11 @@ const IntroBox = () => {
         <BtnBox>
           <button
             data-aos="fade-up"
-            onClick={scrollToSection.bind(this, "overview")}
+            onClick={() => {
+              navigate("/login");
+            }}
           >
-            view more
+            Sign In
           </button>
         </BtnBox>
       </TextBox>

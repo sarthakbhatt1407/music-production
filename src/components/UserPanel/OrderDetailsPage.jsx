@@ -640,7 +640,7 @@ const OrderDetailsPage = () => {
   const [orderLoop, setOrderLoop] = useState([]);
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
-
+  const [audioReady, setAudioReady] = useState(false);
   // States for parsed artists
   const [parsedSingers, setParsedSingers] = useState([]);
   const [parsedComposers, setParsedComposers] = useState([]);
@@ -771,7 +771,7 @@ const OrderDetailsPage = () => {
     if (field === "labelName") return "Label Name";
     if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
       return "Sub Label";
-    if (field === "dateOfRelease") return "Date of Release";
+    if (field === "dateOfRelease") return "Date of Live";
     if (field === "AlbumType" || field === "albumType") return "Album Type";
     if (field === "orderDateAndTime") return "Order Date";
     if (field === "musicDirector") return "Music Director";
@@ -958,15 +958,40 @@ const OrderDetailsPage = () => {
             </AlbumCover>
 
             <AlbumTitle level={3}>{order.title}</AlbumTitle>
-
             <StyledAudioPlayer>
-              <AudioPlayer
-                src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
-                autoPlayAfterSrcChange={false}
-                showJumpControls={false}
-                customAdditionalControls={[]}
-                layout="stacked-reverse"
-              />
+              {!audioReady ? (
+                <Button
+                  type="primary"
+                  icon={<FaPlayCircle />}
+                  size="large"
+                  onClick={() => setAudioReady(true)}
+                  style={{
+                    width: "100%",
+                    height: "48px",
+                    marginBottom: "8px",
+                    background: "linear-gradient(to right, #1677ff, #69c0ff)",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    fontSize: "16px",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Play Audio
+                </Button>
+              ) : (
+                <AudioPlayer
+                  key="audio-player"
+                  src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
+                  autoPlayAfterSrcChange={true}
+                  showJumpControls={false}
+                  customAdditionalControls={[]}
+                  layout="stacked-reverse"
+                />
+              )}
             </StyledAudioPlayer>
 
             {order.description && (
@@ -985,6 +1010,21 @@ const OrderDetailsPage = () => {
                   <FaInfoCircle /> Basic Information
                 </GroupTitle>
                 <DetailsList>
+                  {groupedFields.labels.map(({ field, value, id }) => {
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
                   {groupedFields.main.map(({ field, value, id }) => {
                     // Skip fields already displayed in the left panel
                     if (field === "title" || field === "description")
@@ -997,6 +1037,35 @@ const OrderDetailsPage = () => {
                         key={id}
                         highlighted={field.toLowerCase() === "status"}
                       >
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                  {groupedFields.other.map(({ field, value, id }) => {
+                    // Skip artist fields as they're handled separately
+                    if (
+                      field === "file" ||
+                      field === "thumbnail" ||
+                      field.includes("singer") ||
+                      field.includes("composer") ||
+                      field.includes("lyricist") ||
+                      field === "musicDirector" ||
+                      field === "director" ||
+                      field === "producer" ||
+                      field === "starCast"
+                    )
+                      return null;
+
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
                         <DetailLabel>
                           {getFieldIcon(formattedField)}
                           {formattedField}
@@ -1020,6 +1089,7 @@ const OrderDetailsPage = () => {
                 <DetailsList>
                   {groupedFields.dates.map(({ field, value, id }) => {
                     if (field === "dateLive") return null;
+                    if (field === "orderDateAndTime") return null;
 
                     const formattedField = formatFieldName(field);
                     let displayValue = value;
@@ -1036,32 +1106,6 @@ const OrderDetailsPage = () => {
                         </DetailLabel>
                         <DetailValue>
                           {renderFieldValue(formattedField, displayValue)}
-                        </DetailValue>
-                      </DetailRow>
-                    );
-                  })}
-                </DetailsList>
-              </DetailsGroup>
-            )}
-
-            {/* Labels group */}
-            {groupedFields.labels.length > 0 && (
-              <DetailsGroup>
-                <GroupTitle level={5}>
-                  <FaUsers /> Label Information
-                </GroupTitle>
-                <DetailsList>
-                  {groupedFields.labels.map(({ field, value, id }) => {
-                    const formattedField = formatFieldName(field);
-
-                    return (
-                      <DetailRow key={id}>
-                        <DetailLabel>
-                          {getFieldIcon(formattedField)}
-                          {formattedField}
-                        </DetailLabel>
-                        <DetailValue>
-                          {renderFieldValue(formattedField, value)}
                         </DetailValue>
                       </DetailRow>
                     );
@@ -1378,46 +1422,6 @@ const OrderDetailsPage = () => {
                 </DetailRow>
               )}
             </DetailsGroup>
-
-            {/* Other information */}
-            {groupedFields.other.length > 0 && (
-              <DetailsGroup>
-                <GroupTitle level={5}>
-                  <FaShieldAlt /> Additional Information
-                </GroupTitle>
-                <DetailsList>
-                  {groupedFields.other.map(({ field, value, id }) => {
-                    // Skip artist fields as they're handled separately
-                    if (
-                      field === "file" ||
-                      field === "thumbnail" ||
-                      field.includes("singer") ||
-                      field.includes("composer") ||
-                      field.includes("lyricist") ||
-                      field === "musicDirector" ||
-                      field === "director" ||
-                      field === "producer" ||
-                      field === "starCast"
-                    )
-                      return null;
-
-                    const formattedField = formatFieldName(field);
-
-                    return (
-                      <DetailRow key={id}>
-                        <DetailLabel>
-                          {getFieldIcon(formattedField)}
-                          {formattedField}
-                        </DetailLabel>
-                        <DetailValue>
-                          {renderFieldValue(formattedField, value)}
-                        </DetailValue>
-                      </DetailRow>
-                    );
-                  })}
-                </DetailsList>
-              </DetailsGroup>
-            )}
 
             {/* Downloads section */}
             <DetailsGroup>

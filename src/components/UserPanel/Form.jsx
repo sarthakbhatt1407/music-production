@@ -7,6 +7,7 @@ import {
   Select,
   Input as AntdInput,
 } from "antd";
+import AudioPlayer from "react-h5-audio-player";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
@@ -1289,11 +1290,13 @@ const Form = () => {
       .join(", ");
 
     const starCastNames = selectedStarCast.map((s) => s.name).join(", ");
+    console.log(
+      selectedStarCast && selectedStarCast.length > 0 ? starCastNames : ""
+    );
 
     const musicDirectorNames = selectedMusicDirectors
       .map((s) => s.name)
       .join(", ");
-    console.log(musicDirectorNames);
 
     const directorNames = selectedDirectors.map((s) => s.name).join(", ");
     const producerNames = selectedProducers.map((s) => s.name).join(", ");
@@ -1329,9 +1332,7 @@ const Form = () => {
     formData.append("genre", inpFields.genre);
     formData.append(
       "starCast",
-      inpFields.starCast && inpFields.starCastNames.length > 0
-        ? starCastNames
-        : ""
+      selectedStarCast && selectedStarCast.length > 0 ? starCastNames : ""
     );
 
     formData.append("singerAppleId", singerAppleIds);
@@ -2081,7 +2082,7 @@ const Form = () => {
                     <Option value="Kokborok">Kokborok</Option>
                     <Option value="Konkani">Konkani</Option>
                     <Option value="Korean">Korean</Option>
-                    <Option value="Kumauni">Kumauni</Option>
+                    {/* <Option value="Kumauni">Kumauni</Option> */}
                     <Option value="Latin">Latin</Option>
                     <Option value="Maithili">Maithili</Option>
                     <Option value="Malay">Malay</Option>
@@ -2252,6 +2253,24 @@ const Form = () => {
                   >
                     <Button icon={<UploadOutlined />}>Audio file</Button>
                   </Upload>
+                  {inpFields.file && (
+                    <AudioPlayer
+                      src={
+                        inpFields.file
+                          ? typeof inpFields.file === "string"
+                            ? inpFields.file
+                            : URL.createObjectURL(inpFields.file)
+                          : ""
+                      }
+                      autoPlayAfterSrcChange={false}
+                      showJumpControls={false}
+                      customAdditionalControls={[]}
+                      layout="stacked-reverse"
+                      style={{
+                        marginTop: "1rem",
+                      }}
+                    />
+                  )}
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="isrc">isrc</Label>
@@ -2289,18 +2308,15 @@ const Form = () => {
                       (hh:mm:ss)
                     </span>
                   </Label>
-
                   <TimePicker
                     name="crbt"
                     id="crbt"
                     format={format}
-                    defaultValue={moment("00:00:30", format)}
                     onChange={(time) => {
-                      if (!time) {
-                        return;
-                      }
-                      let res = time.format(format); // Use moment's format to ensure correct output
-                      setInpFields({ ...inpFields, crbt: res });
+                      if (!time) return;
+                      console.log("hi");
+                      console.log(time.format(format));
+                      setInpFields({ ...inpFields, crbt: time.format(format) });
                     }}
                   />
                 </LabelInpBox>

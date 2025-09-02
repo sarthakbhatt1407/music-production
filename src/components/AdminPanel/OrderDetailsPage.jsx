@@ -46,6 +46,7 @@ import {
   FaTimesCircle,
   FaMusic,
   FaCopy,
+  FaFileExcel,
   FaSpotify,
 } from "react-icons/fa";
 
@@ -752,6 +753,7 @@ const OrderDetailsPage = () => {
   const [orderLoop, setOrderLoop] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const [audioReady, setAudioReady] = useState(false);
 
   // States for parsed artists
   const [parsedSingers, setParsedSingers] = useState([]);
@@ -986,7 +988,7 @@ const OrderDetailsPage = () => {
     if (field === "labelName") return "Label Name";
     if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
       return "Sub Label";
-    if (field === "dateOfRelease") return "Date of Release";
+    if (field === "dateOfRelease") return "Date of Live";
     if (field === "AlbumType" || field === "albumType") return "Album Type";
     if (field === "orderDateAndTime") return "Order Date";
     if (field === "musicDirector") return "Music Director";
@@ -1165,12 +1167,33 @@ const OrderDetailsPage = () => {
               )}
             </Space>
 
-            <BackButton
-              onClick={() => navigate("/admin-panel/orders")}
-              icon={<FaArrowLeft />}
-            >
-              Back to Albums
-            </BackButton>
+            <Space>
+              <Button
+                type="primary"
+                icon={<FaFileExcel />}
+                style={{
+                  background: "#52c41a",
+                  borderColor: "#52c41a",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+                onClick={() => {
+                  window.open(
+                    `${process.env.REACT_APP_BASE_URL}/order/export/${order.id}`,
+                    "_blank"
+                  );
+                }}
+              >
+                Export to Excel
+              </Button>
+              {/* <BackButton
+                onClick={() => navigate("/admin-panel/orders")}
+                icon={<FaArrowLeft />}
+              >
+                Back to Albums
+              </BackButton> */}
+            </Space>
           </NavigationRow>
         </div>
       </PageHeader>
@@ -1203,16 +1226,40 @@ const OrderDetailsPage = () => {
             </AlbumCover>
 
             <AlbumTitle level={3}>{order.title}</AlbumTitle>
-
             <StyledAudioPlayer>
-              <AudioPlayer
-                src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
-                autoPlayAfterSrcChange={false}
-                showJumpControls={false}
-                customAdditionalControls={[]}
-                layout="stacked-reverse"
-                onPlay={(e) => console.log("onPlay")}
-              />
+              {!audioReady ? (
+                <Button
+                  type="primary"
+                  icon={<FaPlayCircle />}
+                  size="large"
+                  onClick={() => setAudioReady(true)}
+                  style={{
+                    width: "100%",
+                    height: "48px",
+                    marginBottom: "8px",
+                    background: "linear-gradient(to right, #1677ff, #69c0ff)",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    fontSize: "16px",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Play Audio
+                </Button>
+              ) : (
+                <AudioPlayer
+                  key="audio-player"
+                  src={`${process.env.REACT_APP_BASE_URL}/${order.file}`}
+                  autoPlayAfterSrcChange={true}
+                  showJumpControls={false}
+                  customAdditionalControls={[]}
+                  layout="stacked-reverse"
+                />
+              )}
             </StyledAudioPlayer>
 
             {order.description && (
@@ -1231,6 +1278,21 @@ const OrderDetailsPage = () => {
                   <FaInfoCircle /> Basic Information
                 </GroupTitle>
                 <DetailsList>
+                  {groupedFields.labels.map(({ field, value, id }) => {
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
                   {groupedFields.main.map(({ field, value, id }) => {
                     // Skip fields already displayed in the left panel
                     if (field === "title" || field === "description")
@@ -1252,6 +1314,59 @@ const OrderDetailsPage = () => {
                         </DetailValue>
                       </DetailRow>
                     );
+                  })}{" "}
+                  {groupedFields.other.map(({ field, value, id }) => {
+                    // Skip fields that are handled elsewhere
+                    if (
+                      field === "file" ||
+                      field === "thumbnail" ||
+                      field === "musicDirector" ||
+                      field === "director" ||
+                      field === "producer" ||
+                      field === "starCast" ||
+                      field === "youtubeContentId" ||
+                      field === "youtubeMusic" ||
+                      field.includes("singer") ||
+                      field.includes("composer") ||
+                      field.includes("lyricist")
+                    )
+                      return null;
+
+                    const formattedField = formatFieldName(field);
+
+                    return (
+                      <DetailRow key={id}>
+                        <DetailLabel>
+                          {getFieldIcon(formattedField)}
+                          {formattedField}
+                        </DetailLabel>
+                        <DetailValue>
+                          {renderFieldValue(formattedField, value)}
+                        </DetailValue>
+                      </DetailRow>
+                    );
+                  })}
+                  {orderLoop.map(({ field, value, id }) => {
+                    if (
+                      (field === "youtubeContentId" ||
+                        field === "youtubeMusic") &&
+                      value.trim().length > 0
+                    ) {
+                      const formattedField = formatFieldName(field);
+
+                      return (
+                        <DetailRow key={id}>
+                          <DetailLabel>
+                            {getFieldIcon(formattedField)}
+                            {formattedField}
+                          </DetailLabel>
+                          <DetailValue>
+                            {renderFieldValue(formattedField, value)}
+                          </DetailValue>
+                        </DetailRow>
+                      );
+                    }
+                    return null;
                   })}
                 </DetailsList>
               </DetailsGroup>
@@ -1267,7 +1382,8 @@ const OrderDetailsPage = () => {
                   {groupedFields.dates.map(({ field, value, id }) => {
                     const formattedField = formatFieldName(field);
                     let displayValue = value;
-
+                    if (field === "dateLive") return null;
+                    if (field === "orderDateAndTime") return null;
                     if (field === "orderDateAndTime") {
                       displayValue = value.split("/")[0];
                     }
@@ -1280,32 +1396,6 @@ const OrderDetailsPage = () => {
                         </DetailLabel>
                         <DetailValue>
                           {renderFieldValue(formattedField, displayValue)}
-                        </DetailValue>
-                      </DetailRow>
-                    );
-                  })}
-                </DetailsList>
-              </DetailsGroup>
-            )}
-
-            {/* Labels group */}
-            {groupedFields.labels.length > 0 && (
-              <DetailsGroup>
-                <GroupTitle level={5}>
-                  <FaUsers /> Label Information
-                </GroupTitle>
-                <DetailsList>
-                  {groupedFields.labels.map(({ field, value, id }) => {
-                    const formattedField = formatFieldName(field);
-
-                    return (
-                      <DetailRow key={id}>
-                        <DetailLabel>
-                          {getFieldIcon(formattedField)}
-                          {formattedField}
-                        </DetailLabel>
-                        <DetailValue>
-                          {renderFieldValue(formattedField, value)}
                         </DetailValue>
                       </DetailRow>
                     );
@@ -1662,80 +1752,6 @@ const OrderDetailsPage = () => {
                 </DetailRow>
               )}
             </DetailsGroup>
-
-            {/* YouTube Content ID and other social/platform links */}
-            <DetailsGroup>
-              <GroupTitle level={5}>
-                <FaLink /> Platform Links
-              </GroupTitle>
-              <DetailsList>
-                {/* YouTube fields */}
-                {orderLoop.map(({ field, value, id }) => {
-                  if (
-                    (field === "youtubeContentId" ||
-                      field === "youtubeMusic") &&
-                    value.trim().length > 0
-                  ) {
-                    const formattedField = formatFieldName(field);
-
-                    return (
-                      <DetailRow key={id}>
-                        <DetailLabel>
-                          {getFieldIcon(formattedField)}
-                          {formattedField}
-                        </DetailLabel>
-                        <DetailValue>
-                          {renderFieldValue(formattedField, value)}
-                        </DetailValue>
-                      </DetailRow>
-                    );
-                  }
-                  return null;
-                })}
-              </DetailsList>
-            </DetailsGroup>
-
-            {/* Other information */}
-            {groupedFields.other.length > 0 && (
-              <DetailsGroup>
-                <GroupTitle level={5}>
-                  <FaShieldAlt /> Additional Information
-                </GroupTitle>
-                <DetailsList>
-                  {groupedFields.other.map(({ field, value, id }) => {
-                    // Skip fields that are handled elsewhere
-                    if (
-                      field === "file" ||
-                      field === "thumbnail" ||
-                      field === "musicDirector" ||
-                      field === "director" ||
-                      field === "producer" ||
-                      field === "starCast" ||
-                      field === "youtubeContentId" ||
-                      field === "youtubeMusic" ||
-                      field.includes("singer") ||
-                      field.includes("composer") ||
-                      field.includes("lyricist")
-                    )
-                      return null;
-
-                    const formattedField = formatFieldName(field);
-
-                    return (
-                      <DetailRow key={id}>
-                        <DetailLabel>
-                          {getFieldIcon(formattedField)}
-                          {formattedField}
-                        </DetailLabel>
-                        <DetailValue>
-                          {renderFieldValue(formattedField, value)}
-                        </DetailValue>
-                      </DetailRow>
-                    );
-                  })}
-                </DetailsList>
-              </DetailsGroup>
-            )}
 
             {/* Downloads section */}
             <DetailsGroup>

@@ -28,6 +28,11 @@ import {
   CopyrightOutlined,
   FileProtectOutlined,
   WarningOutlined,
+  DollarOutlined,
+  TransactionOutlined,
+  WalletOutlined,
+  GiftOutlined,
+  BankOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -117,8 +122,18 @@ const AdminHome = () => {
   const [userStats, setUserStats] = useState(null);
   const [workStats, setWorkStats] = useState(null);
   const [copyrightStats, setCopyrightStats] = useState(null);
+  const [paymentStats, setPaymentStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Helper function to format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
 
   // Static data for recent users
   const recentUsers = [
@@ -188,6 +203,7 @@ const AdminHome = () => {
         setUserStats(data.userStats);
         setWorkStats(data.workStats);
         setCopyrightStats(data.copyrightStats);
+        setPaymentStats(data.paymentStats);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         setError(err.message);
@@ -213,6 +229,14 @@ const AdminHome = () => {
           pendingCopyright: 24,
           resolvedCopyright: 58,
           rejectedCopyright: 11,
+        });
+
+        // Fallback for payment stats
+        setPaymentStats({
+          totalPayment: 54680.25,
+          totalPaid: 42370.5,
+          totalBonusPaid: 3250.75,
+          balanceRem: 9059.0,
         });
       } finally {
         setIsLoading(false);
@@ -331,99 +355,12 @@ const AdminHome = () => {
   return (
     <DashboardContainer>
       <SectionTitle level={2}>Admin Dashboard</SectionTitle>
-
-      <Divider orientation="left">
-        <Space>
-          <TeamOutlined />
-          User Statistics
-        </Space>
-      </Divider>
-
-      <Row gutter={[24, 24]}>
-        <Col xs={24} sm={12} lg={6}>
-          <StatsCard>
-            <StatisticWrapper>
-              <IconWrapper bgColor="#e6f7ff" color="#1677ff">
-                <TeamOutlined />
-              </IconWrapper>
-              <Statistic
-                title="Total Users"
-                value={userStats.totalUsers}
-                valueStyle={{ color: "#1677ff" }}
-              />
-              <Text type="secondary">All registered users</Text>
-            </StatisticWrapper>
-          </StatsCard>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <StatsCard>
-            <StatisticWrapper>
-              <IconWrapper bgColor="#fff2e8" color="#fa541c">
-                <UserSwitchOutlined />
-              </IconWrapper>
-              <Statistic
-                title="Pending Approval"
-                value={userStats.pendingUsers}
-                valueStyle={{ color: "#fa541c" }}
-              />
-              <Progress
-                percent={Math.round(
-                  (userStats.pendingUsers / userStats.totalUsers) * 100
-                )}
-                status="active"
-                strokeColor="#fa541c"
-              />
-            </StatisticWrapper>
-          </StatsCard>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <StatsCard>
-            <StatisticWrapper>
-              <IconWrapper bgColor="#f6ffed" color="#52c41a">
-                <UserOutlined />
-              </IconWrapper>
-              <Statistic
-                title="Active Users"
-                value={userStats.activeUsers}
-                valueStyle={{ color: "#52c41a" }}
-              />
-              <Progress
-                percent={Math.round(
-                  (userStats.activeUsers / userStats.totalUsers) * 100
-                )}
-                status="active"
-                strokeColor="#52c41a"
-              />
-            </StatisticWrapper>
-          </StatsCard>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <StatsCard>
-            <StatisticWrapper>
-              <IconWrapper bgColor="#e6f7ff" color="#1677ff">
-                <UserAddOutlined />
-              </IconWrapper>
-              <Statistic
-                title="New This Month"
-                value={userStats.newUsersThisMonth}
-                valueStyle={{ color: "#1677ff" }}
-              />
-              <Text type="secondary">Recent signups</Text>
-            </StatisticWrapper>
-          </StatsCard>
-        </Col>
-      </Row>
-
       <Divider orientation="left" style={{ marginTop: "40px" }}>
         <Space>
           <FileDoneOutlined />
           Work Statistics
         </Space>
       </Divider>
-
       <Row gutter={[24, 24]}>
         <Col xs={24} sm={12} lg={6}>
           <StatsCard>
@@ -521,6 +458,188 @@ const AdminHome = () => {
                 valueStyle={{ color: "#a0d911" }}
               />
               <Text type="secondary">New work orders</Text>
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+      </Row>
+      {/* Payment Statistics Section */}
+      <Divider orientation="left" style={{ marginTop: "40px" }}>
+        <Space>
+          <DollarOutlined />
+          Payment Statistics
+        </Space>
+      </Divider>
+
+      <Row gutter={[24, 24]}>
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#e6fffb" color="#13c2c2">
+                <DollarOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Total Revenue"
+                value={paymentStats?.totalPayment || 0}
+                valueStyle={{ color: "#13c2c2" }}
+                formatter={(value) => formatCurrency(value)}
+              />
+              <Text type="secondary">All financial transactions</Text>
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#f6ffed" color="#52c41a">
+                <TransactionOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Total Paid"
+                value={paymentStats?.totalPaid || 0}
+                valueStyle={{ color: "#52c41a" }}
+                formatter={(value) => formatCurrency(value)}
+              />
+              <Progress
+                percent={Math.round(
+                  (paymentStats?.totalPaid / paymentStats?.totalPayment) *
+                    100 || 0
+                )}
+                status="success"
+                strokeColor="#52c41a"
+              />
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#fff0f6" color="#eb2f96">
+                <GiftOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Total Bonus Paid"
+                value={paymentStats?.totalBonusPaid || 0}
+                valueStyle={{ color: "#eb2f96" }}
+                formatter={(value) => formatCurrency(value)}
+              />
+              <Progress
+                percent={Math.round(
+                  (paymentStats?.totalBonusPaid / paymentStats?.totalPayment) *
+                    100 || 0
+                )}
+                status="active"
+                strokeColor="#eb2f96"
+              />
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#f9f0ff" color="#722ed1">
+                <WalletOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Balance Remaining"
+                value={paymentStats?.balanceRem || 0}
+                valueStyle={{ color: "#722ed1" }}
+                formatter={(value) => formatCurrency(value)}
+              />
+              <Progress
+                percent={Math.round(
+                  (paymentStats?.balanceRem / paymentStats?.totalPayment) *
+                    100 || 0
+                )}
+                status="active"
+                strokeColor="#722ed1"
+              />
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+      </Row>
+      <Divider orientation="left">
+        <Space>
+          <TeamOutlined />
+          User Statistics
+        </Space>
+      </Divider>
+
+      <Row gutter={[24, 24]}>
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#e6f7ff" color="#1677ff">
+                <TeamOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Total Users"
+                value={userStats.totalUsers}
+                valueStyle={{ color: "#1677ff" }}
+              />
+              <Text type="secondary">All registered users</Text>
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#fff2e8" color="#fa541c">
+                <UserSwitchOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Pending Approval"
+                value={userStats.pendingUsers}
+                valueStyle={{ color: "#fa541c" }}
+              />
+              <Progress
+                percent={Math.round(
+                  (userStats.pendingUsers / userStats.totalUsers) * 100
+                )}
+                status="active"
+                strokeColor="#fa541c"
+              />
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#f6ffed" color="#52c41a">
+                <UserOutlined />
+              </IconWrapper>
+              <Statistic
+                title="Active Users"
+                value={userStats.activeUsers}
+                valueStyle={{ color: "#52c41a" }}
+              />
+              <Progress
+                percent={Math.round(
+                  (userStats.activeUsers / userStats.totalUsers) * 100
+                )}
+                status="active"
+                strokeColor="#52c41a"
+              />
+            </StatisticWrapper>
+          </StatsCard>
+        </Col>
+
+        <Col xs={24} sm={12} lg={6}>
+          <StatsCard>
+            <StatisticWrapper>
+              <IconWrapper bgColor="#e6f7ff" color="#1677ff">
+                <UserAddOutlined />
+              </IconWrapper>
+              <Statistic
+                title="New This Month"
+                value={userStats.newUsersThisMonth}
+                valueStyle={{ color: "#1677ff" }}
+              />
+              <Text type="secondary">Recent signups</Text>
             </StatisticWrapper>
           </StatsCard>
         </Col>
