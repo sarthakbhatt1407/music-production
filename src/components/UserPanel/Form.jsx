@@ -349,13 +349,13 @@ const Form = () => {
       message: "Fill all require fields.",
     });
   };
-  const format = "HH:mm:ss";
+  const format = "mm:ss";
   const deafaultFields = {
     labelName: labelNameFromStore,
     title: "",
     dateOfRelease: "",
     albumType: "album",
-    language: "Hindi",
+    language: "Garhwali",
     mood: "Romantic",
     description: "",
     singer: "",
@@ -372,7 +372,7 @@ const Form = () => {
     upc: "",
     isrc: "",
     lyricist: "",
-    crbt: "00:00:30",
+    crbt: "00:30",
     genre: "",
     singerAppleId: "",
     singerSpotifyId: "",
@@ -391,6 +391,7 @@ const Form = () => {
     releaseDate: "",
     youtubeContentId: "Yes",
     youtubeMusic: "Yes",
+    contentType: "single",
   };
 
   const [filteredArtists, setFilteredArtists] = useState([]);
@@ -1179,6 +1180,7 @@ const Form = () => {
       inpFields.mood.length === 0 ||
       selectedSingers.length === 0 ||
       selectedLyricists.length === 0 ||
+      inpFields.contentType.length === 0 ||
       selectedComposers.length === 0 ||
       inpFields.thumbnail === null ||
       inpFields.file === null
@@ -1198,6 +1200,10 @@ const Form = () => {
       if (inpFields.language.length === 0) {
         const language = document.querySelector("#language");
         language.style.border = "1px solid red";
+      }
+      if (inpFields.contentType.length === 0) {
+        const contentType = document.querySelector("#contentType");
+        contentType.style.border = "1px solid red";
       }
       if (inpFields.mood.length === 0) {
         const mood = document.querySelector("#mood");
@@ -1320,6 +1326,7 @@ const Form = () => {
     formData.append("composer", composerNames.length > 0 ? composerNames : "");
     formData.append("lyricist", lyricistNames.length > 0 ? lyricistNames : "");
     formData.append("youtubeMusic", inpFields.youtubeMusic);
+    formData.append("contentType", inpFields.contentType);
     formData.append("youtubeContentId", inpFields.youtubeContentId);
 
     formData.append("lyrics", inpFields.lyrics);
@@ -1428,6 +1435,7 @@ const Form = () => {
               <Option value="musicDirector">Music Director</Option>
               <Option value="director">Director</Option>
               <Option value="producer">Producer</Option>
+              <Option value="starcast">Starcast</Option>
             </Select>
           </Form1.Item>
 
@@ -1926,6 +1934,87 @@ const Form = () => {
                   />
                 </LabelInpBox>
                 <LabelInpBox>
+                  <Label htmlFor="language">
+                    Album Language <span style={{ margin: 0 }}>*</span>
+                  </Label>
+
+                  <Select1
+                    name="language"
+                    id="language"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, language: value });
+                    }}
+                  >
+                    {" "}
+                    <Option value="Garhwali">Garhwali</Option>
+                    <Option value="Ahirani">Ahirani</Option>
+                    <Option value="Arabic">Arabic</Option>
+                    <Option value="Assamese">Assamese</Option>
+                    <Option value="Awadhi">Awadhi</Option>
+                    <Option value="Banjara">Banjara</Option>
+                    <Option value="Bengali">Bengali</Option>
+                    <Option value="Bhojpuri">Bhojpuri</Option>
+                    <Option value="Burmese">Burmese</Option>
+                    <Option value="Chhattisgarhi">Chhattisgarhi</Option>
+                    <Option value="Chinese">Chinese</Option>
+                    <Option value="Dogri">Dogri</Option>
+                    <Option value="English">English</Option>
+                    <Option value="French">French</Option>
+                    <Option value="Garo">Garo</Option>
+                    <Option value="Gujarati">Gujarati</Option>
+                    <Option value="Haryanvi">Haryanvi</Option>
+                    <Option value="Himachali">Himachali</Option>
+                    <Option value="Hindi">Hindi</Option>
+                    <Option value="Iban">Iban</Option>
+                    <Option value="Indonesian">Indonesian</Option>
+                    <Option value="Instrumental">Instrumental</Option>
+                    <Option value="Italian">Italian</Option>
+                    <Option value="Japanese">Japanese</Option>
+                    <Option value="Javanese">Javanese</Option>
+                    <Option value="Kannada">Kannada</Option>
+                    <Option value="Kashmiri">Kashmiri</Option>
+                    <Option value="Khasi">Khasi</Option>
+                    <Option value="Kokborok">Kokborok</Option>
+                    <Option value="Konkani">Konkani</Option>
+                    <Option value="Korean">Korean</Option>
+                    {/* <Option value="Kumauni">Kumauni</Option> */}
+                    <Option value="Latin">Latin</Option>
+                    <Option value="Maithili">Maithili</Option>
+                    <Option value="Malay">Malay</Option>
+                    <Option value="Malayalam">Malayalam</Option>
+                    <Option value="Mandarin">Mandarin</Option>
+                    <Option value="Manipuri">Manipuri</Option>
+                    <Option value="Marathi">Marathi</Option>
+                    <Option value="Marwari">Marwari</Option>
+                    <Option value="Naga">Naga</Option>
+                    <Option value="Nagpuri">Nagpuri</Option>
+                    <Option value="Nepali">Nepali</Option>
+                    <Option value="Odia">Odia</Option>
+                    <Option value="Pali">Pali</Option>
+                    <Option value="Persian">Persian</Option>
+                    <Option value="Punjabi">Punjabi</Option>
+                    <Option value="Rajasthani">Rajasthani</Option>
+                    <Option value="Sambalpuri">Sambalpuri</Option>
+                    <Option value="Sanskrit">Sanskrit</Option>
+                    <Option value="Santali">Santali</Option>
+                    <Option value="Santhili">Santhili</Option>
+                    <Option value="Sindhi">Sindhi</Option>
+                    <Option value="Sinhala">Sinhala</Option>
+                    <Option value="Spanish">Spanish</Option>
+                    <Option value="Swahili">Swahili</Option>
+                    <Option value="Tamil">Tamil</Option>
+                    <Option value="Telugu">Telugu</Option>
+                    <Option value="Thai">Thai</Option>
+                    <Option value="Tibetan">Tibetan</Option>
+                    <Option value="Tulu">Tulu</Option>
+                    <Option value="Turkish">Turkish</Option>
+                    <Option value="Ukrainian">Ukrainian</Option>
+                    <Option value="Urdu">Urdu</Option>
+                  </Select1>
+                </LabelInpBox>
+                <LabelInpBox>
                   <Label htmlFor="genre">
                     Genre <span style={{ margin: 0 }}>*</span>
                   </Label>
@@ -2002,23 +2091,6 @@ const Form = () => {
                   <DatePicker onChange={onDateChanger} id="dateOfRelease" />
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label>
-                    Album type <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="albumType"
-                    id="albumType"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, albumType: value });
-                    }}
-                  >
-                    <Option value={"album"}>Album</Option>
-                    <Option value={"film"}>film</Option>
-                  </Select1>
-                </LabelInpBox>
-                <LabelInpBox>
                   <Label htmlFor="releaseDate">
                     release date{" "}
                     <span
@@ -2038,96 +2110,43 @@ const Form = () => {
                   />
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="language">
-                    Album Language <span style={{ margin: 0 }}>*</span>
+                  <Label>
+                    Album Category <span style={{ margin: 0 }}>*</span>
                   </Label>
-
                   <Select1
-                    name="language"
-                    id="language"
+                    name="albumType"
+                    id="albumType"
                     onChange={(e) => {
                       const ele = document.querySelector(`#${e.target.id}`);
                       const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, language: value });
+                      setInpFields({ ...inpFields, albumType: value });
                     }}
                   >
-                    <Option value="Ahirani">Ahirani</Option>
-                    <Option value="Arabic">Arabic</Option>
-                    <Option value="Assamese">Assamese</Option>
-                    <Option value="Awadhi">Awadhi</Option>
-                    <Option value="Banjara">Banjara</Option>
-                    <Option value="Bengali">Bengali</Option>
-                    <Option value="Bhojpuri">Bhojpuri</Option>
-                    <Option value="Burmese">Burmese</Option>
-                    <Option value="Chhattisgarhi">Chhattisgarhi</Option>
-                    <Option value="Chinese">Chinese</Option>
-                    <Option value="Dogri">Dogri</Option>
-                    <Option value="English">English</Option>
-                    <Option value="French">French</Option>
-                    <Option value="Garhwali">Garhwali</Option>
-                    <Option value="Garo">Garo</Option>
-                    <Option value="Gujarati">Gujarati</Option>
-                    <Option value="Haryanvi">Haryanvi</Option>
-                    <Option value="Himachali">Himachali</Option>
-                    <Option value="Hindi">Hindi</Option>
-                    <Option value="Iban">Iban</Option>
-                    <Option value="Indonesian">Indonesian</Option>
-                    <Option value="Instrumental">Instrumental</Option>
-                    <Option value="Italian">Italian</Option>
-                    <Option value="Japanese">Japanese</Option>
-                    <Option value="Javanese">Javanese</Option>
-                    <Option value="Kannada">Kannada</Option>
-                    <Option value="Kashmiri">Kashmiri</Option>
-                    <Option value="Khasi">Khasi</Option>
-                    <Option value="Kokborok">Kokborok</Option>
-                    <Option value="Konkani">Konkani</Option>
-                    <Option value="Korean">Korean</Option>
-                    {/* <Option value="Kumauni">Kumauni</Option> */}
-                    <Option value="Latin">Latin</Option>
-                    <Option value="Maithili">Maithili</Option>
-                    <Option value="Malay">Malay</Option>
-                    <Option value="Malayalam">Malayalam</Option>
-                    <Option value="Mandarin">Mandarin</Option>
-                    <Option value="Manipuri">Manipuri</Option>
-                    <Option value="Marathi">Marathi</Option>
-                    <Option value="Marwari">Marwari</Option>
-                    <Option value="Naga">Naga</Option>
-                    <Option value="Nagpuri">Nagpuri</Option>
-                    <Option value="Nepali">Nepali</Option>
-                    <Option value="Odia">Odia</Option>
-                    <Option value="Pali">Pali</Option>
-                    <Option value="Persian">Persian</Option>
-                    <Option value="Punjabi">Punjabi</Option>
-                    <Option value="Rajasthani">Rajasthani</Option>
-                    <Option value="Sambalpuri">Sambalpuri</Option>
-                    <Option value="Sanskrit">Sanskrit</Option>
-                    <Option value="Santali">Santali</Option>
-                    <Option value="Santhili">Santhili</Option>
-                    <Option value="Sindhi">Sindhi</Option>
-                    <Option value="Sinhala">Sinhala</Option>
-                    <Option value="Spanish">Spanish</Option>
-                    <Option value="Swahili">Swahili</Option>
-                    <Option value="Tamil">Tamil</Option>
-                    <Option value="Telugu">Telugu</Option>
-                    <Option value="Thai">Thai</Option>
-                    <Option value="Tibetan">Tibetan</Option>
-                    <Option value="Tulu">Tulu</Option>
-                    <Option value="Turkish">Turkish</Option>
-                    <Option value="Ukrainian">Ukrainian</Option>
-                    <Option value="Urdu">Urdu</Option>
+                    {" "}
+                    <Option value={"album"}>Album</Option>
+                    <Option value={"movie/soundtrack"}>Movie/Soundtrack</Option>
                   </Select1>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="description">Album description</Label>
-                  <Input
-                    type="text"
-                    name="description"
-                    id="description"
-                    onChange={onChangeHandler}
-                    value={inpFields.description}
-                    placeholder="description"
-                  />
+                  <Label>
+                    Content Type <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select1
+                    name="contentType"
+                    id="contentType"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, contentType: value });
+                    }}
+                  >
+                    <Option value={"single"}>Single</Option>
+                    <Option value={"album"}>Album</Option>
+                    <Option value={"compilation"}>Compilation</Option>
+                    <Option value={"remix"}>Remix</Option>
+                  </Select1>
                 </LabelInpBox>
+
                 <LabelInpBox>
                   <Label htmlFor="mood">
                     Album mood <span style={{ margin: 0 }}>*</span>
@@ -2223,6 +2242,17 @@ const Form = () => {
                   <div id="imgbox" style={{ width: "1rem" }}></div>
                 </LabelInpBox>
                 <LabelInpBox>
+                  <Label htmlFor="description">Album description</Label>
+                  <Input
+                    type="text"
+                    name="description"
+                    id="description"
+                    onChange={onChangeHandler}
+                    value={inpFields.description}
+                    placeholder="description"
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
                   <Label htmlFor="lyrics">Album lyrics (optional)</Label>
                   <TxtArea
                     rows="5"
@@ -2298,14 +2328,14 @@ const Form = () => {
 
                 <LabelInpBox>
                   <Label htmlFor="crbt">
-                    Time{" "}
+                    CRBT /Preview Start Time
                     <span
                       style={{
                         color: "#b3b2b2",
                         textTransform: "none",
                       }}
                     >
-                      (hh:mm:ss)
+                      (mm:ss)
                     </span>
                   </Label>
                   <TimePicker

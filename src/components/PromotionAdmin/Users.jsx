@@ -13,15 +13,17 @@ import {
   Skeleton,
   useTheme,
   useMediaQuery,
+  Button,
+  CircularProgress,
 } from "@mui/material";
 import { FiCopy } from "react-icons/fi";
 import { BiSearchAlt } from "react-icons/bi";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router";
 import { Breadcrumb } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { LinkOutlined } from "@mui/icons-material";
+import { LinkOutlined, Login } from "@mui/icons-material";
 
 const Container = styled.div`
   padding: 0.5rem 1rem;
@@ -92,6 +94,7 @@ const Users = () => {
   const userId = useSelector((state) => state.userId);
   const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [searchTerm, setSearchTerm] = useState("");
   const [userTypeFilter, setUserTypeFilter] = useState("all");
@@ -99,6 +102,8 @@ const Users = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userExists, setUserExists] = useState(true);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -125,6 +130,145 @@ const Users = () => {
   useEffect(() => {
     fetchUsers();
   }, [userId]);
+
+  const demoLogin = async (contactNum) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: contactNum,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contactNum: contactNum,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (loginData.user.userType == "promoter") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promoter", adminView: true },
+              });
+              navigate("/promotor-admin-panel/home");
+            }
+            if (loginData.user.userType == "influencer") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "influencer", adminView: true },
+              });
+              navigate("/influencer-admin-panel/home");
+            }
+            if (loginData.user.userType == "admin") {
+              console.log(loginData.user.userType);
+
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promotion-admin" },
+              });
+              navigate("/admin-admin-panel/home");
+            }
+          }, 700);
+        }
+      } else {
+        setUserExists(data.exists);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const demoHandleVerifyOtp = async (mob) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: mob,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              phone: mob,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (!loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-user", adminView: true },
+              });
+              navigate("/user-panel/home");
+            }
+            if (loginData.user.isAdmin) {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "music-admin", adminView: true },
+              });
+              navigate("/admin-panel/orders");
+            }
+          }, 1000);
+        }
+      } else {
+        navigate("/register", {
+          state: {
+            contactNum: mob,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Verify OTP error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -171,8 +315,37 @@ const Users = () => {
     {
       field: "contactNum",
       headerName: "Contact Number",
-      width: 150,
-      renderCell: (params) => <Typography>{params.value}</Typography>,
+      width: 180,
+      renderCell: (params) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <Typography>{params.value}</Typography>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent cell click navigation
+              if (params.row.userType === "music") {
+                demoHandleVerifyOtp(params.row.contactNum);
+              } else {
+                demoLogin(params.row.contactNum);
+              }
+            }}
+            disabled={isLoading}
+            sx={{
+              color: "primary.main",
+              "&:hover": {
+                backgroundColor: "primary.light",
+                color: "white",
+              },
+            }}
+          >
+            {isLoading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <Login fontSize="small" />
+            )}
+          </IconButton>
+        </div>
+      ),
     },
     {
       field: "userType",
@@ -348,7 +521,10 @@ const Users = () => {
               //   navigate(`/admin-admin-panel/${row.row.userType}/${row.id}`);
               // }}
               onCellClick={(cell) => {
-                if (cell.field === "socialMediaUrl") {
+                if (
+                  cell.field === "socialMediaUrl" ||
+                  cell.field === "contactNum"
+                ) {
                   return;
                 }
                 if (cell.field === "profileImage") {

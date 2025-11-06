@@ -123,6 +123,9 @@ const UserWallet = () => {
       }
     }
     setLoading(true);
+    if (action === "bonus") {
+      formData.remark = "Bonus - " + formData.remark;
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BASE_URL}/brand/add-inf-wallet`,
@@ -298,6 +301,8 @@ const UserWallet = () => {
                                   transaction.description.toLowerCase();
                                 const entryId = transaction.id;
                                 setLoading(true);
+                                console.log({ id: entryId, action, infId: id });
+
                                 try {
                                   const response = await fetch(
                                     `${process.env.REACT_APP_BASE_URL}/brand/delete-inf-wallet`,
@@ -315,6 +320,7 @@ const UserWallet = () => {
                                   );
 
                                   const data = await response.json();
+                                  console.log(data);
 
                                   if (!response.ok) {
                                     throw new Error(
@@ -412,6 +418,15 @@ const UserWallet = () => {
             type="number"
             fullWidth
             value={formData.amount}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="remark"
+            label="Remark"
+            type="text"
+            fullWidth
+            value={formData.remark}
             onChange={handleInputChange}
           />
         </DialogContent>

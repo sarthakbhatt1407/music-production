@@ -338,9 +338,11 @@ const EditOrder = () => {
     releaseDate: "",
     youtubeContentId: "",
     youtubeMusic: "",
+    contentType: "",
   };
   const id = useParams().id;
   const [order, setOrder] = useState(null);
+  const [backupOrder, setBackupOrder] = useState(null);
   const [inpFields, setInpFields] = useState(deafaultFields);
   const [subLabels, setSubLabels] = useState([]);
   const [isLoading, setIsloading] = useState(false);
@@ -354,6 +356,7 @@ const EditOrder = () => {
       `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
     );
     const data = await res.json();
+    console.log(data);
 
     setInpFields({
       ...data.order,
@@ -363,10 +366,12 @@ const EditOrder = () => {
       lyricist: "",
       producer: "",
       starCast: "",
+      musicDirector: "",
     });
 
     setSelectedGenre(data.order.genre);
     setSelectedSubgenre(data.order.subgenre);
+    setBackupOrder(data.order);
     setOrder({
       ...data.order,
 
@@ -375,15 +380,7 @@ const EditOrder = () => {
       lyricist: "",
       producer: "",
       starCast: "",
-    });
-    console.log({
-      ...data.order,
-
-      singer: "",
-      composer: "",
-      lyricist: "",
-      producer: "",
-      starCast: "",
+      musicDirector: "",
     });
 
     setIsloading(false);
@@ -605,7 +602,7 @@ const EditOrder = () => {
     ele.style.border = "1px solid #d7d7d7";
     setInpFields({ ...inpFields, [id]: val });
   };
-  const format = "HH:mm:ss";
+  const format = "mm:ss";
 
   const [selectedSingers, setSelectedSingers] = useState([]);
   const [selectedComposers, setSelectedComposers] = useState([]);
@@ -980,6 +977,7 @@ const EditOrder = () => {
     formData.append("singerSpotifyId", singerSpotifyIds);
     formData.append("singerFacebookUrl", singerFacebookUrls);
     formData.append("singerInstagramUrl", singerInstagramUrls);
+    formData.append("contentType", inpFields.contentType);
 
     formData.append("composerAppleId", composerAppleIds);
     formData.append("composerSpotifyId", composerSpotifyIds);
@@ -1397,21 +1395,28 @@ const EditOrder = () => {
                   />
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label>
-                    Album type <span style={{ margin: 0 }}>*</span>
+                  <Label htmlFor="releaseDate">
+                    release date{" "}
+                    <span
+                      style={{
+                        color: "#b3b2b2",
+                        textTransform: "none",
+                      }}
+                    >
+                      (If already released)
+                    </span>
                   </Label>
-                  <Select
-                    name="albumType"
-                    id="albumType"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, albumType: value });
+                  <DatePicker
+                    onChange={(date, dateString) => {
+                      setInpFields({ ...inpFields, releaseDate: dateString });
                     }}
-                  >
-                    <Option value={"song"}>Song</Option>
-                    <Option value={"film"}>film</Option>
-                  </Select>
+                    id="releaseDate"
+                    value={
+                      inpFields.releaseDate
+                        ? dayjs(inpFields.releaseDate)
+                        : null
+                    }
+                  />
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="genre">
@@ -1470,6 +1475,46 @@ const EditOrder = () => {
                           {subgenre}
                         </Option>
                       ))}
+                  </Select>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label>
+                    Album Category <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="albumType"
+                    id="albumType"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, albumType: value });
+                    }}
+                    value={inpFields.albumType}
+                  >
+                    {" "}
+                    <Option value={"album"}>Album</Option>
+                    <Option value={"movie/soundtrack"}>Movie/Soundtrack</Option>
+                  </Select>
+                </LabelInpBox>
+                <LabelInpBox>
+                  <Label>
+                    Content Type <span style={{ margin: 0 }}>*</span>
+                  </Label>
+                  <Select
+                    name="contentType"
+                    id="contentType"
+                    onChange={(e) => {
+                      const ele = document.querySelector(`#${e.target.id}`);
+                      const value = ele.options[ele.selectedIndex].value;
+                      setInpFields({ ...inpFields, contentType: value });
+                    }}
+                    value={inpFields.contentType}
+                  >
+                    {" "}
+                    <Option value={"single"}>Single</Option>
+                    <Option value={"album"}>Album</Option>
+                    <Option value={"compilation"}>Compilation</Option>
+                    <Option value={"remix"}>Remix</Option>
                   </Select>
                 </LabelInpBox>
                 <LabelInpBox>
@@ -1552,41 +1597,7 @@ const EditOrder = () => {
                     <Option value="Urdu">Urdu</Option>
                   </Select>
                 </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="description">Album description</Label>
-                  <Input
-                    type="text"
-                    name="description"
-                    id="description"
-                    onChange={onChangeHandler}
-                    value={inpFields.description}
-                    placeholder="description"
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="releaseDate">
-                    release date{" "}
-                    <span
-                      style={{
-                        color: "#b3b2b2",
-                        textTransform: "none",
-                      }}
-                    >
-                      (If already released)
-                    </span>
-                  </Label>
-                  <DatePicker
-                    onChange={(date, dateString) => {
-                      setInpFields({ ...inpFields, releaseDate: dateString });
-                    }}
-                    id="releaseDate"
-                    value={
-                      inpFields.releaseDate
-                        ? dayjs(inpFields.releaseDate)
-                        : null
-                    }
-                  />
-                </LabelInpBox>
+
                 <LabelInpBox>
                   <Label htmlFor="mood">
                     Album mood <span style={{ margin: 0 }}>*</span>
@@ -1672,6 +1683,17 @@ const EditOrder = () => {
                   <div id="imgbox" style={{ width: "1rem" }}></div>
                 </LabelInpBox>
                 <LabelInpBox>
+                  <Label htmlFor="description">Album description</Label>
+                  <Input
+                    type="text"
+                    name="description"
+                    id="description"
+                    onChange={onChangeHandler}
+                    value={inpFields.description}
+                    placeholder="description"
+                  />
+                </LabelInpBox>
+                <LabelInpBox>
                   <Label htmlFor="lyrics">Album lyrics (optional)</Label>
                   <TxtArea
                     rows="5"
@@ -1724,14 +1746,14 @@ const EditOrder = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="crbt">
-                    Time{" "}
+                    CRBT /Preview Start Time
                     <span
                       style={{
                         color: "#b3b2b2",
                         textTransform: "none",
                       }}
                     >
-                      (hh:mm:ss)
+                      (mm:ss)
                     </span>
                   </Label>
 
@@ -1759,6 +1781,7 @@ const EditOrder = () => {
                 </LabelInpBox>
               </AllInpBox>
             </FormSeperator>
+
             <FormSeperator>
               <h2>Artists</h2>
               <AllInpBox>
@@ -1781,7 +1804,23 @@ const EditOrder = () => {
                     style={{ width: "100%" }}
                     filterOption={false}
                   />
+
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.singer.length > 0 &&
+                      selectedSingers.length <
+                        backupOrder.singer.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.singer} (originally added)
+                        </div>
+                      )}
                     {selectedSingers.length === 0 && (
                       <div
                         style={{
@@ -1794,6 +1833,7 @@ const EditOrder = () => {
                         No Singer Selected
                       </div>
                     )}
+
                     {selectedSingers.map((s, idx) => (
                       <ArtistTag key={idx}>
                         <span
@@ -1892,6 +1932,21 @@ const EditOrder = () => {
                     filterOption={false}
                   />
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.composer.length > 0 &&
+                      selectedComposers.length <
+                        backupOrder.composer.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.composer} (originally added)
+                        </div>
+                      )}
                     {selectedComposers.length === 0 && (
                       <div
                         style={{
@@ -2001,6 +2056,21 @@ const EditOrder = () => {
                     filterOption={false}
                   />
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.lyricist.length > 0 &&
+                      selectedLyricists.length <
+                        backupOrder.lyricist.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.lyricist} (originally added)
+                        </div>
+                      )}
                     {selectedLyricists.length === 0 && (
                       <div
                         style={{
@@ -2112,6 +2182,21 @@ const EditOrder = () => {
                     filterOption={false}
                   />
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.musicDirector.length > 0 &&
+                      selectedMusicDirectors.length <
+                        backupOrder.musicDirector.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.musicDirector} (originally added)
+                        </div>
+                      )}
                     {selectedMusicDirectors.length === 0 && (
                       <div
                         style={{
@@ -2221,6 +2306,21 @@ const EditOrder = () => {
                     filterOption={false}
                   />
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.director.length > 0 &&
+                      selectedDirectors.length <
+                        backupOrder.director.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.director} (originally added)
+                        </div>
+                      )}
                     {selectedDirectors.length === 0 && (
                       <div
                         style={{
@@ -2330,6 +2430,21 @@ const EditOrder = () => {
                     filterOption={false}
                   />
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.producer.length > 0 &&
+                      selectedProducers.length <
+                        backupOrder.producer.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.producer} (originally added)
+                        </div>
+                      )}
                     {selectedProducers.length === 0 && (
                       <div
                         style={{
@@ -2439,6 +2554,21 @@ const EditOrder = () => {
                     filterOption={false}
                   />
                   <div style={{ marginTop: "0.5rem" }}>
+                    {backupOrder.starCast.length > 0 &&
+                      selectedStarCast.length <
+                        backupOrder.starCast.split(",").length && (
+                        <div
+                          style={{
+                            color: "#f99393",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            padding: "0.2rem 0",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {backupOrder.starCast} (originally added)
+                        </div>
+                      )}
                     {selectedStarCast.length === 0 && (
                       <div
                         style={{

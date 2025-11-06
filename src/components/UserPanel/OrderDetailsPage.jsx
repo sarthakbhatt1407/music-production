@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { useSelector } from "react-redux";
 import styled, { keyframes, css } from "styled-components";
 import MusicLoader from "../Loader/MusicLoader";
 import {
@@ -13,6 +14,7 @@ import {
   Tooltip,
   Tag,
   Space,
+  notification,
 } from "antd";
 import { Link } from "react-router-dom";
 import AudioPlayer from "react-h5-audio-player";
@@ -445,6 +447,40 @@ const DeleteButton = styled(ActionButton)`
   }
 `;
 
+const TakedownButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 180px;
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #fff2e6;
+    color: #d4671b;
+    border-color: #fa8c16;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:disabled {
+    background-color: #f5f5f5;
+    color: #bfbfbf;
+    border-color: #d9d9d9;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+`;
+
 const StatusTag = styled(Tag)`
   margin-left: 12px;
   padding: 2px 12px;
@@ -635,6 +671,7 @@ const parseArtists = (name, appleId, spotifyId, facebookUrl, instagramUrl) => {
 
 const OrderDetailsPage = () => {
   const id = useParams().id;
+  const userId = useSelector((state) => state.userId);
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [orderLoop, setOrderLoop] = useState([]);
@@ -645,6 +682,14 @@ const OrderDetailsPage = () => {
   const [parsedSingers, setParsedSingers] = useState([]);
   const [parsedComposers, setParsedComposers] = useState([]);
   const [parsedLyricists, setParsedLyricists] = useState([]);
+
+  // Notification function
+  const openNotificationWithIcon = (type, message) => {
+    notification[type]({
+      message: message,
+      placement: "topRight",
+    });
+  };
 
   // Fetch order data
   const fetcher = async () => {
@@ -750,6 +795,123 @@ const OrderDetailsPage = () => {
     }
   };
 
+  // Takedown order confirmation
+  const handleTakedown = async () => {
+    // Load Razorpay script first
+    const razorpayLoaded = await loadRazorpayScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!razorpayLoaded) {
+      messageApi.error(
+        "Razorpay SDK failed to load. Please check your internet connection."
+      );
+      return;
+    }
+
+    try {
+      // Create payment order for takedown
+      const orderRes = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/payment/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: 500, // Takedown fee amount (₹5.00)
+            currency: "INR",
+          }),
+        }
+      );
+
+      const paymentData = await orderRes.json();
+      console.log("Payment order created:", paymentData);
+
+      if (!paymentData || !paymentData.order_id) {
+        messageApi.error("Failed to create payment order. Please try again.");
+        return;
+      }
+
+      // Razorpay options
+      const options = {
+        key: "rzp_test_RAQAuLXpIZAQYQ", // Replace with your Razorpay test/live key
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        order_id: paymentData.order_id,
+        name: "Music Distribution - Takedown",
+        description: "Takedown request processing fee",
+        handler: async function (response) {
+          console.log("Payment Success:", response);
+
+          try {
+            // Process takedown directly after successful payment
+            const res = await fetch(
+              `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${
+                order.id
+              }&action=takedown&userId=${"664b0a564ea2493604d28fb8"}`,
+              {
+                method: "PATCH",
+              }
+            );
+            const data = await res.json();
+            console.log(data);
+
+            if (res.ok) {
+              openNotificationWithIcon("success", data.message);
+              setTimeout(() => {
+                navigate("/user-panel/history");
+              }, 500);
+            } else {
+              messageApi.error("Failed to take down album");
+            }
+          } catch (error) {
+            console.error("Error processing takedown after payment:", error);
+            messageApi.error(
+              "Payment successful but failed to process takedown. Please contact support."
+            );
+          }
+        },
+        prefill: {
+          name: order.artistName || "User",
+          email: order.email || "",
+          contact: order.phone || "",
+        },
+        theme: {
+          color: "#fa8c16",
+        },
+        modal: {
+          ondismiss: function () {
+            messageApi.info(
+              "Payment cancelled. Takedown request not processed."
+            );
+          },
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Error initiating takedown payment:", error);
+      messageApi.error("Failed to initiate payment. Please try again.");
+    }
+  };
+
+  // Load Razorpay script
+  const loadRazorpayScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
   // Copy to clipboard functionality
   const copyToClipboard = async (text) => {
     try {
@@ -771,12 +933,13 @@ const OrderDetailsPage = () => {
     if (field === "labelName") return "Label Name";
     if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
       return "Sub Label";
-    if (field === "dateOfRelease") return "Date of Live";
+    if (field === "dateOfRelease") return "Scheduled Release Date";
+    if (field === "dateLive") return "Date Live";
+    if (field === "releaseDate") return "Previous Release Date";
     if (field === "AlbumType" || field === "albumType") return "Album Type";
     if (field === "orderDateAndTime") return "Order Date";
     if (field === "musicDirector") return "Music Director";
     if (field === "starCast") return "Star Cast";
-    if (field === "dateLive") return "Date of Live";
 
     // General formatting
     return field
@@ -1088,12 +1251,10 @@ const OrderDetailsPage = () => {
                 </GroupTitle>
                 <DetailsList>
                   {groupedFields.dates.map(({ field, value, id }) => {
-                    if (field === "dateLive") return null;
-                    if (field === "orderDateAndTime") return null;
-
                     const formattedField = formatFieldName(field);
                     let displayValue = value;
 
+                    // Special handling for orderDateAndTime to extract just the date part
                     if (field === "orderDateAndTime") {
                       displayValue = value.split("/")[0];
                     }
@@ -1436,7 +1597,7 @@ const OrderDetailsPage = () => {
                   </DetailLabel>
                   <DetailValue>
                     <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}`}
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}&title=${order.title}`}
                       target="_blank"
                     >
                       <FaDownload /> Download Image
@@ -1450,7 +1611,7 @@ const OrderDetailsPage = () => {
                   </DetailLabel>
                   <DetailValue>
                     <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}`}
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}&title=${order.title}`}
                       target="_blank"
                     >
                       <FaDownload /> Download Audio
@@ -1482,6 +1643,24 @@ const OrderDetailsPage = () => {
                   </EditButton>
                 </ActionButtons>
               )}
+
+            {/* Takedown button for completed orders */}
+            {order.status === "completed" && order.deleted === false && (
+              <ActionButtons>
+                <Popconfirm
+                  title="Request takedown for this album?"
+                  description="This will remove your music from all platforms. A processing fee will be charged."
+                  onConfirm={handleTakedown}
+                  okText="Pay"
+                  cancelText="Cancel"
+                  placement="top"
+                >
+                  <TakedownButton>
+                    <FaTimesCircle /> Request Takedown
+                  </TakedownButton>
+                </Popconfirm>
+              </ActionButtons>
+            )}
           </DetailsSection>
         </ContentCard>
       )}

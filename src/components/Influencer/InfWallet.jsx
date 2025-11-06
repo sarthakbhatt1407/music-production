@@ -17,6 +17,14 @@ import {
   TextField,
   Chip,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FaSearch, FaDownload, FaSync } from "react-icons/fa";
@@ -44,6 +52,17 @@ const InfWallet = () => {
   const [loading, setLoading] = useState(true);
   const [walletData, setWalletdata] = useState([]);
   const [userData, setUserData] = useState(null);
+  // Payment request feature (copied from UserWalletView)
+  const [paymentRequestOpen, setPaymentRequestOpen] = useState(false);
+  const [requestFormData, setRequestFormData] = useState({
+    amount: "",
+    message: "",
+  });
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({
+    severity: "success",
+    message: "",
+  });
 
   const filteredTransactions = walletData.filter(
     (transaction) =>
@@ -59,6 +78,72 @@ const InfWallet = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // Payment request handlers
+  const handleRequestChange = (e) => {
+    const { name, value } = e.target;
+    setRequestFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRequestSubmit = async () => {
+    if (
+      !requestFormData.amount ||
+      isNaN(parseFloat(requestFormData.amount)) ||
+      parseFloat(requestFormData.amount) <= 0
+    ) {
+      setAlertInfo({
+        severity: "error",
+        message: "Please enter a valid amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/req-payment-inf`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: userId,
+            amount: parseFloat(requestFormData.amount),
+            remark: requestFormData.message || "Payment request",
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.sent) {
+        setAlertInfo({
+          severity: "success",
+          message: "Payment request sent successfully to admin!",
+        });
+        setRequestFormData({ amount: "", message: "" });
+        setPaymentRequestOpen(false);
+      } else {
+        setAlertInfo({
+          severity: "error",
+          message: data.message || "Failed to send payment request",
+        });
+      }
+    } catch (err) {
+      console.error("Error sending payment request:", err);
+      setAlertInfo({
+        severity: "error",
+        message: "An error occurred. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+      setAlertOpen(true);
+    }
+  };
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
   };
 
   useEffect(() => {
@@ -156,7 +241,12 @@ const InfWallet = () => {
           <Grid item xs={12}>
             <Paper sx={{ p: 3 }}>
               <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 2,
+                  alignItems: "center",
+                }}
               >
                 <TextField
                   size="small"
@@ -167,14 +257,22 @@ const InfWallet = () => {
                     startAdornment: <FaSearch style={{ marginRight: 8 }} />,
                   }}
                 />
-                {/* <Box>
-                <IconButton title="Refresh">
-                  <FaSync />
-                </IconButton>
-                <IconButton title="Export">
-                  <FaDownload />
-                </IconButton>
-              </Box> */}
+                <Box>
+                  <Button
+                    variant="contained"
+                    onClick={() => setPaymentRequestOpen(true)}
+                    sx={{
+                      background: "#ff9800",
+                      color: "#fff",
+                      "&:hover": { background: "#f57c00" },
+                      textTransform: "none",
+                      borderRadius: 1,
+                      ml: 1,
+                    }}
+                  >
+                    Request Payment
+                  </Button>
+                </Box>
               </Box>
 
               <TableContainer>
@@ -229,6 +327,90 @@ const InfWallet = () => {
           </Grid>
         </Grid>
       )}
+      {/* Payment Request Dialog */}
+      <Dialog
+        open={paymentRequestOpen}
+        onClose={() => setPaymentRequestOpen(false)}
+        PaperProps={{ sx: { borderRadius: 2, maxWidth: 500 } }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" fontWeight={600} sx={{ color: "#333333" }}>
+            Request Payment
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 3, color: "#757575" }}>
+            Please specify the amount you would like to request and add a
+            message for the admin.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="amount"
+            label="Amount (₹)"
+            type="number"
+            fullWidth
+            value={requestFormData.amount}
+            onChange={handleRequestChange}
+            sx={{ mb: 3 }}
+          />
+          <TextField
+            margin="dense"
+            name="message"
+            label="Message to Admin"
+            type="text"
+            fullWidth
+            value={requestFormData.message}
+            onChange={handleRequestChange}
+            placeholder="Please include any relevant details about your payment request"
+            multiline
+            rows={3}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button
+            onClick={() => setPaymentRequestOpen(false)}
+            variant="outlined"
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              borderColor: "#ff9800",
+              color: "#ff9800",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRequestSubmit}
+            variant="contained"
+            disabled={loading}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              px: 3,
+              bgcolor: "#ff9800",
+              "&:hover": { bgcolor: "#f57c00" },
+            }}
+          >
+            {loading ? "Sending..." : "Send Request"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Alert Snackbar */}
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertInfo.severity}
+          sx={{ width: "100%" }}
+        >
+          {alertInfo.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

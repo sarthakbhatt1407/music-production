@@ -444,7 +444,6 @@ const DrawerPanel = (props) => {
                 padding: "0 1rem",
               }}
             >
-              <Para style={{}}>{userData && userData.name}</Para>
               <Avatar
                 style={{ transform: "scale(1.3)" }}
                 icon={<UserOutlined />}

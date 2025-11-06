@@ -27,12 +27,13 @@ import {
   WorkHistoryOutlined,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
 import { Badge } from "@mui/material";
 import { BiWallet } from "react-icons/bi";
+import MusicLoader from "../Loader/MusicLoader";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -48,30 +49,144 @@ const LogoDiv = styled.div`
 const InfDrawerPanel = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const page = props.page;
-  const items = [
-    {
-      label: <Link to={"/influencer-admin-panel/profile"}>Profile</Link>,
-      key: "0",
-    },
-    {
-      type: "divider",
-    },
+  const adminView = useSelector((state) => state.adminView);
+  console.log("adminvieww", adminView);
+  const [loading, setLoading] = useState(false);
+  const demoLogin = async () => {
+    const contactNum = "8126770620";
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/inf/user/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contactNum: contactNum,
+          }),
+        }
+      );
 
-    {
-      label: (
-        <span
-          onClick={() => {
-            dispatch({ type: "logout" });
-            navigate("/promotions/login");
-          }}
-        >
-          Log out
-        </span>
-      ),
-      key: "1",
-    },
-  ];
+      const data = await res.json();
+      console.log(data);
+
+      if (data.exists) {
+        const loginRes = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contactNum: contactNum,
+            }),
+          }
+        );
+        const loginData = await loginRes.json();
+        console.log(loginData);
+
+        if (loginData.isloggedIn) {
+          setTimeout(() => {
+            if (loginData.user.userType == "promoter") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promoter", adminView: false },
+              });
+              navigate("/promotor-admin-panel/home");
+            }
+            if (loginData.user.userType == "influencer") {
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "influencer", adminView: false },
+              });
+              navigate("/influencer-admin-panel/home");
+            }
+            if (loginData.user.userType == "admin") {
+              console.log(loginData.user.userType);
+
+              dispatch({
+                type: "log in",
+                data: { ...loginData, type: "promotion-admin" },
+              });
+              navigate("/admin-admin-panel/home");
+            }
+          }, 700);
+        }
+      } else {
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const page = props.page;
+  const items = adminView
+    ? [
+        {
+          label: <Link to={"/influencer-admin-panel/profile"}>Profile</Link>,
+          key: "0",
+        },
+        {
+          type: "divider",
+        },
+
+        {
+          label: (
+            <span
+              onClick={() => {
+                dispatch({ type: "logout" });
+                navigate("/promotions/login");
+              }}
+            >
+              Log out
+            </span>
+          ),
+          key: "1",
+        },
+        {
+          type: "divider",
+        },
+        {
+          label: (
+            <span
+              onClick={() => {
+                demoLogin();
+              }}
+            >
+              Admin Panel
+            </span>
+          ),
+          key: "2",
+        },
+      ]
+    : [
+        {
+          label: <Link to={"/influencer-admin-panel/profile"}>Profile</Link>,
+          key: "0",
+        },
+        {
+          type: "divider",
+        },
+
+        {
+          label: (
+            <span
+              onClick={() => {
+                dispatch({ type: "logout" });
+                navigate("/promotions/login");
+              }}
+            >
+              Log out
+            </span>
+          ),
+          key: "1",
+        },
+      ];
   const defaultSelector = (page) => {
     if (page === "home") {
       return ["2"];
@@ -140,6 +255,7 @@ const InfDrawerPanel = (props) => {
   } = theme.useToken();
   return (
     <Layout style={{ height: "100vh" }}>
+      {loading && <MusicLoader />}
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <LogoDiv>
           <img src={logo} alt="" />

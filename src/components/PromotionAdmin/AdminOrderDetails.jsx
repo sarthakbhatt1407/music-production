@@ -89,6 +89,7 @@ const AdminOrderDetails = () => {
   const [influencers, setInfluencers] = useState([]);
   const [activeStep, setActiveStep] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchTermMain, setSearchTermMain] = useState("");
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
   const [openInfModal, setOpenInfModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
@@ -99,8 +100,13 @@ const AdminOrderDetails = () => {
   const [selInfRej, setSelInfRej] = useState(null);
   const filteredInfluencers = influencers.filter(
     (influencer) =>
-      influencer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      influencer.category.toLowerCase().includes(searchTerm.toLowerCase())
+      influencer.name &&
+      influencer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const filteredMainInfluencers = selInfluencers.filter(
+    (influencer) =>
+      influencer.name &&
+      influencer.name.toLowerCase().includes(searchTermMain.toLowerCase())
   );
   const handleInfluencerSelect = (influencer) => {
     setSelectedInfluencers((prev) => {
@@ -453,6 +459,37 @@ const AdminOrderDetails = () => {
       console.error("Failed to copy: ", err);
     }
   };
+
+  const renderDescriptionWithLinks = (text) => {
+    if (!text) return text;
+
+    // Regular expression to detect URLs
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+    const parts = text.split(urlRegex);
+
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        const url = part.startsWith("http") ? part : `https://${part}`;
+        return (
+          <a
+            key={index}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#1976d2",
+              textDecoration: "underline",
+              wordBreak: "break-all",
+            }}
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
     <Container
       maxWidth="xl"
@@ -558,15 +595,21 @@ const AdminOrderDetails = () => {
                   color="text.secondary"
                   style={{
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     gap: "1rem",
+                    flexWrap: "wrap",
                   }}
                 >
-                  Description: {order.campaignDescription}
+                  <span>Description:</span>
+                  <span style={{ flex: 1, wordBreak: "break-word" }}>
+                    {renderDescriptionWithLinks(order.campaignDescription)}
+                  </span>
                   <ContentCopyOutlined
                     style={{
                       cursor: "pointer",
                       transform: "scale(.8)",
+                      flexShrink: 0,
+                      marginTop: "2px",
                     }}
                     onClick={copyToClipBoard.bind(
                       this,
@@ -755,6 +798,67 @@ const AdminOrderDetails = () => {
                     Add Influencers
                   </Button>
                 </Box>
+                <Box
+                  sx={{
+                    mb: 3,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    p: 2.5,
+                    backgroundColor: "white",
+                    borderRadius: 3,
+                    border: "1px solid #e0e0e0",
+                    marginTop: "1rem",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 40,
+                      height: 40,
+                      backgroundColor: "#f5f5f5",
+                      borderRadius: "50%",
+                      color: "#666",
+                    }}
+                  >
+                    <FaSearch style={{ fontSize: "16px" }} />
+                  </Box>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search influencers by name..."
+                    value={searchTermMain}
+                    onChange={(e) => setSearchTermMain(e.target.value)}
+                    size="medium"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: "#fafafa",
+                        borderRadius: 2,
+                        fontSize: "16px",
+                        "& fieldset": {
+                          borderColor: "#e0e0e0",
+                          borderWidth: "1px",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d0d0d0",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#999",
+                          borderWidth: "1px",
+                        },
+                      },
+                      "& .MuiInputBase-input": {
+                        padding: "12px 14px",
+                      },
+                      "& .MuiInputBase-input::placeholder": {
+                        color: "#666",
+                        opacity: 1,
+                      },
+                    }}
+                  />
+                </Box>
                 <TableContainer
                   sx={{ height: "auto", maxHeight: "100svh", overflow: "auto" }}
                 >
@@ -774,7 +878,7 @@ const AdminOrderDetails = () => {
                     </TableHead>
                     <TableBody>
                       {selectedInfluencers &&
-                        selInfluencers.map((influencer) => (
+                        filteredMainInfluencers.map((influencer) => (
                           <TableRow key={influencer.id}>
                             <TableCell>
                               <Box
@@ -894,6 +998,32 @@ const AdminOrderDetails = () => {
                             </TableCell>
                           </TableRow>
                         ))}
+                      {filteredMainInfluencers.length === 0 &&
+                        searchTermMain && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={9}
+                              align="center"
+                              sx={{ py: 4 }}
+                            >
+                              <Typography
+                                variant="body1"
+                                color="text.secondary"
+                              >
+                                No influencers found matching "{searchTermMain}"
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      {selInfluencers.length === 0 && !searchTermMain && (
+                        <TableRow>
+                          <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                            <Typography variant="body1" color="text.secondary">
+                              No influencers assigned to this order yet
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -1121,9 +1251,76 @@ const AdminOrderDetails = () => {
         onClose={() => {
           setOpenInfModal(false);
         }}
+        maxWidth={false}
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "70%",
+            maxWidth: "none",
+          },
+        }}
       >
         <DialogTitle>Select Influencers</DialogTitle>
         <DialogContent>
+          <Box
+            sx={{
+              mb: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              p: 2.5,
+              backgroundColor: "white",
+              borderRadius: 3,
+              border: "1px solid #e0e0e0",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 40,
+                height: 40,
+                backgroundColor: "#f5f5f5",
+                borderRadius: "50%",
+                color: "#666",
+              }}
+            >
+              <FaSearch style={{ fontSize: "16px" }} />
+            </Box>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search influencers by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="medium"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#fafafa",
+                  borderRadius: 2,
+                  fontSize: "16px",
+                  "& fieldset": {
+                    borderColor: "#e0e0e0",
+                    borderWidth: "1px",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#d0d0d0",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#999",
+                    borderWidth: "1px",
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  padding: "12px 14px",
+                },
+                "& .MuiInputBase-input::placeholder": {
+                  color: "#666",
+                  opacity: 1,
+                },
+              }}
+            />
+          </Box>
           <TableContainer
             sx={{
               height: "auto",
@@ -1194,6 +1391,24 @@ const AdminOrderDetails = () => {
                     </TableCell>
                   </TableRow>
                 ))}
+                {filteredInfluencers.length === 0 && searchTerm && (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body1" color="text.secondary">
+                        No influencers found matching "{searchTerm}"
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {influencers.length === 0 && !searchTerm && (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body1" color="text.secondary">
+                        No influencers available to add
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -1202,6 +1417,7 @@ const AdminOrderDetails = () => {
           <Button
             onClick={() => {
               setOpenInfModal(false);
+              setSearchTerm(""); // Clear search when modal closes
             }}
             color="primary"
           >

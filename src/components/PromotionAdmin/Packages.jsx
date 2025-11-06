@@ -25,7 +25,7 @@ import {
   TableBody,
 } from "@mui/material";
 
-import { FaCheck, FaTimes, FaUserCheck } from "react-icons/fa";
+import { FaCheck, FaTimes, FaUserCheck, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { LinkOutlined } from "@mui/icons-material";
 import { message } from "antd";
@@ -140,8 +140,8 @@ const Packages = () => {
   };
   const filteredInfluencers = influencers.filter(
     (influencer) =>
-      influencer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      influencer.category.toLowerCase().includes(searchTerm.toLowerCase())
+      influencer.name &&
+      influencer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const fetchUsers = async () => {
     setLoading(true);
@@ -224,6 +224,7 @@ const Packages = () => {
         type: "",
       });
       setSelectedInfluencers([]);
+      setSearchTerm("");
       getAllPackages();
       message.success(data.message);
     } catch (error) {
@@ -411,140 +412,272 @@ const Packages = () => {
         </Box>
       </Container>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => {
+          setDialogOpen(false);
+          setSearchTerm("");
+        }}
+        maxWidth={false}
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "60%",
+            maxWidth: "none",
+          },
+        }}
+      >
         <DialogTitle>Add New Package</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Please fill in the details for the new package.
-          </DialogContentText>
-          <div
-            style={{
-              height: "fit-content",
-              maxHeight: "40vh",
+        <DialogContent sx={{ p: 0 }}>
+          {/* Influencer Selection Section */}
+          <Box sx={{ p: 3, borderBottom: "1px solid #e0e0e0" }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ mb: 2, color: "#333", fontWeight: 600 }}
+            >
+              Select Influencers
+            </Typography>
+            <Box
+              sx={{
+                mb: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                p: 2.5,
+                backgroundColor: "white",
+                borderRadius: 3,
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 40,
+                  height: 40,
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "50%",
+                  color: "#666",
+                }}
+              >
+                <FaSearch style={{ fontSize: "16px" }} />
+              </Box>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Search influencers by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size="medium"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#fafafa",
+                    borderRadius: 2,
+                    fontSize: "16px",
+                    "& fieldset": {
+                      borderColor: "#e0e0e0",
+                      borderWidth: "1px",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#d0d0d0",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#999",
+                      borderWidth: "1px",
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "12px 14px",
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "#666",
+                    opacity: 1,
+                  },
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
+                height: "300px",
+                overflow: "auto",
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                backgroundColor: "#fafafa",
+              }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Influencer</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Social Media </TableCell>
+                    <TableCell>Amount </TableCell>
+                    <TableCell align="center">Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody sx={{}}>
+                  {filteredInfluencers.map((influencer) => (
+                    <TableRow key={influencer.id}>
+                      <TableCell>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
+                          <img
+                            src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
+                            alt={influencer.name}
+                            style={{
+                              width: "40px",
+                              height: "40px",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                            }}
+                          />
 
-              overflow: "scroll",
-            }}
-          >
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Influencer</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Social Media </TableCell>
-                  <TableCell>Amount </TableCell>
-                  <TableCell align="center">Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody sx={{}}>
-                {filteredInfluencers.map((influencer) => (
-                  <TableRow key={influencer.id}>
-                    <TableCell>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                      >
-                        <img
-                          src={`${process.env.REACT_APP_BASE_URL}/${influencer.profileImage}`}
-                          alt={influencer.name}
-                          style={{
-                            width: "40px",
-                            height: "40px",
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                          }}
-                        />
-
-                        {influencer.name}
-                      </Box>
-                    </TableCell>
-                    <TableCell>{influencer.profession}</TableCell>{" "}
-                    <TableCell align="center">
-                      <Link to={influencer.socialMediaUrl} target="_blank">
-                        <LinkOutlined />
-                      </Link>
-                    </TableCell>
-                    <TableCell align="center">₹ {influencer.price}</TableCell>
-                    <TableCell align="center">
-                      <StyledButton
-                        variant="contained"
-                        color={
-                          selectedInfluencers.some(
+                          {influencer.name}
+                        </Box>
+                      </TableCell>
+                      <TableCell>{influencer.profession}</TableCell>{" "}
+                      <TableCell align="center">
+                        <Link to={influencer.socialMediaUrl} target="_blank">
+                          <LinkOutlined />
+                        </Link>
+                      </TableCell>
+                      <TableCell align="center">₹ {influencer.price}</TableCell>
+                      <TableCell align="center">
+                        <StyledButton
+                          variant="contained"
+                          color={
+                            selectedInfluencers.some(
+                              (i) => i.id === influencer.id
+                            )
+                              ? "success"
+                              : "primary"
+                          }
+                          onClick={() => handleInfluencerSelect(influencer)}
+                          startIcon={<FaUserCheck />}
+                        >
+                          {selectedInfluencers.some(
                             (i) => i.id === influencer.id
                           )
-                            ? "success"
-                            : "primary"
-                        }
-                        onClick={() => handleInfluencerSelect(influencer)}
-                        startIcon={<FaUserCheck />}
-                      >
-                        {selectedInfluencers.some((i) => i.id === influencer.id)
-                          ? "Selected"
-                          : "Select"}
-                      </StyledButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                            ? "Selected"
+                            : "Select"}
+                        </StyledButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredInfluencers.length === 0 && searchTerm && (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          No influencers found matching "{searchTerm}"
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {influencers.length === 0 && !searchTerm && (
+                    <TableRow>
+                      <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          No influencers available
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+          </Box>
 
-          <TextField
-            autoFocus
-            margin="dense"
-            name="name"
-            label="Name"
-            type="text"
-            fullWidth
-            value={formData.name}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="description"
-            label="Description"
-            type="text"
-            fullWidth
-            value={formData.description}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="originalPrice"
-            label="Original Price"
-            type="number"
-            fullWidth
-            value={formData.originalPrice}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="discountedPrice"
-            label="Discounted Price"
-            type="number"
-            fullWidth
-            value={formData.discountedPrice}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="type"
-            label="Type"
-            select
-            fullWidth
-            value={formData.type}
-            onChange={handleInputChange}
-          >
-            <MenuItem value="Basic">Basic</MenuItem>
-            <MenuItem value="Standard">Standard</MenuItem>
-            <MenuItem value="Premium">Premium</MenuItem>
-            <MenuItem value="Deluxe">Deluxe</MenuItem>
-            <MenuItem value="BasicPlus">Basic Plus</MenuItem>
-            <MenuItem value="StandardPlus">Standard Plus</MenuItem>
-            <MenuItem value="Premium Plus">Premium Plus</MenuItem>
-            <MenuItem value="Deluxe Plus">Deluxe Plus</MenuItem>
-          </TextField>
+          {/* Package Details Section */}
+          <Box sx={{ p: 3 }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ mb: 3, color: "#333", fontWeight: 600 }}
+            >
+              Package Details
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  name="name"
+                  label="Name"
+                  type="text"
+                  fullWidth
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  margin="dense"
+                  name="type"
+                  label="Type"
+                  select
+                  fullWidth
+                  value={formData.type}
+                  onChange={handleInputChange}
+                >
+                  <MenuItem value="Basic">Basic</MenuItem>
+                  <MenuItem value="Standard">Standard</MenuItem>
+                  <MenuItem value="Premium">Premium</MenuItem>
+                  <MenuItem value="Deluxe">Deluxe</MenuItem>
+                  <MenuItem value="BasicPlus">Basic Plus</MenuItem>
+                  <MenuItem value="StandardPlus">Standard Plus</MenuItem>
+                  <MenuItem value="Premium Plus">Premium Plus</MenuItem>
+                  <MenuItem value="Deluxe Plus">Deluxe Plus</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  margin="dense"
+                  name="description"
+                  label="Description"
+                  type="text"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  margin="dense"
+                  name="originalPrice"
+                  label="Original Price"
+                  type="number"
+                  fullWidth
+                  value={formData.originalPrice}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  margin="dense"
+                  name="discountedPrice"
+                  label="Discounted Price"
+                  type="number"
+                  fullWidth
+                  value={formData.discountedPrice}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setDialogOpen(false);
+              setSearchTerm("");
+            }}
+          >
+            Cancel
+          </Button>
           <Button onClick={handleSubmit}>Submit</Button>
         </DialogActions>
       </Dialog>

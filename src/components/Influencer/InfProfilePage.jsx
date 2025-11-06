@@ -14,6 +14,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { FiEdit2, FiUpload } from "react-icons/fi";
@@ -21,7 +23,13 @@ import { Breadcrumb, message } from "antd";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
 import { Link } from "react-router-dom";
-import { DownloadOutlined } from "@mui/icons-material";
+import {
+  DownloadOutlined,
+  Person,
+  LocationOn,
+  AccountBalance,
+  Link as LinkIcon,
+} from "@mui/icons-material";
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   width: 150,
@@ -43,11 +51,27 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
+// TabPanel Component
+function TabPanel({ children, value, index, ...other }) {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`profile-tabpanel-${index}`}
+      aria-labelledby={`profile-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
 const InfProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [formError, setFormError] = useState("");
+  const [activeTab, setActiveTab] = useState(0);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -274,244 +298,337 @@ const InfProfilePage = () => {
             </Alert>
           )}
 
-          <Box sx={{ mb: 2, textAlign: "right" }}>
+          <Box
+            sx={{
+              mb: 2,
+              display: "flex",
+              gap: { xs: 1, sm: 2 },
+              justifyContent: "flex-end",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "stretch", sm: "center" },
+            }}
+          >
             <Button
               startIcon={editMode ? null : <FiEdit2 />}
               variant={editMode ? "contained" : "outlined"}
               onClick={() => setEditMode(!editMode)}
               color={editMode ? "error" : "primary"}
+              size="medium"
+              sx={{
+                minWidth: { xs: "100%", sm: "auto" },
+                fontSize: { xs: "0.875rem", sm: "0.875rem" },
+                padding: { xs: "10px 16px", sm: "8px 16px" },
+              }}
             >
               {editMode ? "Cancel" : "Edit Profile"}
             </Button>
-          </Box>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Full Name"
-                value={formData.fullName}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Phone"
-                value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                disabled={true}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="City"
-                value={formData.city}
-                onChange={(e) => handleInputChange("city", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="State"
-                value={formData.state}
-                onChange={(e) => handleInputChange("state", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Postal Code"
-                value={formData.postalCode}
-                onChange={(e) =>
-                  handleInputChange("postalCode", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Address"
-                multiline
-                rows={3}
-                value={formData.address}
-                onChange={(e) => handleInputChange("address", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Instagram URL"
-                value={formData.socialMediaUrl}
-                onChange={(e) =>
-                  handleInputChange("socialMediaUrl", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Facebook URL"
-                value={formData.facebookUrl}
-                onChange={(e) =>
-                  handleInputChange("facebookUrl", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="YouTube URL"
-                value={formData.youtubeUrl}
-                onChange={(e) =>
-                  handleInputChange("youtubeUrl", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="TikTok URL"
-                value={formData.tikTokUrl}
-                onChange={(e) => handleInputChange("tikTokUrl", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Spotify URL"
-                value={formData.spotifyUrl}
-                onChange={(e) =>
-                  handleInputChange("spotifyUrl", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="JioSaavn URL"
-                value={formData.jioSaavnUrl}
-                onChange={(e) =>
-                  handleInputChange("jioSaavnUrl", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Account Number"
-                value={formData.accountNumber}
-                onChange={(e) =>
-                  handleInputChange("accountNumber", e.target.value)
-                }
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="IFSC Code"
-                value={formData.ifscCode}
-                onChange={(e) => handleInputChange("ifscCode", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Bank Name"
-                value={formData.bankName}
-                onChange={(e) => handleInputChange("bankName", e.target.value)}
-                disabled={!editMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel id="profession-label">Profession</InputLabel>
-                <Select
-                  labelId="profession-label"
-                  id="profession"
-                  value={formData.profession}
-                  onChange={(e) =>
-                    handleInputChange("profession", e.target.value)
-                  }
-                  disabled={!editMode}
-                >
-                  <MenuItem value="Model">Model</MenuItem>
-                  <MenuItem value="Creator">Creator</MenuItem>
-                  <MenuItem value="Non-Creator">Non-Creator</MenuItem>
-                  <MenuItem value="Neno-Creator">Neno-Creator</MenuItem>
-                  <MenuItem value="Singer">Singer</MenuItem>
-                  <MenuItem value="Actor">Actor</MenuItem>
-                  <MenuItem value="Music Director">Music Director</MenuItem>
-                  <MenuItem value="Lyricist">Lyricist</MenuItem>
-                  <MenuItem value="Comedian">Comedian</MenuItem>
-                  <MenuItem value="Editor">Editor</MenuItem>
-                  <MenuItem value="Cinematographer">Cinematographer</MenuItem>
-                  <MenuItem value="Poster Designer">Poster Designer</MenuItem>
-                  <MenuItem value="Script Writer">Script Writer</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Price"
-                value={formData.price}
-                onChange={(e) => handleInputChange("price", e.target.value)}
-                disabled={!editMode}
-                type="number"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography
-                style={{ display: "flex", alignItems: "center", gap: 10 }}
-              >
-                Legal Agreement :{" "}
-                <Link
-                  to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${formData.legalDoc}`}
-                  target="_blank"
-                >
-                  <DownloadOutlined style={{ transform: "scale(1.1)" }} />
-                </Link>{" "}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          {editMode && (
-            <Box sx={{ mt: 3, textAlign: "right" }}>
+            {editMode && (
               <Button
                 variant="contained"
                 onClick={handleSubmit}
                 disabled={loading}
+                size="medium"
+                sx={{
+                  minWidth: { xs: "100%", sm: "auto" },
+                  fontSize: { xs: "0.875rem", sm: "0.875rem" },
+                  padding: { xs: "10px 16px", sm: "8px 16px" },
+                }}
               >
                 {loading ? <CircularProgress size={24} /> : "Save Changes"}
               </Button>
-            </Box>
-          )}
+            )}
+          </Box>
+
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              mb: 2,
+            }}
+          >
+            <Tabs
+              value={activeTab}
+              onChange={(e, newValue) => setActiveTab(newValue)}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                "& .MuiTabs-scrollButtons": {
+                  "&.Mui-disabled": {
+                    opacity: 0.3,
+                  },
+                },
+              }}
+            >
+              <Tab
+                label="Personal Info"
+                icon={<Person />}
+                iconPosition="start"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                label="Address"
+                icon={<LocationOn />}
+                iconPosition="start"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                label="Bank Details"
+                icon={<AccountBalance />}
+                iconPosition="start"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                label="Social Media"
+                icon={<LinkIcon />}
+                iconPosition="start"
+                sx={{ minHeight: 48 }}
+              />
+            </Tabs>
+          </Box>
+
+          {/* Personal Information Tab */}
+          <TabPanel value={activeTab} index={0}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Full Name"
+                  value={formData.fullName}
+                  onChange={(e) =>
+                    handleInputChange("fullName", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Phone"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  disabled={true}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="profession-label">Profession</InputLabel>
+                  <Select
+                    labelId="profession-label"
+                    id="profession"
+                    value={formData.profession}
+                    onChange={(e) =>
+                      handleInputChange("profession", e.target.value)
+                    }
+                    disabled={!editMode}
+                  >
+                    <MenuItem value="Model">Model</MenuItem>
+                    <MenuItem value="Creator">Creator</MenuItem>
+                    <MenuItem value="Non-Creator">Non-Creator</MenuItem>
+                    <MenuItem value="Neno-Creator">Neno-Creator</MenuItem>
+                    <MenuItem value="Singer">Singer</MenuItem>
+                    <MenuItem value="Actor">Actor</MenuItem>
+                    <MenuItem value="Music Director">Music Director</MenuItem>
+                    <MenuItem value="Lyricist">Lyricist</MenuItem>
+                    <MenuItem value="Comedian">Comedian</MenuItem>
+                    <MenuItem value="Editor">Editor</MenuItem>
+                    <MenuItem value="Cinematographer">Cinematographer</MenuItem>
+                    <MenuItem value="Poster Designer">Poster Designer</MenuItem>
+                    <MenuItem value="Script Writer">Script Writer</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Price"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange("price", e.target.value)}
+                  disabled={!editMode}
+                  type="number"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+
+          {/* Address Tab */}
+          <TabPanel value={activeTab} index={1}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Address"
+                  multiline
+                  rows={3}
+                  value={formData.address}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="City"
+                  value={formData.city}
+                  onChange={(e) => handleInputChange("city", e.target.value)}
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="State"
+                  value={formData.state}
+                  onChange={(e) => handleInputChange("state", e.target.value)}
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Postal Code"
+                  value={formData.postalCode}
+                  onChange={(e) =>
+                    handleInputChange("postalCode", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+
+          {/* Bank Details Tab */}
+          <TabPanel value={activeTab} index={2}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Account Number"
+                  value={formData.accountNumber}
+                  onChange={(e) =>
+                    handleInputChange("accountNumber", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="IFSC Code"
+                  value={formData.ifscCode}
+                  onChange={(e) =>
+                    handleInputChange("ifscCode", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Bank Name"
+                  value={formData.bankName}
+                  onChange={(e) =>
+                    handleInputChange("bankName", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+
+          {/* Social Media Tab */}
+          <TabPanel value={activeTab} index={3}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Instagram URL"
+                  value={formData.socialMediaUrl}
+                  onChange={(e) =>
+                    handleInputChange("socialMediaUrl", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Facebook URL"
+                  value={formData.facebookUrl}
+                  onChange={(e) =>
+                    handleInputChange("facebookUrl", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="YouTube URL"
+                  value={formData.youtubeUrl}
+                  onChange={(e) =>
+                    handleInputChange("youtubeUrl", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="TikTok URL"
+                  value={formData.tikTokUrl}
+                  onChange={(e) =>
+                    handleInputChange("tikTokUrl", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Spotify URL"
+                  value={formData.spotifyUrl}
+                  onChange={(e) =>
+                    handleInputChange("spotifyUrl", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="JioSaavn URL"
+                  value={formData.jioSaavnUrl}
+                  onChange={(e) =>
+                    handleInputChange("jioSaavnUrl", e.target.value)
+                  }
+                  disabled={!editMode}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  Legal Agreement :{" "}
+                  <Link
+                    to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${formData.legalDoc}`}
+                    target="_blank"
+                  >
+                    <DownloadOutlined style={{ transform: "scale(1.1)" }} />
+                  </Link>{" "}
+                </Typography>
+              </Grid>
+            </Grid>
+          </TabPanel>
         </StyledPaper>
       </Box>
     </Container>

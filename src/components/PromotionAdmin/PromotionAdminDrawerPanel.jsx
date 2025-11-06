@@ -27,7 +27,7 @@ import {
   WorkHistoryOutlined,
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
@@ -48,6 +48,7 @@ const LogoDiv = styled.div`
 const PromotionAdminDrawerPanel = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const page = props.page;
   const items = [
     {

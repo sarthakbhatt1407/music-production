@@ -88,8 +88,6 @@ const Home = () => {
           data={{ para: "Get in touch", heading: "Contact Us" }}
         />
         <ContactsUs />
-        {/* <SevicesHeading data={{ para: "queries", heading: "FAQ" }} />
-      <Faq /> */}
         <Footer />
       </div>
     </>

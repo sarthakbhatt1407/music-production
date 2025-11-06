@@ -988,12 +988,13 @@ const OrderDetailsPage = () => {
     if (field === "labelName") return "Label Name";
     if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
       return "Sub Label";
-    if (field === "dateOfRelease") return "Date of Live";
+    if (field === "dateOfRelease") return "Scheduled Release Date";
+    if (field === "releaseDate") return "Previous Release Date";
+    if (field === "dateLive") return "Platform Live Date";
     if (field === "AlbumType" || field === "albumType") return "Album Type";
     if (field === "orderDateAndTime") return "Order Date";
     if (field === "musicDirector") return "Music Director";
     if (field === "starCast") return "Star Cast";
-    if (field === "dateLive") return "Date of Live";
 
     // General formatting
     return field
@@ -1382,8 +1383,8 @@ const OrderDetailsPage = () => {
                   {groupedFields.dates.map(({ field, value, id }) => {
                     const formattedField = formatFieldName(field);
                     let displayValue = value;
-                    if (field === "dateLive") return null;
-                    if (field === "orderDateAndTime") return null;
+
+                    // Handle orderDateAndTime formatting
                     if (field === "orderDateAndTime") {
                       displayValue = value.split("/")[0];
                     }
@@ -1766,7 +1767,7 @@ const OrderDetailsPage = () => {
                   </DetailLabel>
                   <DetailValue>
                     <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}`}
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}&title=${order.title}`}
                       target="_blank"
                     >
                       <FaDownload /> Download Image
@@ -1780,7 +1781,7 @@ const OrderDetailsPage = () => {
                   </DetailLabel>
                   <DetailValue>
                     <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}`}
+                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}&title=${order.title}`}
                       target="_blank"
                     >
                       <FaDownload /> Download Audio

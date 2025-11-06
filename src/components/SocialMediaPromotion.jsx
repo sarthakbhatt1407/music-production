@@ -566,19 +566,6 @@ const SocialMediaPromotion = () => {
           </Grid>
         </Container>
       )}
-
-      <IconButton
-        sx={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          backgroundColor: "#D91A02",
-          color: "white",
-          "&:hover": { backgroundColor: "#B01502" },
-        }}
-      >
-        <BsChatDotsFill size={24} />
-      </IconButton>
     </Box>
   );
 };

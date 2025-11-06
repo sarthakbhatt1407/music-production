@@ -414,7 +414,8 @@ const ArtistManagement = () => {
               <Option value="lyricist">Lyricist</Option>
               <Option value="musicDirector">Music Director</Option>
               <Option value="director">Director</Option>
-              <Option value="producer">Producer</Option>
+              <Option value="producer">Producer</Option>{" "}
+              <Option value="starcast">Starcast</Option>
             </Select>
           </Form.Item>
 
