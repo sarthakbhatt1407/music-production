@@ -629,7 +629,7 @@ const MobileOtpLogin = () => {
 
   return (
     <LoginContainer>
-      <button onClick={demoHandleVerifyOtp}>Demo login</button>
+      {/* <button onClick={demoHandleVerifyOtp}>Demo login</button> */}
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}

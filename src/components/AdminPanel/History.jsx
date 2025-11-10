@@ -565,7 +565,7 @@ const History = () => {
       </div>
 
       {/* Mobile Cards View */}
-      <MobileBox>
+      {/* <MobileBox>
         {historyOrders.length > 0 ? (
           historyOrders.map((order) => (
             <MobileOrderBox
@@ -665,7 +665,7 @@ const History = () => {
             }
           />
         )}
-      </MobileBox>
+      </MobileBox> */}
     </MainBox>
   );
 };

@@ -499,7 +499,7 @@ const Orders = () => {
       </div>
 
       {/* Mobile Cards View */}
-      <MobileBox>
+      {/* <MobileBox>
         {pendingOrders.length > 0 ? (
           pendingOrders.map((order) => (
             <MobileOrderBox
@@ -574,7 +574,7 @@ const Orders = () => {
             }
           />
         )}
-      </MobileBox>
+      </MobileBox> */}
     </MainBox>
   );
 };

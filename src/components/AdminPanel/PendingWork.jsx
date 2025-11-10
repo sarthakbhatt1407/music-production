@@ -619,7 +619,7 @@ const PendingWork = () => {
       </div>
 
       {/* Mobile Cards View */}
-      <MobileBox>
+      {/* <MobileBox>
         {processingOrders.length > 0 ? (
           processingOrders.map((order) => (
             <MobileOrderBox
@@ -702,7 +702,7 @@ const PendingWork = () => {
             }
           />
         )}
-      </MobileBox>
+      </MobileBox> */}
 
       {/* UPC/ISRC Modal */}
       <Modal

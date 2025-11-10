@@ -1086,7 +1086,7 @@ const ProAndInfLogin = () => {
               </LoginCard>
             </Container>
           </LoginContainer>
-          <button onClick={demoLogin}>demo login</button>
+          {/* <button onClick={demoLogin}>demo login</button> */}
         </>
       )}
       {!userExist && (
