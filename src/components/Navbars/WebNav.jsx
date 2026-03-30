@@ -11,10 +11,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
 import logo from "../../assets/images/logo/logo.webp";
 import { Reorder } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function WebNav({ mode, toggleColorMode }) {
+  const navigate = useNavigate();
   const isAdmin = useSelector((state) => state.isAdmin);
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const type = useSelector((state) => state.type);
@@ -93,13 +94,28 @@ function WebNav({ mode, toggleColorMode }) {
           >
             <img
               src={logo}
-              onClick={() => scrollToSection("intro")}
+              onClick={() => {
+                if (window.location.pathname === "/") {
+                  scrollToSection("intro");
+                } else {
+                  navigate("/");
+                }
+              }}
               style={logoStyle}
               alt="logo of sitemark"
             />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <MenuItem
-                onClick={() => scrollToSection("overview")}
+                onClick={() => {
+                  if (window.location.pathname === "/") {
+                    scrollToSection("overview");
+                  } else {
+                    navigate("/");
+                    setTimeout(() => {
+                      scrollToSection("overview");
+                    }, 500);
+                  }
+                }}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography
@@ -124,7 +140,16 @@ function WebNav({ mode, toggleColorMode }) {
                 </Typography>
               </MenuItem>
               <MenuItem
-                onClick={() => scrollToSection("services")}
+                onClick={() => {
+                  if (window.location.pathname === "/") {
+                    scrollToSection("services");
+                  } else {
+                    navigate("/");
+                    setTimeout(() => {
+                      scrollToSection("services");
+                    }, 500);
+                  }
+                }}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography
@@ -149,7 +174,16 @@ function WebNav({ mode, toggleColorMode }) {
                 </Typography>
               </MenuItem>
               <MenuItem
-                onClick={() => scrollToSection("startwithus")}
+                onClick={() => {
+                  if (window.location.pathname === "/") {
+                    scrollToSection("startwithus");
+                  } else {
+                    navigate("/");
+                    setTimeout(() => {
+                      scrollToSection("startwithus");
+                    }, 500);
+                  }
+                }}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography
@@ -176,7 +210,16 @@ function WebNav({ mode, toggleColorMode }) {
                 </Typography>
               </MenuItem>{" "}
               <MenuItem
-                onClick={() => scrollToSection("contact-us")}
+                onClick={() => {
+                  if (window.location.pathname === "/") {
+                    scrollToSection("contact-us");
+                  } else {
+                    navigate("/");
+                    setTimeout(() => {
+                      scrollToSection("contact-us");
+                    }, 500);
+                  }
+                }}
                 sx={{ py: "6px", px: "12px" }}
               >
                 <Typography

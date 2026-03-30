@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 // import intro from "../assets/images/intro.webp";
 import intro from "../assets/images/12.png";
-import introMobile from "../assets/images/introMobile.webp";
+import introMobile from "../assets/images/12.png";
 import { useNavigate } from "react-router";
 
 const MainBox = styled.div`
@@ -40,8 +40,8 @@ const MainBox = styled.div`
       background-repeat: no-repeat;
       background-size: cover;
       z-index: -1;
-      opacity: 1;
-      filter: blur(3px);
+      opacity: 0.4;
+      filter: blur(1px);
     }
   }
 `;
@@ -95,7 +95,7 @@ const TextBox = styled.div`
 `;
 
 const Para = styled.span`
-  margin-top: -13rem;
+  margin-top: -14%;
   font-size: 1.6rem;
   text-transform: capitalize;
   letter-spacing: 0.1rem;
@@ -108,6 +108,10 @@ const Para = styled.span`
     margin-top: -5.5rem;
     font-weight: bold;
     letter-spacing: 0;
+
+    &:last-child {
+      color: black;
+    }
   }
   /* @media only screen and (min-width: 351px) and (max-width: 549px) {
     font-size: 1.3rem;
@@ -125,7 +129,7 @@ const BtnBox = styled.div`
     font-weight: bold;
     border: 2px solid #828181;
     background-color: transparent;
-    margin-top: -14rem;
+    margin-top: -14%;
     color: black;
     overflow: hidden;
     padding: 0.7rem 2rem;

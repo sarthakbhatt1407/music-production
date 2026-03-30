@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -191,6 +191,10 @@ const DualLoginPage = () => {
       repeatType: "loop",
     },
   };
+  useEffect(() => {
+    // Scroll to top on mount
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Box
