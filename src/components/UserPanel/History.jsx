@@ -22,7 +22,7 @@ import {
   Badge,
   Typography,
 } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import UserOrdersStatus from "../UserOrdersStatus";
 
@@ -174,19 +174,25 @@ const AlbumCard = styled(Card)`
   }
 
   .ant-card-cover {
-    height: 180px;
+    height: auto;
+    min-height: 180px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
 
     img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
+      object-fit: contain;
       transition: transform 0.3s ease;
+      max-height: 250px;
     }
   }
 
   &:hover .ant-card-cover img {
-    transform: scale(1.05);
+    transform: scale(1.02);
   }
 
   .ant-card-body {
@@ -240,6 +246,7 @@ const ViewButton = styled(Link)`
 
 const History = () => {
   const userId = useSelector((state) => state.userId);
+  const navigate = useNavigate();
   const [orders, setOrders] = useState(null);
   const [filteredOrders, setFilteredOrders] = useState(null);
   const [isLoading, setIsloading] = useState(true);
@@ -471,6 +478,7 @@ const History = () => {
                 key={id}
                 cover={<img alt={title} src={thumbSrc} />}
                 hoverable
+                onClick={() => navigate(`/user-panel/order/${id}`)}
               >
                 <Title level={5} style={{ margin: 0, marginBottom: "1rem" }}>
                   {title}
@@ -493,20 +501,6 @@ const History = () => {
                   </CardItem>
 
                   <CardItem>
-                    <ItemLabel>Language</ItemLabel>
-                    <ItemValue>{language}</ItemValue>
-                  </CardItem>
-
-                  <CardItem>
-                    <ItemLabel>Release Date</ItemLabel>
-                    <ItemValue>
-                      {dateLive && dateLive.length > 2
-                        ? dateLive
-                        : dateOfRelease}
-                    </ItemValue>
-                  </CardItem>
-
-                  <CardItem>
                     <ItemLabel>Created</ItemLabel>
                     <ItemValue>{orderDateAndTime.split("/")[0]}</ItemValue>
                   </CardItem>
@@ -518,13 +512,11 @@ const History = () => {
                       width: "100%",
                     }}
                   >
-                    <Link to={`/user-panel/order/${id}`}>
-                      <ViewButton>
-                        <Space>
-                          <EyeOutlined /> View Details
-                        </Space>
-                      </ViewButton>
-                    </Link>
+                    {/* <ViewButton to={`/user-panel/order/${id}`}>
+                      <Space>
+                        <EyeOutlined /> View Details
+                      </Space>
+                    </ViewButton> */}
                   </Space>
                 </CardContent>
               </AlbumCard>

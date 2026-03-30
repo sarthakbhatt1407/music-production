@@ -194,7 +194,7 @@ const PendingWork = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/get-all-orders/?userId=${userId}`
+        `${process.env.REACT_APP_BASE_URL}/order/get-all-orders-by-status/?userId=${userId}&status=processing`,
       );
       const data = await res.json();
 
@@ -233,7 +233,7 @@ const PendingWork = () => {
             adminId: userId,
             id: currentOrderId,
           }),
-        }
+        },
       );
       const data = await res.json();
 
@@ -249,7 +249,7 @@ const PendingWork = () => {
       } else {
         openNotificationWithIcon(
           "error",
-          data.message || "Failed to update order"
+          data.message || "Failed to update order",
         );
       }
     } catch (err) {
@@ -268,7 +268,7 @@ const PendingWork = () => {
         `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${id}&action=completed&userId=${userId}`,
         {
           method: "PATCH",
-        }
+        },
       );
       const data = await res.json();
 
@@ -575,7 +575,7 @@ const PendingWork = () => {
             onClick={() => {
               window.open(
                 `${process.env.REACT_APP_BASE_URL}/order/get/export/processing`,
-                "_blank"
+                "_blank",
               );
             }}
           >

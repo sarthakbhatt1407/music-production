@@ -224,7 +224,10 @@ const Footer = () => {
         </MidDiv>
       </FirstDiv>
       <SecondDiv>
-        <p>Copyright © 2024 Rivaaz Films. All rights reserved.</p>
+        <p>
+          Copyright © {new Date().getFullYear()} Rivaaz Films. All rights
+          reserved.
+        </p>
       </SecondDiv>
     </MainDiv>
   );

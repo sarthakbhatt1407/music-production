@@ -47,6 +47,26 @@ const MainDiv = styled(motion.div)`
 
   @media only screen and (max-width: 1000px) {
     padding: 1rem;
+    gap: 1rem;
+  }
+
+  @media only screen and (max-width: 768px) {
+    padding: 0.75rem;
+    gap: 0.75rem;
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    padding: 0.5rem;
+    gap: 0.5rem;
+
+    h1 {
+      font-size: 1.3rem;
+    }
   }
 `;
 
@@ -78,6 +98,44 @@ const ProfileHeader = styled.div`
       font-size: 0.9rem;
     }
   }
+
+  @media only screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .header-title {
+      h1 {
+        font-size: 1.6rem;
+      }
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    .completion-indicator {
+      align-self: stretch;
+      justify-content: space-between;
+
+      span {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    margin-bottom: 0.75rem;
+
+    .header-title {
+      h1 {
+        font-size: 1.4rem;
+      }
+      p {
+        font-size: 0.85rem;
+      }
+    }
+  }
 `;
 
 const ContentDiv = styled(motion.div)`
@@ -89,6 +147,15 @@ const ContentDiv = styled(motion.div)`
 
   @media only screen and (max-width: 1000px) {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media only screen and (max-width: 768px) {
+    gap: 0.75rem;
+  }
+
+  @media only screen and (max-width: 480px) {
+    gap: 0.5rem;
   }
 `;
 
@@ -154,6 +221,59 @@ const ProfileCard = styled(motion.div)`
       }
     }
   }
+
+  @media only screen and (max-width: 768px) {
+    padding: 1.5rem;
+    margin-bottom: 0;
+
+    .avatar-container {
+      margin-bottom: 1rem;
+
+      .edit-overlay {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .profile-name {
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    .profile-contact {
+      margin-bottom: 1rem;
+
+      .contact-item {
+        font-size: 0.9rem;
+
+        svg {
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    padding: 1rem;
+    border-radius: 12px;
+
+    .profile-name {
+      font-size: 1.2rem;
+    }
+
+    .profile-contact {
+      .contact-item {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+
+        svg {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
 `;
 
 const DetailsTabs = styled(Tabs)`
@@ -167,6 +287,48 @@ const DetailsTabs = styled(Tabs)`
     &.ant-tabs-tab-active .ant-tabs-tab-btn {
       color: #1677ff;
       font-weight: 600;
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    .ant-tabs-nav {
+      margin-bottom: 0.75rem;
+    }
+
+    .ant-tabs-tab {
+      padding: 10px 12px;
+      font-size: 0.9rem;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+    }
+
+    .ant-tabs-nav-wrap {
+      overflow-x: auto;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    .ant-tabs-tab {
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      min-width: auto;
+
+      span {
+        gap: 0.2rem;
+      }
+
+      svg {
+        font-size: 0.9rem !important;
+      }
+    }
+
+    .ant-tabs-nav-list {
+      display: flex;
+      flex-wrap: nowrap;
     }
   }
 `;
@@ -200,6 +362,48 @@ const DetailSection = styled(motion.div)`
 
   .section-content {
     padding: 1.5rem;
+  }
+
+  @media only screen and (max-width: 768px) {
+    border-radius: 12px;
+
+    .section-header {
+      padding: 1rem 1.25rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+
+      h3 {
+        font-size: 1.1rem;
+        gap: 0.5rem;
+
+        svg {
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    .section-content {
+      padding: 1.25rem;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    .section-header {
+      padding: 0.75rem 1rem;
+
+      h3 {
+        font-size: 1rem;
+
+        svg {
+          font-size: 1rem;
+        }
+      }
+    }
+
+    .section-content {
+      padding: 1rem;
+    }
   }
 `;
 
@@ -255,6 +459,49 @@ const InfoRow = styled.div`
       }
     }
   }
+
+  @media only screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+
+    .info-label {
+      flex: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      gap: 0.4rem;
+
+      svg {
+        font-size: 1rem;
+      }
+    }
+
+    .info-value {
+      flex: none;
+      width: 100%;
+      font-size: 0.9rem;
+      padding-left: 1.4rem;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    margin-bottom: 0.75rem;
+
+    .info-label {
+      font-size: 0.85rem;
+
+      svg {
+        font-size: 0.9rem;
+      }
+    }
+
+    .info-value {
+      font-size: 0.85rem;
+      padding-left: 1.2rem;
+      word-break: break-all;
+    }
+  }
 `;
 
 const ActionButton = styled(motion.button)`
@@ -279,6 +526,28 @@ const ActionButton = styled(motion.button)`
 
   &:active {
     transform: translateY(0);
+  }
+
+  @media only screen and (max-width: 768px) {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    gap: 0.4rem;
+    width: 100%;
+    justify-content: center;
+
+    svg {
+      font-size: 1rem !important;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+
+    svg {
+      font-size: 0.9rem !important;
+    }
   }
 `;
 
@@ -327,6 +596,56 @@ const ModalContent = styled(motion.div)`
     justify-content: flex-end;
     gap: 1rem;
   }
+
+  @media only screen and (max-width: 768px) {
+    width: 90%;
+    max-width: none;
+    margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    .modal-header {
+      padding: 1.25rem;
+
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+      gap: 1rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.25rem;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    width: 95%;
+    margin: 0.5rem;
+    border-radius: 12px;
+
+    .modal-header {
+      padding: 1rem;
+
+      h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    .modal-body {
+      padding: 1rem;
+      gap: 0.75rem;
+    }
+
+    .modal-footer {
+      padding: 0.75rem 1rem;
+    }
+  }
 `;
 
 const FormGroup = styled.div`
@@ -345,6 +664,18 @@ const FormGroup = styled.div`
     font-size: 0.8rem;
     margin-top: 0.25rem;
   }
+
+  @media only screen and (max-width: 768px) {
+    gap: 0.4rem;
+
+    label {
+      font-size: 0.85rem;
+    }
+
+    .error-message {
+      font-size: 0.75rem;
+    }
+  }
 `;
 
 const Input = styled.input`
@@ -362,6 +693,17 @@ const Input = styled.input`
 
   &.error {
     border-color: #f44336;
+  }
+
+  @media only screen and (max-width: 768px) {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  @media only screen and (max-width: 480px) {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
   }
 `;
 
@@ -432,6 +774,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [profileCompletion, setProfileCompletion] = useState(0);
   const [formErrors, setFormErrors] = useState({});
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const [userProfile, setUserProfile] = useState({
     name: "",
@@ -531,6 +874,16 @@ const ProfilePage = () => {
 
   useEffect(() => {
     fecher();
+
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
     // eslint-disable-next-line
   }, [refresher]);
 
@@ -704,6 +1057,16 @@ const ProfilePage = () => {
     if (percent < 40) return "#f5222d";
     if (percent < 70) return "#faad14";
     return "#52c41a";
+  };
+
+  const getTabLabel = (icon, text) => {
+    const isMobile = windowWidth <= 480;
+    return (
+      <span>
+        {icon}
+        {!isMobile && text}
+      </span>
+    );
   };
 
   return (
@@ -939,7 +1302,10 @@ const ProfilePage = () => {
             { title: "User Panel" },
             { title: "Profile" },
           ]}
-          style={{ marginBottom: "1rem" }}
+          style={{
+            marginBottom: windowWidth <= 768 ? "0.75rem" : "1rem",
+            fontSize: windowWidth <= 480 ? "0.85rem" : "inherit",
+          }}
         />
 
         <ProfileHeader>
@@ -983,7 +1349,9 @@ const ProfilePage = () => {
                   offset={[-5, 5]}
                 >
                   <Avatar
-                    size={120}
+                    size={
+                      windowWidth <= 480 ? 80 : windowWidth <= 768 ? 100 : 120
+                    }
                     src={
                       userData.userPic.includes("cloudinary")
                         ? `${userData.userPic}`
@@ -1022,12 +1390,12 @@ const ProfilePage = () => {
               tabPosition="top"
             >
               <TabPane
-                tab={
-                  <span>
-                    <PersonOutlineOutlined style={{ marginRight: 8 }} />
-                    Personal Details
-                  </span>
-                }
+                tab={getTabLabel(
+                  <PersonOutlineOutlined
+                    style={{ marginRight: windowWidth <= 480 ? 0 : 8 }}
+                  />,
+                  "Personal Details"
+                )}
                 key="1"
               >
                 <DetailSection
@@ -1087,7 +1455,11 @@ const ProfilePage = () => {
                   </div>
                 </DetailSection>
 
-                <Divider style={{ margin: "1.5rem 0" }} />
+                <Divider
+                  style={{
+                    margin: windowWidth <= 768 ? "1rem 0" : "1.5rem 0",
+                  }}
+                />
 
                 <DetailSection
                   initial={{ y: 20, opacity: 0 }}
@@ -1144,12 +1516,12 @@ const ProfilePage = () => {
               </TabPane>
 
               <TabPane
-                tab={
-                  <span>
-                    <AccountBalanceOutlined style={{ marginRight: 8 }} />
-                    Bank Details
-                  </span>
-                }
+                tab={getTabLabel(
+                  <AccountBalanceOutlined
+                    style={{ marginRight: windowWidth <= 480 ? 0 : 8 }}
+                  />,
+                  "Bank Details"
+                )}
                 key="2"
               >
                 <DetailSection
@@ -1269,12 +1641,12 @@ const ProfilePage = () => {
               </TabPane>
 
               <TabPane
-                tab={
-                  <span>
-                    <VerifiedUserOutlined style={{ marginRight: 8 }} />
-                    Documents
-                  </span>
-                }
+                tab={getTabLabel(
+                  <VerifiedUserOutlined
+                    style={{ marginRight: windowWidth <= 480 ? 0 : 8 }}
+                  />,
+                  "Documents"
+                )}
                 key="3"
               >
                 <DetailSection

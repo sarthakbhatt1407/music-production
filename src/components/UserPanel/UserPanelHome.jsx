@@ -54,12 +54,31 @@ const MainContainer = styled.div`
   overflow-y: auto;
 
   @media (max-width: 768px) {
-    padding: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    border-radius: 4px;
   }
 `;
 
 const HeaderSection = styled.div`
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
+
+  .ant-breadcrumb {
+    margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+  }
 `;
 
 const PageTitle = styled.div`
@@ -67,6 +86,28 @@ const PageTitle = styled.div`
   align-items: center;
   gap: 0.5rem;
   margin: 1rem 0;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    margin: 0.75rem 0;
+    gap: 0.25rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  h3 {
+    @media (max-width: 768px) {
+      font-size: 1.25rem !important;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.1rem !important;
+    }
+  }
 `;
 
 const DashboardGrid = styled.div`
@@ -88,6 +129,14 @@ const StyledCard = styled(Card)`
   .ant-card-head {
     border-bottom: 1px solid #f0f0f0;
     padding: 0 24px;
+
+    @media (max-width: 768px) {
+      padding: 0 16px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0 12px;
+    }
   }
 
   .ant-card-head-title {
@@ -95,16 +144,41 @@ const StyledCard = styled(Card)`
     font-size: 1rem;
     font-weight: 600;
     color: #3c4858;
+
+    @media (max-width: 768px) {
+      padding: 12px 0;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 10px 0;
+      font-size: 0.85rem;
+    }
   }
 
   .ant-card-body {
     padding: 24px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
   }
 
   @media (max-width: 768px) {
-    .ant-card-body {
-      padding: 16px;
+    border-radius: 8px;
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
+  }
+
+  @media (max-width: 480px) {
+    border-radius: 6px;
   }
 `;
 
@@ -113,12 +187,62 @@ const CardHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h4 {
+    @media (max-width: 768px) {
+      font-size: 1rem !important;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.9rem !important;
+    }
+  }
+
+  .ant-space {
+    @media (max-width: 480px) {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .ant-select {
+    @media (max-width: 480px) {
+      min-width: 90px;
+      flex: 1;
+    }
+  }
 `;
 
 const ChartContainer = styled.div`
   width: 100%;
   height: 300px;
   margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    height: 250px;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    height: 200px;
+    margin-top: 0.5rem;
+  }
 `;
 
 const StatGrid = styled.div`
@@ -126,6 +250,18 @@ const StatGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
 `;
 
 const StatCard = styled(Card)`
@@ -135,16 +271,51 @@ const StatCard = styled(Card)`
 
   .ant-card-body {
     padding: 1.5rem;
+
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+    }
   }
 
   .ant-statistic-title {
     color: #6c757d;
     font-weight: 500;
     margin-bottom: 0.5rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
   }
 
   .ant-statistic-content {
     color: #3c4858;
+
+    .ant-statistic-content-value {
+      @media (max-width: 768px) {
+        font-size: 1.25rem !important;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 1.1rem !important;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+  }
+
+  @media (max-width: 480px) {
+    border-radius: 6px;
   }
 `;
 
@@ -486,19 +657,19 @@ const UserPanelHome = () => {
             style={{ marginBottom: "1rem" }}
           />
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={8}>
+            <Col xs={24} sm={12} md={8}>
               <Skeleton.Button
                 active
                 style={{ width: "100%", height: "120px" }}
               />
             </Col>
-            <Col xs={24} sm={8}>
+            <Col xs={24} sm={12} md={8}>
               <Skeleton.Button
                 active
                 style={{ width: "100%", height: "120px" }}
               />
             </Col>
-            <Col xs={24} sm={8}>
+            <Col xs={24} sm={24} md={8}>
               <Skeleton.Button
                 active
                 style={{ width: "100%", height: "120px" }}
@@ -507,7 +678,16 @@ const UserPanelHome = () => {
           </Row>
           <Skeleton.Button
             active
-            style={{ width: "100%", height: "400px", marginTop: "1.5rem" }}
+            style={{
+              width: "100%",
+              height:
+                window.innerWidth <= 480
+                  ? "200px"
+                  : window.innerWidth <= 768
+                  ? "250px"
+                  : "400px",
+              marginTop: "1.5rem",
+            }}
           />
         </>
       ) : (
@@ -642,13 +822,18 @@ const UserPanelHome = () => {
                 <Divider style={{ margin: "0.5rem 0 1.5rem" }} />
 
                 {reportData && reportData.length > 0 ? (
-                  <Row gutter={16}>
-                    <Col xs={24} md={16}>
+                  <Row gutter={[16, 16]}>
+                    <Col xs={24} lg={16}>
                       <ChartContainer>
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart
                             data={reportData}
-                            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                            margin={{
+                              top: 10,
+                              right: window.innerWidth <= 480 ? 10 : 30,
+                              left: 0,
+                              bottom: 0,
+                            }}
                           >
                             <defs>
                               {Object.entries(COLORSSTREAM).map(
@@ -684,12 +869,27 @@ const UserPanelHome = () => {
                               dataKey="name"
                               axisLine={false}
                               tickLine={false}
-                              style={{ fontSize: "0.8rem" }}
+                              style={{
+                                fontSize:
+                                  window.innerWidth <= 480
+                                    ? "0.7rem"
+                                    : "0.8rem",
+                              }}
+                              angle={window.innerWidth <= 480 ? -45 : 0}
+                              textAnchor={
+                                window.innerWidth <= 480 ? "end" : "middle"
+                              }
+                              height={window.innerWidth <= 480 ? 60 : 30}
                             />
                             <YAxis
                               axisLine={false}
                               tickLine={false}
-                              style={{ fontSize: "0.8rem" }}
+                              style={{
+                                fontSize:
+                                  window.innerWidth <= 480
+                                    ? "0.7rem"
+                                    : "0.8rem",
+                              }}
                             />
                             <Tooltip
                               cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
@@ -697,18 +897,26 @@ const UserPanelHome = () => {
                                 borderRadius: "8px",
                                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                                 border: "none",
+                                fontSize:
+                                  window.innerWidth <= 480
+                                    ? "0.8rem"
+                                    : "0.9rem",
                               }}
                             />
                             <Legend
                               wrapperStyle={{
                                 paddingTop: "10px",
+                                fontSize:
+                                  window.innerWidth <= 480
+                                    ? "0.8rem"
+                                    : "0.9rem",
                               }}
                             />
                             <Bar
                               dataKey="views"
                               name="Views"
                               radius={[4, 4, 0, 0]}
-                              barSize={30}
+                              barSize={window.innerWidth <= 480 ? 20 : 30}
                               animationDuration={1500}
                             >
                               {reportData.map((entry, index) => (
@@ -723,7 +931,7 @@ const UserPanelHome = () => {
                       </ChartContainer>
                     </Col>
 
-                    <Col xs={24} md={8}>
+                    <Col xs={24} lg={8}>
                       <ChartContainer>
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
@@ -731,14 +939,17 @@ const UserPanelHome = () => {
                               data={reportData}
                               cx="50%"
                               cy="50%"
-                              innerRadius={60}
-                              outerRadius={80}
+                              innerRadius={window.innerWidth <= 480 ? 40 : 60}
+                              outerRadius={window.innerWidth <= 480 ? 60 : 80}
                               fill="#8884d8"
                               paddingAngle={5}
                               dataKey="views"
                               nameKey="name"
-                              label={({ name, percent }) =>
-                                `${name}: ${(percent * 100).toFixed(0)}%`
+                              label={
+                                window.innerWidth <= 480
+                                  ? false
+                                  : ({ name, percent }) =>
+                                      `${name}: ${(percent * 100).toFixed(0)}%`
                               }
                               labelLine={false}
                               animationDuration={1500}
@@ -759,8 +970,19 @@ const UserPanelHome = () => {
                                 borderRadius: "8px",
                                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                                 border: "none",
+                                fontSize:
+                                  window.innerWidth <= 480
+                                    ? "0.8rem"
+                                    : "0.9rem",
                               }}
                             />
+                            {window.innerWidth <= 480 && (
+                              <Legend
+                                verticalAlign="bottom"
+                                height={36}
+                                wrapperStyle={{ fontSize: "0.7rem" }}
+                              />
+                            )}
                           </PieChart>
                         </ResponsiveContainer>
                       </ChartContainer>
@@ -773,24 +995,35 @@ const UserPanelHome = () => {
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      padding: "2rem",
-                      minHeight: "300px",
+                      padding: window.innerWidth <= 480 ? "1.5rem" : "2rem",
+                      minHeight: window.innerWidth <= 480 ? "200px" : "300px",
+                      textAlign: "center",
                     }}
                   >
                     <BarChartOutlined
                       style={{
-                        fontSize: "3rem",
+                        fontSize: window.innerWidth <= 480 ? "2rem" : "3rem",
                         color: "#d9d9d9",
                         marginBottom: "1rem",
                       }}
                     />
-                    <Text type="secondary" style={{ fontSize: "1rem" }}>
+                    <Text
+                      type="secondary"
+                      style={{
+                        fontSize: window.innerWidth <= 480 ? "0.9rem" : "1rem",
+                        marginBottom: "0.5rem",
+                      }}
+                    >
                       No streaming data available for {selectedMonth}{" "}
                       {reportSelectedYear}
                     </Text>
                     <Text
                       type="secondary"
-                      style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}
+                      style={{
+                        fontSize:
+                          window.innerWidth <= 480 ? "0.8rem" : "0.9rem",
+                        marginTop: "0.5rem",
+                      }}
                     >
                       Try selecting a different month or year
                     </Text>

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import intro from "../assets/images/intro.webp";
+// import intro from "../assets/images/intro.webp";
+import intro from "../assets/images/12.png";
 import introMobile from "../assets/images/introMobile.webp";
 import { useNavigate } from "react-router";
 
@@ -26,7 +27,7 @@ const MainBox = styled.div`
     background-size: cover;
     z-index: -1;
     opacity: 1;
-    filter: blur(3px);
+    /* filter: blur(3px); */
     @media only screen and (min-width: 0px) and (max-width: 549px) {
       background: url(${(props) => props.introMobile});
       content: "";
@@ -66,12 +67,12 @@ const TextBox = styled.div`
     letter-spacing: 0.1rem;
     padding: 2rem 0;
     h1 {
-      font-size: 8rem;
+      font-size: 6rem;
       text-align: center;
     }
     h2 {
-      font-size: 8rem;
-      color: #d91903;
+      font-size: 6rem;
+      /* color: #d91903; */
     }
   }
   @media only screen and (min-width: 0px) and (max-width: 700px) {
@@ -94,8 +95,8 @@ const TextBox = styled.div`
 `;
 
 const Para = styled.span`
-  margin-top: -8rem;
-  font-size: 1.8rem;
+  margin-top: -13rem;
+  font-size: 1.6rem;
   text-transform: capitalize;
   letter-spacing: 0.1rem;
   color: black;
@@ -124,7 +125,7 @@ const BtnBox = styled.div`
     font-weight: bold;
     border: 2px solid #828181;
     background-color: transparent;
-    margin-top: -5rem;
+    margin-top: -14rem;
     color: black;
     overflow: hidden;
     padding: 0.7rem 2rem;
@@ -197,7 +198,7 @@ const IntroBox = () => {
           <button
             data-aos="fade-up"
             onClick={() => {
-              navigate("/login");
+              navigate("/select-login");
             }}
           >
             Sign In

@@ -15,6 +15,9 @@ import {
   Space,
   Card,
   Popconfirm,
+  Typography,
+  Pagination,
+  Spin,
 } from "antd";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
@@ -26,9 +29,12 @@ import {
   PlusOutlined,
   HomeOutlined,
   CopyrightOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import MusicLoader from "../Loader/MusicLoader";
+
+const { Title, Text } = Typography;
 
 const MainBox = styled.div`
   width: 100%;
@@ -41,8 +47,14 @@ const MainBox = styled.div`
   flex-direction: column;
   gap: 1.5rem;
 
-  @media only screen and (max-width: 1000px) {
+  @media (max-width: 768px) {
     padding: 1rem;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+    gap: 0.75rem;
   }
 `;
 
@@ -62,13 +74,19 @@ const PageHeader = styled.div`
     gap: 0.5rem;
   }
 
-  @media only screen and (max-width: 768px) {
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
 
     h1 {
       font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.25rem;
     }
   }
 `;
@@ -100,6 +118,131 @@ const ContentCard = styled(Card)`
   .ant-empty {
     padding: 2.5rem 0;
   }
+
+  @media (max-width: 1000px) {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+  }
+
+  @media (max-width: 480px) {
+    border-radius: 6px;
+  }
+`;
+
+// Mobile Container and Card Components
+const MobileContainer = styled.div`
+  display: none;
+
+  @media (max-width: 1000px) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.75rem;
+  }
+`;
+
+const ClaimCard = styled(Card)`
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .ant-card-body {
+    padding: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+
+    &:hover {
+      transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  @media (max-width: 480px) {
+    border-radius: 6px;
+
+    .ant-card-body {
+      padding: 0.75rem;
+    }
+  }
+`;
+
+const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const CardItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+
+    &:last-child {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+`;
+
+const ItemLabel = styled(Text)`
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.85rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const ItemValue = styled.div`
+  color: #3c4858;
+  font-weight: 500;
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+
+  @media (max-width: 480px) {
+    gap: 0.25rem;
+  }
 `;
 
 const ActionButton = styled(Button)`
@@ -116,6 +259,16 @@ const ActionButton = styled(Button)`
       background-color: #0958d9;
       border-color: #0958d9;
     }
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+  }
+
+  @media (max-width: 480px) {
+    padding: 8px 16px;
+    font-size: 14px;
   }
 `;
 
@@ -263,6 +416,48 @@ const CopyRightPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Render status for mobile cards
+  const renderStatus = (status) => {
+    let color, icon, text;
+
+    switch (status) {
+      case "pending":
+        color = "gold";
+        icon = <ClockCircleOutlined />;
+        text = "Pending";
+        break;
+      case "resolved":
+        color = "green";
+        icon = <CheckCircleOutlined />;
+        text = "Resolved";
+        break;
+      case "rejected":
+        color = "red";
+        icon = <CloseCircleOutlined />;
+        text = "Rejected";
+        break;
+      default:
+        color = "default";
+        text = "Unknown";
+    }
+
+    return (
+      <Tag
+        color={color}
+        style={{
+          padding: "4px 12px",
+          borderRadius: "4px",
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          width: "fit-content",
+        }}
+      >
+        {icon} {text}
+      </Tag>
+    );
   };
 
   const columns = [
@@ -443,6 +638,75 @@ const CopyRightPage = () => {
           />
         )}
       </ContentCard>
+
+      {/* Mobile Card View */}
+      <MobileContainer>
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <MusicLoader />
+          </div>
+        ) : tableData.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No copyright claims found"
+            />
+          </div>
+        ) : (
+          tableData.map((claim) => (
+            <ClaimCard key={claim.key}>
+              <CardContent>
+                <CardItem>
+                  <ItemLabel>Platform:</ItemLabel>
+                  <ItemValue>{claim.platform}</ItemValue>
+                </CardItem>
+                <CardItem>
+                  <ItemLabel>Status:</ItemLabel>
+                  <ItemValue>{renderStatus(claim.status)}</ItemValue>
+                </CardItem>
+                <CardItem>
+                  <ItemLabel>Created:</ItemLabel>
+                  <ItemValue>
+                    {claim.created ? claim.created.split("/")[0] : "Unknown"}
+                  </ItemValue>
+                </CardItem>
+                <CardItem>
+                  <ItemLabel>Content Link:</ItemLabel>
+                  <ItemValue>
+                    {claim.link ? (
+                      <a
+                        href={claim.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: "#1890ff",
+                          textDecoration: "none",
+                          wordBreak: "break-all",
+                        }}
+                      >
+                        {claim.link.length > 40
+                          ? `${claim.link.substring(0, 40)}...`
+                          : claim.link}
+                      </a>
+                    ) : (
+                      <span style={{ color: "#999" }}>No link provided</span>
+                    )}
+                  </ItemValue>
+                </CardItem>
+                <ActionButtons>
+                  <ActionButton
+                    size="small"
+                    style={{ fontSize: "12px" }}
+                    onClick={() => handleDelete(claim.id)}
+                  >
+                    Delete
+                  </ActionButton>
+                </ActionButtons>
+              </CardContent>
+            </ClaimCard>
+          ))
+        )}
+      </MobileContainer>
 
       <StyledModal
         title="Create New Copyright Claim"

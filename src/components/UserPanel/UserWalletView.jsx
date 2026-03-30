@@ -90,6 +90,77 @@ const StyledTableContainer = styled(TableContainer)({
   "& .MuiTableRow-root:hover": {
     backgroundColor: "#f8faff",
   },
+  "@media (max-width: 1000px)": {
+    display: "none",
+  },
+});
+
+// Mobile Components
+const MobileContainer = styled(Box)({
+  display: "none",
+  "@media (max-width: 1000px)": {
+    display: "block",
+    padding: "16px 0",
+  },
+});
+
+const TransactionCard = styled(Card)({
+  marginBottom: "16px",
+  borderRadius: "12px",
+  boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+  border: "1px solid #e0e0e0",
+});
+
+const CardHeader = styled(Box)({
+  padding: "12px 16px",
+  borderBottom: "1px solid #f0f0f0",
+  backgroundColor: "#fafafa",
+  borderRadius: "12px 12px 0 0",
+});
+
+const CardBody = styled(Box)({
+  padding: "16px",
+});
+
+const CardItem = styled(Box)({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "12px",
+  "&:last-child": {
+    marginBottom: 0,
+  },
+});
+
+const ItemLabel = styled(Typography)({
+  fontSize: "14px",
+  color: "#666",
+  fontWeight: 500,
+});
+
+const ItemValue = styled(Typography)({
+  fontSize: "14px",
+  fontWeight: 600,
+  color: "#333",
+});
+
+const MobileBalanceGrid = styled(Box)({
+  display: "none",
+  "@media (max-width: 768px)": {
+    display: "block",
+    "& .MuiGrid-container": {
+      gap: "16px",
+    },
+    "& .MuiGrid-item": {
+      padding: "0 !important",
+    },
+  },
+});
+
+const DesktopBalanceGrid = styled(Box)({
+  "@media (max-width: 768px)": {
+    display: "none",
+  },
 });
 
 const AmountText = styled(Typography)(({ type }) => ({
@@ -117,6 +188,12 @@ const PageHeader = styled(Box)({
   justifyContent: "space-between",
   alignItems: "center",
   marginBottom: 32,
+  "@media (max-width: 768px)": {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 16,
+    marginBottom: 24,
+  },
 });
 
 const IconWithLabel = styled(Box)({
@@ -136,6 +213,12 @@ const ActionButton = styled(Button)({
   fontWeight: 600,
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
   marginLeft: 16,
+  "@media (max-width: 768px)": {
+    marginLeft: 0,
+    marginTop: 8,
+    fontSize: "12px",
+    padding: "6px 12px",
+  },
 });
 
 const monthOptions = [
@@ -231,6 +314,11 @@ const UserWalletView = () => {
           userName: data.name,
           userAvatar: data.img,
         }));
+        setRequestFormData({
+          amount:
+            Number.parseInt(data.totalEarn) - Number.parseInt(data.totalPaid),
+          message: "",
+        });
       }
     } catch (err) {
       console.error("Error fetching wallet data:", err);
@@ -370,7 +458,17 @@ const UserWalletView = () => {
             </Typography>
           </Box>
         </Box>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            "@media (max-width: 768px)": {
+              flexDirection: "column",
+              width: "100%",
+              gap: 1,
+            },
+          }}
+        >
           <ActionButton
             variant="contained"
             color="primary"
@@ -379,6 +477,11 @@ const UserWalletView = () => {
             sx={{
               bgcolor: "#ff9800",
               "&:hover": { bgcolor: "#f57c00" },
+              "@media (max-width: 768px)": {
+                marginLeft: "0 !important",
+                width: "100%",
+                justifyContent: "center",
+              },
             }}
           >
             Request Payment
@@ -391,7 +494,12 @@ const UserWalletView = () => {
             sx={{
               bgcolor: "#1976d2",
               "&:hover": { bgcolor: "#1565c0" },
-              marginLeft: 2,
+              "@media (max-width: 768px)": {
+                marginLeft: "0 !important",
+                marginTop: "0 !important",
+                width: "100%",
+                justifyContent: "center",
+              },
             }}
           >
             Download Report
@@ -399,76 +507,228 @@ const UserWalletView = () => {
         </Box>
       </PageHeader>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={3}>
-          <BalanceBox bgColor="linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)">
-            <WalletIcon
-              sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
-            />
-            <Typography
-              variant="h6"
-              fontWeight={500}
-              sx={{ mb: 1, color: "white" }}
-            >
-              Total Earned
-            </Typography>
-            <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
-              ₹{userData.paidOrders.toLocaleString("en-IN")}
-            </Typography>
-          </BalanceBox>
+      <DesktopBalanceGrid>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={3}>
+            <BalanceBox bgColor="linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)">
+              <WalletIcon
+                sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
+              />
+              <Typography
+                variant="h6"
+                fontWeight={500}
+                sx={{ mb: 1, color: "white" }}
+              >
+                Total Earned
+              </Typography>
+              <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
+                ₹{userData.paidOrders.toLocaleString("en-IN")}
+              </Typography>
+            </BalanceBox>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <BalanceBox bgColor="linear-gradient(135deg, #0BA360 0%, #3CBA92 100%)">
+              <PaymentsIcon
+                sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
+              />
+              <Typography
+                variant="h6"
+                fontWeight={500}
+                sx={{ mb: 1, color: "white" }}
+              >
+                Total Paid
+              </Typography>
+              <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
+                ₹{userData.balancePaid.toLocaleString("en-IN")}
+              </Typography>
+            </BalanceBox>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <BalanceBox bgColor="linear-gradient(135deg, #FF9966 0%, #FF5E62 100%)">
+              <TrendingUpIcon
+                sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
+              />
+              <Typography
+                variant="h6"
+                fontWeight={500}
+                sx={{ mb: 1, color: "white" }}
+              >
+                Balance Due
+              </Typography>
+              <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
+                ₹{userData.currentBalance.toLocaleString("en-IN")}
+              </Typography>
+            </BalanceBox>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <BalanceBox bgColor="linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)">
+              <BonusIcon
+                sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
+              />
+              <Typography
+                variant="h6"
+                fontWeight={500}
+                sx={{ mb: 1, color: "white" }}
+              >
+                Bonus
+              </Typography>
+              <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
+                ₹{userData.bonus.toLocaleString("en-IN")}
+              </Typography>
+            </BalanceBox>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <BalanceBox bgColor="linear-gradient(135deg, #0BA360 0%, #3CBA92 100%)">
-            <PaymentsIcon
-              sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
-            />
-            <Typography
-              variant="h6"
-              fontWeight={500}
-              sx={{ mb: 1, color: "white" }}
-            >
-              Total Paid
-            </Typography>
-            <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
-              ₹{userData.balancePaid.toLocaleString("en-IN")}
-            </Typography>
-          </BalanceBox>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <BalanceBox bgColor="linear-gradient(135deg, #FF9966 0%, #FF5E62 100%)">
-            <TrendingUpIcon
-              sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
-            />
-            <Typography
-              variant="h6"
-              fontWeight={500}
-              sx={{ mb: 1, color: "white" }}
-            >
-              Balance Due
-            </Typography>
-            <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
-              ₹{userData.currentBalance.toLocaleString("en-IN")}
-            </Typography>
-          </BalanceBox>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <BalanceBox bgColor="linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)">
-            <BonusIcon
-              sx={{ fontSize: 48, mb: 2, color: "white", opacity: 0.8 }}
-            />
-            <Typography
-              variant="h6"
-              fontWeight={500}
-              sx={{ mb: 1, color: "white" }}
-            >
-              Bonus
-            </Typography>
-            <Typography variant="h3" fontWeight={700} sx={{ color: "white" }}>
-              ₹{userData.bonus.toLocaleString("en-IN")}
-            </Typography>
-          </BalanceBox>
-        </Grid>
+      </DesktopBalanceGrid>
 
+      <MobileBalanceGrid>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {/* First Row - Total Earned and Total Paid */}
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ flex: 1 }}>
+              <BalanceBox
+                bgColor="linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)"
+                sx={{
+                  minHeight: "80px",
+                  padding: "12px !important",
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "20px !important",
+                    marginBottom: "4px !important",
+                  },
+                  "& .MuiTypography-h6": {
+                    fontSize: "9px !important",
+                    marginBottom: "2px !important",
+                  },
+                  "& .MuiTypography-h3": { fontSize: "14px !important" },
+                }}
+              >
+                <WalletIcon sx={{ color: "white", opacity: 0.8 }} />
+                <Typography
+                  variant="h6"
+                  fontWeight={500}
+                  sx={{ color: "white" }}
+                >
+                  Total Earned
+                </Typography>
+                <Typography
+                  variant="h3"
+                  fontWeight={700}
+                  sx={{ color: "white" }}
+                >
+                  ₹{userData.paidOrders.toLocaleString("en-IN")}
+                </Typography>
+              </BalanceBox>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <BalanceBox
+                bgColor="linear-gradient(135deg, #0BA360 0%, #3CBA92 100%)"
+                sx={{
+                  minHeight: "80px",
+                  padding: "12px !important",
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "20px !important",
+                    marginBottom: "4px !important",
+                  },
+                  "& .MuiTypography-h6": {
+                    fontSize: "9px !important",
+                    marginBottom: "2px !important",
+                  },
+                  "& .MuiTypography-h3": { fontSize: "14px !important" },
+                }}
+              >
+                <PaymentsIcon sx={{ color: "white", opacity: 0.8 }} />
+                <Typography
+                  variant="h6"
+                  fontWeight={500}
+                  sx={{ color: "white" }}
+                >
+                  Total Paid
+                </Typography>
+                <Typography
+                  variant="h3"
+                  fontWeight={700}
+                  sx={{ color: "white" }}
+                >
+                  ₹{userData.balancePaid.toLocaleString("en-IN")}
+                </Typography>
+              </BalanceBox>
+            </Box>
+          </Box>
+
+          {/* Second Row - Balance Due and Bonus */}
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ flex: 1 }}>
+              <BalanceBox
+                bgColor="linear-gradient(135deg, #FF9966 0%, #FF5E62 100%)"
+                sx={{
+                  minHeight: "80px",
+                  padding: "12px !important",
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "20px !important",
+                    marginBottom: "4px !important",
+                  },
+                  "& .MuiTypography-h6": {
+                    fontSize: "9px !important",
+                    marginBottom: "2px !important",
+                  },
+                  "& .MuiTypography-h3": { fontSize: "14px !important" },
+                }}
+              >
+                <TrendingUpIcon sx={{ color: "white", opacity: 0.8 }} />
+                <Typography
+                  variant="h6"
+                  fontWeight={500}
+                  sx={{ color: "white" }}
+                >
+                  Balance Due
+                </Typography>
+                <Typography
+                  variant="h3"
+                  fontWeight={700}
+                  sx={{ color: "white" }}
+                >
+                  ₹{userData.currentBalance.toLocaleString("en-IN")}
+                </Typography>
+              </BalanceBox>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <BalanceBox
+                bgColor="linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)"
+                sx={{
+                  minHeight: "80px",
+                  padding: "12px !important",
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "20px !important",
+                    marginBottom: "4px !important",
+                  },
+                  "& .MuiTypography-h6": {
+                    fontSize: "9px !important",
+                    marginBottom: "2px !important",
+                  },
+                  "& .MuiTypography-h3": { fontSize: "14px !important" },
+                }}
+              >
+                <BonusIcon sx={{ color: "white", opacity: 0.8 }} />
+                <Typography
+                  variant="h6"
+                  fontWeight={500}
+                  sx={{ color: "white" }}
+                >
+                  Bonus
+                </Typography>
+                <Typography
+                  variant="h3"
+                  fontWeight={700}
+                  sx={{ color: "white" }}
+                >
+                  ₹{userData.bonus.toLocaleString("en-IN")}
+                </Typography>
+              </BalanceBox>
+            </Box>
+          </Box>
+        </Box>
+      </MobileBalanceGrid>
+
+      <Grid container spacing={4} style={{ marginTop: "8px" }}>
         <Grid item xs={12}>
           <StyledCard>
             <GradientHeader bgColor="linear-gradient(90deg, #2c3e50 0%, #4c669f 100%)">
@@ -478,7 +738,9 @@ const UserWalletView = () => {
             </GradientHeader>
 
             <CardContent sx={{ p: 0 }}>
-              <Box sx={{ p: 3 }}>
+              <Box
+                sx={{ p: 3, "@media (max-width: 1000px)": { display: "none" } }}
+              >
                 <StyledTextField
                   fullWidth
                   size="small"
@@ -596,6 +858,170 @@ const UserWalletView = () => {
                 rowsPerPageOptions={[5, 10, 25]}
                 sx={{ px: 2 }}
               />
+
+              {/* Mobile Transaction Cards */}
+              <MobileContainer
+                style={{
+                  marginTop: "16px",
+                }}
+              >
+                <Box sx={{ mb: 2, px: 3 }}>
+                  <StyledTextField
+                    fullWidth
+                    size="small"
+                    placeholder="Search by description or amount..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <SearchIcon sx={{ color: "#757575", mr: 1 }} />
+                      ),
+                    }}
+                  />
+                </Box>
+
+                <Box sx={{ px: 2 }}>
+                  {loading ? (
+                    <Box sx={{ textAlign: "center", py: 4 }}>
+                      <MusicLoader />
+                    </Box>
+                  ) : filteredTransactions.length === 0 ? (
+                    <Box sx={{ textAlign: "center", py: 4 }}>
+                      <Typography sx={{ color: "#757575" }}>
+                        No transactions found
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <>
+                      {filteredTransactions
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((transaction) => (
+                          <TransactionCard key={transaction.id}>
+                            <CardHeader>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: "#333",
+                                  textTransform: "capitalize",
+                                }}
+                              >
+                                {transaction.description}
+                              </Typography>
+                            </CardHeader>
+                            <CardBody>
+                              <CardItem>
+                                <ItemLabel>Date:</ItemLabel>
+                                <ItemValue>{transaction.date}</ItemValue>
+                              </CardItem>
+                              <CardItem>
+                                <ItemLabel>Time:</ItemLabel>
+                                <ItemValue>{transaction.time}</ItemValue>
+                              </CardItem>
+                              <CardItem>
+                                <ItemLabel>Amount:</ItemLabel>
+                                <ItemValue>
+                                  <AmountText
+                                    variant="body2"
+                                    type={transaction.type}
+                                    sx={{ fontWeight: 700 }}
+                                  >
+                                    ₹
+                                    {transaction.amount.toLocaleString("en-IN")}
+                                  </AmountText>
+                                </ItemValue>
+                              </CardItem>
+                              <CardItem>
+                                <ItemLabel>Type:</ItemLabel>
+                                <ItemValue>
+                                  <Chip
+                                    label={
+                                      transaction.type === "bonus"
+                                        ? "Bonus"
+                                        : "Payment"
+                                    }
+                                    sx={{
+                                      color:
+                                        transaction.type === "bonus"
+                                          ? "#9c27b0"
+                                          : "#1976d2",
+                                      borderColor:
+                                        transaction.type === "bonus"
+                                          ? "#9c27b0"
+                                          : "#1976d2",
+                                    }}
+                                    size="small"
+                                    variant="outlined"
+                                  />
+                                </ItemValue>
+                              </CardItem>
+                            </CardBody>
+                          </TransactionCard>
+                        ))}
+
+                      {/* Mobile Pagination */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: 2,
+                          mt: 3,
+                          pb: 2,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <Button
+                          size="small"
+                          onClick={() =>
+                            handleChangePage(null, Math.max(0, page - 1))
+                          }
+                          disabled={page === 0}
+                          sx={{
+                            fontSize: "12px",
+                            minWidth: "70px",
+                            bgcolor: "#f5f5f5",
+                            color: "#333",
+                            "&:hover": { bgcolor: "#e0e0e0" },
+                          }}
+                        >
+                          Previous
+                        </Button>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "#666", fontSize: "12px" }}
+                        >
+                          Page {page + 1} of{" "}
+                          {Math.ceil(filteredTransactions.length / rowsPerPage)}
+                        </Typography>
+                        <Button
+                          size="small"
+                          onClick={() => handleChangePage(null, page + 1)}
+                          disabled={
+                            page >=
+                            Math.ceil(
+                              filteredTransactions.length / rowsPerPage
+                            ) -
+                              1
+                          }
+                          sx={{
+                            fontSize: "12px",
+                            minWidth: "70px",
+                            bgcolor: "#f5f5f5",
+                            color: "#333",
+                            "&:hover": { bgcolor: "#e0e0e0" },
+                          }}
+                        >
+                          Next
+                        </Button>
+                      </Box>
+                    </>
+                  )}
+                </Box>
+              </MobileContainer>
             </CardContent>
           </StyledCard>
         </Grid>

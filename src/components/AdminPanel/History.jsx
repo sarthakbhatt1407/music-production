@@ -184,9 +184,10 @@ const History = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/get-all-orders/?userId=${userId}`
+        `${process.env.REACT_APP_BASE_URL}/order/get-all-orders-by-status/?userId=${userId}&status=completed`,
       );
       const data = await res.json();
+      console.log(data);
 
       if (res.ok) {
         const sortedOrders = data.orders.reverse();
@@ -521,7 +522,7 @@ const History = () => {
             onClick={() => {
               window.open(
                 `${process.env.REACT_APP_BASE_URL}/order/get/export/completed`,
-                "_blank"
+                "_blank",
               );
             }}
           >

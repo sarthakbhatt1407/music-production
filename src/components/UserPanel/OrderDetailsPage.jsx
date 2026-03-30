@@ -159,6 +159,7 @@ const ContentCard = styled.div`
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
     min-height: auto;
+    overflow-y: scroll;
   }
 `;
 
@@ -175,7 +176,8 @@ const AlbumSection = styled.div`
   @media (max-width: 1024px) {
     border-right: none;
     border-bottom: 1px solid #f0f0f0;
-    padding: 30px 20px;
+    padding: 20px;
+    gap: 6px;
   }
 `;
 
@@ -263,7 +265,9 @@ const DetailsSection = styled.div`
   flex-direction: column;
 
   @media (max-width: 1024px) {
-    padding: 30px 20px;
+    padding: 20px 20px;
+    overflow: hidden;
+    height: fit-content;
   }
 
   /* Custom scrollbar */

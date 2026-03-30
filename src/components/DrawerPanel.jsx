@@ -31,6 +31,42 @@ import { IoWalletOutline } from "react-icons/io5";
 import MusicLoader from "./Loader/MusicLoader";
 const { Header, Sider, Content } = Layout;
 
+const MobileSider = styled(Sider)`
+  @media only screen and (max-width: 768px) {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    transform: ${(props) =>
+      props.collapsed ? "translateX(-100%)" : "translateX(0)"};
+    transition: transform 0.3s ease-in-out;
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+  }
+`;
+
+const MobileOverlay = styled.div`
+  display: none;
+  @media only screen and (max-width: 768px) {
+    display: ${(props) => (props.show ? "block" : "none")};
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+`;
+
+const ResponsiveLayout = styled(Layout)`
+  @media only screen and (max-width: 768px) {
+    margin-left: 0 !important;
+  }
+`;
+
 const LogoDiv = styled.div`
   display: flex;
   justify-content: center;
@@ -231,6 +267,7 @@ const DrawerPanel = (props) => {
   };
   const userId = useSelector((state) => state.userId);
   const [collapsed, setCollapsed] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [userData, setUserdata] = useState(null);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -259,15 +296,46 @@ const DrawerPanel = (props) => {
     const intv = setInterval(() => {
       fetcher();
     }, 20000);
+
+    // Handle window resize for mobile detection
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setCollapsed(true); // Always start collapsed on mobile
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       clearInterval(intv);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  // Handle mobile menu click
+  const handleMobileMenuClick = () => {
+    if (isMobile) {
+      setCollapsed(true); // Close menu when clicking a link on mobile
+    }
+  };
 
   return (
     <Layout style={{ height: "100vh" }}>
       {isLoading && <MusicLoader />}
-      <Sider trigger={null} collapsible collapsed={collapsed}>
+
+      {/* Mobile Overlay */}
+      <MobileOverlay
+        show={!collapsed && isMobile}
+        onClick={() => setCollapsed(true)}
+      />
+
+      <MobileSider
+        trigger={null}
+        collapsible
+        collapsed={isMobile ? collapsed : collapsed}
+      >
         <LogoDiv>
           <img src={logo} alt="" />
         </LogoDiv>
@@ -285,10 +353,7 @@ const DrawerPanel = (props) => {
             {
               key: "1",
               icon: (
-                <Link
-                  to={"/user-panel/home"}
-                  onClick={() => setCollapsed(true)}
-                >
+                <Link to={"/user-panel/home"} onClick={handleMobileMenuClick}>
                   <HomeOutlined />
                 </Link>
               ),
@@ -297,10 +362,7 @@ const DrawerPanel = (props) => {
             {
               key: "2",
               icon: (
-                <Link
-                  to={"/user-panel/upload"}
-                  onClick={() => setCollapsed(true)}
-                >
+                <Link to={"/user-panel/upload"} onClick={handleMobileMenuClick}>
                   <UploadOutlined />
                 </Link>
               ),
@@ -311,7 +373,7 @@ const DrawerPanel = (props) => {
               icon: (
                 <Link
                   to={"/user-panel/history"}
-                  onClick={() => setCollapsed(true)}
+                  onClick={handleMobileMenuClick}
                 >
                   <HistoryOutlined />
                 </Link>
@@ -323,7 +385,7 @@ const DrawerPanel = (props) => {
               icon: (
                 <Link
                   to={"/user-panel/copyright"}
-                  onClick={() => setCollapsed(true)}
+                  onClick={handleMobileMenuClick}
                 >
                   <Copyright />
                 </Link>
@@ -336,7 +398,7 @@ const DrawerPanel = (props) => {
               icon: (
                 <Link
                   to={"/user-panel/profile"}
-                  onClick={() => setCollapsed(true)}
+                  onClick={handleMobileMenuClick}
                 >
                   <AccountCircleOutlined />
                 </Link>
@@ -348,7 +410,7 @@ const DrawerPanel = (props) => {
               icon: (
                 <Link
                   to={"/user-panel/reports"}
-                  onClick={() => setCollapsed(true)}
+                  onClick={handleMobileMenuClick}
                 >
                   <SiMicrosoftexcel
                     style={{
@@ -364,13 +426,8 @@ const DrawerPanel = (props) => {
               icon: (
                 <Link
                   to={"/user-panel/notification"}
-                  onClick={() => setCollapsed(true)}
+                  onClick={handleMobileMenuClick}
                 >
-                  {/* <IoIosNotifications
-                    style={{
-                      transform: "scale(1.6)",
-                    }}
-                  /> */}
                   <Badge
                     badgeContent={noti ? noti.length : 0}
                     color="success"
@@ -387,10 +444,7 @@ const DrawerPanel = (props) => {
             {
               key: "8",
               icon: (
-                <Link
-                  to={"/user-panel/wallet"}
-                  onClick={() => setCollapsed(true)}
-                >
+                <Link to={"/user-panel/wallet"} onClick={handleMobileMenuClick}>
                   <IoWalletOutline
                     style={{
                       transform: "scale(1.2)",
@@ -402,8 +456,9 @@ const DrawerPanel = (props) => {
             },
           ]}
         />
-      </Sider>
-      <Layout>
+      </MobileSider>
+
+      <ResponsiveLayout>
         <Header
           style={{
             padding: "0 2% 0 0",
@@ -463,7 +518,7 @@ const DrawerPanel = (props) => {
         >
           {props.children}
         </Content>
-      </Layout>
+      </ResponsiveLayout>
     </Layout>
   );
 };

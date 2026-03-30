@@ -153,7 +153,7 @@ const Orders = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/get-all-orders/?userId=${userId}`
+        `${process.env.REACT_APP_BASE_URL}/order/get-all-orders-by-status/?userId=${userId}&status=waiting`,
       );
       const data = await res.json();
       console.log(data);
@@ -452,7 +452,7 @@ const Orders = () => {
             onClick={() => {
               window.open(
                 `${process.env.REACT_APP_BASE_URL}/order/get/export/waiting`,
-                "_blank"
+                "_blank",
               );
             }}
           >
