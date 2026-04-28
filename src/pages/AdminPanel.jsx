@@ -37,6 +37,8 @@ import MusicLoader from "../components/Loader/MusicLoader";
 import ArtistManagement from "../components/AdminPanel/ArtistManagement";
 import { useSelector } from "react-redux";
 import AdminHome from "../components/AdminPanel/AdminHome";
+import BulkUpload from "../components/AdminPanel/BulkUpload";
+import AdminTools from "../components/AdminPanel/AdminTools";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -484,6 +486,8 @@ const AdminPanel = () => {
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}
         {page === "artists" && <ArtistManagement />}
+        {page === "tools" && <AdminTools />}
+        {page === "bulk-upload" && <BulkUpload />}
         {page === "all-users" && <AllUsers />}
         {page === "notification" && <Notification />}
         {page === "user-profile" && <UserProfile />}

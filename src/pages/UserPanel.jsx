@@ -18,6 +18,11 @@ import { FaFileCsv, FaFileDownload, FaQuestion } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import UserWalletView from "../components/UserPanel/UserWalletView";
 import MusicLoader from "../components/Loader/MusicLoader";
+import FormQueryHub from "../components/UserPanel/FormQueries/FormQueryHub";
+import SocialMediaLinking from "../components/UserPanel/FormQueries/SocialMediaLinking";
+import YoutubeOacRequest from "../components/UserPanel/FormQueries/YoutubeOacRequest";
+import InstaFbWhitelist from "../components/UserPanel/FormQueries/InstaFbWhitelist";
+import InstaReelCredit from "../components/UserPanel/FormQueries/InstaReelCredit";
 
 const Modal = styled.div`
   width: 100%;
@@ -201,7 +206,7 @@ const UserPanel = () => {
           body: JSON.stringify({
             contactNum: mob,
           }),
-        }
+        },
       );
       const data = await res.json();
       if (data.exists) {
@@ -215,7 +220,7 @@ const UserPanel = () => {
             body: JSON.stringify({
               phone: mob,
             }),
-          }
+          },
         );
         const loginData = await loginRes.json();
         if (loginData.isloggedIn) {
@@ -264,7 +269,7 @@ const UserPanel = () => {
   const fecher = async () => {
     setIsLoading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`,
     );
     const data = await res.json();
     if (res.ok) {
@@ -297,13 +302,16 @@ const UserPanel = () => {
     return String(email)
       .toLowerCase()
       .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       );
   };
   const [inpField, setInpField] = useState(defaultField);
   const page = useParams().page;
+  const subpage = useParams().subpage;
+
   const id = useParams().id;
   const action = useParams().action;
+  console.log(page, action, subpage);
   const [open, setOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [nameErr, setNameErr] = useState(false);
@@ -314,7 +322,7 @@ const UserPanel = () => {
   // Download report modal state
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(
-    monthOptions[new Date().getMonth()]
+    monthOptions[new Date().getMonth()],
   );
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [downloading, setDownloading] = useState(false);
@@ -372,7 +380,7 @@ const UserPanel = () => {
         body: JSON.stringify({
           ...inpField,
         }),
-      }
+      },
     );
     const data = await res.json();
     if (res.ok) {
@@ -389,7 +397,7 @@ const UserPanel = () => {
 
   const handleDownloadReport = async () => {
     const win = window.open(
-      `${process.env.REACT_APP_BASE_URL}/user/get-report/${userData.name}/${selectedMonth}/${selectedYear}`
+      `${process.env.REACT_APP_BASE_URL}/user/get-report/${userData.name}/${selectedMonth}/${selectedYear}`,
     );
     setTimeout(() => {
       if (win) win.close();
@@ -485,6 +493,19 @@ const UserPanel = () => {
           {page === "profile" && <ProfilePage />}
           {page === "upload" && <Form />}
           {page === "reports" && <Reports />}
+          {page === "form-query" && !subpage && <FormQueryHub />}
+          {page === "form-query" && subpage === "social-media-linking" && (
+            <SocialMediaLinking />
+          )}
+          {page === "form-query" && subpage === "youtube-oac-request" && (
+            <YoutubeOacRequest />
+          )}
+          {page === "form-query" && subpage === "insta-fb-whitelist" && (
+            <InstaFbWhitelist />
+          )}
+          {page === "form-query" && subpage === "insta-reel-credit" && (
+            <InstaReelCredit />
+          )}
           {page === "history" && <History />}
           {page === "wallet" && <UserWalletView />}
           {page === "notification" && <UserNoti />}

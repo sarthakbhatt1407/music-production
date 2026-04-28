@@ -26,7 +26,7 @@ import { useDispatch } from "react-redux";
 import logo from "../assets/images/logo/ready.png";
 import styled from "@emotion/styled";
 import { IoIosNotifications, IoIosNotificationsOff } from "react-icons/io";
-import { BsMusicNoteList } from "react-icons/bs";
+import { BsMusicNoteList, BsTools } from "react-icons/bs";
 const { Header, Sider, Content } = Layout;
 
 const LogoDiv = styled.div`
@@ -99,6 +99,9 @@ const DrawerPanel = (props) => {
     }
     if (page === "artists") {
       return ["11"];
+    }
+    if (page === "tools") {
+      return ["12"];
     }
   };
 
@@ -234,6 +237,18 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Artists",
+            },
+            {
+              key: "12",
+              icon: (
+                <Link
+                  to={"/admin-panel/tools"}
+                  onClick={() => setCollapsed(true)}
+                >
+                  <BsTools />
+                </Link>
+              ),
+              label: "Tools",
             },
             {
               key: "10",

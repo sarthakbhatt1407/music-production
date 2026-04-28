@@ -28,6 +28,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { Badge } from "@mui/material";
 import { FaWallet } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
+import { MdOutlineAssignment } from "react-icons/md";
 import MusicLoader from "./Loader/MusicLoader";
 const { Header, Sider, Content } = Layout;
 
@@ -264,6 +265,9 @@ const DrawerPanel = (props) => {
     if (page === "wallet") {
       return ["8"];
     }
+    if (page === "form-query") {
+      return ["9"];
+    }
   };
   const userId = useSelector((state) => state.userId);
   const [collapsed, setCollapsed] = useState(true);
@@ -453,6 +457,18 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Wallet",
+            },
+            {
+              key: "9",
+              icon: (
+                <Link
+                  to={"/user-panel/form-query"}
+                  onClick={handleMobileMenuClick}
+                >
+                  <MdOutlineAssignment />
+                </Link>
+              ),
+              label: "Form Query",
             },
           ]}
         />

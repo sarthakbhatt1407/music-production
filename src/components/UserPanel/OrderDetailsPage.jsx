@@ -15,6 +15,7 @@ import {
   Tag,
   Space,
   notification,
+  Modal,
 } from "antd";
 import { Link } from "react-router-dom";
 import AudioPlayer from "react-h5-audio-player";
@@ -215,6 +216,24 @@ const AlbumDescription = styled(Paragraph)`
   max-width: 320px;
   line-height: 1.6;
   font-size: 15px;
+  word-break: break-word;
+  cursor: ${({ $clickable }) => ($clickable ? "pointer" : "default")};
+`;
+
+const DescriptionButton = styled(Button)`
+  padding: 0;
+  height: auto;
+  font-weight: 500;
+  margin-top: -2rem;
+`;
+
+const FullDescription = styled(Paragraph)`
+  max-height: 60vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+  margin-bottom: 0 !important;
 `;
 
 const StyledAudioPlayer = styled.div`
@@ -628,7 +647,9 @@ const groupFields = (fields) => {
     const fieldName = field.field.toLowerCase();
 
     // Group by category
-    if (["title", "description", "status", "albumtype"].includes(fieldName)) {
+    if (
+      ["description", "status", "albumtype", "songtitle"].includes(fieldName)
+    ) {
       groups.main.push(field);
     } else if (fieldName.includes("label")) {
       groups.labels.push(field);
@@ -682,6 +703,7 @@ const OrderDetailsPage = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [audioReady, setAudioReady] = useState(false);
+  const [isDescriptionModalOpen, setIsDescriptionModalOpen] = useState(false);
   // States for parsed artists
   const [parsedSingers, setParsedSingers] = useState([]);
   const [parsedComposers, setParsedComposers] = useState([]);
@@ -700,7 +722,7 @@ const OrderDetailsPage = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+        `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`,
       );
       const data = await res.json();
 
@@ -719,8 +741,8 @@ const OrderDetailsPage = () => {
           data.order.singerAppleId,
           data.order.singerSpotifyId,
           data.order.singerFacebookUrl,
-          data.order.singerInstagramUrl
-        )
+          data.order.singerInstagramUrl,
+        ),
       );
 
       setParsedComposers(
@@ -729,8 +751,8 @@ const OrderDetailsPage = () => {
           data.order.composerAppleId,
           data.order.composerSpotifyId,
           data.order.composerFacebookUrl,
-          data.order.composerInstagramUrl
-        )
+          data.order.composerInstagramUrl,
+        ),
       );
 
       setParsedLyricists(
@@ -739,8 +761,8 @@ const OrderDetailsPage = () => {
           data.order.lyricistAppleId,
           data.order.lyricistSpotifyId,
           data.order.lyricistFacebookUrl,
-          data.order.lyricistInstagramUrl
-        )
+          data.order.lyricistInstagramUrl,
+        ),
       );
 
       // Process order fields
@@ -782,7 +804,7 @@ const OrderDetailsPage = () => {
         `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=delete`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       if (res.ok) {
@@ -803,12 +825,12 @@ const OrderDetailsPage = () => {
   const handleTakedown = async () => {
     // Load Razorpay script first
     const razorpayLoaded = await loadRazorpayScript(
-      "https://checkout.razorpay.com/v1/checkout.js"
+      "https://checkout.razorpay.com/v1/checkout.js",
     );
 
     if (!razorpayLoaded) {
       messageApi.error(
-        "Razorpay SDK failed to load. Please check your internet connection."
+        "Razorpay SDK failed to load. Please check your internet connection.",
       );
       return;
     }
@@ -826,7 +848,7 @@ const OrderDetailsPage = () => {
             amount: 500, // Takedown fee amount (₹5.00)
             currency: "INR",
           }),
-        }
+        },
       );
 
       const paymentData = await orderRes.json();
@@ -856,7 +878,7 @@ const OrderDetailsPage = () => {
               }&action=takedown&userId=${"664b0a564ea2493604d28fb8"}`,
               {
                 method: "PATCH",
-              }
+              },
             );
             const data = await res.json();
             console.log(data);
@@ -872,7 +894,7 @@ const OrderDetailsPage = () => {
           } catch (error) {
             console.error("Error processing takedown after payment:", error);
             messageApi.error(
-              "Payment successful but failed to process takedown. Please contact support."
+              "Payment successful but failed to process takedown. Please contact support.",
             );
           }
         },
@@ -887,7 +909,7 @@ const OrderDetailsPage = () => {
         modal: {
           ondismiss: function () {
             messageApi.info(
-              "Payment cancelled. Takedown request not processed."
+              "Payment cancelled. Takedown request not processed.",
             );
           },
         },
@@ -935,6 +957,8 @@ const OrderDetailsPage = () => {
   const formatFieldName = (field) => {
     // Handle special cases
     if (field === "labelName") return "Label Name";
+    if (field === "songtitle") return "Song Title";
+    if (field === "title") return "Album Title";
     if (field === "subLabel1" || field === "subLabel2" || field === "subLabel3")
       return "Sub Label";
     if (field === "dateOfRelease") return "Scheduled Release Date";
@@ -985,12 +1009,12 @@ const OrderDetailsPage = () => {
           {fieldLower.includes("apple")
             ? "Apple Music"
             : fieldLower.includes("facebook")
-            ? "Facebook"
-            : fieldLower.includes("instagram")
-            ? "Instagram"
-            : fieldLower.includes("spotify")
-            ? "Spotify"
-            : "Platform"}
+              ? "Facebook"
+              : fieldLower.includes("instagram")
+                ? "Instagram"
+                : fieldLower.includes("spotify")
+                  ? "Spotify"
+                  : "Platform"}
         </Link>
       );
     }
@@ -1057,6 +1081,11 @@ const OrderDetailsPage = () => {
 
   // Get status information
   const statusInfo = order && order.status ? getStatusInfo(order.status) : null;
+  const descriptionText = order?.description || "";
+  const hasLongDescription = descriptionText.length > 50;
+  const descriptionPreview = hasLongDescription
+    ? `${descriptionText.slice(0, 50)}...`
+    : descriptionText;
 
   return (
     <PageContainer>
@@ -1124,7 +1153,9 @@ const OrderDetailsPage = () => {
               />
             </AlbumCover>
 
-            <AlbumTitle level={3}>{order.title}</AlbumTitle>
+            <AlbumTitle level={3}>
+              {order.songtitle ? order.songtitle : order.title}
+            </AlbumTitle>
             <StyledAudioPlayer>
               {!audioReady ? (
                 <Button
@@ -1162,7 +1193,24 @@ const OrderDetailsPage = () => {
             </StyledAudioPlayer>
 
             {order.description && (
-              <AlbumDescription>{order.description}</AlbumDescription>
+              <>
+                <AlbumDescription
+                  $clickable={hasLongDescription}
+                  onClick={() => {
+                    if (hasLongDescription) setIsDescriptionModalOpen(true);
+                  }}
+                >
+                  {descriptionPreview}
+                </AlbumDescription>
+                {hasLongDescription && (
+                  <DescriptionButton
+                    type="link"
+                    onClick={() => setIsDescriptionModalOpen(true)}
+                  >
+                    Show full description
+                  </DescriptionButton>
+                )}
+              </>
             )}
           </AlbumSection>
 
@@ -1668,6 +1716,19 @@ const OrderDetailsPage = () => {
           </DetailsSection>
         </ContentCard>
       )}
+
+      <Modal
+        title="Full Description"
+        open={isDescriptionModalOpen}
+        onCancel={() => setIsDescriptionModalOpen(false)}
+        footer={[
+          <Button key="close" onClick={() => setIsDescriptionModalOpen(false)}>
+            Close
+          </Button>,
+        ]}
+      >
+        <FullDescription>{descriptionText}</FullDescription>
+      </Modal>
     </PageContainer>
   );
 };

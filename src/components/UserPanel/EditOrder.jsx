@@ -338,6 +338,7 @@ const EditOrder = () => {
     releaseDate: "",
     youtubeContentId: "",
     youtubeMusic: "",
+    songtitle: "",
     contentType: "",
   };
   const id = useParams().id;
@@ -353,7 +354,7 @@ const EditOrder = () => {
   const fetcher = async () => {
     setIsloading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+      `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`,
     );
     const data = await res.json();
     console.log(data);
@@ -392,7 +393,7 @@ const EditOrder = () => {
   const fetchArtists = async () => {
     setIsloading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`
+      `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`,
     );
     const data = await res.json();
     if (res.ok) {
@@ -670,7 +671,7 @@ const EditOrder = () => {
           s.appleId === artistObj.appleId &&
           s.spotifyId === artistObj.spotifyId &&
           s.facebookUrl === artistObj.facebookUrl &&
-          s.instagramUrl === artistObj.instagramUrl
+          s.instagramUrl === artistObj.instagramUrl,
       );
     if (role === "singer") {
       if (alreadySelected(selectedSingers))
@@ -967,7 +968,7 @@ const EditOrder = () => {
     formData.append("lyricist", lyricistNames.length > 0 ? lyricistNames : "");
     formData.append(
       "musicDirector",
-      musicDirectorNames.length > 0 ? musicDirectorNames : ""
+      musicDirectorNames.length > 0 ? musicDirectorNames : "",
     );
     formData.append("director", directorNames.length > 0 ? directorNames : "");
     formData.append("producer", producerNames.length > 0 ? producerNames : "");
@@ -990,6 +991,7 @@ const EditOrder = () => {
     formData.append("lyricistInstagramUrl", lyricistInstagramUrls);
     formData.append("youtubeMusic", inpFields.youtubeMusic);
     formData.append("youtubeContentId", inpFields.youtubeContentId);
+    formData.append("songtitle", inpFields.songtitle);
 
     formData.append("labelName", inpFields.labelName);
     formData.append("title", inpFields.title);
@@ -1023,7 +1025,7 @@ const EditOrder = () => {
       {
         method: "PATCH",
         body: formData,
-      }
+      },
     );
     const data = await res.json();
 
@@ -1733,15 +1735,14 @@ const EditOrder = () => {
                   />
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="title">title</Label>
+                  <Label htmlFor="songtitle">songtitle</Label>
                   <Input
                     type="text"
-                    name="title"
-                    id="title"
-                    placeholder="title"
-                    disabled
+                    name="songtitle"
+                    id="songtitle"
+                    placeholder="songtitle"
                     onChange={onChangeHandler}
-                    value={inpFields.title}
+                    value={inpFields.songtitle}
                   />
                 </LabelInpBox>
                 <LabelInpBox>

@@ -73,6 +73,11 @@ const App = () => {
         {isLoggedIn && !isAdmin && type == "music-user" && (
           <>
             <Route path="/user-panel/:page" exact element={<UserPanel />} />
+            <Route
+              path="/user-panel/:page/:subpage"
+              exact
+              element={<UserPanel />}
+            />
             <Route path="/user-panel/order/:id" exact element={<UserPanel />} />
             <Route
               path="/user-panel/order/:id/:action"

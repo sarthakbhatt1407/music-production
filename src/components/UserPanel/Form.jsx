@@ -231,6 +231,29 @@ const BtnDiv = styled.div`
     letter-spacing: 0.09rem;
   }
 `;
+
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+
+  @media only screen and (max-width: 768px) {
+    align-items: flex-start;
+  }
+`;
+
+const SectionActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const SongDivider = styled.div`
+  border-top: 1px solid #eef0f4;
+  margin: 0.5rem 0;
+`;
 const Modal1 = styled.div`
   width: 100%;
   height: 100%;
@@ -344,9 +367,9 @@ const Form = () => {
   const [api, contextHolderNot] = notification.useNotification({
     duration: 1.5,
   });
-  const openNotificationWithIcon = (type) => {
-    api[type]({
-      message: "Fill all require fields.",
+  const openValidationNotification = (msg = "Fill all require fields.") => {
+    api.error({
+      message: msg,
     });
   };
   const format = "mm:ss";
@@ -451,7 +474,7 @@ const Form = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(values),
-          }
+          },
         );
 
         const data = await response.json();
@@ -460,8 +483,8 @@ const Form = () => {
           // Update the artist in the local state
           setArtists(
             artists.map((artist) =>
-              artist._id === editingArtist._id ? data.artist : artist
-            )
+              artist._id === editingArtist._id ? data.artist : artist,
+            ),
           );
           messageApi.success("Artist updated successfully");
         } else {
@@ -477,7 +500,7 @@ const Form = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(values),
-          }
+          },
         );
 
         const data = await response.json();
@@ -501,7 +524,7 @@ const Form = () => {
   };
   // Check if role needs social media fields
   const showSocialMediaFields = ["singer", "lyricist", "composer"].includes(
-    selectedRole
+    selectedRole,
   );
 
   // Handle role change
@@ -537,6 +560,30 @@ const Form = () => {
   const [selectedMusicDirectors, setSelectedMusicDirectors] = useState([]);
   const [selectedDirectors, setSelectedDirectors] = useState([]);
   const [selectedProducers, setSelectedProducers] = useState([]);
+  const createSongSection = () => ({
+    id: `song-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    fields: {
+      songTitle: "",
+      file: null,
+      isrc: "",
+      crbt: "00:30",
+      singer: "",
+      lyricist: "",
+      composer: "",
+      musicDirector: "",
+      director: "",
+      producer: "",
+      starCast: "",
+    },
+    selectedSingers: [],
+    selectedComposers: [],
+    selectedLyricists: [],
+    selectedMusicDirectors: [],
+    selectedDirectors: [],
+    selectedProducers: [],
+    selectedStarCast: [],
+  });
+  const [songSections, setSongSections] = useState(() => [createSongSection()]);
   // ...existing code...
   const navigate = useNavigate();
   const [showSingerModal, setShowSingerModal] = useState(false);
@@ -732,7 +779,7 @@ const Form = () => {
   const fetcher = async () => {
     setIsloading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`,
     );
     const data = await res.json();
 
@@ -751,7 +798,7 @@ const Form = () => {
   const fetchArtists = async () => {
     setIsloading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`
+      `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`,
     );
     const data = await res.json();
     if (res.ok) {
@@ -785,7 +832,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, singer: "" }));
@@ -810,7 +857,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, composer: "" }));
@@ -835,7 +882,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, lyricist: "" }));
@@ -860,7 +907,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, musicDirector: "" }));
@@ -885,7 +932,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, director: "" }));
@@ -910,7 +957,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, producer: "" }));
@@ -935,7 +982,7 @@ const Form = () => {
             s.appleId === (artist.appleId || "") &&
             s.spotifyId === (artist.spotifyId || "") &&
             s.facebookUrl === (artist.facebookUrl || "") &&
-            s.instagramUrl === (artist.instagramUrl || "")
+            s.instagramUrl === (artist.instagramUrl || ""),
         )
       ) {
         setInpFields((prev) => ({ ...prev, starCast: "" }));
@@ -989,6 +1036,141 @@ const Form = () => {
     setSelectedProducers((prev) => prev.filter((_, i) => i !== idx));
   };
   // ...existing code...
+
+  const selectedKeyByRole = {
+    singer: "selectedSingers",
+    lyricist: "selectedLyricists",
+    composer: "selectedComposers",
+    musicDirector: "selectedMusicDirectors",
+    director: "selectedDirectors",
+    producer: "selectedProducers",
+    starCast: "selectedStarCast",
+  };
+
+  const addSongSection = () => {
+    setSongSections((prev) => [...prev, createSongSection()]);
+  };
+
+  const removeSongSection = (sectionId) => {
+    setSongSections((prev) =>
+      prev.length === 1
+        ? prev
+        : prev.filter((section) => section.id !== sectionId),
+    );
+  };
+
+  const updateSongField = (sectionId, field, value) => {
+    setSongSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              fields: {
+                ...section.fields,
+                [field]: value,
+              },
+            }
+          : section,
+      ),
+    );
+  };
+
+  const handleSectionArtistSelect = (sectionId, role, value, option) => {
+    const artist =
+      option?.artist ||
+      artists.find((a) => a.name.toLowerCase() === value.toLowerCase());
+    if (!artist) return;
+    const selectedKey = selectedKeyByRole[role];
+    const selectedArtist = {
+      name: artist.name,
+      appleId: artist.appleId || "",
+      spotifyId: artist.spotifyId || "",
+      facebookUrl: artist.facebookUrl || "",
+      instagramUrl: artist.instagramUrl || "",
+    };
+
+    setSongSections((prev) =>
+      prev.map((section) => {
+        if (section.id !== sectionId) return section;
+        const alreadySelected = section[selectedKey].find(
+          (s) =>
+            s.name === selectedArtist.name &&
+            s.appleId === selectedArtist.appleId &&
+            s.spotifyId === selectedArtist.spotifyId &&
+            s.facebookUrl === selectedArtist.facebookUrl &&
+            s.instagramUrl === selectedArtist.instagramUrl,
+        );
+        if (alreadySelected) {
+          return {
+            ...section,
+            fields: { ...section.fields, [role]: "" },
+          };
+        }
+        return {
+          ...section,
+          fields: { ...section.fields, [role]: "" },
+          [selectedKey]: [...section[selectedKey], selectedArtist],
+        };
+      }),
+    );
+  };
+
+  const removeSectionArtist = (sectionId, role, artistIndex) => {
+    const selectedKey = selectedKeyByRole[role];
+    setSongSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              [selectedKey]: section[selectedKey].filter(
+                (_, i) => i !== artistIndex,
+              ),
+            }
+          : section,
+      ),
+    );
+  };
+
+  const getSectionFileProps = (sectionId) => ({
+    beforeUpload: (file) => {
+      const isValid =
+        file.type === "audio/wav" ||
+        file.type === "audio/mp3" ||
+        file.type === "audio/mpeg";
+      if (!isValid) {
+        message.error(`Upload valid audio file!`);
+      }
+      return isValid || Upload.LIST_IGNORE;
+    },
+    onChange: (info) => {
+      const file = info.fileList[0]?.originFileObj || null;
+      updateSongField(sectionId, "file", file);
+    },
+  });
+
+  const joinNames = (items) => items.map((s) => s.name).join(", ");
+  const joinAppleIds = (items) => items.map((s) => s.appleId).join(", ");
+  const joinSpotifyIds = (items) => items.map((s) => s.spotifyId).join(", ");
+  const joinFacebookUrls = (items) =>
+    items.map((s) => s.facebookUrl).join(", ");
+  const joinInstagramUrls = (items) =>
+    items.map((s) => s.instagramUrl).join(", ");
+
+  const getMissingSongMessage = (section, sectionIndex) => {
+    const label = `Song ${sectionIndex + 1}`;
+    if (section.fields.songTitle.trim().length === 0)
+      return `${label}: Please enter song title.`;
+    if (section.fields.file === null) return `${label}: Please upload audio.`;
+    if (section.selectedSingers.length === 0)
+      return `${label}: Please select singer from the list.`;
+    if (section.selectedLyricists.length === 0)
+      return `${label}: Please select lyricist from the list.`;
+    if (section.selectedComposers.length === 0)
+      return `${label}: Please select composer from the list.`;
+    if (section.fields.isrc.length > 0 && section.fields.isrc.length < 12)
+      return `${label}: ISRC must be at least 12 characters.`;
+    return "";
+  };
 
   const imgReader = (img) => {
     var reader = new FileReader();
@@ -1171,19 +1353,27 @@ const Form = () => {
   const onSubmitHandler = async () => {
     setIsloading(true);
 
-    // Validation: required fields
+    const invalidSongIndex = songSections.findIndex(
+      (section, sectionIndex) =>
+        getMissingSongMessage(section, sectionIndex).length > 0,
+    );
+    const invalidSongMessage =
+      invalidSongIndex !== -1
+        ? getMissingSongMessage(
+            songSections[invalidSongIndex],
+            invalidSongIndex,
+          )
+        : "";
+
     if (
       inpFields.labelName.length === 0 ||
       inpFields.title.length === 0 ||
       inpFields.dateOfRelease.length === 0 ||
       inpFields.language.length === 0 ||
       inpFields.mood.length === 0 ||
-      selectedSingers.length === 0 ||
-      selectedLyricists.length === 0 ||
       inpFields.contentType.length === 0 ||
-      selectedComposers.length === 0 ||
       inpFields.thumbnail === null ||
-      inpFields.file === null
+      invalidSongIndex !== -1
     ) {
       if (inpFields.labelName.length === 0) {
         const labelName = document.querySelector("#labelName");
@@ -1225,166 +1415,289 @@ const Form = () => {
         const subgenre = document.querySelector("#subgenre");
         subgenre.style.border = "1px solid red";
       }
-      if (selectedSingers.length === 0) {
-        const singer = document.querySelector("#singer");
-        if (singer) singer.style.border = "1px solid red";
-      }
-      if (selectedComposers.length === 0) {
-        const composer = document.querySelector("#composer");
-        if (composer) composer.style.border = "1px solid red";
-      }
-      if (selectedLyricists.length === 0) {
-        const lyricist = document.querySelector("#lyricist");
-        if (lyricist) lyricist.style.border = "1px solid red";
+      if (invalidSongIndex !== -1) {
+        const section = songSections[invalidSongIndex];
+        if (section.fields.songTitle.trim().length === 0) {
+          const songTitle = document.querySelector(`#songTitle-${section.id}`);
+          if (songTitle) songTitle.style.border = "1px solid red";
+        }
+        if (section.selectedSingers.length === 0) {
+          const singer = document.querySelector(`#singer-${section.id}`);
+          if (singer) singer.style.border = "1px solid red";
+        }
+        if (section.selectedComposers.length === 0) {
+          const composer = document.querySelector(`#composer-${section.id}`);
+          if (composer) composer.style.border = "1px solid red";
+        }
+        if (section.selectedLyricists.length === 0) {
+          const lyricist = document.querySelector(`#lyricist-${section.id}`);
+          if (lyricist) lyricist.style.border = "1px solid red";
+        }
+        const file = document.querySelector(`#file-${section.id}`);
+        if (file && section.fields.file === null) file.style.color = "red";
+        if (section.fields.isrc.length > 0 && section.fields.isrc.length < 12) {
+          const isrc = document.querySelector(`#isrc-${section.id}`);
+          if (isrc) isrc.style.border = "1px solid red";
+        }
       }
 
       if (inpFields.thumbnail === null) {
         const thumbnail = document.querySelector("#thumbnail");
         thumbnail.style.color = "red";
       }
-      if (inpFields.file === null) {
-        const file = document.querySelector("#file");
-        file.style.color = "red";
-      }
       setIsloading(false);
-      openNotificationWithIcon("error");
+      openValidationNotification(
+        invalidSongMessage || "Fill all require fields.",
+      );
       return;
     }
-    if (inpFields.isrc.length > 0) {
-      if (inpFields.isrc.length < 12) {
-        const isrc = document.querySelector("#isrc");
-        isrc.style.border = "1px solid red";
-        setIsloading(false);
-        openNotificationWithIcon("error");
-        return;
-      }
-    }
-
-    // Prepare comma separated values for singers, composers, lyricists and their links
-    const singerNames = selectedSingers.map((s) => s.name).join(", ");
-    const singerAppleIds = selectedSingers.map((s) => s.appleId).join(", ");
-    const singerSpotifyIds = selectedSingers.map((s) => s.spotifyId).join(", ");
-    const singerFacebookUrls = selectedSingers
-      .map((s) => s.facebookUrl)
-      .join(", ");
-    const singerInstagramUrls = selectedSingers
-      .map((s) => s.instagramUrl)
-      .join(", ");
-
-    const composerNames = selectedComposers.map((s) => s.name).join(", ");
-    const composerAppleIds = selectedComposers.map((s) => s.appleId).join(", ");
-    const composerSpotifyIds = selectedComposers
-      .map((s) => s.spotifyId)
-      .join(", ");
-    const composerFacebookUrls = selectedComposers
-      .map((s) => s.facebookUrl)
-      .join(", ");
-    const composerInstagramUrls = selectedComposers
-      .map((s) => s.instagramUrl)
-      .join(", ");
-
-    const lyricistNames = selectedLyricists.map((s) => s.name).join(", ");
-    const lyricistAppleIds = selectedLyricists.map((s) => s.appleId).join(", ");
-    const lyricistSpotifyIds = selectedLyricists
-      .map((s) => s.spotifyId)
-      .join(", ");
-    const lyricistFacebookUrls = selectedLyricists
-      .map((s) => s.facebookUrl)
-      .join(", ");
-    const lyricistInstagramUrls = selectedLyricists
-      .map((s) => s.instagramUrl)
-      .join(", ");
-
-    const starCastNames = selectedStarCast.map((s) => s.name).join(", ");
-    console.log(
-      selectedStarCast && selectedStarCast.length > 0 ? starCastNames : ""
-    );
-
-    const musicDirectorNames = selectedMusicDirectors
-      .map((s) => s.name)
-      .join(", ");
-
-    const directorNames = selectedDirectors.map((s) => s.name).join(", ");
-    const producerNames = selectedProducers.map((s) => s.name).join(", ");
-
-    const formData = new FormData();
-    formData.append(
-      "musicDirector",
-      musicDirectorNames.length > 0 ? musicDirectorNames : ""
-    );
-    formData.append("director", directorNames.length > 0 ? directorNames : "");
-    formData.append("producer", producerNames.length > 0 ? producerNames : "");
-    formData.append("labelName", inpFields.labelName);
-    formData.append("title", inpFields.title);
-    formData.append("dateOfRelease", inpFields.dateOfRelease);
-    formData.append("albumType", inpFields.albumType);
-    formData.append("language", inpFields.language);
-    formData.append("mood", inpFields.mood);
-    formData.append("description", inpFields.description);
-
-    formData.append("singer", singerNames);
-    formData.append("composer", composerNames.length > 0 ? composerNames : "");
-    formData.append("lyricist", lyricistNames.length > 0 ? lyricistNames : "");
-    formData.append("youtubeMusic", inpFields.youtubeMusic);
-    formData.append("contentType", inpFields.contentType);
-    formData.append("youtubeContentId", inpFields.youtubeContentId);
-
-    formData.append("lyrics", inpFields.lyrics);
-    formData.append("upc", inpFields.upc);
-    formData.append("isrc", inpFields.isrc);
-    formData.append("crbt", inpFields.crbt);
-    formData.append("subLabel1", inpFields.subLabel1);
-    formData.append("subLabel2", inpFields.subLabel2);
-    formData.append("subLabel3", inpFields.subLabel3);
-    formData.append("genre", inpFields.genre);
-    formData.append(
-      "starCast",
-      selectedStarCast && selectedStarCast.length > 0 ? starCastNames : ""
-    );
-
-    formData.append("singerAppleId", singerAppleIds);
-    formData.append("singerSpotifyId", singerSpotifyIds);
-    formData.append("singerFacebookUrl", singerFacebookUrls);
-    formData.append("singerInstagramUrl", singerInstagramUrls);
-
-    formData.append("composerAppleId", composerAppleIds);
-    formData.append("composerSpotifyId", composerSpotifyIds);
-    formData.append("composerFacebookUrl", composerFacebookUrls);
-    formData.append("composerInstagramUrl", composerInstagramUrls);
-
-    formData.append("lyricistAppleId", lyricistAppleIds);
-    formData.append("lyricistSpotifyId", lyricistSpotifyIds);
-    formData.append("lyricistFacebookUrl", lyricistFacebookUrls);
-    formData.append("lyricistInstagramUrl", lyricistInstagramUrls);
-
-    formData.append("file", inpFields.file);
-    formData.append("thumbnail", inpFields.thumbnail);
-    formData.append("userId", userId);
-    formData.append("releaseDate", inpFields.releaseDate);
-    formData.append("subgenre", inpFields.subgenre);
 
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/new-order`,
-        {
-          method: "POST",
-          body: formData,
+      for (const section of songSections) {
+        const formData = new FormData();
+        formData.append(
+          "musicDirector",
+          joinNames(section.selectedMusicDirectors),
+        );
+        formData.append("director", joinNames(section.selectedDirectors));
+        formData.append("producer", joinNames(section.selectedProducers));
+        formData.append("labelName", inpFields.labelName);
+        formData.append("title", inpFields.title);
+        formData.append("songtitle", section.fields.songTitle);
+        formData.append("dateOfRelease", inpFields.dateOfRelease);
+        formData.append("albumType", inpFields.albumType);
+        formData.append("language", inpFields.language);
+        formData.append("mood", inpFields.mood);
+        formData.append("description", inpFields.description);
+
+        formData.append("singer", joinNames(section.selectedSingers));
+        formData.append("composer", joinNames(section.selectedComposers));
+        formData.append("lyricist", joinNames(section.selectedLyricists));
+        formData.append("youtubeMusic", inpFields.youtubeMusic);
+        formData.append("contentType", inpFields.contentType);
+        formData.append("youtubeContentId", inpFields.youtubeContentId);
+
+        formData.append("lyrics", inpFields.lyrics);
+        formData.append("upc", inpFields.upc);
+        formData.append("isrc", section.fields.isrc);
+        formData.append("crbt", section.fields.crbt);
+        formData.append("subLabel1", inpFields.subLabel1);
+        formData.append("subLabel2", inpFields.subLabel2);
+        formData.append("subLabel3", inpFields.subLabel3);
+        formData.append("genre", inpFields.genre);
+        formData.append("starCast", joinNames(section.selectedStarCast));
+
+        formData.append("singerAppleId", joinAppleIds(section.selectedSingers));
+        formData.append(
+          "singerSpotifyId",
+          joinSpotifyIds(section.selectedSingers),
+        );
+        formData.append(
+          "singerFacebookUrl",
+          joinFacebookUrls(section.selectedSingers),
+        );
+        formData.append(
+          "singerInstagramUrl",
+          joinInstagramUrls(section.selectedSingers),
+        );
+
+        formData.append(
+          "composerAppleId",
+          joinAppleIds(section.selectedComposers),
+        );
+        formData.append(
+          "composerSpotifyId",
+          joinSpotifyIds(section.selectedComposers),
+        );
+        formData.append(
+          "composerFacebookUrl",
+          joinFacebookUrls(section.selectedComposers),
+        );
+        formData.append(
+          "composerInstagramUrl",
+          joinInstagramUrls(section.selectedComposers),
+        );
+
+        formData.append(
+          "lyricistAppleId",
+          joinAppleIds(section.selectedLyricists),
+        );
+        formData.append(
+          "lyricistSpotifyId",
+          joinSpotifyIds(section.selectedLyricists),
+        );
+        formData.append(
+          "lyricistFacebookUrl",
+          joinFacebookUrls(section.selectedLyricists),
+        );
+        formData.append(
+          "lyricistInstagramUrl",
+          joinInstagramUrls(section.selectedLyricists),
+        );
+
+        formData.append("file", section.fields.file);
+        formData.append("thumbnail", inpFields.thumbnail);
+        formData.append("userId", userId);
+        formData.append("releaseDate", inpFields.releaseDate);
+        formData.append("subgenre", inpFields.subgenre);
+
+        const res = await fetch(
+          `${process.env.REACT_APP_BASE_URL}/order/new-order`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          error(data.message || "Something went wrong");
+          setIsloading(false);
+          return;
         }
-      );
-      const data = await res.json();
-      if (res.ok) {
-        success("Order created");
-        setTimeout(() => {
-          navigate("/user-panel/history");
-        }, 1000);
-      } else {
-        error(data.message || "Something went wrong");
       }
+      success(`${songSections.length} order created`);
+      setTimeout(() => {
+        navigate("/user-panel/history");
+      }, 1000);
     } catch (err) {
       error("Network error");
     }
     setIsloading(false);
   };
+
+  const renderArtistTags = (section, role) => {
+    const selectedKey = selectedKeyByRole[role];
+    const selectedArtists = section[selectedKey];
+    const labelMap = {
+      singer: "Singer",
+      lyricist: "Lyricist",
+      composer: "Composer",
+      musicDirector: "Music Director",
+      director: "Director",
+      producer: "Producer",
+      starCast: "Star Cast",
+    };
+
+    return (
+      <div style={{ marginTop: "0.5rem" }}>
+        {selectedArtists.length === 0 && (
+          <div
+            style={{
+              color: "#bbb",
+              fontSize: "0.8rem",
+              fontStyle: "italic",
+              padding: "0.2rem 0",
+            }}
+          >
+            No {labelMap[role]} Selected
+          </div>
+        )}
+        {selectedArtists.map((artist, idx) => (
+          <ArtistTag key={`${section.id}-${role}-${idx}`}>
+            <span
+              style={{
+                fontWeight: "500",
+                fontSize: ".8rem",
+                marginRight: "auto",
+                color: "black",
+                letterSpacing: ".06rem",
+              }}
+            >
+              {artist.name}
+            </span>
+            <SocialLinks>
+              <SocialIcon
+                active={artist.facebookUrl?.trim().length > 0}
+                onClick={() =>
+                  artist.facebookUrl &&
+                  window.open(artist.facebookUrl, "_blank")
+                }
+                title={
+                  artist.facebookUrl
+                    ? "Visit Facebook profile"
+                    : "No Facebook profile"
+                }
+              >
+                <FacebookOutlined />
+              </SocialIcon>
+              <SocialIcon
+                active={artist.instagramUrl?.trim().length > 0}
+                onClick={() =>
+                  artist.instagramUrl &&
+                  window.open(artist.instagramUrl, "_blank")
+                }
+                title={
+                  artist.instagramUrl
+                    ? "Visit Instagram profile"
+                    : "No Instagram profile"
+                }
+              >
+                <Instagram />
+              </SocialIcon>
+              <SocialIcon
+                active={artist.appleId?.trim().length > 0}
+                onClick={() =>
+                  artist.appleId && window.open(artist.appleId, "_blank")
+                }
+                title={
+                  artist.appleId
+                    ? "Visit Apple Music profile"
+                    : "No Apple Music profile"
+                }
+              >
+                <Apple />
+              </SocialIcon>
+              <SocialIcon
+                active={artist.spotifyId?.trim().length > 0}
+                onClick={() =>
+                  artist.spotifyId && window.open(artist.spotifyId, "_blank")
+                }
+                title={
+                  artist.spotifyId
+                    ? "Visit Spotify profile"
+                    : "No Spotify profile"
+                }
+              >
+                <FaSpotify style={{ fontSize: "1.1rem" }} />
+              </SocialIcon>
+            </SocialLinks>
+            <RemoveButton
+              onClick={() => removeSectionArtist(section.id, role, idx)}
+              title={`Remove ${labelMap[role]}`}
+            >
+              <CloseOutlined />
+            </RemoveButton>
+          </ArtistTag>
+        ))}
+      </div>
+    );
+  };
+
+  const renderArtistField = (section, role, label, required = false) => (
+    <LabelInpBox>
+      <Label htmlFor={`${role}-${section.id}`}>
+        {label} {required && <span style={{ margin: 0 }}>*</span>}
+      </Label>
+      <AutoComplete
+        id={`${role}-${section.id}`}
+        value={section.fields[role]}
+        options={artistOptions[role]}
+        onSearch={(value) => handleArtistSearch(role, value)}
+        onSelect={(value, option) =>
+          handleSectionArtistSelect(section.id, role, value, option)
+        }
+        onChange={(value) => {
+          const ele = document.querySelector(`#${role}-${section.id}`);
+          if (ele) ele.style.border = "1px solid white";
+          updateSongField(section.id, role, value);
+        }}
+        placeholder={`${label} name`}
+        style={{ width: "100%" }}
+        filterOption={false}
+      />
+      {renderArtistTags(section, role)}
+    </LabelInpBox>
+  );
 
   return (
     <MainDiv>
@@ -2243,8 +2556,8 @@ const Form = () => {
                 </LabelInpBox>
                 <LabelInpBox>
                   <Label htmlFor="description">Album description</Label>
-                  <Input
-                    type="text"
+                  <TxtArea
+                    rows="5"
                     name="description"
                     id="description"
                     onChange={onChangeHandler}
@@ -2266,245 +2579,424 @@ const Form = () => {
             </FormSeperator>
 
             <FormSeperator>
-              <h2>CRBT</h2>
-              <AllInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="file" id="file">
-                    Audio{" "}
-                    <span style={{ margin: 0, textTransform: "none" }}>
-                      (.wav or .mp3)*
-                    </span>
-                  </Label>
-                  <Upload
-                    method="get"
-                    listType="picture"
-                    {...fileProps}
-                    maxCount={1}
-                  >
-                    <Button icon={<UploadOutlined />}>Audio file</Button>
-                  </Upload>
-                  {inpFields.file && (
-                    <AudioPlayer
-                      src={
-                        inpFields.file
-                          ? typeof inpFields.file === "string"
-                            ? inpFields.file
-                            : URL.createObjectURL(inpFields.file)
-                          : ""
-                      }
-                      autoPlayAfterSrcChange={false}
-                      showJumpControls={false}
-                      customAdditionalControls={[]}
-                      layout="stacked-reverse"
-                      style={{
-                        marginTop: "1rem",
-                      }}
-                    />
-                  )}
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="isrc">isrc</Label>
-                  <Input
-                    type="text"
-                    name="isrc"
-                    id="isrc"
-                    onChange={onChangeHandler}
-                    value={inpFields.isrc}
-                    placeholder="isrc"
+              <SectionHeader>
+                <h2>Song Sections</h2>
+                <SectionActions>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={addSongSection}
                   />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="title">title</Label>
-                  <Input
-                    type="text"
-                    name="title"
-                    id="title"
-                    placeholder="title"
-                    disabled
-                    onChange={onChangeHandler}
-                    value={inpFields.title}
-                  />
-                </LabelInpBox>
-
-                <LabelInpBox>
-                  <Label htmlFor="crbt">
-                    CRBT /Preview Start Time
-                    <span
-                      style={{
-                        color: "#b3b2b2",
-                        textTransform: "none",
-                      }}
-                    >
-                      (mm:ss)
-                    </span>
-                  </Label>
-                  <TimePicker
-                    name="crbt"
-                    id="crbt"
-                    format={format}
-                    onChange={(time) => {
-                      if (!time) return;
-                      console.log("hi");
-                      console.log(time.format(format));
-                      setInpFields({ ...inpFields, crbt: time.format(format) });
-                    }}
-                  />
-                </LabelInpBox>
-              </AllInpBox>
-            </FormSeperator>
-            <FormSeperator>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "1rem",
-                  width: "99%",
-                }}
-              >
-                <h2>Artists</h2>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={showAddModal}
-                >
-                  Add Artist
-                </Button>
-              </div>
-              <p
-                style={{
-                  margin: "-0.4rem 0 0.6rem 0",
-                  fontSize: ".78rem",
-                  lineHeight: "1.2rem",
-                  color: "#5f6368",
-                  background: "#f5f7fa",
-                  padding: ".55rem .75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #e2e6eb",
-                }}
-              >
-                Note: Please select artists using the auto-complete fields
-                below. If an artist is not listed, add the artist first using
-                the Add Artist button, then select it. This ensures consistent,
-                professional metadata for your release.
-              </p>
-              <AllInpBox>
-                {/* SINGER */}
-                <LabelInpBox>
-                  <Label htmlFor="singer">
-                    singer <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <AutoComplete
-                    id="singer"
-                    value={inpFields.singer}
-                    options={artistOptions.singer}
-                    onSearch={(value) => handleArtistSearch("singer", value)}
-                    onSelect={(value, option) =>
-                      handleArtistSelect("singer", value, option)
-                    }
-                    onChange={(value) => {
-                      const ele = document.querySelector(`#singer`);
-
-                      ele.style.border = "1px solid white";
-                      setInpFields({ ...inpFields, singer: value });
-                    }}
-                    placeholder="Singer name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedSingers.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
-                        }}
-                      >
-                        No Singer Selected
-                      </div>
+                </SectionActions>
+              </SectionHeader>
+              {songSections.map((section, sectionIndex) => (
+                <div key={section.id}>
+                  {sectionIndex > 0 && <SongDivider />}
+                  <SectionHeader>
+                    <h2 style={{ color: "red" }}>Song {sectionIndex + 1}</h2>
+                    {songSections.length > 1 && (
+                      <Button
+                        danger
+                        icon={<CloseOutlined />}
+                        onClick={() => removeSongSection(section.id)}
+                      />
                     )}
-                    {selectedSingers.map((s, idx) => (
-                      <ArtistTag key={idx}>
+                  </SectionHeader>
+
+                  <h2 style={{ margin: ".7rem 0 " }}>CRBT</h2>
+                  <AllInpBox>
+                    <LabelInpBox>
+                      <Label
+                        htmlFor={`file-${section.id}`}
+                        id={`file-${section.id}`}
+                      >
+                        Audio{" "}
+                        <span style={{ margin: 0, textTransform: "none" }}>
+                          (.wav or .mp3)*
+                        </span>
+                      </Label>
+                      <Upload
+                        method="get"
+                        listType="picture"
+                        {...getSectionFileProps(section.id)}
+                        maxCount={1}
+                      >
+                        <Button icon={<UploadOutlined />}>Audio file</Button>
+                      </Upload>
+                      {section.fields.file && (
+                        <AudioPlayer
+                          src={
+                            typeof section.fields.file === "string"
+                              ? section.fields.file
+                              : URL.createObjectURL(section.fields.file)
+                          }
+                          autoPlayAfterSrcChange={false}
+                          showJumpControls={false}
+                          customAdditionalControls={[]}
+                          layout="stacked-reverse"
+                          style={{
+                            marginTop: "1rem",
+                          }}
+                        />
+                      )}
+                    </LabelInpBox>
+                    <LabelInpBox>
+                      <Label htmlFor={`isrc-${section.id}`}>isrc</Label>
+                      <Input
+                        type="text"
+                        name="isrc"
+                        id={`isrc-${section.id}`}
+                        onChange={(e) => {
+                          e.target.style.border = "1px solid #d7d7d7";
+                          updateSongField(section.id, "isrc", e.target.value);
+                        }}
+                        value={section.fields.isrc}
+                        placeholder="isrc"
+                      />
+                    </LabelInpBox>
+                    <LabelInpBox>
+                      <Label htmlFor={`songTitle-${section.id}`}>
+                        Song Title <span style={{ margin: 0 }}>*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        name="songTitle"
+                        id={`songTitle-${section.id}`}
+                        placeholder="song title"
+                        onChange={(e) => {
+                          e.target.style.border = "1px solid #d7d7d7";
+                          updateSongField(
+                            section.id,
+                            "songTitle",
+                            e.target.value,
+                          );
+                        }}
+                        value={section.fields.songTitle}
+                      />
+                    </LabelInpBox>
+
+                    <LabelInpBox>
+                      <Label htmlFor={`crbt-${section.id}`}>
+                        CRBT /Preview Start Time
                         <span
                           style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
+                            color: "#b3b2b2",
+                            textTransform: "none",
                           }}
                         >
-                          {s.name}
+                          (mm:ss)
                         </span>
-                        <SocialLinks>
-                          <SocialIcon
-                            active={s.facebookUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.facebookUrl &&
-                              window.open(s.facebookUrl, "_blank")
-                            }
-                            title={
-                              s.facebookUrl
-                                ? "Visit Facebook profile"
-                                : "No Facebook profile"
-                            }
-                          >
-                            <FacebookOutlined />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.instagramUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.instagramUrl &&
-                              window.open(s.instagramUrl, "_blank")
-                            }
-                            title={
-                              s.instagramUrl
-                                ? "Visit Instagram profile"
-                                : "No Instagram profile"
-                            }
-                          >
-                            <Instagram />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.appleId?.trim().length > 0}
-                            onClick={() =>
-                              s.appleId && window.open(s.appleId, "_blank")
-                            }
-                            title={
-                              s.appleId
-                                ? "Visit Apple Music profile"
-                                : "No Apple Music profile"
-                            }
-                          >
-                            <Apple />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.spotifyId?.trim().length > 0}
-                            onClick={() =>
-                              s.spotifyId && window.open(s.spotifyId, "_blank")
-                            }
-                            title={
-                              s.spotifyId
-                                ? "Visit Spotify profile"
-                                : "No Spotify profile"
-                            }
-                          >
-                            <FaSpotify style={{ fontSize: "1.1rem" }} />
-                          </SocialIcon>
-                        </SocialLinks>
-                        <RemoveButton
-                          onClick={() => removeSinger(idx)}
-                          title="Remove singer"
+                      </Label>
+                      <TimePicker
+                        name="crbt"
+                        id={`crbt-${section.id}`}
+                        format={format}
+                        defaultValue={moment(section.fields.crbt, format)}
+                        onChange={(time) => {
+                          if (!time) return;
+                          updateSongField(
+                            section.id,
+                            "crbt",
+                            time.format(format),
+                          );
+                        }}
+                      />
+                    </LabelInpBox>
+                  </AllInpBox>
+
+                  <SectionHeader style={{ marginTop: "1rem" }}>
+                    <h2>Artists</h2>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={showAddModal}
+                    >
+                      Add Artist
+                    </Button>
+                  </SectionHeader>
+                  <p
+                    style={{
+                      margin: ".7rem 0",
+                      fontSize: ".78rem",
+                      lineHeight: "1.2rem",
+                      color: "#5f6368",
+                      background: "#f5f7fa",
+                      padding: ".55rem .75rem",
+                      borderRadius: "6px",
+                      border: "1px solid #e2e6eb",
+                    }}
+                  >
+                    Select artists for this song section. The label and album
+                    details above will be reused for every song submitted.
+                  </p>
+                  <AllInpBox>
+                    {renderArtistField(section, "singer", "singer", true)}
+                    {renderArtistField(section, "lyricist", "lyricist", true)}
+                    {renderArtistField(section, "composer", "composer", true)}
+                    {renderArtistField(
+                      section,
+                      "musicDirector",
+                      "music Director",
+                    )}
+                    {renderArtistField(section, "director", "director")}
+                    {renderArtistField(section, "producer", "Producer")}
+                    {renderArtistField(section, "starCast", "starCast")}
+                  </AllInpBox>
+                </div>
+              ))}
+              <BtnDiv>
+                <button onClick={onSubmitHandler}>Submit</button>
+              </BtnDiv>
+            </FormSeperator>
+
+            {false && (
+              <>
+                <FormSeperator>
+                  <h2>CRBT</h2>
+                  <AllInpBox>
+                    <LabelInpBox>
+                      <Label htmlFor="file" id="file">
+                        Audio{" "}
+                        <span style={{ margin: 0, textTransform: "none" }}>
+                          (.wav or .mp3)*
+                        </span>
+                      </Label>
+                      <Upload
+                        method="get"
+                        listType="picture"
+                        {...fileProps}
+                        maxCount={1}
+                      >
+                        <Button icon={<UploadOutlined />}>Audio file</Button>
+                      </Upload>
+                      {inpFields.file && (
+                        <AudioPlayer
+                          src={
+                            inpFields.file
+                              ? typeof inpFields.file === "string"
+                                ? inpFields.file
+                                : URL.createObjectURL(inpFields.file)
+                              : ""
+                          }
+                          autoPlayAfterSrcChange={false}
+                          showJumpControls={false}
+                          customAdditionalControls={[]}
+                          layout="stacked-reverse"
+                          style={{
+                            marginTop: "1rem",
+                          }}
+                        />
+                      )}
+                    </LabelInpBox>
+                    <LabelInpBox>
+                      <Label htmlFor="isrc">isrc</Label>
+                      <Input
+                        type="text"
+                        name="isrc"
+                        id="isrc"
+                        onChange={onChangeHandler}
+                        value={inpFields.isrc}
+                        placeholder="isrc"
+                      />
+                    </LabelInpBox>
+                    <LabelInpBox>
+                      <Label htmlFor="title">Song name</Label>
+                      <Input
+                        type="text"
+                        name="title"
+                        id="title"
+                        placeholder="title"
+                        disabled
+                        onChange={onChangeHandler}
+                        value={inpFields.title}
+                      />
+                    </LabelInpBox>
+
+                    <LabelInpBox>
+                      <Label htmlFor="crbt">
+                        CRBT /Preview Start Time
+                        <span
+                          style={{
+                            color: "#b3b2b2",
+                            textTransform: "none",
+                          }}
                         >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
+                          (mm:ss)
+                        </span>
+                      </Label>
+                      <TimePicker
+                        name="crbt"
+                        id="crbt"
+                        format={format}
+                        onChange={(time) => {
+                          if (!time) return;
+                          console.log("hi");
+                          console.log(time.format(format));
+                          setInpFields({
+                            ...inpFields,
+                            crbt: time.format(format),
+                          });
+                        }}
+                      />
+                    </LabelInpBox>
+                  </AllInpBox>
+                </FormSeperator>
+                <FormSeperator>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: "1rem",
+                      width: "99%",
+                    }}
+                  >
+                    <h2>Artists</h2>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={showAddModal}
+                    >
+                      Add Artist
+                    </Button>
                   </div>
-                </LabelInpBox>
-                {/* <LabelInpBox>
+                  <p
+                    style={{
+                      margin: "-0.4rem 0 0.6rem 0",
+                      fontSize: ".78rem",
+                      lineHeight: "1.2rem",
+                      color: "#5f6368",
+                      background: "#f5f7fa",
+                      padding: ".55rem .75rem",
+                      borderRadius: "6px",
+                      border: "1px solid #e2e6eb",
+                    }}
+                  >
+                    Note: Please select artists using the auto-complete fields
+                    below. If an artist is not listed, add the artist first
+                    using the Add Artist button, then select it. This ensures
+                    consistent, professional metadata for your release.
+                  </p>
+                  <AllInpBox>
+                    {/* SINGER */}
+                    <LabelInpBox>
+                      <Label htmlFor="singer">
+                        singer <span style={{ margin: 0 }}>*</span>
+                      </Label>
+                      <AutoComplete
+                        id="singer"
+                        value={inpFields.singer}
+                        options={artistOptions.singer}
+                        onSearch={(value) =>
+                          handleArtistSearch("singer", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("singer", value, option)
+                        }
+                        onChange={(value) => {
+                          const ele = document.querySelector(`#singer`);
+
+                          ele.style.border = "1px solid white";
+                          setInpFields({ ...inpFields, singer: value });
+                        }}
+                        placeholder="Singer name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedSingers.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
+                          >
+                            No Singer Selected
+                          </div>
+                        )}
+                        {selectedSingers.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+                            <SocialLinks>
+                              <SocialIcon
+                                active={s.facebookUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.facebookUrl &&
+                                  window.open(s.facebookUrl, "_blank")
+                                }
+                                title={
+                                  s.facebookUrl
+                                    ? "Visit Facebook profile"
+                                    : "No Facebook profile"
+                                }
+                              >
+                                <FacebookOutlined />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.instagramUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.instagramUrl &&
+                                  window.open(s.instagramUrl, "_blank")
+                                }
+                                title={
+                                  s.instagramUrl
+                                    ? "Visit Instagram profile"
+                                    : "No Instagram profile"
+                                }
+                              >
+                                <Instagram />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.appleId?.trim().length > 0}
+                                onClick={() =>
+                                  s.appleId && window.open(s.appleId, "_blank")
+                                }
+                                title={
+                                  s.appleId
+                                    ? "Visit Apple Music profile"
+                                    : "No Apple Music profile"
+                                }
+                              >
+                                <Apple />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.spotifyId?.trim().length > 0}
+                                onClick={() =>
+                                  s.spotifyId &&
+                                  window.open(s.spotifyId, "_blank")
+                                }
+                                title={
+                                  s.spotifyId
+                                    ? "Visit Spotify profile"
+                                    : "No Spotify profile"
+                                }
+                              >
+                                <FaSpotify style={{ fontSize: "1.1rem" }} />
+                              </SocialIcon>
+                            </SocialLinks>
+                            <RemoveButton
+                              onClick={() => removeSinger(idx)}
+                              title="Remove singer"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
+                      </div>
+                    </LabelInpBox>
+                    {/* <LabelInpBox>
                   <Label htmlFor="singer">Add Singer Profile</Label>
                   <div
                     style={{
@@ -2547,120 +3039,123 @@ const Form = () => {
                     />
                   </div>
                 </LabelInpBox> */}
-                {/* LYRICIST */}
-                <LabelInpBox>
-                  <Label htmlFor="lyricist">lyricist</Label>
-                  <AutoComplete
-                    id="lyricist"
-                    value={inpFields.lyricist}
-                    options={artistOptions.lyricist}
-                    onSearch={(value) => handleArtistSearch("lyricist", value)}
-                    onSelect={(value, option) =>
-                      handleArtistSelect("lyricist", value, option)
-                    }
-                    onChange={(value) => {
-                      const ele = document.querySelector(`#lyricist`);
-                      ele.style.border = "1px solid white";
-                      setInpFields({ ...inpFields, lyricist: value });
-                    }}
-                    placeholder="Lyricist name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  {/* Show selected lyricists as tags */}
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedLyricists.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
+                    {/* LYRICIST */}
+                    <LabelInpBox>
+                      <Label htmlFor="lyricist">lyricist</Label>
+                      <AutoComplete
+                        id="lyricist"
+                        value={inpFields.lyricist}
+                        options={artistOptions.lyricist}
+                        onSearch={(value) =>
+                          handleArtistSearch("lyricist", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("lyricist", value, option)
+                        }
+                        onChange={(value) => {
+                          const ele = document.querySelector(`#lyricist`);
+                          ele.style.border = "1px solid white";
+                          setInpFields({ ...inpFields, lyricist: value });
                         }}
-                      >
-                        No Lyricist Selected
+                        placeholder="Lyricist name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      {/* Show selected lyricists as tags */}
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedLyricists.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
+                          >
+                            No Lyricist Selected
+                          </div>
+                        )}
+                        {selectedLyricists.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+                            <SocialLinks>
+                              <SocialIcon
+                                active={s.facebookUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.facebookUrl &&
+                                  window.open(s.facebookUrl, "_blank")
+                                }
+                                title={
+                                  s.facebookUrl
+                                    ? "Visit Facebook profile"
+                                    : "No Facebook profile"
+                                }
+                              >
+                                <FacebookOutlined />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.instagramUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.instagramUrl &&
+                                  window.open(s.instagramUrl, "_blank")
+                                }
+                                title={
+                                  s.instagramUrl
+                                    ? "Visit Instagram profile"
+                                    : "No Instagram profile"
+                                }
+                              >
+                                <Instagram />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.appleId?.trim().length > 0}
+                                onClick={() =>
+                                  s.appleId && window.open(s.appleId, "_blank")
+                                }
+                                title={
+                                  s.appleId
+                                    ? "Visit Apple Music profile"
+                                    : "No Apple Music profile"
+                                }
+                              >
+                                <Apple />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.spotifyId?.trim().length > 0}
+                                onClick={() =>
+                                  s.spotifyId &&
+                                  window.open(s.spotifyId, "_blank")
+                                }
+                                title={
+                                  s.spotifyId
+                                    ? "Visit Spotify profile"
+                                    : "No Spotify profile"
+                                }
+                              >
+                                <FaSpotify style={{ fontSize: "1.1rem" }} />
+                              </SocialIcon>
+                            </SocialLinks>
+                            <RemoveButton
+                              onClick={() => removeLyricist(idx)}
+                              title="Remove lyricist"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
                       </div>
-                    )}
-                    {selectedLyricists.map((s, idx) => (
-                      <ArtistTag key={idx}>
-                        <span
-                          style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
-                          }}
-                        >
-                          {s.name}
-                        </span>
-                        <SocialLinks>
-                          <SocialIcon
-                            active={s.facebookUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.facebookUrl &&
-                              window.open(s.facebookUrl, "_blank")
-                            }
-                            title={
-                              s.facebookUrl
-                                ? "Visit Facebook profile"
-                                : "No Facebook profile"
-                            }
-                          >
-                            <FacebookOutlined />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.instagramUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.instagramUrl &&
-                              window.open(s.instagramUrl, "_blank")
-                            }
-                            title={
-                              s.instagramUrl
-                                ? "Visit Instagram profile"
-                                : "No Instagram profile"
-                            }
-                          >
-                            <Instagram />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.appleId?.trim().length > 0}
-                            onClick={() =>
-                              s.appleId && window.open(s.appleId, "_blank")
-                            }
-                            title={
-                              s.appleId
-                                ? "Visit Apple Music profile"
-                                : "No Apple Music profile"
-                            }
-                          >
-                            <Apple />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.spotifyId?.trim().length > 0}
-                            onClick={() =>
-                              s.spotifyId && window.open(s.spotifyId, "_blank")
-                            }
-                            title={
-                              s.spotifyId
-                                ? "Visit Spotify profile"
-                                : "No Spotify profile"
-                            }
-                          >
-                            <FaSpotify style={{ fontSize: "1.1rem" }} />
-                          </SocialIcon>
-                        </SocialLinks>
-                        <RemoveButton
-                          onClick={() => removeLyricist(idx)}
-                          title="Remove lyricist"
-                        >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
-                  </div>
-                </LabelInpBox>
-                {/* <LabelInpBox>
+                    </LabelInpBox>
+                    {/* <LabelInpBox>
                   <Label htmlFor="lyricist">Add Lyricist Profile</Label>
                   <div
                     style={{
@@ -2703,120 +3198,123 @@ const Form = () => {
                     />
                   </div>
                 </LabelInpBox> */}
-                {/* COMPOSER */}
-                <LabelInpBox>
-                  <Label htmlFor="composer">composer</Label>
-                  <AutoComplete
-                    id="composer"
-                    value={inpFields.composer}
-                    options={artistOptions.composer}
-                    onSearch={(value) => handleArtistSearch("composer", value)}
-                    onSelect={(value, option) =>
-                      handleArtistSelect("composer", value, option)
-                    }
-                    onChange={(value) => {
-                      const ele = document.querySelector(`#composer`);
-                      ele.style.border = "1px solid white";
-                      setInpFields({ ...inpFields, composer: value });
-                    }}
-                    placeholder="Composer name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  {/* Show selected composers as tags */}
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedComposers.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
+                    {/* COMPOSER */}
+                    <LabelInpBox>
+                      <Label htmlFor="composer">composer</Label>
+                      <AutoComplete
+                        id="composer"
+                        value={inpFields.composer}
+                        options={artistOptions.composer}
+                        onSearch={(value) =>
+                          handleArtistSearch("composer", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("composer", value, option)
+                        }
+                        onChange={(value) => {
+                          const ele = document.querySelector(`#composer`);
+                          ele.style.border = "1px solid white";
+                          setInpFields({ ...inpFields, composer: value });
                         }}
-                      >
-                        No Composer Selected
+                        placeholder="Composer name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      {/* Show selected composers as tags */}
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedComposers.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
+                          >
+                            No Composer Selected
+                          </div>
+                        )}
+                        {selectedComposers.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+                            <SocialLinks>
+                              <SocialIcon
+                                active={s.facebookUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.facebookUrl &&
+                                  window.open(s.facebookUrl, "_blank")
+                                }
+                                title={
+                                  s.facebookUrl
+                                    ? "Visit Facebook profile"
+                                    : "No Facebook profile"
+                                }
+                              >
+                                <FacebookOutlined />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.instagramUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.instagramUrl &&
+                                  window.open(s.instagramUrl, "_blank")
+                                }
+                                title={
+                                  s.instagramUrl
+                                    ? "Visit Instagram profile"
+                                    : "No Instagram profile"
+                                }
+                              >
+                                <Instagram />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.appleId?.trim().length > 0}
+                                onClick={() =>
+                                  s.appleId && window.open(s.appleId, "_blank")
+                                }
+                                title={
+                                  s.appleId
+                                    ? "Visit Apple Music profile"
+                                    : "No Apple Music profile"
+                                }
+                              >
+                                <Apple />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.spotifyId?.trim().length > 0}
+                                onClick={() =>
+                                  s.spotifyId &&
+                                  window.open(s.spotifyId, "_blank")
+                                }
+                                title={
+                                  s.spotifyId
+                                    ? "Visit Spotify profile"
+                                    : "No Spotify profile"
+                                }
+                              >
+                                <FaSpotify style={{ fontSize: "1.1rem" }} />
+                              </SocialIcon>
+                            </SocialLinks>
+                            <RemoveButton
+                              onClick={() => removeComposer(idx)}
+                              title="Remove Composer"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
                       </div>
-                    )}
-                    {selectedComposers.map((s, idx) => (
-                      <ArtistTag key={idx}>
-                        <span
-                          style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
-                          }}
-                        >
-                          {s.name}
-                        </span>
-                        <SocialLinks>
-                          <SocialIcon
-                            active={s.facebookUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.facebookUrl &&
-                              window.open(s.facebookUrl, "_blank")
-                            }
-                            title={
-                              s.facebookUrl
-                                ? "Visit Facebook profile"
-                                : "No Facebook profile"
-                            }
-                          >
-                            <FacebookOutlined />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.instagramUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.instagramUrl &&
-                              window.open(s.instagramUrl, "_blank")
-                            }
-                            title={
-                              s.instagramUrl
-                                ? "Visit Instagram profile"
-                                : "No Instagram profile"
-                            }
-                          >
-                            <Instagram />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.appleId?.trim().length > 0}
-                            onClick={() =>
-                              s.appleId && window.open(s.appleId, "_blank")
-                            }
-                            title={
-                              s.appleId
-                                ? "Visit Apple Music profile"
-                                : "No Apple Music profile"
-                            }
-                          >
-                            <Apple />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.spotifyId?.trim().length > 0}
-                            onClick={() =>
-                              s.spotifyId && window.open(s.spotifyId, "_blank")
-                            }
-                            title={
-                              s.spotifyId
-                                ? "Visit Spotify profile"
-                                : "No Spotify profile"
-                            }
-                          >
-                            <FaSpotify style={{ fontSize: "1.1rem" }} />
-                          </SocialIcon>
-                        </SocialLinks>
-                        <RemoveButton
-                          onClick={() => removeComposer(idx)}
-                          title="Remove Composer"
-                        >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
-                  </div>
-                </LabelInpBox>
-                {/* <LabelInpBox>
+                    </LabelInpBox>
+                    {/* <LabelInpBox>
                   <Label htmlFor="composer">Add Composer Profile</Label>
                   <div
                     style={{
@@ -2859,291 +3357,300 @@ const Form = () => {
                     />
                   </div>
                 </LabelInpBox> */}
-                {/* OTHERS */}
-                {/* MUSIC DIRECTOR */}
-                <LabelInpBox>
-                  <Label htmlFor="musicDirector">music Director</Label>
-                  <AutoComplete
-                    id="musicDirector"
-                    value={inpFields.musicDirector}
-                    options={artistOptions.musicDirector}
-                    onSearch={(value) =>
-                      handleArtistSearch("musicDirector", value)
-                    }
-                    onSelect={(value, option) =>
-                      handleArtistSelect("musicDirector", value, option)
-                    }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, musicDirector: value })
-                    }
-                    placeholder="Music director name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedMusicDirectors.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
-                        }}
-                      >
-                        No Music Director Selected
-                      </div>
-                    )}
-                    {selectedMusicDirectors.map((s, idx) => (
-                      <ArtistTag key={idx}>
-                        <span
-                          style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
-                          }}
-                        >
-                          {s.name}
-                        </span>
-
-                        <RemoveButton
-                          onClick={() => removeMusicDirector(idx)}
-                          title="Remove Music Director"
-                        >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
-                  </div>
-                </LabelInpBox>
-
-                {/* DIRECTOR */}
-                <LabelInpBox>
-                  <Label htmlFor="director">director</Label>
-                  <AutoComplete
-                    id="director"
-                    value={inpFields.director}
-                    options={artistOptions.director}
-                    onSearch={(value) => handleArtistSearch("director", value)}
-                    onSelect={(value, option) =>
-                      handleArtistSelect("director", value, option)
-                    }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, director: value })
-                    }
-                    placeholder="Director name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedDirectors.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
-                        }}
-                      >
-                        No Director Selected
-                      </div>
-                    )}
-                    {selectedDirectors.map((s, idx) => (
-                      <ArtistTag key={idx}>
-                        <span
-                          style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
-                          }}
-                        >
-                          {s.name}
-                        </span>
-
-                        <RemoveButton
-                          onClick={() => removeDirector(idx)}
-                          title="Remove Director"
-                        >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
-                  </div>
-                </LabelInpBox>
-
-                {/* PRODUCER */}
-                <LabelInpBox>
-                  <Label htmlFor="Producer">Producer</Label>
-                  <AutoComplete
-                    id="producer"
-                    value={inpFields.producer}
-                    options={artistOptions.producer}
-                    onSearch={(value) => handleArtistSearch("producer", value)}
-                    onSelect={(value, option) =>
-                      handleArtistSelect("producer", value, option)
-                    }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, producer: value })
-                    }
-                    placeholder="Producer name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedProducers.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
-                        }}
-                      >
-                        No Producer Selected
-                      </div>
-                    )}
-                    {selectedProducers.map((s, idx) => (
-                      <ArtistTag key={idx}>
-                        <span
-                          style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
-                          }}
-                        >
-                          {s.name}
-                        </span>
-
-                        <RemoveButton
-                          onClick={() => removeProducer(idx)}
-                          title="Remove Producer"
-                        >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
-                  </div>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="starCast">starCast</Label>
-                  <AutoComplete
-                    id="starCast"
-                    value={inpFields.starCast}
-                    options={artistOptions.starCast}
-                    onSearch={(value) => handleArtistSearch("starCast", value)}
-                    onSelect={(value, option) =>
-                      handleArtistSelect("starCast", value, option)
-                    }
-                    onChange={(value) =>
-                      setInpFields({ ...inpFields, starCast: value })
-                    }
-                    placeholder="Star Cast name"
-                    style={{ width: "100%" }}
-                    filterOption={false}
-                  />
-                  {/* Show selected star cast as tags */}
-                  <div style={{ marginTop: "0.5rem" }}>
-                    {selectedStarCast.length === 0 && (
-                      <div
-                        style={{
-                          color: "#bbb",
-                          fontSize: "0.8rem",
-                          fontStyle: "italic",
-                          padding: "0.2rem 0",
-                        }}
-                      >
-                        No Star Cast Selected
-                      </div>
-                    )}
-                    {selectedStarCast.map((s, idx) => (
-                      <ArtistTag key={idx}>
-                        <span
-                          style={{
-                            fontWeight: "500",
-                            fontSize: ".8rem",
-                            marginRight: "auto",
-                            color: "black",
-                            letterSpacing: ".06rem",
-                          }}
-                        >
-                          {s.name}
-                        </span>
-                        <SocialLinks>
-                          <SocialIcon
-                            active={s.facebookUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.facebookUrl &&
-                              window.open(s.facebookUrl, "_blank")
-                            }
-                            title={
-                              s.facebookUrl
-                                ? "Visit Facebook profile"
-                                : "No Facebook profile"
-                            }
+                    {/* OTHERS */}
+                    {/* MUSIC DIRECTOR */}
+                    <LabelInpBox>
+                      <Label htmlFor="musicDirector">music Director</Label>
+                      <AutoComplete
+                        id="musicDirector"
+                        value={inpFields.musicDirector}
+                        options={artistOptions.musicDirector}
+                        onSearch={(value) =>
+                          handleArtistSearch("musicDirector", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("musicDirector", value, option)
+                        }
+                        onChange={(value) =>
+                          setInpFields({ ...inpFields, musicDirector: value })
+                        }
+                        placeholder="Music director name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedMusicDirectors.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
                           >
-                            <FacebookOutlined />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.instagramUrl?.trim().length > 0}
-                            onClick={() =>
-                              s.instagramUrl &&
-                              window.open(s.instagramUrl, "_blank")
-                            }
-                            title={
-                              s.instagramUrl
-                                ? "Visit Instagram profile"
-                                : "No Instagram profile"
-                            }
+                            No Music Director Selected
+                          </div>
+                        )}
+                        {selectedMusicDirectors.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+
+                            <RemoveButton
+                              onClick={() => removeMusicDirector(idx)}
+                              title="Remove Music Director"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
+                      </div>
+                    </LabelInpBox>
+
+                    {/* DIRECTOR */}
+                    <LabelInpBox>
+                      <Label htmlFor="director">director</Label>
+                      <AutoComplete
+                        id="director"
+                        value={inpFields.director}
+                        options={artistOptions.director}
+                        onSearch={(value) =>
+                          handleArtistSearch("director", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("director", value, option)
+                        }
+                        onChange={(value) =>
+                          setInpFields({ ...inpFields, director: value })
+                        }
+                        placeholder="Director name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedDirectors.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
                           >
-                            <Instagram />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.appleId?.trim().length > 0}
-                            onClick={() =>
-                              s.appleId && window.open(s.appleId, "_blank")
-                            }
-                            title={
-                              s.appleId
-                                ? "Visit Apple Music profile"
-                                : "No Apple Music profile"
-                            }
+                            No Director Selected
+                          </div>
+                        )}
+                        {selectedDirectors.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+
+                            <RemoveButton
+                              onClick={() => removeDirector(idx)}
+                              title="Remove Director"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
+                      </div>
+                    </LabelInpBox>
+
+                    {/* PRODUCER */}
+                    <LabelInpBox>
+                      <Label htmlFor="Producer">Producer</Label>
+                      <AutoComplete
+                        id="producer"
+                        value={inpFields.producer}
+                        options={artistOptions.producer}
+                        onSearch={(value) =>
+                          handleArtistSearch("producer", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("producer", value, option)
+                        }
+                        onChange={(value) =>
+                          setInpFields({ ...inpFields, producer: value })
+                        }
+                        placeholder="Producer name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedProducers.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
                           >
-                            <Apple />
-                          </SocialIcon>
-                          <SocialIcon
-                            active={s.spotifyId?.trim().length > 0}
-                            onClick={() =>
-                              s.spotifyId && window.open(s.spotifyId, "_blank")
-                            }
-                            title={
-                              s.spotifyId
-                                ? "Visit Spotify profile"
-                                : "No Spotify profile"
-                            }
+                            No Producer Selected
+                          </div>
+                        )}
+                        {selectedProducers.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+
+                            <RemoveButton
+                              onClick={() => removeProducer(idx)}
+                              title="Remove Producer"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox>
+                      <Label htmlFor="starCast">starCast</Label>
+                      <AutoComplete
+                        id="starCast"
+                        value={inpFields.starCast}
+                        options={artistOptions.starCast}
+                        onSearch={(value) =>
+                          handleArtistSearch("starCast", value)
+                        }
+                        onSelect={(value, option) =>
+                          handleArtistSelect("starCast", value, option)
+                        }
+                        onChange={(value) =>
+                          setInpFields({ ...inpFields, starCast: value })
+                        }
+                        placeholder="Star Cast name"
+                        style={{ width: "100%" }}
+                        filterOption={false}
+                      />
+                      {/* Show selected star cast as tags */}
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedStarCast.length === 0 && (
+                          <div
+                            style={{
+                              color: "#bbb",
+                              fontSize: "0.8rem",
+                              fontStyle: "italic",
+                              padding: "0.2rem 0",
+                            }}
                           >
-                            <FaSpotify style={{ fontSize: "1.1rem" }} />
-                          </SocialIcon>
-                        </SocialLinks>
-                        <RemoveButton
-                          onClick={() => removeStarCast(idx)}
-                          title="Remove Star Cast"
-                        >
-                          <CloseOutlined />
-                        </RemoveButton>
-                      </ArtistTag>
-                    ))}
-                  </div>
-                </LabelInpBox>
-              </AllInpBox>
-              <BtnDiv>
-                <button onClick={onSubmitHandler}>Submit</button>
-              </BtnDiv>
-            </FormSeperator>
+                            No Star Cast Selected
+                          </div>
+                        )}
+                        {selectedStarCast.map((s, idx) => (
+                          <ArtistTag key={idx}>
+                            <span
+                              style={{
+                                fontWeight: "500",
+                                fontSize: ".8rem",
+                                marginRight: "auto",
+                                color: "black",
+                                letterSpacing: ".06rem",
+                              }}
+                            >
+                              {s.name}
+                            </span>
+                            <SocialLinks>
+                              <SocialIcon
+                                active={s.facebookUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.facebookUrl &&
+                                  window.open(s.facebookUrl, "_blank")
+                                }
+                                title={
+                                  s.facebookUrl
+                                    ? "Visit Facebook profile"
+                                    : "No Facebook profile"
+                                }
+                              >
+                                <FacebookOutlined />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.instagramUrl?.trim().length > 0}
+                                onClick={() =>
+                                  s.instagramUrl &&
+                                  window.open(s.instagramUrl, "_blank")
+                                }
+                                title={
+                                  s.instagramUrl
+                                    ? "Visit Instagram profile"
+                                    : "No Instagram profile"
+                                }
+                              >
+                                <Instagram />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.appleId?.trim().length > 0}
+                                onClick={() =>
+                                  s.appleId && window.open(s.appleId, "_blank")
+                                }
+                                title={
+                                  s.appleId
+                                    ? "Visit Apple Music profile"
+                                    : "No Apple Music profile"
+                                }
+                              >
+                                <Apple />
+                              </SocialIcon>
+                              <SocialIcon
+                                active={s.spotifyId?.trim().length > 0}
+                                onClick={() =>
+                                  s.spotifyId &&
+                                  window.open(s.spotifyId, "_blank")
+                                }
+                                title={
+                                  s.spotifyId
+                                    ? "Visit Spotify profile"
+                                    : "No Spotify profile"
+                                }
+                              >
+                                <FaSpotify style={{ fontSize: "1.1rem" }} />
+                              </SocialIcon>
+                            </SocialLinks>
+                            <RemoveButton
+                              onClick={() => removeStarCast(idx)}
+                              title="Remove Star Cast"
+                            >
+                              <CloseOutlined />
+                            </RemoveButton>
+                          </ArtistTag>
+                        ))}
+                      </div>
+                    </LabelInpBox>
+                  </AllInpBox>
+                  <BtnDiv>
+                    <button onClick={onSubmitHandler}>Submit</button>
+                  </BtnDiv>
+                </FormSeperator>
+              </>
+            )}
           </FormBox>
         </>
       )}
