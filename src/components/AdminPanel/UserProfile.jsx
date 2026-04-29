@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Popconfirm } from "antd";
+import { Breadcrumb, Popconfirm, Switch } from "antd";
 import { FloatButton } from "antd";
 import {
   EyeOutlined,
@@ -616,6 +616,7 @@ const UserProfile = () => {
   const [editPaid, setEditPaid] = useState(0);
   const [showEditPaid, setShowEditPaid] = useState(false);
   const [showLeglmod, setShowLegalMod] = useState(false);
+  const [isUserEnabled, setIsUserEnabled] = useState(false);
   let a = 0;
   const [showExcel, setShowExcel] = useState(false);
   const totalPaymentReporter = (report) => {
@@ -669,10 +670,47 @@ const UserProfile = () => {
     }
   };
 
+  const handleUserStatusChange = async (checked) => {
+    setIsUserEnabled(checked);
+    const action = checked ? "approved" : "disable";
+
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/user-status-changer`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+            action: action,
+          }),
+        },
+      );
+      const data = await res.json();
+      console.log(data);
+
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+      } else {
+        openNotificationWithIcon("error", data.message);
+        setIsUserEnabled(!checked); // Revert the state if API fails
+      }
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      openNotificationWithIcon("error", "Failed to update user status");
+      setIsUserEnabled(!checked); // Revert the state if API fails
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const userOrderFetcher = async () => {
     setIsLoading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/order/user-all-orders/?user=${id}`
+      `${process.env.REACT_APP_BASE_URL}/order/user-all-orders/?user=${id}`,
     );
     const data = await res.json();
 
@@ -689,7 +727,7 @@ const UserProfile = () => {
   const userDetailsFetch = async () => {
     setIsLoading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${id}`
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${id}`,
     );
     const data = await res.json();
     console.log(data);
@@ -697,6 +735,12 @@ const UserProfile = () => {
     if (res.ok) {
       setUserdata(data.user);
       setEditPaid(data.user.paidEarning);
+      // Set user status - if status is "approved", enable the switch
+      if (data.user.status === "approved") {
+        setIsUserEnabled(true);
+      } else {
+        setIsUserEnabled(false);
+      }
       totalPaymentReporter(data.user.finacialReport[0]);
       if (data.user.finacialReport[0][currentYear]) {
         setModalEarningInpFields(data.user.finacialReport[0][modalYearSel]);
@@ -704,7 +748,7 @@ const UserProfile = () => {
 
       if (data.user.analytics[0][currentYear]) {
         setModalStreamInpFields(
-          data.user.analytics[0][currentYear][selectedMonth]
+          data.user.analytics[0][currentYear][selectedMonth],
         );
       }
 
@@ -843,7 +887,7 @@ const UserProfile = () => {
           year: reportSelectedYear,
           month: selectedMonth,
         }),
-      }
+      },
     );
     const data = await res.json();
 
@@ -873,7 +917,7 @@ const UserProfile = () => {
           report: modalEarningInpFields,
           year: modalYearSel,
         }),
-      }
+      },
     );
     const data = await res.json();
 
@@ -955,7 +999,7 @@ const UserProfile = () => {
                           method: "POST",
 
                           body: formD,
-                        }
+                        },
                       );
                       const data = await res.json();
 
@@ -1026,7 +1070,7 @@ const UserProfile = () => {
                           method: "POST",
 
                           body: formD,
-                        }
+                        },
                       );
                       const data = await res.json();
 
@@ -1093,14 +1137,14 @@ const UserProfile = () => {
                   if (editPaid === 0) {
                     openNotificationWithIcon(
                       "error",
-                      "Amount should be greater than 0."
+                      "Amount should be greater than 0.",
                     );
                     return;
                   }
                   if (editPaid > totalEarningUser) {
                     openNotificationWithIcon(
                       "error",
-                      "Amount is greater than total amount."
+                      "Amount is greater than total amount.",
                     );
                     return;
                   }
@@ -1117,7 +1161,7 @@ const UserProfile = () => {
                         adminId: userId,
                         paid: Number(editPaid),
                       }),
-                    }
+                    },
                   );
                   const data = await res.json();
                   console.log(data);
@@ -1176,14 +1220,14 @@ const UserProfile = () => {
                   if (paidInp === 0) {
                     openNotificationWithIcon(
                       "error",
-                      "Amount should be greater than 0."
+                      "Amount should be greater than 0.",
                     );
                     return;
                   }
                   if (paidInp > totalEarningUser - userData.paidEarning) {
                     openNotificationWithIcon(
                       "error",
-                      "Amount is greater than remaining amount."
+                      "Amount is greater than remaining amount.",
                     );
                     return;
                   }
@@ -1200,7 +1244,7 @@ const UserProfile = () => {
                         adminId: userId,
                         paid: Number(paidInp),
                       }),
-                    }
+                    },
                   );
                   const data = await res.json();
                   console.log(data);
@@ -1242,7 +1286,7 @@ const UserProfile = () => {
                     setModalYearSel(value);
                     if (userData.finacialReport[0][value]) {
                       setModalEarningInpFields(
-                        userData.finacialReport[0][value]
+                        userData.finacialReport[0][value],
                       );
                     } else {
                       setModalEarningInpFields(defaultEarning);
@@ -1411,7 +1455,7 @@ const UserProfile = () => {
                       resArr = defaultReports;
                     }
                     setModalStreamInpFields(
-                      userData.analytics[0][reportSelectedYear][value]
+                      userData.analytics[0][reportSelectedYear][value],
                     );
                     let arr = [];
                     for (const key in resArr) {
@@ -1694,6 +1738,7 @@ const UserProfile = () => {
                     }
                     alt=""
                   />
+
                   <div>
                     <span>{userData.name}</span>
                     <span>+91-{userData.phone}</span>
@@ -1715,6 +1760,21 @@ const UserProfile = () => {
                     >
                       {userData.email}
                     </span>
+                    <div
+                      style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+
+                        width: "10%",
+                      }}
+                    >
+                      <Switch
+                        checked={isUserEnabled}
+                        onChange={handleUserStatusChange}
+                        checkedChildren="Enable"
+                        unCheckedChildren="Disable"
+                      />
+                    </div>
                   </div>
                 </LeftDiv>
                 <RightDiv>
@@ -1732,6 +1792,7 @@ const UserProfile = () => {
                         {userData.name}
                       </a>
                     </div>
+
                     <div>
                       <span>Email</span>
                       <span style={{ textTransform: "none" }}>
@@ -1812,7 +1873,7 @@ const UserProfile = () => {
                             }}
                             onClick={copyToClipBoard.bind(
                               this,
-                              userData.bankDetails[0].accountNo
+                              userData.bankDetails[0].accountNo,
                             )}
                           />
                         )}
@@ -1832,7 +1893,7 @@ const UserProfile = () => {
                             }}
                             onClick={copyToClipBoard.bind(
                               this,
-                              userData.bankDetails[0].ifsc
+                              userData.bankDetails[0].ifsc,
                             )}
                           />
                         )}
@@ -1860,7 +1921,7 @@ const UserProfile = () => {
                             }}
                             onClick={copyToClipBoard.bind(
                               this,
-                              userData.bankDetails[0].upi
+                              userData.bankDetails[0].upi,
                             )}
                           />
                         )}
