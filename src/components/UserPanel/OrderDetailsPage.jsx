@@ -708,6 +708,9 @@ const OrderDetailsPage = () => {
   const [parsedSingers, setParsedSingers] = useState([]);
   const [parsedComposers, setParsedComposers] = useState([]);
   const [parsedLyricists, setParsedLyricists] = useState([]);
+  // States for download payment
+  const [downloadPaymentLoading, setDownloadPaymentLoading] = useState(false);
+  const [downloadFileType, setDownloadFileType] = useState(null); // "thumbnail" or "audio"
 
   // Notification function
   const openNotificationWithIcon = (type, message) => {
@@ -845,7 +848,7 @@ const OrderDetailsPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            amount: 500, // Takedown fee amount (₹5.00)
+            amount: 5, // Takedown fee amount (₹5.00)
             currency: "INR",
           }),
         },
@@ -936,6 +939,99 @@ const OrderDetailsPage = () => {
       };
       document.body.appendChild(script);
     });
+  };
+
+  // Handle download with payment
+  const handleDownloadPayment = async (fileType) => {
+    setDownloadFileType(fileType);
+    setDownloadPaymentLoading(true);
+
+    // Load Razorpay script
+    const res = await loadRazorpayScript(
+      "https://checkout.razorpay.com/v1/checkout.js",
+    );
+
+    if (!res) {
+      messageApi.error(
+        "Razorpay SDK failed to load. Please check your internet connection.",
+      );
+      setDownloadPaymentLoading(false);
+      return;
+    }
+
+    try {
+      // Create payment order for download (₹5 = 500 paise)
+      const orderRes = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/payment/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: 5, // ₹5 in paise
+            currency: "INR",
+          }),
+        },
+      );
+
+      const paymentData = await orderRes.json();
+      console.log("Download payment order created:", paymentData);
+
+      if (!paymentData || !paymentData.order_id) {
+        messageApi.error("Failed to create payment order. Please try again.");
+        setDownloadPaymentLoading(false);
+        return;
+      }
+
+      // Determine file URL and name
+      const fileUrl = fileType === "thumbnail" ? order.thumbnail : order.file;
+      const fileName =
+        fileType === "thumbnail"
+          ? `${order.title || order.songtitle || "cover"}-art`
+          : `${order.title || order.songtitle || "audio"}`;
+      const downloadLink = `${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${fileUrl}&title=${fileName}`;
+
+      // Razorpay options
+      const options = {
+        key: "rzp_test_RAQAuLXpIZAQYQ", // Replace with your Razorpay test/live key
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        order_id: paymentData.order_id,
+        name: "Music Distribution - Download",
+        description: `Download ${fileType === "thumbnail" ? "Cover Art" : "Audio File"}`,
+        handler: async function (response) {
+          // Direct navigation to download URL (bypasses popup blocker)
+          window.location.href = downloadLink;
+          messageApi.success("Download starting!");
+          setDownloadPaymentLoading(false);
+          setDownloadFileType(null);
+        },
+        prefill: {
+          name: order.artistName || "User",
+          email: order.email || "",
+          contact: order.phone || "",
+        },
+        theme: {
+          color: "#32a86d",
+        },
+        modal: {
+          ondismiss: function () {
+            messageApi.info("Payment cancelled. Download not completed.");
+            setDownloadPaymentLoading(false);
+            setDownloadFileType(null);
+          },
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Error initiating download payment:", error);
+      messageApi.error("Failed to initiate payment. Please try again.");
+      setDownloadPaymentLoading(false);
+      setDownloadFileType(null);
+    }
   };
 
   // Copy to clipboard functionality
@@ -1648,12 +1744,18 @@ const OrderDetailsPage = () => {
                     Cover Art
                   </DetailLabel>
                   <DetailValue>
-                    <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.thumbnail}&title=${order.title}`}
-                      target="_blank"
+                    <Button
+                      type="primary"
+                      icon={<FaDownload />}
+                      onClick={() => handleDownloadPayment("thumbnail")}
+                      loading={
+                        downloadPaymentLoading &&
+                        downloadFileType === "thumbnail"
+                      }
+                      disabled={downloadPaymentLoading}
                     >
-                      <FaDownload /> Download Image
-                    </Link>
+                      Download Image (₹5)
+                    </Button>
                   </DetailValue>
                 </DetailRow>
                 <DetailRow>
@@ -1662,12 +1764,17 @@ const OrderDetailsPage = () => {
                     Audio File
                   </DetailLabel>
                   <DetailValue>
-                    <Link
-                      to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.file}&title=${order.title}`}
-                      target="_blank"
+                    <Button
+                      type="primary"
+                      icon={<FaDownload />}
+                      onClick={() => handleDownloadPayment("audio")}
+                      loading={
+                        downloadPaymentLoading && downloadFileType === "audio"
+                      }
+                      disabled={downloadPaymentLoading}
                     >
-                      <FaDownload /> Download Audio
-                    </Link>
+                      Download Audio (₹5)
+                    </Button>
                   </DetailValue>
                 </DetailRow>
               </DetailsList>
