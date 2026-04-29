@@ -60,33 +60,33 @@ const cards = [
     title: "Social Media Linking",
     description: "Collect artist name, ISRC, and social links.",
     icon: <ShareAltOutlined />,
-    to: "/user-panel/form-query/social-media-linking",
+    slug: "social-media-linking",
     tag: "Linking",
   },
   {
     title: "YouTube OAC Request",
     description: "Submit channel info and three ISRC references.",
     icon: <YoutubeOutlined />,
-    to: "/user-panel/form-query/youtube-oac-request",
+    slug: "youtube-oac-request",
     tag: "YouTube",
   },
   {
     title: "Insta / Fb Whitelist",
     description: "Send label info, page link, and ISRC details.",
     icon: <GlobalOutlined />,
-    to: "/user-panel/form-query/insta-fb-whitelist",
+    slug: "insta-fb-whitelist",
     tag: "Whitelist",
   },
   {
     title: "Insta Reel Credit",
     description: "Credit request form for reel or audio page links.",
     icon: <FormOutlined />,
-    to: "/user-panel/form-query/insta-reel-credit",
+    slug: "insta-reel-credit",
     tag: "Credit",
   },
 ];
 
-const FormQueryHub = () => {
+const FormQueryHub = ({ basePath = "/user-panel/form-query" }) => {
   return (
     <QueryShell
       title="Form Query"
@@ -95,7 +95,7 @@ const FormQueryHub = () => {
       <CardGrid>
         {cards.map((card) => (
           <ToolCard
-            key={card.to}
+            key={card.slug}
             title={card.title}
             extra={<Tag color="blue">{card.tag}</Tag>}
             bordered={false}
@@ -103,7 +103,7 @@ const FormQueryHub = () => {
             <IconBadge>{card.icon}</IconBadge>
             <Card.Meta title={card.title} description={card.description} />
             <Actions>
-              <Link to={card.to}>
+              <Link to={`${basePath}/${card.slug}`}>
                 <Button type="primary">Open Form</Button>
               </Link>
             </Actions>
