@@ -15,7 +15,7 @@ const Page = styled.div`
   overflow: scroll;
 
   height: 90svh;
-  padding-bottom: 2rem;
+  padding-bottom: 5rem;
 `;
 
 const Hero = styled.div`
@@ -187,7 +187,7 @@ const AdminTools = () => {
                 <IconBadge>{card.icon}</IconBadge>
                 <Card.Meta title={card.title} description={card.description} />
                 <Actions>
-                  <Button type="primary">Open Form</Button>
+                  <Button type="primary">Open</Button>
                 </Actions>
               </ToolCard>
             </CardLink>

@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import {
   Button,
   Empty,
+  Descriptions,
   Form,
   Input,
   Modal,
@@ -103,6 +104,7 @@ const SocialMediaLinking = ({
   const [submitLoading, setSubmitLoading] = useState(false);
   const [records, setRecords] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   const apiBase = useMemo(
     () => `${process.env.REACT_APP_BASE_URL}/form-query`,
@@ -154,6 +156,10 @@ const SocialMediaLinking = ({
   const handleCloseModal = () => {
     if (submitLoading) return;
     setIsModalOpen(false);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setSelectedRecord(null);
   };
 
   const handleFinish = async (values) => {
@@ -268,7 +274,12 @@ const SocialMediaLinking = ({
       key: "facebookUrl",
       render: (value) =>
         value ? (
-          <LinkCell href={value} target="_blank" rel="noreferrer">
+          <LinkCell
+            href={value}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Space size={6}>
               <LinkOutlined />
               <span>Open link</span>
@@ -284,7 +295,12 @@ const SocialMediaLinking = ({
       key: "instagramUrl",
       render: (value) =>
         value ? (
-          <LinkCell href={value} target="_blank" rel="noreferrer">
+          <LinkCell
+            href={value}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Space size={6}>
               <LinkOutlined />
               <span>Open link</span>
@@ -334,7 +350,7 @@ const SocialMediaLinking = ({
       key: "action",
       width: 180,
       render: (_, record) => (
-        <Space size={8} wrap>
+        <Space size={8} wrap onClick={(e) => e.stopPropagation()}>
           {String(record.status || "").toLowerCase() !== "confirmed" && (
             <Popconfirm
               title="Confirm this request?"
@@ -386,6 +402,9 @@ const SocialMediaLinking = ({
           columns={columns}
           dataSource={records}
           rowKey={(record) => record._id || record.id}
+          onRow={(record) => ({
+            onClick: () => setSelectedRecord(record),
+          })}
           pagination={{
             pageSize: 5,
             showSizeChanger: true,
@@ -407,6 +426,74 @@ const SocialMediaLinking = ({
           }}
         />
       </TableCard>
+
+      <Modal
+        open={!!selectedRecord}
+        onCancel={handleCloseDetailsModal}
+        footer={null}
+        centered
+        width={900}
+        destroyOnClose
+        className="social-media-linking-details-modal"
+      >
+        <div style={{ marginBottom: "1rem" }}>
+          <h2 style={{ margin: 0, fontSize: "1.15rem" }}>Request Details</h2>
+          <p style={{ margin: "0.35rem 0 0", color: "#667085" }}>
+            Full version of the selected social media linking request.
+          </p>
+        </div>
+
+        <Descriptions bordered column={2} size="small">
+          <Descriptions.Item label="Artist Name">
+            {selectedRecord?.artistName || "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Status">
+            {selectedRecord?.status || "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="ISRC">
+            {selectedRecord?.isrc || "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Email">
+            {selectedRecord?.email || "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Contact">
+            {selectedRecord?.contact || "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Label Name">
+            {selectedRecord?.labelName || "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Facebook URL">
+            {selectedRecord?.facebookUrl ? (
+              <LinkCell
+                href={selectedRecord.facebookUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Space size={6}>
+                  <LinkOutlined />{" "}
+                </Space>
+              </LinkCell>
+            ) : (
+              "-"
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Instagram URL">
+            {selectedRecord?.instagramUrl ? (
+              <LinkCell
+                href={selectedRecord.instagramUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Space size={6}>
+                  <LinkOutlined />
+                </Space>
+              </LinkCell>
+            ) : (
+              "-"
+            )}
+          </Descriptions.Item>
+        </Descriptions>
+      </Modal>
     </PageWrap>
   );
 };
