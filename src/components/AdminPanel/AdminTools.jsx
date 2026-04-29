@@ -2,15 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import { Card, Button, Tag } from "antd";
 import { Link } from "react-router-dom";
-import { UploadOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  ShareAltOutlined,
+  YoutubeOutlined,
+  GlobalOutlined,
+  FormOutlined,
+} from "@ant-design/icons";
 
 const Page = styled.div`
-  min-height: 100%;
   padding: 8px;
-  overflow: auto;
-  background:
-    radial-gradient(circle at top left, rgba(22, 119, 255, 0.08), transparent 30%),
-    linear-gradient(180deg, #f7f9fc 0%, #f3f6fb 100%);
+  overflow: scroll;
+
+  height: 90svh;
+  padding-bottom: 2rem;
 `;
 
 const Hero = styled.div`
@@ -81,17 +86,71 @@ const Actions = styled.div`
   margin-top: 1rem;
 `;
 
+const CardLink = styled(Link)`
+  display: block;
+  color: inherit;
+  text-decoration: none;
+`;
+
+const SectionTitle = styled.h2`
+  margin: 1.5rem 0 1rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #111827;
+`;
+
+const SecondaryGrid = styled(Card)`
+  border: 1px solid #e6ebf3;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  margin-top: 1rem;
+
+  .ant-card-body {
+    padding: 1rem;
+  }
+`;
+
+const QuickGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+`;
+
+const queryCards = [
+  {
+    title: "Social Media Linking",
+    description: "Collect artist name, ISRC, and social links.",
+    icon: <ShareAltOutlined />,
+    to: "/admin-panel/tools/social-media-linking",
+    tag: "Linking",
+  },
+  {
+    title: "YouTube OAC Request",
+    description: "Submit channel info and three ISRC references.",
+    icon: <YoutubeOutlined />,
+    to: "/admin-panel/tools/youtube-oac-request",
+    tag: "YouTube",
+  },
+  {
+    title: "Insta / Fb Whitelist",
+    description: "Send label info, page link, and ISRC details.",
+    icon: <GlobalOutlined />,
+    to: "/admin-panel/tools/insta-fb-whitelist",
+    tag: "Whitelist",
+  },
+  {
+    title: "Insta Reel Credit",
+    description: "Credit request form for reel or audio page links.",
+    icon: <FormOutlined />,
+    to: "/admin-panel/tools/insta-reel-credit",
+    tag: "Credit",
+  },
+];
+
 const AdminTools = () => {
   return (
     <Page>
-      <Hero>
-        <h1>Tools</h1>
-        <p>
-          Open one of the admin tools below. The bulk upload card routes to the
-          dedicated uploader page.
-        </p>
-      </Hero>
-
       <CardGrid>
         <ToolCard
           title="Bulk Upload"
@@ -114,6 +173,27 @@ const AdminTools = () => {
           </Actions>
         </ToolCard>
       </CardGrid>
+
+      <SectionTitle>Form Queries</SectionTitle>
+      <SecondaryGrid bordered={false}>
+        <QuickGrid>
+          {queryCards.map((card) => (
+            <CardLink key={card.to} to={card.to}>
+              <ToolCard
+                title={card.title}
+                extra={<Tag color="blue">{card.tag}</Tag>}
+                bordered={false}
+              >
+                <IconBadge>{card.icon}</IconBadge>
+                <Card.Meta title={card.title} description={card.description} />
+                <Actions>
+                  <Button type="primary">Open Form</Button>
+                </Actions>
+              </ToolCard>
+            </CardLink>
+          ))}
+        </QuickGrid>
+      </SecondaryGrid>
     </Page>
   );
 };

@@ -39,6 +39,10 @@ import { useSelector } from "react-redux";
 import AdminHome from "../components/AdminPanel/AdminHome";
 import BulkUpload from "../components/AdminPanel/BulkUpload";
 import AdminTools from "../components/AdminPanel/AdminTools";
+import SocialMediaLinking from "../components/AdminPanel/FormQueries/SocialMediaLinking";
+import YoutubeOacRequest from "../components/AdminPanel/FormQueries/YoutubeOacRequest";
+import InstaFbWhitelist from "../components/AdminPanel/FormQueries/InstaFbWhitelist";
+import InstaReelCredit from "../components/AdminPanel/FormQueries/InstaReelCredit";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -486,7 +490,19 @@ const AdminPanel = () => {
         {page === "history" && <History />}
         {page === "copyright" && <CopyrightAdmin />}
         {page === "artists" && <ArtistManagement />}
-        {page === "tools" && <AdminTools />}
+        {page === "tools" && !id && <AdminTools />}
+        {page === "tools" && id === "social-media-linking" && (
+          <SocialMediaLinking />
+        )}
+        {page === "tools" && id === "youtube-oac-request" && (
+          <YoutubeOacRequest backTo="/admin-panel/tools" />
+        )}
+        {page === "tools" && id === "insta-fb-whitelist" && (
+          <InstaFbWhitelist backTo="/admin-panel/tools" />
+        )}
+        {page === "tools" && id === "insta-reel-credit" && (
+          <InstaReelCredit backTo="/admin-panel/tools" />
+        )}
         {page === "bulk-upload" && <BulkUpload />}
         {page === "all-users" && <AllUsers />}
         {page === "notification" && <Notification />}
@@ -494,7 +510,7 @@ const AdminPanel = () => {
         {page === "user-queries" && <UserQueries />}
         {page === "pending-profile" && <PendingProfiles />}
         {page === "user-wallet" && id && <MusicUserWallet />}
-        {id && !action && !page && <OrderDetailsPage />}
+        {page !== "tools" && id && !action && !page && <OrderDetailsPage />}
         {action === "edit" && <EditOrder />}
       </AdminDrawerPanel>
     </div>

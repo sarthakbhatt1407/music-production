@@ -92,7 +92,7 @@ const cards = [
   },
 ];
 
-const FormQueryHub = ({ basePath = "/user-panel/form-query" }) => {
+const FormQueryHub = ({ basePath = "/admin-panel/tools" }) => {
   return (
     <QueryShell
       title="Form Query"

@@ -11,7 +11,7 @@ const FieldWrap = styled.div`
 `;
 
 const InstaFbWhitelist = ({
-  backTo = "/user-panel/form-query",
+  backTo = "/admin-panel/tools",
   title = "Insta / Fb Whitelist",
   description = "Use this form when a page link and release ISRC need whitelist approval.",
 }) => {

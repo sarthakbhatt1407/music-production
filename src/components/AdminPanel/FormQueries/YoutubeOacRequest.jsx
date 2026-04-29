@@ -11,7 +11,7 @@ const FieldWrap = styled.div`
 `;
 
 const YoutubeOacRequest = ({
-  backTo = "/user-panel/form-query",
+  backTo = "/admin-panel/tools",
   title = "YouTube OAC Request",
   description = "Share the channel details and three matching ISRCs for the request.",
 }) => {

@@ -11,7 +11,7 @@ const FieldWrap = styled.div`
 `;
 
 const InstaReelCredit = ({
-  backTo = "/user-panel/form-query",
+  backTo = "/admin-panel/tools",
   title = "Insta Reel Credit",
   description = "Submit release details for reel credit or audio page attribution.",
 }) => {
