@@ -41,7 +41,9 @@ const InstaReelCredit = ({
               <Form.Item
                 name="singerName"
                 label="Singer Name"
-                rules={[{ required: true, message: "Please enter singer name" }]}
+                rules={[
+                  { required: true, message: "Please enter singer name" },
+                ]}
               >
                 <Input placeholder="Singer name" />
               </Form.Item>

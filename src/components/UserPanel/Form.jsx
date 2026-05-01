@@ -331,14 +331,59 @@ const BtnBox = styled.div`
   }
 `;
 const PendingBox = styled.div`
-  background-color: white;
-  height: 50svh;
+  width: 100%;
+  margin: 1rem 0 1.25rem;
+  padding: 1.25rem 1.4rem;
+  border-radius: 14px;
+  border: 1px solid #d9e6ff;
+  background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  color: #334155;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.9rem;
+  align-items: flex-start;
+  font-size: 1rem;
+  line-height: 1.55;
+  letter-spacing: 0.01rem;
+`;
+
+const PendingTitle = styled.div`
+  display: flex;
   align-items: center;
-  font-size: 1.4rem;
-  color: #0000008e;
-  letter-spacing: 0.09rem;
+  gap: 0.55rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #0f172a;
+`;
+
+const PendingPill = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+`;
+
+const PendingActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  /* justify-content:   center; */
+  /* background-color: red; */
+  width: 100%;
+  .ant-btn {
+    min-width: 132px;
+    height: 40px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
 `;
 
 // Tag for displaying selected singers
@@ -591,6 +636,7 @@ const Form = () => {
   const [showLyricistModal, setShowLyricistModal] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [userData, setUserdata] = useState(null);
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const genreSubgenreMap = {
     Film: [
       "Devotional",
@@ -776,6 +822,21 @@ const Form = () => {
       content: msg,
     });
   };
+  const loadRazorpayScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+  console.log(`${process.env.REACT_APP_BASE_URL}/user/payment-status-changer`);
+
   const fetcher = async () => {
     setIsloading(true);
     const res = await fetch(
@@ -787,6 +848,117 @@ const Form = () => {
       setUserdata(data.user);
     }
     setIsloading(false);
+  };
+  const handleActivateProfilePayment = async () => {
+    if (!userId) {
+      messageApi.error("User not found. Please log in again.");
+      return;
+    }
+
+    setPaymentLoading(true);
+    const razorpayLoaded = await loadRazorpayScript(
+      "https://checkout.razorpay.com/v1/checkout.js",
+    );
+
+    if (!razorpayLoaded) {
+      messageApi.error(
+        "Razorpay SDK failed to load. Please check your internet connection.",
+      );
+      setPaymentLoading(false);
+      return;
+    }
+
+    try {
+      const orderRes = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/payment/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: 100,
+            currency: "INR",
+          }),
+        },
+      );
+
+      const paymentData = await orderRes.json();
+
+      if (!paymentData || !paymentData.order_id) {
+        messageApi.error("Failed to create payment order. Please try again.");
+        setPaymentLoading(false);
+        return;
+      }
+
+      const options = {
+        key: "rzp_test_RAQAuLXpIZAQYQ",
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        order_id: paymentData.order_id,
+        name: "Music Distribution - Profile Activation",
+        description: "Activate profile by paying ₹100",
+        handler: async function (response) {
+          console.log(userId);
+
+          try {
+            const res = await fetch(
+              `${process.env.REACT_APP_BASE_URL}/user/payment-status-changer`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  id: userId,
+                }),
+              },
+            );
+            const data = await res.json();
+            console.log(data);
+            if (res.ok) {
+              messageApi.success(
+                data.message || "Payment completed successfully.",
+              );
+              await fetcher();
+            } else {
+              messageApi.error(
+                data.message ||
+                  "Payment succeeded but profile status could not be updated.",
+              );
+            }
+          } catch (error) {
+            console.error("Error updating payment status:", error);
+            messageApi.error(
+              "Payment successful but failed to update profile status. Please contact support.",
+            );
+          } finally {
+            setPaymentLoading(false);
+          }
+        },
+        prefill: {
+          name: userData?.name || "User",
+          email: userData?.email || "",
+          contact: userData?.phone || "",
+        },
+        theme: {
+          color: "#1677ff",
+        },
+        modal: {
+          ondismiss: function () {
+            messageApi.info("Payment cancelled.");
+            setPaymentLoading(false);
+          },
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      messageApi.error("Failed to initiate payment. Please try again.");
+      setPaymentLoading(false);
+    }
   };
   useEffect(() => {
     fetcher();
@@ -1716,8 +1888,37 @@ const Form = () => {
       {!isLoading && userData && userData.status === "pending" && (
         <>
           <PendingBox>
-            Your profile is in review. Kindly wait for admin approval to upload
-            content.
+            <PendingTitle>
+              <PendingPill>Under Review</PendingPill>
+              Profile approval pending
+            </PendingTitle>
+            <div>
+              Your profile is in review. Kindly wait for admin approval to
+              upload content.
+            </div>
+          </PendingBox>
+        </>
+      )}
+      {!isLoading && userData && userData.status === "paymentpending" && (
+        <>
+          <PendingBox>
+            <PendingTitle>
+              <PendingPill>Action Required</PendingPill>
+              Activate your profile
+            </PendingTitle>
+            <div>
+              Your profile is pending activation. Please pay Rs. 100 to activate
+              your dashboard access.
+            </div>
+            <PendingActions>
+              <Button
+                type="primary"
+                onClick={handleActivateProfilePayment}
+                loading={paymentLoading}
+              >
+                Pay Now
+              </Button>
+            </PendingActions>
           </PendingBox>
         </>
       )}
@@ -1782,762 +1983,783 @@ const Form = () => {
           </Form1.Item>
         </Form1>
       </Modal>
-      {!isLoading && userData && userData.status != "pending" && (
-        <>
-          {showComposerModal && (
-            <Modal1>
-              <ModalBox>
-                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
-                  <p style={{ color: "#353434" }}>
-                    For Artist profile linking, only Facebook page link and
-                    Instagram profile ID link will be accepted
-                  </p>
-                  <p>
-                    Note: Name can't be edited. Please ensure you are adding the
-                    correct name.
-                  </p>
-                </div>
-                <ModalFormBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="composer">Name</Label>
-                    <ModalInput
-                      type="text"
-                      id="composer"
-                      onChange={onChangeHandler}
-                      value={inpFields.composer}
-                    />
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="composerAppleId">Apple ID</Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
+      {!isLoading &&
+        userData &&
+        userData.status !== "pending" &&
+        userData.status !== "paymentpending" && (
+          <>
+            {showComposerModal && (
+              <Modal1>
+                <ModalBox>
+                  <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                    <p style={{ color: "#353434" }}>
+                      For Artist profile linking, only Facebook page link and
+                      Instagram profile ID link will be accepted
+                    </p>
+                    <p>
+                      Note: Name can't be edited. Please ensure you are adding
+                      the correct name.
+                    </p>
+                  </div>
+                  <ModalFormBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="composer">Name</Label>
                       <ModalInput
                         type="text"
-                        id="composerAppleId"
+                        id="composer"
                         onChange={onChangeHandler}
-                        value={inpFields.composerAppleId}
+                        value={inpFields.composer}
                       />
-                      <Link to={inpFields.composerAppleId} target="_blank">
-                        <Apple />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="composerSpotifyId">Spotify ID</Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="composerSpotifyId"
-                        onChange={onChangeHandler}
-                        value={inpFields.composerSpotifyId}
-                      />
-                      <Link to={inpFields.composerSpotifyId} target="_blank">
-                        <FaSpotify
-                          style={{
-                            transform: "scale(1.5)",
-                          }}
-                        />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="composerFacebookUrl">Facebook Url </Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="composerFacebookUrl"
-                        onChange={onChangeHandler}
-                        value={inpFields.composerFacebookUrl}
-                      />
-                      <Link to={inpFields.composerFacebookUrl} target="_blank">
-                        <FacebookOutlined />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="composerInstagramUrl">Instagram Url </Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="composerInstagramUrl"
-                        onChange={onChangeHandler}
-                        value={inpFields.composerInstagramUrl}
-                      />
-                      <Link to={inpFields.composerInstagramUrl} target="_blank">
-                        <Instagram />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <div></div>
-                  <BtnBox>
-                    <button
-                      onClick={() => {
-                        setShowComposerModal(false);
-                      }}
-                    >
-                      Submit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowComposerModal(false);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </BtnBox>
-                </ModalFormBox>
-              </ModalBox>
-            </Modal1>
-          )}
-          {showLyricistModal && (
-            <Modal1>
-              <ModalBox>
-                {" "}
-                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
-                  <p style={{ color: "#353434" }}>
-                    For Artist profile linking, only Facebook page link and
-                    Instagram profile ID link will be accepted
-                  </p>
-                  <p>
-                    Note: Name can't be edited. Please ensure you are adding the
-                    correct name.
-                  </p>
-                </div>
-                <ModalFormBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="lyricist">Name</Label>
-                    <ModalInput
-                      type="text"
-                      id="lyricist"
-                      onChange={onChangeHandler}
-                      value={inpFields.lyricist}
-                    />
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="lyricistAppleId">Apple ID</Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="lyricistAppleId"
-                        onChange={onChangeHandler}
-                        value={inpFields.lyricistAppleId}
-                      />
-                      <Link to={inpFields.lyricistAppleId} target="_blank">
-                        <Apple />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="lyricistSpotifyId">Spotify ID</Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="lyricistSpotifyId"
-                        onChange={onChangeHandler}
-                        value={inpFields.lyricistSpotifyId}
-                      />
-                      <Link to={inpFields.lyricistSpotifyId} target="_blank">
-                        <FaSpotify
-                          style={{
-                            transform: "scale(1.5)",
-                            marginLeft: "0.4rem",
-                          }}
-                        />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="lyricistFacebookUrl">Facebook Url </Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="lyricistFacebookUrl"
-                        onChange={onChangeHandler}
-                        value={inpFields.lyricistFacebookUrl}
-                      />
-                      <Link to={inpFields.lyricistFacebookUrl} target="_blank">
-                        <FacebookOutlined />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="lyricistInstagramUrl">Instagram Url </Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="lyricistInstagramUrl"
-                        onChange={onChangeHandler}
-                        value={inpFields.lyricistInstagramUrl}
-                      />
-                      <Link to={inpFields.lyricistInstagramUrl} target="_blank">
-                        <Instagram />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <div></div>
-
-                  <BtnBox>
-                    <button
-                      onClick={() => {
-                        setShowLyricistModal(false);
-                      }}
-                    >
-                      Submit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowLyricistModal(false);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </BtnBox>
-                </ModalFormBox>
-              </ModalBox>
-            </Modal1>
-          )}
-          {showSingerModal && (
-            <Modal1>
-              <ModalBox>
-                {" "}
-                <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
-                  <p style={{ color: "#353434" }}>
-                    For Artist profile linking, only Facebook page link and
-                    Instagram profile ID link will be accepted
-                  </p>
-                  <p>
-                    Note: Name can't be edited. Please ensure you are adding the
-                    correct name.
-                  </p>
-                </div>
-                <ModalFormBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="singer">Name</Label>
-                    <ModalInput
-                      type="text"
-                      id="singer"
-                      onChange={onChangeHandler}
-                      value={inpFields.singer}
-                    />
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="singerAppleId">Apple ID</Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="singerAppleId"
-                        onChange={onChangeHandler}
-                        value={inpFields.singerAppleId}
-                      />
-                      <Link to={inpFields.singerAppleId} target="_blank">
-                        <Apple />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="singerSpotifyId">Spotify ID</Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      {" "}
-                      <ModalInput
-                        type="text"
-                        id="singerSpotifyId"
-                        onChange={onChangeHandler}
-                        value={inpFields.singerSpotifyId}
-                      />
-                      <Link to={inpFields.singerSpotifyId} target="_blank">
-                        <FaSpotify
-                          style={{
-                            transform: "scale(1.5)",
-                            marginLeft: "0.4rem",
-                          }}
-                        />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="singerFacebookUrl">Facebook Url </Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      {" "}
-                      <ModalInput
-                        type="text"
-                        id="singerFacebookUrl"
-                        onChange={onChangeHandler}
-                        value={inpFields.singerFacebookUrl}
-                      />
-                      <Link to={inpFields.singerFacebookUrl} target="_blank">
-                        <FacebookOutlined />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <LabelInpBox style={{ width: "100%" }}>
-                    <Label htmlFor="singerInstagramUrl">Instagram Url </Label>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "0.5rem",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ModalInput
-                        type="text"
-                        id="singerInstagramUrl"
-                        onChange={onChangeHandler}
-                        value={inpFields.singerInstagramUrl}
-                      />
-                      <Link to={inpFields.singerInstagramUrl} target="_blank">
-                        <Instagram />
-                      </Link>
-                    </div>
-                  </LabelInpBox>
-                  <div></div>
-
-                  <BtnBox>
-                    <button
-                      onClick={() => {
-                        setShowSingerModal(false);
-                      }}
-                    >
-                      Submit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowSingerModal(false);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </BtnBox>
-                </ModalFormBox>
-              </ModalBox>
-            </Modal1>
-          )}
-          {contextHolderNot}
-          {contextHolder}
-
-          <FormBox>
-            <FormSeperator>
-              <h2>Label</h2>
-              <AllInpBox>
-                <LabelInpBox id="1">
-                  <Label htmlFor="labelName">
-                    label name <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="labelName"
-                    id="labelName"
-                    placeholder="Label"
-                    disabled
-                    onChange={onChangeHandler}
-                    value={inpFields.labelName}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label>sub-label</Label>
-                  <Select1
-                    name="category"
-                    id="category"
-                    onChange={getSelectedValue}
-                  >
-                    <Option defaultValue value={0}>
-                      NA
-                    </Option>
-                    <Option value={1}>1</Option>
-                    <Option value={2}>2</Option>
-                    <Option value={3}>3</Option>
-                  </Select1>
-                </LabelInpBox>
-                {subLabels.length > 0 &&
-                  subLabels.map((sbl) => {
-                    return (
-                      <LabelInpBox key={sbl.key}>
-                        <Label htmlFor={sbl.id}>{sbl.lbl}</Label>
-                        <Input
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="composerAppleId">Apple ID</Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
                           type="text"
-                          name={sbl.id}
-                          id={sbl.id}
-                          placeholder="sub-label name"
+                          id="composerAppleId"
                           onChange={onChangeHandler}
-                          value={inpFields[sbl.id]}
+                          value={inpFields.composerAppleId}
                         />
-                      </LabelInpBox>
-                    );
-                  })}
-              </AllInpBox>
-            </FormSeperator>
-            <FormSeperator>
-              <h2>Album</h2>
-              <AllInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="title">
-                    Album title <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    name="title"
-                    id="title"
-                    placeholder="title"
-                    onChange={onChangeHandler}
-                    value={inpFields.title}
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="language">
-                    Album Language <span style={{ margin: 0 }}>*</span>
-                  </Label>
+                        <Link to={inpFields.composerAppleId} target="_blank">
+                          <Apple />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="composerSpotifyId">Spotify ID</Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="composerSpotifyId"
+                          onChange={onChangeHandler}
+                          value={inpFields.composerSpotifyId}
+                        />
+                        <Link to={inpFields.composerSpotifyId} target="_blank">
+                          <FaSpotify
+                            style={{
+                              transform: "scale(1.5)",
+                            }}
+                          />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="composerFacebookUrl">Facebook Url </Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="composerFacebookUrl"
+                          onChange={onChangeHandler}
+                          value={inpFields.composerFacebookUrl}
+                        />
+                        <Link
+                          to={inpFields.composerFacebookUrl}
+                          target="_blank"
+                        >
+                          <FacebookOutlined />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="composerInstagramUrl">
+                        Instagram Url{" "}
+                      </Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="composerInstagramUrl"
+                          onChange={onChangeHandler}
+                          value={inpFields.composerInstagramUrl}
+                        />
+                        <Link
+                          to={inpFields.composerInstagramUrl}
+                          target="_blank"
+                        >
+                          <Instagram />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <div></div>
+                    <BtnBox>
+                      <button
+                        onClick={() => {
+                          setShowComposerModal(false);
+                        }}
+                      >
+                        Submit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowComposerModal(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </BtnBox>
+                  </ModalFormBox>
+                </ModalBox>
+              </Modal1>
+            )}
+            {showLyricistModal && (
+              <Modal1>
+                <ModalBox>
+                  {" "}
+                  <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                    <p style={{ color: "#353434" }}>
+                      For Artist profile linking, only Facebook page link and
+                      Instagram profile ID link will be accepted
+                    </p>
+                    <p>
+                      Note: Name can't be edited. Please ensure you are adding
+                      the correct name.
+                    </p>
+                  </div>
+                  <ModalFormBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="lyricist">Name</Label>
+                      <ModalInput
+                        type="text"
+                        id="lyricist"
+                        onChange={onChangeHandler}
+                        value={inpFields.lyricist}
+                      />
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="lyricistAppleId">Apple ID</Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="lyricistAppleId"
+                          onChange={onChangeHandler}
+                          value={inpFields.lyricistAppleId}
+                        />
+                        <Link to={inpFields.lyricistAppleId} target="_blank">
+                          <Apple />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="lyricistSpotifyId">Spotify ID</Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="lyricistSpotifyId"
+                          onChange={onChangeHandler}
+                          value={inpFields.lyricistSpotifyId}
+                        />
+                        <Link to={inpFields.lyricistSpotifyId} target="_blank">
+                          <FaSpotify
+                            style={{
+                              transform: "scale(1.5)",
+                              marginLeft: "0.4rem",
+                            }}
+                          />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="lyricistFacebookUrl">Facebook Url </Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="lyricistFacebookUrl"
+                          onChange={onChangeHandler}
+                          value={inpFields.lyricistFacebookUrl}
+                        />
+                        <Link
+                          to={inpFields.lyricistFacebookUrl}
+                          target="_blank"
+                        >
+                          <FacebookOutlined />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="lyricistInstagramUrl">
+                        Instagram Url{" "}
+                      </Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="lyricistInstagramUrl"
+                          onChange={onChangeHandler}
+                          value={inpFields.lyricistInstagramUrl}
+                        />
+                        <Link
+                          to={inpFields.lyricistInstagramUrl}
+                          target="_blank"
+                        >
+                          <Instagram />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <div></div>
 
-                  <Select1
-                    name="language"
-                    id="language"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, language: value });
-                    }}
-                  >
-                    {" "}
-                    <Option value="Garhwali">Garhwali</Option>
-                    <Option value="Ahirani">Ahirani</Option>
-                    <Option value="Arabic">Arabic</Option>
-                    <Option value="Assamese">Assamese</Option>
-                    <Option value="Awadhi">Awadhi</Option>
-                    <Option value="Banjara">Banjara</Option>
-                    <Option value="Bengali">Bengali</Option>
-                    <Option value="Bhojpuri">Bhojpuri</Option>
-                    <Option value="Burmese">Burmese</Option>
-                    <Option value="Chhattisgarhi">Chhattisgarhi</Option>
-                    <Option value="Chinese">Chinese</Option>
-                    <Option value="Dogri">Dogri</Option>
-                    <Option value="English">English</Option>
-                    <Option value="French">French</Option>
-                    <Option value="Garo">Garo</Option>
-                    <Option value="Gujarati">Gujarati</Option>
-                    <Option value="Haryanvi">Haryanvi</Option>
-                    <Option value="Himachali">Himachali</Option>
-                    <Option value="Hindi">Hindi</Option>
-                    <Option value="Iban">Iban</Option>
-                    <Option value="Indonesian">Indonesian</Option>
-                    <Option value="Instrumental">Instrumental</Option>
-                    <Option value="Italian">Italian</Option>
-                    <Option value="Japanese">Japanese</Option>
-                    <Option value="Javanese">Javanese</Option>
-                    <Option value="Kannada">Kannada</Option>
-                    <Option value="Kashmiri">Kashmiri</Option>
-                    <Option value="Khasi">Khasi</Option>
-                    <Option value="Kokborok">Kokborok</Option>
-                    <Option value="Konkani">Konkani</Option>
-                    <Option value="Korean">Korean</Option>
-                    {/* <Option value="Kumauni">Kumauni</Option> */}
-                    <Option value="Latin">Latin</Option>
-                    <Option value="Maithili">Maithili</Option>
-                    <Option value="Malay">Malay</Option>
-                    <Option value="Malayalam">Malayalam</Option>
-                    <Option value="Mandarin">Mandarin</Option>
-                    <Option value="Manipuri">Manipuri</Option>
-                    <Option value="Marathi">Marathi</Option>
-                    <Option value="Marwari">Marwari</Option>
-                    <Option value="Naga">Naga</Option>
-                    <Option value="Nagpuri">Nagpuri</Option>
-                    <Option value="Nepali">Nepali</Option>
-                    <Option value="Odia">Odia</Option>
-                    <Option value="Pali">Pali</Option>
-                    <Option value="Persian">Persian</Option>
-                    <Option value="Punjabi">Punjabi</Option>
-                    <Option value="Rajasthani">Rajasthani</Option>
-                    <Option value="Sambalpuri">Sambalpuri</Option>
-                    <Option value="Sanskrit">Sanskrit</Option>
-                    <Option value="Santali">Santali</Option>
-                    <Option value="Santhili">Santhili</Option>
-                    <Option value="Sindhi">Sindhi</Option>
-                    <Option value="Sinhala">Sinhala</Option>
-                    <Option value="Spanish">Spanish</Option>
-                    <Option value="Swahili">Swahili</Option>
-                    <Option value="Tamil">Tamil</Option>
-                    <Option value="Telugu">Telugu</Option>
-                    <Option value="Thai">Thai</Option>
-                    <Option value="Tibetan">Tibetan</Option>
-                    <Option value="Tulu">Tulu</Option>
-                    <Option value="Turkish">Turkish</Option>
-                    <Option value="Ukrainian">Ukrainian</Option>
-                    <Option value="Urdu">Urdu</Option>
-                  </Select1>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="genre">
-                    Genre <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="genre"
-                    id="genre"
-                    onChange={(e) => {
-                      const id = e.target.id;
+                    <BtnBox>
+                      <button
+                        onClick={() => {
+                          setShowLyricistModal(false);
+                        }}
+                      >
+                        Submit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowLyricistModal(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </BtnBox>
+                  </ModalFormBox>
+                </ModalBox>
+              </Modal1>
+            )}
+            {showSingerModal && (
+              <Modal1>
+                <ModalBox>
+                  {" "}
+                  <div style={{ padding: "0rem .6rem", color: "#9c9c9c" }}>
+                    <p style={{ color: "#353434" }}>
+                      For Artist profile linking, only Facebook page link and
+                      Instagram profile ID link will be accepted
+                    </p>
+                    <p>
+                      Note: Name can't be edited. Please ensure you are adding
+                      the correct name.
+                    </p>
+                  </div>
+                  <ModalFormBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="singer">Name</Label>
+                      <ModalInput
+                        type="text"
+                        id="singer"
+                        onChange={onChangeHandler}
+                        value={inpFields.singer}
+                      />
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="singerAppleId">Apple ID</Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="singerAppleId"
+                          onChange={onChangeHandler}
+                          value={inpFields.singerAppleId}
+                        />
+                        <Link to={inpFields.singerAppleId} target="_blank">
+                          <Apple />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="singerSpotifyId">Spotify ID</Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        {" "}
+                        <ModalInput
+                          type="text"
+                          id="singerSpotifyId"
+                          onChange={onChangeHandler}
+                          value={inpFields.singerSpotifyId}
+                        />
+                        <Link to={inpFields.singerSpotifyId} target="_blank">
+                          <FaSpotify
+                            style={{
+                              transform: "scale(1.5)",
+                              marginLeft: "0.4rem",
+                            }}
+                          />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="singerFacebookUrl">Facebook Url </Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        {" "}
+                        <ModalInput
+                          type="text"
+                          id="singerFacebookUrl"
+                          onChange={onChangeHandler}
+                          value={inpFields.singerFacebookUrl}
+                        />
+                        <Link to={inpFields.singerFacebookUrl} target="_blank">
+                          <FacebookOutlined />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <LabelInpBox style={{ width: "100%" }}>
+                      <Label htmlFor="singerInstagramUrl">Instagram Url </Label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ModalInput
+                          type="text"
+                          id="singerInstagramUrl"
+                          onChange={onChangeHandler}
+                          value={inpFields.singerInstagramUrl}
+                        />
+                        <Link to={inpFields.singerInstagramUrl} target="_blank">
+                          <Instagram />
+                        </Link>
+                      </div>
+                    </LabelInpBox>
+                    <div></div>
 
-                      const ele = document.querySelector(`#${id}`);
-                      ele.style.border = "1px solid #d7d7d7";
-                      const value = e.target.value;
-                      setSelectedGenre(value);
-                      setInpFields({
-                        ...inpFields,
-                        genre: value,
-                        subgenre: "",
-                      });
-                    }}
-                    value={selectedGenre}
-                  >
-                    <Option value="">Select Genre</Option>
-                    {Object.keys(genreSubgenreMap).map((genre) => (
-                      <Option key={genre} value={genre}>
-                        {genre}
+                    <BtnBox>
+                      <button
+                        onClick={() => {
+                          setShowSingerModal(false);
+                        }}
+                      >
+                        Submit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowSingerModal(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </BtnBox>
+                  </ModalFormBox>
+                </ModalBox>
+              </Modal1>
+            )}
+            {contextHolderNot}
+            {contextHolder}
+
+            <FormBox>
+              <FormSeperator>
+                <h2>Label</h2>
+                <AllInpBox>
+                  <LabelInpBox id="1">
+                    <Label htmlFor="labelName">
+                      label name <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      name="labelName"
+                      id="labelName"
+                      placeholder="Label"
+                      disabled
+                      onChange={onChangeHandler}
+                      value={inpFields.labelName}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label>sub-label</Label>
+                    <Select1
+                      name="category"
+                      id="category"
+                      onChange={getSelectedValue}
+                    >
+                      <Option defaultValue value={0}>
+                        NA
                       </Option>
-                    ))}
-                  </Select1>
-                </LabelInpBox>
+                      <Option value={1}>1</Option>
+                      <Option value={2}>2</Option>
+                      <Option value={3}>3</Option>
+                    </Select1>
+                  </LabelInpBox>
+                  {subLabels.length > 0 &&
+                    subLabels.map((sbl) => {
+                      return (
+                        <LabelInpBox key={sbl.key}>
+                          <Label htmlFor={sbl.id}>{sbl.lbl}</Label>
+                          <Input
+                            type="text"
+                            name={sbl.id}
+                            id={sbl.id}
+                            placeholder="sub-label name"
+                            onChange={onChangeHandler}
+                            value={inpFields[sbl.id]}
+                          />
+                        </LabelInpBox>
+                      );
+                    })}
+                </AllInpBox>
+              </FormSeperator>
+              <FormSeperator>
+                <h2>Album</h2>
+                <AllInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="title">
+                      Album title <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      name="title"
+                      id="title"
+                      placeholder="title"
+                      onChange={onChangeHandler}
+                      value={inpFields.title}
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="language">
+                      Album Language <span style={{ margin: 0 }}>*</span>
+                    </Label>
 
-                <LabelInpBox>
-                  <Label htmlFor="subgenre">
-                    Sub Genre <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="subgenre"
-                    id="subgenre"
-                    onChange={(e) => {
-                      const id = e.target.id;
+                    <Select1
+                      name="language"
+                      id="language"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
+                        setInpFields({ ...inpFields, language: value });
+                      }}
+                    >
+                      {" "}
+                      <Option value="Garhwali">Garhwali</Option>
+                      <Option value="Ahirani">Ahirani</Option>
+                      <Option value="Arabic">Arabic</Option>
+                      <Option value="Assamese">Assamese</Option>
+                      <Option value="Awadhi">Awadhi</Option>
+                      <Option value="Banjara">Banjara</Option>
+                      <Option value="Bengali">Bengali</Option>
+                      <Option value="Bhojpuri">Bhojpuri</Option>
+                      <Option value="Burmese">Burmese</Option>
+                      <Option value="Chhattisgarhi">Chhattisgarhi</Option>
+                      <Option value="Chinese">Chinese</Option>
+                      <Option value="Dogri">Dogri</Option>
+                      <Option value="English">English</Option>
+                      <Option value="French">French</Option>
+                      <Option value="Garo">Garo</Option>
+                      <Option value="Gujarati">Gujarati</Option>
+                      <Option value="Haryanvi">Haryanvi</Option>
+                      <Option value="Himachali">Himachali</Option>
+                      <Option value="Hindi">Hindi</Option>
+                      <Option value="Iban">Iban</Option>
+                      <Option value="Indonesian">Indonesian</Option>
+                      <Option value="Instrumental">Instrumental</Option>
+                      <Option value="Italian">Italian</Option>
+                      <Option value="Japanese">Japanese</Option>
+                      <Option value="Javanese">Javanese</Option>
+                      <Option value="Kannada">Kannada</Option>
+                      <Option value="Kashmiri">Kashmiri</Option>
+                      <Option value="Khasi">Khasi</Option>
+                      <Option value="Kokborok">Kokborok</Option>
+                      <Option value="Konkani">Konkani</Option>
+                      <Option value="Korean">Korean</Option>
+                      {/* <Option value="Kumauni">Kumauni</Option> */}
+                      <Option value="Latin">Latin</Option>
+                      <Option value="Maithili">Maithili</Option>
+                      <Option value="Malay">Malay</Option>
+                      <Option value="Malayalam">Malayalam</Option>
+                      <Option value="Mandarin">Mandarin</Option>
+                      <Option value="Manipuri">Manipuri</Option>
+                      <Option value="Marathi">Marathi</Option>
+                      <Option value="Marwari">Marwari</Option>
+                      <Option value="Naga">Naga</Option>
+                      <Option value="Nagpuri">Nagpuri</Option>
+                      <Option value="Nepali">Nepali</Option>
+                      <Option value="Odia">Odia</Option>
+                      <Option value="Pali">Pali</Option>
+                      <Option value="Persian">Persian</Option>
+                      <Option value="Punjabi">Punjabi</Option>
+                      <Option value="Rajasthani">Rajasthani</Option>
+                      <Option value="Sambalpuri">Sambalpuri</Option>
+                      <Option value="Sanskrit">Sanskrit</Option>
+                      <Option value="Santali">Santali</Option>
+                      <Option value="Santhili">Santhili</Option>
+                      <Option value="Sindhi">Sindhi</Option>
+                      <Option value="Sinhala">Sinhala</Option>
+                      <Option value="Spanish">Spanish</Option>
+                      <Option value="Swahili">Swahili</Option>
+                      <Option value="Tamil">Tamil</Option>
+                      <Option value="Telugu">Telugu</Option>
+                      <Option value="Thai">Thai</Option>
+                      <Option value="Tibetan">Tibetan</Option>
+                      <Option value="Tulu">Tulu</Option>
+                      <Option value="Turkish">Turkish</Option>
+                      <Option value="Ukrainian">Ukrainian</Option>
+                      <Option value="Urdu">Urdu</Option>
+                    </Select1>
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="genre">
+                      Genre <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="genre"
+                      id="genre"
+                      onChange={(e) => {
+                        const id = e.target.id;
 
-                      const ele = document.querySelector(`#${id}`);
-                      ele.style.border = "1px solid #d7d7d7";
-                      const value = e.target.value;
-                      setSelectedSubgenre(value);
-                      setInpFields({ ...inpFields, subgenre: value });
-                    }}
-                    value={selectedSubgenre}
-                    disabled={!selectedGenre}
-                  >
-                    <Option value="">Select Sub Genre</Option>
-                    {selectedGenre &&
-                      genreSubgenreMap[selectedGenre].map((subgenre) => (
-                        <Option key={subgenre} value={subgenre}>
-                          {subgenre}
+                        const ele = document.querySelector(`#${id}`);
+                        ele.style.border = "1px solid #d7d7d7";
+                        const value = e.target.value;
+                        setSelectedGenre(value);
+                        setInpFields({
+                          ...inpFields,
+                          genre: value,
+                          subgenre: "",
+                        });
+                      }}
+                      value={selectedGenre}
+                    >
+                      <Option value="">Select Genre</Option>
+                      {Object.keys(genreSubgenreMap).map((genre) => (
+                        <Option key={genre} value={genre}>
+                          {genre}
                         </Option>
                       ))}
-                  </Select1>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="upc">upc</Label>
-                  <Input
-                    type="text"
-                    name="upc"
-                    id="upc"
-                    onChange={onChangeHandler}
-                    value={inpFields.upc}
-                    placeholder="upc"
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="dateOfRelease">
-                    Date of Live <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <DatePicker onChange={onDateChanger} id="dateOfRelease" />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="releaseDate">
-                    release date{" "}
-                    <span
-                      style={{
-                        color: "#b3b2b2",
-                        textTransform: "none",
+                    </Select1>
+                  </LabelInpBox>
+
+                  <LabelInpBox>
+                    <Label htmlFor="subgenre">
+                      Sub Genre <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="subgenre"
+                      id="subgenre"
+                      onChange={(e) => {
+                        const id = e.target.id;
+
+                        const ele = document.querySelector(`#${id}`);
+                        ele.style.border = "1px solid #d7d7d7";
+                        const value = e.target.value;
+                        setSelectedSubgenre(value);
+                        setInpFields({ ...inpFields, subgenre: value });
+                      }}
+                      value={selectedSubgenre}
+                      disabled={!selectedGenre}
+                    >
+                      <Option value="">Select Sub Genre</Option>
+                      {selectedGenre &&
+                        genreSubgenreMap[selectedGenre].map((subgenre) => (
+                          <Option key={subgenre} value={subgenre}>
+                            {subgenre}
+                          </Option>
+                        ))}
+                    </Select1>
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="upc">upc</Label>
+                    <Input
+                      type="text"
+                      name="upc"
+                      id="upc"
+                      onChange={onChangeHandler}
+                      value={inpFields.upc}
+                      placeholder="upc"
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="dateOfRelease">
+                      Date of Live <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <DatePicker onChange={onDateChanger} id="dateOfRelease" />
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="releaseDate">
+                      release date{" "}
+                      <span
+                        style={{
+                          color: "#b3b2b2",
+                          textTransform: "none",
+                        }}
+                      >
+                        (If already released)
+                      </span>
+                    </Label>
+                    <DatePicker
+                      onChange={(date, dateString) => {
+                        setInpFields({ ...inpFields, releaseDate: dateString });
+                      }}
+                      id="releaseDate"
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label>
+                      Album Category <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="albumType"
+                      id="albumType"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
+                        setInpFields({ ...inpFields, albumType: value });
                       }}
                     >
-                      (If already released)
-                    </span>
-                  </Label>
-                  <DatePicker
-                    onChange={(date, dateString) => {
-                      setInpFields({ ...inpFields, releaseDate: dateString });
-                    }}
-                    id="releaseDate"
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label>
-                    Album Category <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="albumType"
-                    id="albumType"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, albumType: value });
-                    }}
-                  >
-                    {" "}
-                    <Option value={"album"}>Album</Option>
-                    <Option value={"movie/soundtrack"}>Movie/Soundtrack</Option>
-                  </Select1>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label>
-                    Content Type <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="contentType"
-                    id="contentType"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, contentType: value });
-                    }}
-                  >
-                    <Option value={"single"}>Single</Option>
-                    <Option value={"album"}>Album</Option>
-                    <Option value={"compilation"}>Compilation</Option>
-                    <Option value={"remix"}>Remix</Option>
-                  </Select1>
-                </LabelInpBox>
+                      {" "}
+                      <Option value={"album"}>Album</Option>
+                      <Option value={"movie/soundtrack"}>
+                        Movie/Soundtrack
+                      </Option>
+                    </Select1>
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label>
+                      Content Type <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="contentType"
+                      id="contentType"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
+                        setInpFields({ ...inpFields, contentType: value });
+                      }}
+                    >
+                      <Option value={"single"}>Single</Option>
+                      <Option value={"album"}>Album</Option>
+                      <Option value={"compilation"}>Compilation</Option>
+                      <Option value={"remix"}>Remix</Option>
+                    </Select1>
+                  </LabelInpBox>
 
-                <LabelInpBox>
-                  <Label htmlFor="mood">
-                    Album mood <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="mood"
-                    id="mood"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
+                  <LabelInpBox>
+                    <Label htmlFor="mood">
+                      Album mood <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="mood"
+                      id="mood"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
 
-                      setInpFields({ ...inpFields, mood: value });
-                    }}
-                  >
-                    <Option value={"Romantic"}>Romantic</Option>
-                    <Option value={"Happy"}>Happy</Option>
-                    <Option value={"Sad"}>Sad</Option>
-                    <Option value={"Dance"}>Dance</Option>
-                    <Option value={"Bhangra"}>Bhangra</Option>
-                    <Option value={"Partiotic"}>Partiotic</Option>
-                    <Option value={"Nostalgic"}>Nostalgic</Option>
-                    <Option value={"Inspirational"}>Inspirational</Option>
-                    <Option value={"Enthusiastic"}>Enthusiastic</Option>
-                    <Option value={"Optimistic"}>Optimistic</Option>
-                    <Option value={"Passion"}>Passion</Option>
-                    <Option value={"Pessimistic"}>Pessimistic</Option>
-                    <Option value={"Spiritual"}>Spiritual</Option>
-                    <Option value={"Peppy"}>Peppy</Option>
-                    <Option value={"Philosophical"}>Philosophical</Option>
-                    <Option value={"Mellow"}>Mellow</Option>
-                    <Option value={"Calm"}>Calm</Option>
-                  </Select1>
-                </LabelInpBox>
+                        setInpFields({ ...inpFields, mood: value });
+                      }}
+                    >
+                      <Option value={"Romantic"}>Romantic</Option>
+                      <Option value={"Happy"}>Happy</Option>
+                      <Option value={"Sad"}>Sad</Option>
+                      <Option value={"Dance"}>Dance</Option>
+                      <Option value={"Bhangra"}>Bhangra</Option>
+                      <Option value={"Partiotic"}>Partiotic</Option>
+                      <Option value={"Nostalgic"}>Nostalgic</Option>
+                      <Option value={"Inspirational"}>Inspirational</Option>
+                      <Option value={"Enthusiastic"}>Enthusiastic</Option>
+                      <Option value={"Optimistic"}>Optimistic</Option>
+                      <Option value={"Passion"}>Passion</Option>
+                      <Option value={"Pessimistic"}>Pessimistic</Option>
+                      <Option value={"Spiritual"}>Spiritual</Option>
+                      <Option value={"Peppy"}>Peppy</Option>
+                      <Option value={"Philosophical"}>Philosophical</Option>
+                      <Option value={"Mellow"}>Mellow</Option>
+                      <Option value={"Calm"}>Calm</Option>
+                    </Select1>
+                  </LabelInpBox>
 
-                <LabelInpBox>
-                  <Label htmlFor="youtubeContentId">
-                    YouTube Content Id <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="youtubeContentId"
-                    id="youtubeContentId"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, youtubeContentId: value });
-                    }}
-                    value={inpFields.youtubeContentId}
-                  >
-                    <Option value="">Select</Option>
-                    <Option value="Yes">Yes</Option>
-                    <Option value="No">No</Option>
-                  </Select1>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="youtubeMusic">
-                    YouTube Music <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  <Select1
-                    name="youtubeMusic"
-                    id="youtubeMusic"
-                    onChange={(e) => {
-                      const ele = document.querySelector(`#${e.target.id}`);
-                      const value = ele.options[ele.selectedIndex].value;
-                      setInpFields({ ...inpFields, youtubeMusic: value });
-                    }}
-                    value={inpFields.youtubeMusic}
-                  >
-                    <Option value="">Select</Option>
-                    <Option value="Yes">Yes</Option>
-                    <Option value="No">No</Option>
-                  </Select1>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="thumbnail" id="thumbnail">
-                    Thumbnail (Max. size 10MB)
-                    <span style={{ margin: 0 }}>*</span>
-                  </Label>
-                  {/* <Upload
+                  <LabelInpBox>
+                    <Label htmlFor="youtubeContentId">
+                      YouTube Content Id <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="youtubeContentId"
+                      id="youtubeContentId"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
+                        setInpFields({ ...inpFields, youtubeContentId: value });
+                      }}
+                      value={inpFields.youtubeContentId}
+                    >
+                      <Option value="">Select</Option>
+                      <Option value="Yes">Yes</Option>
+                      <Option value="No">No</Option>
+                    </Select1>
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="youtubeMusic">
+                      YouTube Music <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    <Select1
+                      name="youtubeMusic"
+                      id="youtubeMusic"
+                      onChange={(e) => {
+                        const ele = document.querySelector(`#${e.target.id}`);
+                        const value = ele.options[ele.selectedIndex].value;
+                        setInpFields({ ...inpFields, youtubeMusic: value });
+                      }}
+                      value={inpFields.youtubeMusic}
+                    >
+                      <Option value="">Select</Option>
+                      <Option value="Yes">Yes</Option>
+                      <Option value="No">No</Option>
+                    </Select1>
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="thumbnail" id="thumbnail">
+                      Thumbnail (Max. size 10MB)
+                      <span style={{ margin: 0 }}>*</span>
+                    </Label>
+                    {/* <Upload
                 method="get"
                 listType="picture"
                 {...imgProps}
@@ -2545,458 +2767,459 @@ const Form = () => {
               >
                 <Button icon={<UploadOutlined />}>Upload image</Button>
               </Upload> */}
-                  <Input
-                    type="file"
-                    name=""
-                    accept="image/png, image/jpeg, image/jpg "
-                    id="thmb"
-                    onChange={readrr}
-                  />
-                  <div id="imgbox" style={{ width: "1rem" }}></div>
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="description">Album description</Label>
-                  <TxtArea
-                    rows="5"
-                    name="description"
-                    id="description"
-                    onChange={onChangeHandler}
-                    value={inpFields.description}
-                    placeholder="description"
-                  />
-                </LabelInpBox>
-                <LabelInpBox>
-                  <Label htmlFor="lyrics">Album lyrics (optional)</Label>
-                  <TxtArea
-                    rows="5"
-                    id="lyrics"
-                    placeholder="lyrics"
-                    onChange={onChangeHandler}
-                    value={inpFields.lyrics}
-                  ></TxtArea>
-                </LabelInpBox>
-              </AllInpBox>
-            </FormSeperator>
+                    <Input
+                      type="file"
+                      name=""
+                      accept="image/png, image/jpeg, image/jpg "
+                      id="thmb"
+                      onChange={readrr}
+                    />
+                    <div id="imgbox" style={{ width: "1rem" }}></div>
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="description">Album description</Label>
+                    <TxtArea
+                      rows="5"
+                      name="description"
+                      id="description"
+                      onChange={onChangeHandler}
+                      value={inpFields.description}
+                      placeholder="description"
+                    />
+                  </LabelInpBox>
+                  <LabelInpBox>
+                    <Label htmlFor="lyrics">Album lyrics (optional)</Label>
+                    <TxtArea
+                      rows="5"
+                      id="lyrics"
+                      placeholder="lyrics"
+                      onChange={onChangeHandler}
+                      value={inpFields.lyrics}
+                    ></TxtArea>
+                  </LabelInpBox>
+                </AllInpBox>
+              </FormSeperator>
 
-            <FormSeperator>
-              <SectionHeader>
-                <h2>Song Sections</h2>
-                <SectionActions>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={addSongSection}
-                  />
-                </SectionActions>
-              </SectionHeader>
-              {songSections.map((section, sectionIndex) => (
-                <div key={section.id}>
-                  {sectionIndex > 0 && <SongDivider />}
-                  <SectionHeader>
-                    <h2 style={{ color: "red" }}>Song {sectionIndex + 1}</h2>
-                    {songSections.length > 1 && (
-                      <Button
-                        danger
-                        icon={<CloseOutlined />}
-                        onClick={() => removeSongSection(section.id)}
-                      />
-                    )}
-                  </SectionHeader>
-
-                  <h2 style={{ margin: ".7rem 0 " }}>CRBT</h2>
-                  <AllInpBox>
-                    <LabelInpBox>
-                      <Label
-                        htmlFor={`file-${section.id}`}
-                        id={`file-${section.id}`}
-                      >
-                        Audio{" "}
-                        <span style={{ margin: 0, textTransform: "none" }}>
-                          (.wav or .mp3)*
-                        </span>
-                      </Label>
-                      <Upload
-                        method="get"
-                        listType="picture"
-                        {...getSectionFileProps(section.id)}
-                        maxCount={1}
-                      >
-                        <Button icon={<UploadOutlined />}>Audio file</Button>
-                      </Upload>
-                      {section.fields.file && (
-                        <AudioPlayer
-                          src={
-                            typeof section.fields.file === "string"
-                              ? section.fields.file
-                              : URL.createObjectURL(section.fields.file)
-                          }
-                          autoPlayAfterSrcChange={false}
-                          showJumpControls={false}
-                          customAdditionalControls={[]}
-                          layout="stacked-reverse"
-                          style={{
-                            marginTop: "1rem",
-                          }}
-                        />
-                      )}
-                    </LabelInpBox>
-                    <LabelInpBox>
-                      <Label htmlFor={`isrc-${section.id}`}>isrc</Label>
-                      <Input
-                        type="text"
-                        name="isrc"
-                        id={`isrc-${section.id}`}
-                        onChange={(e) => {
-                          e.target.style.border = "1px solid #d7d7d7";
-                          updateSongField(section.id, "isrc", e.target.value);
-                        }}
-                        value={section.fields.isrc}
-                        placeholder="isrc"
-                      />
-                    </LabelInpBox>
-                    <LabelInpBox>
-                      <Label htmlFor={`songTitle-${section.id}`}>
-                        Song Title <span style={{ margin: 0 }}>*</span>
-                      </Label>
-                      <Input
-                        type="text"
-                        name="songTitle"
-                        id={`songTitle-${section.id}`}
-                        placeholder="song title"
-                        onChange={(e) => {
-                          e.target.style.border = "1px solid #d7d7d7";
-                          updateSongField(
-                            section.id,
-                            "songTitle",
-                            e.target.value,
-                          );
-                        }}
-                        value={section.fields.songTitle}
-                      />
-                    </LabelInpBox>
-
-                    <LabelInpBox>
-                      <Label htmlFor={`crbt-${section.id}`}>
-                        CRBT /Preview Start Time
-                        <span
-                          style={{
-                            color: "#b3b2b2",
-                            textTransform: "none",
-                          }}
-                        >
-                          (mm:ss)
-                        </span>
-                      </Label>
-                      <TimePicker
-                        name="crbt"
-                        id={`crbt-${section.id}`}
-                        format={format}
-                        defaultValue={moment(section.fields.crbt, format)}
-                        onChange={(time) => {
-                          if (!time) return;
-                          updateSongField(
-                            section.id,
-                            "crbt",
-                            time.format(format),
-                          );
-                        }}
-                      />
-                    </LabelInpBox>
-                  </AllInpBox>
-
-                  <SectionHeader style={{ marginTop: "1rem" }}>
-                    <h2>Artists</h2>
+              <FormSeperator>
+                <SectionHeader>
+                  <h2>Song Sections</h2>
+                  <SectionActions>
                     <Button
                       type="primary"
                       icon={<PlusOutlined />}
-                      onClick={showAddModal}
-                    >
-                      Add Artist
-                    </Button>
-                  </SectionHeader>
-                  <p
-                    style={{
-                      margin: ".7rem 0",
-                      fontSize: ".78rem",
-                      lineHeight: "1.2rem",
-                      color: "#5f6368",
-                      background: "#f5f7fa",
-                      padding: ".55rem .75rem",
-                      borderRadius: "6px",
-                      border: "1px solid #e2e6eb",
-                    }}
-                  >
-                    Select artists for this song section. The label and album
-                    details above will be reused for every song submitted.
-                  </p>
-                  <AllInpBox>
-                    {renderArtistField(section, "singer", "singer", true)}
-                    {renderArtistField(section, "lyricist", "lyricist", true)}
-                    {renderArtistField(section, "composer", "composer", true)}
-                    {renderArtistField(
-                      section,
-                      "musicDirector",
-                      "music Director",
-                    )}
-                    {renderArtistField(section, "director", "director")}
-                    {renderArtistField(section, "producer", "Producer")}
-                    {renderArtistField(section, "starCast", "starCast")}
-                  </AllInpBox>
-                </div>
-              ))}
-              <BtnDiv>
-                <button onClick={onSubmitHandler}>Submit</button>
-              </BtnDiv>
-            </FormSeperator>
-
-            {false && (
-              <>
-                <FormSeperator>
-                  <h2>CRBT</h2>
-                  <AllInpBox>
-                    <LabelInpBox>
-                      <Label htmlFor="file" id="file">
-                        Audio{" "}
-                        <span style={{ margin: 0, textTransform: "none" }}>
-                          (.wav or .mp3)*
-                        </span>
-                      </Label>
-                      <Upload
-                        method="get"
-                        listType="picture"
-                        {...fileProps}
-                        maxCount={1}
-                      >
-                        <Button icon={<UploadOutlined />}>Audio file</Button>
-                      </Upload>
-                      {inpFields.file && (
-                        <AudioPlayer
-                          src={
-                            inpFields.file
-                              ? typeof inpFields.file === "string"
-                                ? inpFields.file
-                                : URL.createObjectURL(inpFields.file)
-                              : ""
-                          }
-                          autoPlayAfterSrcChange={false}
-                          showJumpControls={false}
-                          customAdditionalControls={[]}
-                          layout="stacked-reverse"
-                          style={{
-                            marginTop: "1rem",
-                          }}
+                      onClick={addSongSection}
+                    />
+                  </SectionActions>
+                </SectionHeader>
+                {songSections.map((section, sectionIndex) => (
+                  <div key={section.id}>
+                    {sectionIndex > 0 && <SongDivider />}
+                    <SectionHeader>
+                      <h2 style={{ color: "red" }}>Song {sectionIndex + 1}</h2>
+                      {songSections.length > 1 && (
+                        <Button
+                          danger
+                          icon={<CloseOutlined />}
+                          onClick={() => removeSongSection(section.id)}
                         />
                       )}
-                    </LabelInpBox>
-                    <LabelInpBox>
-                      <Label htmlFor="isrc">isrc</Label>
-                      <Input
-                        type="text"
-                        name="isrc"
-                        id="isrc"
-                        onChange={onChangeHandler}
-                        value={inpFields.isrc}
-                        placeholder="isrc"
-                      />
-                    </LabelInpBox>
-                    <LabelInpBox>
-                      <Label htmlFor="title">Song name</Label>
-                      <Input
-                        type="text"
-                        name="title"
-                        id="title"
-                        placeholder="title"
-                        disabled
-                        onChange={onChangeHandler}
-                        value={inpFields.title}
-                      />
-                    </LabelInpBox>
+                    </SectionHeader>
 
-                    <LabelInpBox>
-                      <Label htmlFor="crbt">
-                        CRBT /Preview Start Time
-                        <span
-                          style={{
-                            color: "#b3b2b2",
-                            textTransform: "none",
-                          }}
+                    <h2 style={{ margin: ".7rem 0 " }}>CRBT</h2>
+                    <AllInpBox>
+                      <LabelInpBox>
+                        <Label
+                          htmlFor={`file-${section.id}`}
+                          id={`file-${section.id}`}
                         >
-                          (mm:ss)
-                        </span>
-                      </Label>
-                      <TimePicker
-                        name="crbt"
-                        id="crbt"
-                        format={format}
-                        onChange={(time) => {
-                          if (!time) return;
-                          console.log("hi");
-                          console.log(time.format(format));
-                          setInpFields({
-                            ...inpFields,
-                            crbt: time.format(format),
-                          });
-                        }}
-                      />
-                    </LabelInpBox>
-                  </AllInpBox>
-                </FormSeperator>
-                <FormSeperator>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: "1rem",
-                      width: "99%",
-                    }}
-                  >
-                    <h2>Artists</h2>
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      onClick={showAddModal}
-                    >
-                      Add Artist
-                    </Button>
-                  </div>
-                  <p
-                    style={{
-                      margin: "-0.4rem 0 0.6rem 0",
-                      fontSize: ".78rem",
-                      lineHeight: "1.2rem",
-                      color: "#5f6368",
-                      background: "#f5f7fa",
-                      padding: ".55rem .75rem",
-                      borderRadius: "6px",
-                      border: "1px solid #e2e6eb",
-                    }}
-                  >
-                    Note: Please select artists using the auto-complete fields
-                    below. If an artist is not listed, add the artist first
-                    using the Add Artist button, then select it. This ensures
-                    consistent, professional metadata for your release.
-                  </p>
-                  <AllInpBox>
-                    {/* SINGER */}
-                    <LabelInpBox>
-                      <Label htmlFor="singer">
-                        singer <span style={{ margin: 0 }}>*</span>
-                      </Label>
-                      <AutoComplete
-                        id="singer"
-                        value={inpFields.singer}
-                        options={artistOptions.singer}
-                        onSearch={(value) =>
-                          handleArtistSearch("singer", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("singer", value, option)
-                        }
-                        onChange={(value) => {
-                          const ele = document.querySelector(`#singer`);
-
-                          ele.style.border = "1px solid white";
-                          setInpFields({ ...inpFields, singer: value });
-                        }}
-                        placeholder="Singer name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedSingers.length === 0 && (
-                          <div
+                          Audio{" "}
+                          <span style={{ margin: 0, textTransform: "none" }}>
+                            (.wav or .mp3)*
+                          </span>
+                        </Label>
+                        <Upload
+                          method="get"
+                          listType="picture"
+                          {...getSectionFileProps(section.id)}
+                          maxCount={1}
+                        >
+                          <Button icon={<UploadOutlined />}>Audio file</Button>
+                        </Upload>
+                        {section.fields.file && (
+                          <AudioPlayer
+                            src={
+                              typeof section.fields.file === "string"
+                                ? section.fields.file
+                                : URL.createObjectURL(section.fields.file)
+                            }
+                            autoPlayAfterSrcChange={false}
+                            showJumpControls={false}
+                            customAdditionalControls={[]}
+                            layout="stacked-reverse"
                             style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
+                              marginTop: "1rem",
+                            }}
+                          />
+                        )}
+                      </LabelInpBox>
+                      <LabelInpBox>
+                        <Label htmlFor={`isrc-${section.id}`}>isrc</Label>
+                        <Input
+                          type="text"
+                          name="isrc"
+                          id={`isrc-${section.id}`}
+                          onChange={(e) => {
+                            e.target.style.border = "1px solid #d7d7d7";
+                            updateSongField(section.id, "isrc", e.target.value);
+                          }}
+                          value={section.fields.isrc}
+                          placeholder="isrc"
+                        />
+                      </LabelInpBox>
+                      <LabelInpBox>
+                        <Label htmlFor={`songTitle-${section.id}`}>
+                          Song Title <span style={{ margin: 0 }}>*</span>
+                        </Label>
+                        <Input
+                          type="text"
+                          name="songTitle"
+                          id={`songTitle-${section.id}`}
+                          placeholder="song title"
+                          onChange={(e) => {
+                            e.target.style.border = "1px solid #d7d7d7";
+                            updateSongField(
+                              section.id,
+                              "songTitle",
+                              e.target.value,
+                            );
+                          }}
+                          value={section.fields.songTitle}
+                        />
+                      </LabelInpBox>
+
+                      <LabelInpBox>
+                        <Label htmlFor={`crbt-${section.id}`}>
+                          CRBT /Preview Start Time
+                          <span
+                            style={{
+                              color: "#b3b2b2",
+                              textTransform: "none",
                             }}
                           >
-                            No Singer Selected
-                          </div>
+                            (mm:ss)
+                          </span>
+                        </Label>
+                        <TimePicker
+                          name="crbt"
+                          id={`crbt-${section.id}`}
+                          format={format}
+                          defaultValue={moment(section.fields.crbt, format)}
+                          onChange={(time) => {
+                            if (!time) return;
+                            updateSongField(
+                              section.id,
+                              "crbt",
+                              time.format(format),
+                            );
+                          }}
+                        />
+                      </LabelInpBox>
+                    </AllInpBox>
+
+                    <SectionHeader style={{ marginTop: "1rem" }}>
+                      <h2>Artists</h2>
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={showAddModal}
+                      >
+                        Add Artist
+                      </Button>
+                    </SectionHeader>
+                    <p
+                      style={{
+                        margin: ".7rem 0",
+                        fontSize: ".78rem",
+                        lineHeight: "1.2rem",
+                        color: "#5f6368",
+                        background: "#f5f7fa",
+                        padding: ".55rem .75rem",
+                        borderRadius: "6px",
+                        border: "1px solid #e2e6eb",
+                      }}
+                    >
+                      Select artists for this song section. The label and album
+                      details above will be reused for every song submitted.
+                    </p>
+                    <AllInpBox>
+                      {renderArtistField(section, "singer", "singer", true)}
+                      {renderArtistField(section, "lyricist", "lyricist", true)}
+                      {renderArtistField(section, "composer", "composer", true)}
+                      {renderArtistField(
+                        section,
+                        "musicDirector",
+                        "music Director",
+                      )}
+                      {renderArtistField(section, "director", "director")}
+                      {renderArtistField(section, "producer", "Producer")}
+                      {renderArtistField(section, "starCast", "starCast")}
+                    </AllInpBox>
+                  </div>
+                ))}
+                <BtnDiv>
+                  <button onClick={onSubmitHandler}>Submit</button>
+                </BtnDiv>
+              </FormSeperator>
+
+              {false && (
+                <>
+                  <FormSeperator>
+                    <h2>CRBT</h2>
+                    <AllInpBox>
+                      <LabelInpBox>
+                        <Label htmlFor="file" id="file">
+                          Audio{" "}
+                          <span style={{ margin: 0, textTransform: "none" }}>
+                            (.wav or .mp3)*
+                          </span>
+                        </Label>
+                        <Upload
+                          method="get"
+                          listType="picture"
+                          {...fileProps}
+                          maxCount={1}
+                        >
+                          <Button icon={<UploadOutlined />}>Audio file</Button>
+                        </Upload>
+                        {inpFields.file && (
+                          <AudioPlayer
+                            src={
+                              inpFields.file
+                                ? typeof inpFields.file === "string"
+                                  ? inpFields.file
+                                  : URL.createObjectURL(inpFields.file)
+                                : ""
+                            }
+                            autoPlayAfterSrcChange={false}
+                            showJumpControls={false}
+                            customAdditionalControls={[]}
+                            layout="stacked-reverse"
+                            style={{
+                              marginTop: "1rem",
+                            }}
+                          />
                         )}
-                        {selectedSingers.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                      </LabelInpBox>
+                      <LabelInpBox>
+                        <Label htmlFor="isrc">isrc</Label>
+                        <Input
+                          type="text"
+                          name="isrc"
+                          id="isrc"
+                          onChange={onChangeHandler}
+                          value={inpFields.isrc}
+                          placeholder="isrc"
+                        />
+                      </LabelInpBox>
+                      <LabelInpBox>
+                        <Label htmlFor="title">Song name</Label>
+                        <Input
+                          type="text"
+                          name="title"
+                          id="title"
+                          placeholder="title"
+                          disabled
+                          onChange={onChangeHandler}
+                          value={inpFields.title}
+                        />
+                      </LabelInpBox>
+
+                      <LabelInpBox>
+                        <Label htmlFor="crbt">
+                          CRBT /Preview Start Time
+                          <span
+                            style={{
+                              color: "#b3b2b2",
+                              textTransform: "none",
+                            }}
+                          >
+                            (mm:ss)
+                          </span>
+                        </Label>
+                        <TimePicker
+                          name="crbt"
+                          id="crbt"
+                          format={format}
+                          onChange={(time) => {
+                            if (!time) return;
+                            console.log("hi");
+                            console.log(time.format(format));
+                            setInpFields({
+                              ...inpFields,
+                              crbt: time.format(format),
+                            });
+                          }}
+                        />
+                      </LabelInpBox>
+                    </AllInpBox>
+                  </FormSeperator>
+                  <FormSeperator>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "1rem",
+                        width: "99%",
+                      }}
+                    >
+                      <h2>Artists</h2>
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={showAddModal}
+                      >
+                        Add Artist
+                      </Button>
+                    </div>
+                    <p
+                      style={{
+                        margin: "-0.4rem 0 0.6rem 0",
+                        fontSize: ".78rem",
+                        lineHeight: "1.2rem",
+                        color: "#5f6368",
+                        background: "#f5f7fa",
+                        padding: ".55rem .75rem",
+                        borderRadius: "6px",
+                        border: "1px solid #e2e6eb",
+                      }}
+                    >
+                      Note: Please select artists using the auto-complete fields
+                      below. If an artist is not listed, add the artist first
+                      using the Add Artist button, then select it. This ensures
+                      consistent, professional metadata for your release.
+                    </p>
+                    <AllInpBox>
+                      {/* SINGER */}
+                      <LabelInpBox>
+                        <Label htmlFor="singer">
+                          singer <span style={{ margin: 0 }}>*</span>
+                        </Label>
+                        <AutoComplete
+                          id="singer"
+                          value={inpFields.singer}
+                          options={artistOptions.singer}
+                          onSearch={(value) =>
+                            handleArtistSearch("singer", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("singer", value, option)
+                          }
+                          onChange={(value) => {
+                            const ele = document.querySelector(`#singer`);
+
+                            ele.style.border = "1px solid white";
+                            setInpFields({ ...inpFields, singer: value });
+                          }}
+                          placeholder="Singer name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedSingers.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
-                            <SocialLinks>
-                              <SocialIcon
-                                active={s.facebookUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.facebookUrl &&
-                                  window.open(s.facebookUrl, "_blank")
-                                }
-                                title={
-                                  s.facebookUrl
-                                    ? "Visit Facebook profile"
-                                    : "No Facebook profile"
-                                }
+                              No Singer Selected
+                            </div>
+                          )}
+                          {selectedSingers.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
                               >
-                                <FacebookOutlined />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.instagramUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.instagramUrl &&
-                                  window.open(s.instagramUrl, "_blank")
-                                }
-                                title={
-                                  s.instagramUrl
-                                    ? "Visit Instagram profile"
-                                    : "No Instagram profile"
-                                }
+                                {s.name}
+                              </span>
+                              <SocialLinks>
+                                <SocialIcon
+                                  active={s.facebookUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.facebookUrl &&
+                                    window.open(s.facebookUrl, "_blank")
+                                  }
+                                  title={
+                                    s.facebookUrl
+                                      ? "Visit Facebook profile"
+                                      : "No Facebook profile"
+                                  }
+                                >
+                                  <FacebookOutlined />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.instagramUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.instagramUrl &&
+                                    window.open(s.instagramUrl, "_blank")
+                                  }
+                                  title={
+                                    s.instagramUrl
+                                      ? "Visit Instagram profile"
+                                      : "No Instagram profile"
+                                  }
+                                >
+                                  <Instagram />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.appleId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.appleId &&
+                                    window.open(s.appleId, "_blank")
+                                  }
+                                  title={
+                                    s.appleId
+                                      ? "Visit Apple Music profile"
+                                      : "No Apple Music profile"
+                                  }
+                                >
+                                  <Apple />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.spotifyId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.spotifyId &&
+                                    window.open(s.spotifyId, "_blank")
+                                  }
+                                  title={
+                                    s.spotifyId
+                                      ? "Visit Spotify profile"
+                                      : "No Spotify profile"
+                                  }
+                                >
+                                  <FaSpotify style={{ fontSize: "1.1rem" }} />
+                                </SocialIcon>
+                              </SocialLinks>
+                              <RemoveButton
+                                onClick={() => removeSinger(idx)}
+                                title="Remove singer"
                               >
-                                <Instagram />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.appleId?.trim().length > 0}
-                                onClick={() =>
-                                  s.appleId && window.open(s.appleId, "_blank")
-                                }
-                                title={
-                                  s.appleId
-                                    ? "Visit Apple Music profile"
-                                    : "No Apple Music profile"
-                                }
-                              >
-                                <Apple />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.spotifyId?.trim().length > 0}
-                                onClick={() =>
-                                  s.spotifyId &&
-                                  window.open(s.spotifyId, "_blank")
-                                }
-                                title={
-                                  s.spotifyId
-                                    ? "Visit Spotify profile"
-                                    : "No Spotify profile"
-                                }
-                              >
-                                <FaSpotify style={{ fontSize: "1.1rem" }} />
-                              </SocialIcon>
-                            </SocialLinks>
-                            <RemoveButton
-                              onClick={() => removeSinger(idx)}
-                              title="Remove singer"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
-                    {/* <LabelInpBox>
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
+                      {/* <LabelInpBox>
                   <Label htmlFor="singer">Add Singer Profile</Label>
                   <div
                     style={{
@@ -3039,123 +3262,124 @@ const Form = () => {
                     />
                   </div>
                 </LabelInpBox> */}
-                    {/* LYRICIST */}
-                    <LabelInpBox>
-                      <Label htmlFor="lyricist">lyricist</Label>
-                      <AutoComplete
-                        id="lyricist"
-                        value={inpFields.lyricist}
-                        options={artistOptions.lyricist}
-                        onSearch={(value) =>
-                          handleArtistSearch("lyricist", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("lyricist", value, option)
-                        }
-                        onChange={(value) => {
-                          const ele = document.querySelector(`#lyricist`);
-                          ele.style.border = "1px solid white";
-                          setInpFields({ ...inpFields, lyricist: value });
-                        }}
-                        placeholder="Lyricist name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      {/* Show selected lyricists as tags */}
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedLyricists.length === 0 && (
-                          <div
-                            style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
-                            }}
-                          >
-                            No Lyricist Selected
-                          </div>
-                        )}
-                        {selectedLyricists.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                      {/* LYRICIST */}
+                      <LabelInpBox>
+                        <Label htmlFor="lyricist">lyricist</Label>
+                        <AutoComplete
+                          id="lyricist"
+                          value={inpFields.lyricist}
+                          options={artistOptions.lyricist}
+                          onSearch={(value) =>
+                            handleArtistSearch("lyricist", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("lyricist", value, option)
+                          }
+                          onChange={(value) => {
+                            const ele = document.querySelector(`#lyricist`);
+                            ele.style.border = "1px solid white";
+                            setInpFields({ ...inpFields, lyricist: value });
+                          }}
+                          placeholder="Lyricist name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        {/* Show selected lyricists as tags */}
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedLyricists.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
-                            <SocialLinks>
-                              <SocialIcon
-                                active={s.facebookUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.facebookUrl &&
-                                  window.open(s.facebookUrl, "_blank")
-                                }
-                                title={
-                                  s.facebookUrl
-                                    ? "Visit Facebook profile"
-                                    : "No Facebook profile"
-                                }
+                              No Lyricist Selected
+                            </div>
+                          )}
+                          {selectedLyricists.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
                               >
-                                <FacebookOutlined />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.instagramUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.instagramUrl &&
-                                  window.open(s.instagramUrl, "_blank")
-                                }
-                                title={
-                                  s.instagramUrl
-                                    ? "Visit Instagram profile"
-                                    : "No Instagram profile"
-                                }
+                                {s.name}
+                              </span>
+                              <SocialLinks>
+                                <SocialIcon
+                                  active={s.facebookUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.facebookUrl &&
+                                    window.open(s.facebookUrl, "_blank")
+                                  }
+                                  title={
+                                    s.facebookUrl
+                                      ? "Visit Facebook profile"
+                                      : "No Facebook profile"
+                                  }
+                                >
+                                  <FacebookOutlined />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.instagramUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.instagramUrl &&
+                                    window.open(s.instagramUrl, "_blank")
+                                  }
+                                  title={
+                                    s.instagramUrl
+                                      ? "Visit Instagram profile"
+                                      : "No Instagram profile"
+                                  }
+                                >
+                                  <Instagram />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.appleId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.appleId &&
+                                    window.open(s.appleId, "_blank")
+                                  }
+                                  title={
+                                    s.appleId
+                                      ? "Visit Apple Music profile"
+                                      : "No Apple Music profile"
+                                  }
+                                >
+                                  <Apple />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.spotifyId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.spotifyId &&
+                                    window.open(s.spotifyId, "_blank")
+                                  }
+                                  title={
+                                    s.spotifyId
+                                      ? "Visit Spotify profile"
+                                      : "No Spotify profile"
+                                  }
+                                >
+                                  <FaSpotify style={{ fontSize: "1.1rem" }} />
+                                </SocialIcon>
+                              </SocialLinks>
+                              <RemoveButton
+                                onClick={() => removeLyricist(idx)}
+                                title="Remove lyricist"
                               >
-                                <Instagram />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.appleId?.trim().length > 0}
-                                onClick={() =>
-                                  s.appleId && window.open(s.appleId, "_blank")
-                                }
-                                title={
-                                  s.appleId
-                                    ? "Visit Apple Music profile"
-                                    : "No Apple Music profile"
-                                }
-                              >
-                                <Apple />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.spotifyId?.trim().length > 0}
-                                onClick={() =>
-                                  s.spotifyId &&
-                                  window.open(s.spotifyId, "_blank")
-                                }
-                                title={
-                                  s.spotifyId
-                                    ? "Visit Spotify profile"
-                                    : "No Spotify profile"
-                                }
-                              >
-                                <FaSpotify style={{ fontSize: "1.1rem" }} />
-                              </SocialIcon>
-                            </SocialLinks>
-                            <RemoveButton
-                              onClick={() => removeLyricist(idx)}
-                              title="Remove lyricist"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
-                    {/* <LabelInpBox>
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
+                      {/* <LabelInpBox>
                   <Label htmlFor="lyricist">Add Lyricist Profile</Label>
                   <div
                     style={{
@@ -3198,123 +3422,124 @@ const Form = () => {
                     />
                   </div>
                 </LabelInpBox> */}
-                    {/* COMPOSER */}
-                    <LabelInpBox>
-                      <Label htmlFor="composer">composer</Label>
-                      <AutoComplete
-                        id="composer"
-                        value={inpFields.composer}
-                        options={artistOptions.composer}
-                        onSearch={(value) =>
-                          handleArtistSearch("composer", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("composer", value, option)
-                        }
-                        onChange={(value) => {
-                          const ele = document.querySelector(`#composer`);
-                          ele.style.border = "1px solid white";
-                          setInpFields({ ...inpFields, composer: value });
-                        }}
-                        placeholder="Composer name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      {/* Show selected composers as tags */}
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedComposers.length === 0 && (
-                          <div
-                            style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
-                            }}
-                          >
-                            No Composer Selected
-                          </div>
-                        )}
-                        {selectedComposers.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                      {/* COMPOSER */}
+                      <LabelInpBox>
+                        <Label htmlFor="composer">composer</Label>
+                        <AutoComplete
+                          id="composer"
+                          value={inpFields.composer}
+                          options={artistOptions.composer}
+                          onSearch={(value) =>
+                            handleArtistSearch("composer", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("composer", value, option)
+                          }
+                          onChange={(value) => {
+                            const ele = document.querySelector(`#composer`);
+                            ele.style.border = "1px solid white";
+                            setInpFields({ ...inpFields, composer: value });
+                          }}
+                          placeholder="Composer name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        {/* Show selected composers as tags */}
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedComposers.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
-                            <SocialLinks>
-                              <SocialIcon
-                                active={s.facebookUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.facebookUrl &&
-                                  window.open(s.facebookUrl, "_blank")
-                                }
-                                title={
-                                  s.facebookUrl
-                                    ? "Visit Facebook profile"
-                                    : "No Facebook profile"
-                                }
+                              No Composer Selected
+                            </div>
+                          )}
+                          {selectedComposers.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
                               >
-                                <FacebookOutlined />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.instagramUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.instagramUrl &&
-                                  window.open(s.instagramUrl, "_blank")
-                                }
-                                title={
-                                  s.instagramUrl
-                                    ? "Visit Instagram profile"
-                                    : "No Instagram profile"
-                                }
+                                {s.name}
+                              </span>
+                              <SocialLinks>
+                                <SocialIcon
+                                  active={s.facebookUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.facebookUrl &&
+                                    window.open(s.facebookUrl, "_blank")
+                                  }
+                                  title={
+                                    s.facebookUrl
+                                      ? "Visit Facebook profile"
+                                      : "No Facebook profile"
+                                  }
+                                >
+                                  <FacebookOutlined />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.instagramUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.instagramUrl &&
+                                    window.open(s.instagramUrl, "_blank")
+                                  }
+                                  title={
+                                    s.instagramUrl
+                                      ? "Visit Instagram profile"
+                                      : "No Instagram profile"
+                                  }
+                                >
+                                  <Instagram />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.appleId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.appleId &&
+                                    window.open(s.appleId, "_blank")
+                                  }
+                                  title={
+                                    s.appleId
+                                      ? "Visit Apple Music profile"
+                                      : "No Apple Music profile"
+                                  }
+                                >
+                                  <Apple />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.spotifyId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.spotifyId &&
+                                    window.open(s.spotifyId, "_blank")
+                                  }
+                                  title={
+                                    s.spotifyId
+                                      ? "Visit Spotify profile"
+                                      : "No Spotify profile"
+                                  }
+                                >
+                                  <FaSpotify style={{ fontSize: "1.1rem" }} />
+                                </SocialIcon>
+                              </SocialLinks>
+                              <RemoveButton
+                                onClick={() => removeComposer(idx)}
+                                title="Remove Composer"
                               >
-                                <Instagram />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.appleId?.trim().length > 0}
-                                onClick={() =>
-                                  s.appleId && window.open(s.appleId, "_blank")
-                                }
-                                title={
-                                  s.appleId
-                                    ? "Visit Apple Music profile"
-                                    : "No Apple Music profile"
-                                }
-                              >
-                                <Apple />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.spotifyId?.trim().length > 0}
-                                onClick={() =>
-                                  s.spotifyId &&
-                                  window.open(s.spotifyId, "_blank")
-                                }
-                                title={
-                                  s.spotifyId
-                                    ? "Visit Spotify profile"
-                                    : "No Spotify profile"
-                                }
-                              >
-                                <FaSpotify style={{ fontSize: "1.1rem" }} />
-                              </SocialIcon>
-                            </SocialLinks>
-                            <RemoveButton
-                              onClick={() => removeComposer(idx)}
-                              title="Remove Composer"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
-                    {/* <LabelInpBox>
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
+                      {/* <LabelInpBox>
                   <Label htmlFor="composer">Add Composer Profile</Label>
                   <div
                     style={{
@@ -3357,303 +3582,304 @@ const Form = () => {
                     />
                   </div>
                 </LabelInpBox> */}
-                    {/* OTHERS */}
-                    {/* MUSIC DIRECTOR */}
-                    <LabelInpBox>
-                      <Label htmlFor="musicDirector">music Director</Label>
-                      <AutoComplete
-                        id="musicDirector"
-                        value={inpFields.musicDirector}
-                        options={artistOptions.musicDirector}
-                        onSearch={(value) =>
-                          handleArtistSearch("musicDirector", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("musicDirector", value, option)
-                        }
-                        onChange={(value) =>
-                          setInpFields({ ...inpFields, musicDirector: value })
-                        }
-                        placeholder="Music director name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedMusicDirectors.length === 0 && (
-                          <div
-                            style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
-                            }}
-                          >
-                            No Music Director Selected
-                          </div>
-                        )}
-                        {selectedMusicDirectors.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                      {/* OTHERS */}
+                      {/* MUSIC DIRECTOR */}
+                      <LabelInpBox>
+                        <Label htmlFor="musicDirector">music Director</Label>
+                        <AutoComplete
+                          id="musicDirector"
+                          value={inpFields.musicDirector}
+                          options={artistOptions.musicDirector}
+                          onSearch={(value) =>
+                            handleArtistSearch("musicDirector", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("musicDirector", value, option)
+                          }
+                          onChange={(value) =>
+                            setInpFields({ ...inpFields, musicDirector: value })
+                          }
+                          placeholder="Music director name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedMusicDirectors.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
+                              No Music Director Selected
+                            </div>
+                          )}
+                          {selectedMusicDirectors.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
+                              >
+                                {s.name}
+                              </span>
 
-                            <RemoveButton
-                              onClick={() => removeMusicDirector(idx)}
-                              title="Remove Music Director"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
+                              <RemoveButton
+                                onClick={() => removeMusicDirector(idx)}
+                                title="Remove Music Director"
+                              >
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
 
-                    {/* DIRECTOR */}
-                    <LabelInpBox>
-                      <Label htmlFor="director">director</Label>
-                      <AutoComplete
-                        id="director"
-                        value={inpFields.director}
-                        options={artistOptions.director}
-                        onSearch={(value) =>
-                          handleArtistSearch("director", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("director", value, option)
-                        }
-                        onChange={(value) =>
-                          setInpFields({ ...inpFields, director: value })
-                        }
-                        placeholder="Director name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedDirectors.length === 0 && (
-                          <div
-                            style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
-                            }}
-                          >
-                            No Director Selected
-                          </div>
-                        )}
-                        {selectedDirectors.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                      {/* DIRECTOR */}
+                      <LabelInpBox>
+                        <Label htmlFor="director">director</Label>
+                        <AutoComplete
+                          id="director"
+                          value={inpFields.director}
+                          options={artistOptions.director}
+                          onSearch={(value) =>
+                            handleArtistSearch("director", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("director", value, option)
+                          }
+                          onChange={(value) =>
+                            setInpFields({ ...inpFields, director: value })
+                          }
+                          placeholder="Director name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedDirectors.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
+                              No Director Selected
+                            </div>
+                          )}
+                          {selectedDirectors.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
+                              >
+                                {s.name}
+                              </span>
 
-                            <RemoveButton
-                              onClick={() => removeDirector(idx)}
-                              title="Remove Director"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
+                              <RemoveButton
+                                onClick={() => removeDirector(idx)}
+                                title="Remove Director"
+                              >
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
 
-                    {/* PRODUCER */}
-                    <LabelInpBox>
-                      <Label htmlFor="Producer">Producer</Label>
-                      <AutoComplete
-                        id="producer"
-                        value={inpFields.producer}
-                        options={artistOptions.producer}
-                        onSearch={(value) =>
-                          handleArtistSearch("producer", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("producer", value, option)
-                        }
-                        onChange={(value) =>
-                          setInpFields({ ...inpFields, producer: value })
-                        }
-                        placeholder="Producer name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedProducers.length === 0 && (
-                          <div
-                            style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
-                            }}
-                          >
-                            No Producer Selected
-                          </div>
-                        )}
-                        {selectedProducers.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                      {/* PRODUCER */}
+                      <LabelInpBox>
+                        <Label htmlFor="Producer">Producer</Label>
+                        <AutoComplete
+                          id="producer"
+                          value={inpFields.producer}
+                          options={artistOptions.producer}
+                          onSearch={(value) =>
+                            handleArtistSearch("producer", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("producer", value, option)
+                          }
+                          onChange={(value) =>
+                            setInpFields({ ...inpFields, producer: value })
+                          }
+                          placeholder="Producer name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedProducers.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
+                              No Producer Selected
+                            </div>
+                          )}
+                          {selectedProducers.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
+                              >
+                                {s.name}
+                              </span>
 
-                            <RemoveButton
-                              onClick={() => removeProducer(idx)}
-                              title="Remove Producer"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
-                    <LabelInpBox>
-                      <Label htmlFor="starCast">starCast</Label>
-                      <AutoComplete
-                        id="starCast"
-                        value={inpFields.starCast}
-                        options={artistOptions.starCast}
-                        onSearch={(value) =>
-                          handleArtistSearch("starCast", value)
-                        }
-                        onSelect={(value, option) =>
-                          handleArtistSelect("starCast", value, option)
-                        }
-                        onChange={(value) =>
-                          setInpFields({ ...inpFields, starCast: value })
-                        }
-                        placeholder="Star Cast name"
-                        style={{ width: "100%" }}
-                        filterOption={false}
-                      />
-                      {/* Show selected star cast as tags */}
-                      <div style={{ marginTop: "0.5rem" }}>
-                        {selectedStarCast.length === 0 && (
-                          <div
-                            style={{
-                              color: "#bbb",
-                              fontSize: "0.8rem",
-                              fontStyle: "italic",
-                              padding: "0.2rem 0",
-                            }}
-                          >
-                            No Star Cast Selected
-                          </div>
-                        )}
-                        {selectedStarCast.map((s, idx) => (
-                          <ArtistTag key={idx}>
-                            <span
+                              <RemoveButton
+                                onClick={() => removeProducer(idx)}
+                                title="Remove Producer"
+                              >
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
+                      <LabelInpBox>
+                        <Label htmlFor="starCast">starCast</Label>
+                        <AutoComplete
+                          id="starCast"
+                          value={inpFields.starCast}
+                          options={artistOptions.starCast}
+                          onSearch={(value) =>
+                            handleArtistSearch("starCast", value)
+                          }
+                          onSelect={(value, option) =>
+                            handleArtistSelect("starCast", value, option)
+                          }
+                          onChange={(value) =>
+                            setInpFields({ ...inpFields, starCast: value })
+                          }
+                          placeholder="Star Cast name"
+                          style={{ width: "100%" }}
+                          filterOption={false}
+                        />
+                        {/* Show selected star cast as tags */}
+                        <div style={{ marginTop: "0.5rem" }}>
+                          {selectedStarCast.length === 0 && (
+                            <div
                               style={{
-                                fontWeight: "500",
-                                fontSize: ".8rem",
-                                marginRight: "auto",
-                                color: "black",
-                                letterSpacing: ".06rem",
+                                color: "#bbb",
+                                fontSize: "0.8rem",
+                                fontStyle: "italic",
+                                padding: "0.2rem 0",
                               }}
                             >
-                              {s.name}
-                            </span>
-                            <SocialLinks>
-                              <SocialIcon
-                                active={s.facebookUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.facebookUrl &&
-                                  window.open(s.facebookUrl, "_blank")
-                                }
-                                title={
-                                  s.facebookUrl
-                                    ? "Visit Facebook profile"
-                                    : "No Facebook profile"
-                                }
+                              No Star Cast Selected
+                            </div>
+                          )}
+                          {selectedStarCast.map((s, idx) => (
+                            <ArtistTag key={idx}>
+                              <span
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: ".8rem",
+                                  marginRight: "auto",
+                                  color: "black",
+                                  letterSpacing: ".06rem",
+                                }}
                               >
-                                <FacebookOutlined />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.instagramUrl?.trim().length > 0}
-                                onClick={() =>
-                                  s.instagramUrl &&
-                                  window.open(s.instagramUrl, "_blank")
-                                }
-                                title={
-                                  s.instagramUrl
-                                    ? "Visit Instagram profile"
-                                    : "No Instagram profile"
-                                }
+                                {s.name}
+                              </span>
+                              <SocialLinks>
+                                <SocialIcon
+                                  active={s.facebookUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.facebookUrl &&
+                                    window.open(s.facebookUrl, "_blank")
+                                  }
+                                  title={
+                                    s.facebookUrl
+                                      ? "Visit Facebook profile"
+                                      : "No Facebook profile"
+                                  }
+                                >
+                                  <FacebookOutlined />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.instagramUrl?.trim().length > 0}
+                                  onClick={() =>
+                                    s.instagramUrl &&
+                                    window.open(s.instagramUrl, "_blank")
+                                  }
+                                  title={
+                                    s.instagramUrl
+                                      ? "Visit Instagram profile"
+                                      : "No Instagram profile"
+                                  }
+                                >
+                                  <Instagram />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.appleId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.appleId &&
+                                    window.open(s.appleId, "_blank")
+                                  }
+                                  title={
+                                    s.appleId
+                                      ? "Visit Apple Music profile"
+                                      : "No Apple Music profile"
+                                  }
+                                >
+                                  <Apple />
+                                </SocialIcon>
+                                <SocialIcon
+                                  active={s.spotifyId?.trim().length > 0}
+                                  onClick={() =>
+                                    s.spotifyId &&
+                                    window.open(s.spotifyId, "_blank")
+                                  }
+                                  title={
+                                    s.spotifyId
+                                      ? "Visit Spotify profile"
+                                      : "No Spotify profile"
+                                  }
+                                >
+                                  <FaSpotify style={{ fontSize: "1.1rem" }} />
+                                </SocialIcon>
+                              </SocialLinks>
+                              <RemoveButton
+                                onClick={() => removeStarCast(idx)}
+                                title="Remove Star Cast"
                               >
-                                <Instagram />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.appleId?.trim().length > 0}
-                                onClick={() =>
-                                  s.appleId && window.open(s.appleId, "_blank")
-                                }
-                                title={
-                                  s.appleId
-                                    ? "Visit Apple Music profile"
-                                    : "No Apple Music profile"
-                                }
-                              >
-                                <Apple />
-                              </SocialIcon>
-                              <SocialIcon
-                                active={s.spotifyId?.trim().length > 0}
-                                onClick={() =>
-                                  s.spotifyId &&
-                                  window.open(s.spotifyId, "_blank")
-                                }
-                                title={
-                                  s.spotifyId
-                                    ? "Visit Spotify profile"
-                                    : "No Spotify profile"
-                                }
-                              >
-                                <FaSpotify style={{ fontSize: "1.1rem" }} />
-                              </SocialIcon>
-                            </SocialLinks>
-                            <RemoveButton
-                              onClick={() => removeStarCast(idx)}
-                              title="Remove Star Cast"
-                            >
-                              <CloseOutlined />
-                            </RemoveButton>
-                          </ArtistTag>
-                        ))}
-                      </div>
-                    </LabelInpBox>
-                  </AllInpBox>
-                  <BtnDiv>
-                    <button onClick={onSubmitHandler}>Submit</button>
-                  </BtnDiv>
-                </FormSeperator>
-              </>
-            )}
-          </FormBox>
-        </>
-      )}
+                                <CloseOutlined />
+                              </RemoveButton>
+                            </ArtistTag>
+                          ))}
+                        </div>
+                      </LabelInpBox>
+                    </AllInpBox>
+                    <BtnDiv>
+                      <button onClick={onSubmitHandler}>Submit</button>
+                    </BtnDiv>
+                  </FormSeperator>
+                </>
+              )}
+            </FormBox>
+          </>
+        )}
     </MainDiv>
   );
 };
