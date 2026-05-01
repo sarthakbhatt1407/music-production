@@ -287,7 +287,7 @@ const Register = () => {
 
     // Find full state name
     const stateObj = stateList.find(
-      (s) => s.name === stateCode || s.isoCode === stateCode
+      (s) => s.name === stateCode || s.isoCode === stateCode,
     );
     const stateName = stateObj ? stateObj.name : stateCode;
     console.log(stateName);
@@ -430,7 +430,7 @@ const Register = () => {
     return String(email)
       .toLowerCase()
       .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       );
   };
 
@@ -598,7 +598,7 @@ const Register = () => {
         body: JSON.stringify({
           email: inpFields.email,
         }),
-      }
+      },
     );
     const data = await reslt.json();
     setIsLoading(false);
@@ -616,7 +616,7 @@ const Register = () => {
         body: JSON.stringify({
           email: inpFields.email,
         }),
-      }
+      },
     );
     const data = await reslt.json();
     if (!reslt.ok) {
@@ -658,6 +658,7 @@ const Register = () => {
     formData.append("userPic", inpFields.userPic);
     formData.append("address", inpFields.address);
     formData.append("pincode", inpFields.pincode);
+    formData.append("parentUser", null);
     //
 
     const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/signup`, {

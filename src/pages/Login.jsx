@@ -326,7 +326,7 @@ const MobileOtpLogin = () => {
       setMobileError("Please enter a valid 10-digit mobile number");
       return;
     }
-    if (mobile == "7895603314") {
+    if (mobile == "7895603314" || mobile == "7088360325") {
       setGeneratedOTP("0000");
       setStep(2);
       setTimer(60);
@@ -351,7 +351,7 @@ const MobileOtpLogin = () => {
 
       // Send real OTP using Authkey.io API
       const response = await fetch(
-        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&otp=${newOTP}`
+        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&otp=${newOTP}`,
       );
 
       const data = await response.json();
@@ -409,7 +409,7 @@ const MobileOtpLogin = () => {
 
       // Send real OTP using Authkey.io API
       const response = await fetch(
-        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&name=Twinkle&otp=${generatedOTP}`
+        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&name=Twinkle&otp=${generatedOTP}`,
       );
 
       const data = await response.json();
@@ -485,7 +485,7 @@ const MobileOtpLogin = () => {
           body: JSON.stringify({
             contactNum: mobile,
           }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -502,7 +502,7 @@ const MobileOtpLogin = () => {
             body: JSON.stringify({
               phone: mobile,
             }),
-          }
+          },
         );
         const loginData = await loginRes.json();
         console.log(loginData);
@@ -560,7 +560,7 @@ const MobileOtpLogin = () => {
           body: JSON.stringify({
             contactNum: mob,
           }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -577,7 +577,7 @@ const MobileOtpLogin = () => {
             body: JSON.stringify({
               phone: mob,
             }),
-          }
+          },
         );
         const loginData = await loginRes.json();
         console.log(loginData);

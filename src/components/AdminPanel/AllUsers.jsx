@@ -56,6 +56,7 @@ const AllUsers = () => {
   const [originalUsers, setOriginalUsers] = useState([]); // Store original list for filtering
   const [isLoading, setIsLoading] = useState(false);
   const userId = useSelector((state) => state.userId);
+  const phone = useSelector((state) => state.phone);
   const [refresher, setRefresher] = useState(0);
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -87,7 +88,7 @@ const AllUsers = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/user/get-all-user/?id=${userId}`
+        `${process.env.REACT_APP_BASE_URL}/user/get-all-user/?id=${userId}`,
       );
       const data = await res.json();
 
@@ -123,7 +124,7 @@ const AllUsers = () => {
       (user) =>
         user.name?.toLowerCase().includes(lowercaseSearch) ||
         user.email?.toLowerCase().includes(lowercaseSearch) ||
-        (user.phone && user.phone.toString().includes(lowercaseSearch))
+        (user.phone && user.phone.toString().includes(lowercaseSearch)),
     );
 
     setUsers(filtered);
@@ -146,7 +147,7 @@ const AllUsers = () => {
             userToDeleteId: user.id,
             userName: user.name,
           }),
-        }
+        },
       );
       const data = await res.json();
 
@@ -185,7 +186,7 @@ const AllUsers = () => {
             body: JSON.stringify({
               userId: userToDelete.id,
             }),
-          }
+          },
         );
 
         const deleteData = await deleteRes.json();
@@ -239,7 +240,7 @@ const AllUsers = () => {
           body: JSON.stringify({
             contactNum: mob,
           }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -256,26 +257,38 @@ const AllUsers = () => {
             body: JSON.stringify({
               phone: mob,
             }),
-          }
+          },
         );
         const loginData = await loginRes.json();
         console.log(loginData);
 
         // 9927321330
         // dispatch({ type: "logout" });
+        console.log(phone, "0000000000000000000000000000000");
+
         if (loginData.isloggedIn) {
           setTimeout(() => {
             if (!loginData.user.isAdmin) {
               dispatch({
                 type: "log in",
-                data: { ...loginData, type: "music-user", adminView: true },
+                data: {
+                  ...loginData,
+                  type: "music-user",
+                  adminView: true,
+                  loggedUser: phone,
+                },
               });
               navigate("/user-panel/home");
             }
             if (loginData.user.isAdmin) {
               dispatch({
                 type: "log in",
-                data: { ...loginData, type: "music-admin", adminView: true },
+                data: {
+                  ...loginData,
+                  type: "music-admin",
+                  adminView: true,
+                  loggedUser: phone,
+                },
               });
               navigate("/admin-panel/orders");
             }

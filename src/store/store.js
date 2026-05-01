@@ -6,6 +6,10 @@ const defaultState = {
   labelName: "",
   type: "",
   adminView: false,
+  loggedUser: "",
+  phone: "",
+  subUser: false,
+  parentUser: false,
 };
 
 const storeReducer = (state = defaultState, action) => {
@@ -23,7 +27,12 @@ const storeReducer = (state = defaultState, action) => {
       isAdmin: user.isAdmin,
       type: data.type,
       adminView: data.adminView ? true : false,
+      loggedUser: data.loggedUser || "",
+      phone: user.phone || "",
+      subUser: data.subUser || false,
+      parentUser: user.parentUser ? true : false,
     };
+    console.log(obj, "------------------------");
 
     localStorage.setItem("state", JSON.stringify(obj));
     return {
@@ -34,6 +43,10 @@ const storeReducer = (state = defaultState, action) => {
       isAdmin: user.isAdmin,
       type: data.type,
       adminView: data.adminView ? true : false,
+      loggedUser: data.loggedUser || "",
+      phone: user.phone || "",
+      subUser: data.subUser || false,
+      parentUser: user.parentUser ? true : false,
     };
   }
 

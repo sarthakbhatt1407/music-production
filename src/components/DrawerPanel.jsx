@@ -15,6 +15,7 @@ import {
   Copyright,
   DocumentScannerOutlined,
   HistoryOutlined,
+  ManageAccountsOutlined,
   NotificationsNoneOutlined,
   RestoreFromTrashOutlined,
   Wallet,
@@ -89,7 +90,9 @@ const Para = styled.p`
 
 const DrawerPanel = (props) => {
   const adminView = useSelector((state) => state.adminView);
-  console.log(adminView);
+  const subUser = useSelector((state) => state.subUser);
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const parentUser = useSelector((state) => state.parentUser);
 
   const dispatch = useDispatch();
   const page = props.page;
@@ -106,7 +109,7 @@ const DrawerPanel = (props) => {
   const demoHandleVerifyOtp = async () => {
     setIsLoading(true);
 
-    const mob = "8126770620";
+    const mob = subUser ? loggedUser : "8126770620";
 
     if (true) {
       const res = await fetch(
@@ -119,7 +122,7 @@ const DrawerPanel = (props) => {
           body: JSON.stringify({
             contactNum: mob,
           }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -136,7 +139,7 @@ const DrawerPanel = (props) => {
             body: JSON.stringify({
               phone: mob,
             }),
-          }
+          },
         );
         const loginData = await loginRes.json();
         console.log(loginData);
@@ -216,29 +219,60 @@ const DrawerPanel = (props) => {
           key: "2",
         },
       ]
-    : [
-        {
-          label: <Link to={"/user-panel/profile"}>My Account</Link>,
-          key: "0",
-        },
-        {
-          type: "divider",
-        },
+    : subUser
+      ? [
+          {
+            label: (
+              <span
+                onClick={() => {
+                  demoHandleVerifyOtp();
+                }}
+              >
+                Back to Panel
+              </span>
+            ),
+            key: "2",
+          },
+          {
+            type: "divider",
+          },
+          {
+            label: (
+              <span
+                onClick={() => {
+                  dispatch({ type: "logout" });
+                  navigate("/login");
+                }}
+              >
+                Log out
+              </span>
+            ),
+            key: "1",
+          },
+        ]
+      : [
+          {
+            label: <Link to={"/user-panel/profile"}>My Account</Link>,
+            key: "0",
+          },
+          {
+            type: "divider",
+          },
 
-        {
-          label: (
-            <span
-              onClick={() => {
-                dispatch({ type: "logout" });
-                navigate("/login");
-              }}
-            >
-              Log out
-            </span>
-          ),
-          key: "1",
-        },
-      ];
+          {
+            label: (
+              <span
+                onClick={() => {
+                  dispatch({ type: "logout" });
+                  navigate("/login");
+                }}
+              >
+                Log out
+              </span>
+            ),
+            key: "1",
+          },
+        ];
   const defaultSelector = (page) => {
     if (page === "home") {
       return ["1"];
@@ -268,6 +302,9 @@ const DrawerPanel = (props) => {
     if (page === "form-query") {
       return ["9"];
     }
+    if (page === "manage-users") {
+      return ["10"];
+    }
   };
   const userId = useSelector((state) => state.userId);
   const [collapsed, setCollapsed] = useState(true);
@@ -279,7 +316,7 @@ const DrawerPanel = (props) => {
   const [noti, setNoti] = useState(null);
   const fetcher = async () => {
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/notification/get-all`
+      `${process.env.REACT_APP_BASE_URL}/notification/get-all`,
     );
     const data = await res.json();
 
@@ -287,7 +324,7 @@ const DrawerPanel = (props) => {
       setNoti(data.notifications.reverse());
     }
     const resUser = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`,
     );
     const dataUser = await resUser.json();
 
@@ -469,6 +506,18 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Form Query",
+            },
+            !parentUser && {
+              key: "10",
+              icon: (
+                <Link
+                  to={"/user-panel/manage-users"}
+                  onClick={handleMobileMenuClick}
+                >
+                  <ManageAccountsOutlined />
+                </Link>
+              ),
+              label: "Manage Users",
             },
           ]}
         />

@@ -23,6 +23,7 @@ import SocialMediaLinking from "../components/UserPanel/FormQueries/SocialMediaL
 import YoutubeOacRequest from "../components/UserPanel/FormQueries/YoutubeOacRequest";
 import InstaFbWhitelist from "../components/UserPanel/FormQueries/InstaFbWhitelist";
 import InstaReelCredit from "../components/UserPanel/FormQueries/InstaReelCredit";
+import ManageUsers from "../components/UserPanel/ManageUsers";
 
 const Modal = styled.div`
   width: 100%;
@@ -508,6 +509,7 @@ const UserPanel = () => {
           )}
           {page === "history" && <History />}
           {page === "wallet" && <UserWalletView />}
+          {page === "manage-users" && <ManageUsers />}
           {page === "notification" && <UserNoti />}
           {page === "copyright" && <CopyRightPage />}
           {page === "legal-document" && <LegalDoc />}
