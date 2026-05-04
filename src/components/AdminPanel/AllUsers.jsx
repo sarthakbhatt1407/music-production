@@ -430,16 +430,6 @@ const AllUsers = () => {
   return (
     <MainBox>
       {contextHolder}
-      <Breadcrumb
-        items={[
-          {
-            title: "Admin Panel",
-          },
-          {
-            title: "Users",
-          },
-        ]}
-      />
 
       <HeaderBox>
         <h1>Users</h1>
@@ -502,7 +492,7 @@ const AllUsers = () => {
         loading={isLoading}
         onChange={handleTableChange}
         pagination={{
-          pageSize: 6,
+          pageSize: 5,
           showSizeChanger: true,
           showQuickJumper: true,
           position: ["bottomCenter"],
