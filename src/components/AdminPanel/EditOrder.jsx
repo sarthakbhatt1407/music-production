@@ -1001,7 +1001,10 @@ const EditOrder = () => {
 
     formData.append("thumbnail", inpFields.thumbnail);
 
-    formData.append("lyrics", inpFields.lyrics);
+    formData.append(
+      "lyrics",
+      String(inpFields.lyrics || "").replace(/\r\n/g, "\n"),
+    );
     formData.append("upc", inpFields.upc);
     formData.append("isrc", inpFields.isrc);
 

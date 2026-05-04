@@ -1139,6 +1139,14 @@ const OrderDetailsPage = () => {
     }
 
     // Default text with copy option
+    if (fieldLower === "lyrics") {
+      return (
+        <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+          {value}
+        </span>
+      );
+    }
+
     return (
       <>
         <span>{value === "completed" ? "Live" : value}</span>

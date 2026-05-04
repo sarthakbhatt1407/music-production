@@ -69,6 +69,28 @@ const SocialIcon = styled.div`
   }
 `;
 
+const LabelWithIcon = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+`;
+
+const LabelIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1677ff;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    transform: scale(1.08);
+    color: #0958d9;
+  }
+`;
+
 const ArtistManagement = () => {
   const [artists, setArtists] = useState([]);
   const [filteredArtists, setFilteredArtists] = useState([]);
@@ -78,6 +100,7 @@ const ArtistManagement = () => {
   const [editingArtist, setEditingArtist] = useState(null);
   const [selectedRole, setSelectedRole] = useState("singer"); // Default role
   const [form] = Form.useForm();
+  const artistName = Form.useWatch("name", form);
   const [messageApi, contextHolder] = message.useMessage();
 
   // Fetch artists on component mount
@@ -94,7 +117,7 @@ const ArtistManagement = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`
+        `${process.env.REACT_APP_BASE_URL}/order/get-all-artists`,
       );
       const data = await res.json();
       console.log(data);
@@ -117,7 +140,7 @@ const ArtistManagement = () => {
       setFilteredArtists(artists);
     } else {
       const filtered = artists.filter((artist) =>
-        artist.name.toLowerCase().includes(searchText.toLowerCase())
+        artist.name.toLowerCase().includes(searchText.toLowerCase()),
       );
       setFilteredArtists(filtered);
     }
@@ -164,7 +187,7 @@ const ArtistManagement = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -188,12 +211,12 @@ const ArtistManagement = () => {
       setLoading(true);
 
       // If role is not singer, lyricist, or composer, remove social media fields
-      if (!["singer", "lyricist", "composer"].includes(values.role)) {
-        values.facebookUrl = "";
-        values.instagramUrl = "";
-        values.appleId = "";
-        values.spotifyId = "";
-      }
+      // if (!["singer", "lyricist", "composer"].includes(values.role)) {
+      //   values.facebookUrl = "";
+      //   values.instagramUrl = "";
+      //   values.appleId = "";
+      //   values.spotifyId = "";
+      // }
 
       if (editingArtist) {
         // Update existing artist
@@ -205,7 +228,7 @@ const ArtistManagement = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(values),
-          }
+          },
         );
 
         const data = await response.json();
@@ -214,10 +237,11 @@ const ArtistManagement = () => {
           // Update the artist in the local state
           setArtists(
             artists.map((artist) =>
-              artist._id === editingArtist._id ? data.artist : artist
-            )
+              artist._id === editingArtist._id ? data.artist : artist,
+            ),
           );
           messageApi.success("Artist updated successfully");
+          fetchArtists(); // Refetch to ensure data consistency
         } else {
           messageApi.error(data.message || "Failed to update artist");
         }
@@ -231,7 +255,7 @@ const ArtistManagement = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(values),
-          }
+          },
         );
 
         const data = await response.json();
@@ -240,6 +264,7 @@ const ArtistManagement = () => {
           // Add the new artist to the local state
           setArtists([...artists, data.artist]);
           messageApi.success("Artist added successfully");
+          fetchArtists(); // Refetch to ensure data consistency
         } else {
           messageApi.error(data.message || "Failed to add artist");
         }
@@ -259,9 +284,24 @@ const ArtistManagement = () => {
     setSelectedRole(value);
   };
 
+  const getPlatformProfileUrl = (baseUrl) => {
+    const cleanName = String(artistName || "").trim();
+    if (!cleanName) return baseUrl;
+    const slug = cleanName.toLowerCase().replace(/\s+/g, "");
+    return `${baseUrl.replace(/\/$/, "")}/${slug}`;
+  };
+
+  const openPlatformLink = (baseUrl) => {
+    window.open(
+      getPlatformProfileUrl(baseUrl),
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+
   // Check if role needs social media fields
   const showSocialMediaFields = ["singer", "lyricist", "composer"].includes(
-    selectedRole
+    selectedRole,
   );
 
   const columns = [
@@ -413,7 +453,7 @@ const ArtistManagement = () => {
               <Option value="composer">Composer</Option>
               <Option value="lyricist">Lyricist</Option>
               <Option value="musicDirector">Music Director</Option>
-              <Option value="director">Director</Option>
+              <Option value="director">Track Feature Artist</Option>
               <Option value="producer">Producer</Option>{" "}
               <Option value="starcast">Starcast</Option>
             </Select>
@@ -422,19 +462,105 @@ const ArtistManagement = () => {
           {/* Only show social media fields for singer, lyricist, and composer */}
 
           <>
-            <Form.Item name="facebookUrl" label="Facebook URL">
+            <Form.Item
+              name="facebookUrl"
+              label={
+                <LabelWithIcon>
+                  <span>Facebook URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Facebook"
+                    onClick={() =>
+                      openPlatformLink("https://www.facebook.com/")
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openPlatformLink("https://www.facebook.com/");
+                      }
+                    }}
+                  >
+                    <FacebookOutlined />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <Input placeholder="https://facebook.com/profile" />
             </Form.Item>
 
-            <Form.Item name="instagramUrl" label="Instagram URL">
+            <Form.Item
+              name="instagramUrl"
+              label={
+                <LabelWithIcon>
+                  <span>Instagram URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Instagram"
+                    onClick={() =>
+                      openPlatformLink("https://www.instagram.com/")
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openPlatformLink("https://www.instagram.com/");
+                      }
+                    }}
+                  >
+                    <InstagramOutlined />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <Input placeholder="https://instagram.com/profile" />
             </Form.Item>
 
-            <Form.Item name="appleId" label="Apple Music URL">
+            <Form.Item
+              name="appleId"
+              label={
+                <LabelWithIcon>
+                  <span>Apple Music URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Apple Music"
+                    onClick={() => openPlatformLink("https://music.apple.com/")}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openPlatformLink("https://music.apple.com/");
+                      }
+                    }}
+                  >
+                    <Apple fontSize="small" />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <Input placeholder="https://music.apple.com/artist/id" />
             </Form.Item>
 
-            <Form.Item name="spotifyId" label="Spotify URL">
+            <Form.Item
+              name="spotifyId"
+              label={
+                <LabelWithIcon>
+                  <span>Spotify URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Spotify"
+                    onClick={() =>
+                      openPlatformLink("https://open.spotify.com/")
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openPlatformLink("https://open.spotify.com/");
+                      }
+                    }}
+                  >
+                    <FaSpotify style={{ fontSize: "0.95rem" }} />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <Input placeholder="https://open.spotify.com/artist/" />
             </Form.Item>
           </>

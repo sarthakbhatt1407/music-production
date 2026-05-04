@@ -386,6 +386,28 @@ const PendingActions = styled.div`
   }
 `;
 
+const LabelWithIcon = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+`;
+
+const LabelIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1677ff;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    transform: scale(1.08);
+    color: #0958d9;
+  }
+`;
+
 // Tag for displaying selected singers
 const Tag = styled.span`
   display: inline-flex;
@@ -416,6 +438,19 @@ const Form = () => {
     api.error({
       message: msg,
     });
+  };
+  const getPlatformProfileUrl = (baseUrl, name) => {
+    const cleanName = String(name || "").trim();
+    if (!cleanName) return baseUrl;
+    const slug = cleanName.toLowerCase().replace(/\s+/g, "");
+    return `${baseUrl.replace(/\/$/, "")}/${slug}`;
+  };
+  const openExternalLink = (baseUrl, name) => {
+    window.open(
+      getPlatformProfileUrl(baseUrl, name),
+      "_blank",
+      "noopener,noreferrer",
+    );
   };
   const format = "mm:ss";
   const deafaultFields = {
@@ -469,6 +504,7 @@ const Form = () => {
   const [editingArtist, setEditingArtist] = useState(null);
   const [selectedRole, setSelectedRole] = useState("singer"); // Default role
   const [form] = Form1.useForm();
+  const artistName = Form1.useWatch("name", form);
 
   const [artists, setArtists] = useState([]);
   const showAddModal = () => {
@@ -500,14 +536,6 @@ const Form = () => {
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-
-      // If role is not singer, lyricist, or composer, remove social media fields
-      if (!["singer", "lyricist", "composer"].includes(values.role)) {
-        values.facebookUrl = "";
-        values.instagramUrl = "";
-        values.appleId = "";
-        values.spotifyId = "";
-      }
 
       if (editingArtist) {
         // Update existing artist
@@ -1649,7 +1677,10 @@ const Form = () => {
         formData.append("contentType", inpFields.contentType);
         formData.append("youtubeContentId", inpFields.youtubeContentId);
 
-        formData.append("lyrics", inpFields.lyrics);
+        formData.append(
+          "lyrics",
+          String(inpFields.lyrics || "").replace(/\r\n/g, "\n"),
+        );
         formData.append("upc", inpFields.upc);
         formData.append("isrc", section.fields.isrc);
         formData.append("crbt", section.fields.crbt);
@@ -1947,7 +1978,7 @@ const Form = () => {
               <Option value="composer">Composer</Option>
               <Option value="lyricist">Lyricist</Option>
               <Option value="musicDirector">Music Director</Option>
-              <Option value="director">Director</Option>
+              <Option value="director">Track Feature Artist</Option>
               <Option value="producer">Producer</Option>
               <Option value="starcast">Starcast</Option>
             </Select>
@@ -1956,19 +1987,119 @@ const Form = () => {
           {/* Only show social media fields for singer, lyricist, and composer */}
 
           <>
-            <Form1.Item name="facebookUrl" label="Facebook URL">
+            <Form1.Item
+              name="facebookUrl"
+              label={
+                <LabelWithIcon>
+                  <span>Facebook URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Facebook"
+                    onClick={() =>
+                      openExternalLink("https://www.facebook.com/", artistName)
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openExternalLink(
+                          "https://www.facebook.com/",
+                          artistName,
+                        );
+                      }
+                    }}
+                  >
+                    <FacebookOutlined fontSize="small" />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <AntdInput placeholder="https://facebook.com/profile" />
             </Form1.Item>
 
-            <Form1.Item name="instagramUrl" label="Instagram URL">
+            <Form1.Item
+              name="instagramUrl"
+              label={
+                <LabelWithIcon>
+                  <span>Instagram URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Instagram"
+                    onClick={() =>
+                      openExternalLink("https://www.instagram.com/", artistName)
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openExternalLink(
+                          "https://www.instagram.com/",
+                          artistName,
+                        );
+                      }
+                    }}
+                  >
+                    <Instagram fontSize="small" />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <AntdInput placeholder="https://instagram.com/profile" />
             </Form1.Item>
 
-            <Form1.Item name="appleId" label="Apple Music URL">
+            <Form1.Item
+              name="appleId"
+              label={
+                <LabelWithIcon>
+                  <span>Apple Music URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Apple Music"
+                    onClick={() =>
+                      openExternalLink("https://music.apple.com/", artistName)
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openExternalLink(
+                          "https://music.apple.com/",
+                          artistName,
+                        );
+                      }
+                    }}
+                  >
+                    <Apple fontSize="small" />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <AntdInput placeholder="https://music.apple.com/artist/id" />
             </Form1.Item>
 
-            <Form1.Item name="spotifyId" label="Spotify URL">
+            <Form1.Item
+              name="spotifyId"
+              label={
+                <LabelWithIcon>
+                  <span>Spotify URL</span>
+                  <LabelIcon
+                    role="button"
+                    tabIndex={0}
+                    title="Open Spotify"
+                    onClick={() =>
+                      openExternalLink("https://open.spotify.com/", artistName)
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        openExternalLink(
+                          "https://open.spotify.com/",
+                          artistName,
+                        );
+                      }
+                    }}
+                  >
+                    <FaSpotify style={{ fontSize: "0.95rem" }} />
+                  </LabelIcon>
+                </LabelWithIcon>
+              }
+            >
               <AntdInput placeholder="https://open.spotify.com/artist/" />
             </Form1.Item>
           </>
@@ -2656,7 +2787,7 @@ const Form = () => {
                       }}
                     >
                       {" "}
-                      <Option value={"album"}>Album</Option>
+                      <Option value={"non-filmy"}>Non Filmy</Option>
                       <Option value={"movie/soundtrack"}>
                         Movie/Soundtrack
                       </Option>
@@ -2679,6 +2810,11 @@ const Form = () => {
                       <Option value={"album"}>Album</Option>
                       <Option value={"compilation"}>Compilation</Option>
                       <Option value={"remix"}>Remix</Option>
+                      <Option value={"extended"}>Extended</Option>
+                      <Option value={"instrumental"}>Instrumental</Option>
+                      <Option value={"karaoke"}>Karaoke</Option>
+                      <Option value={"live"}>Live</Option>
+                      <Option value={"studio version"}>Studio Version</Option>
                     </Select1>
                   </LabelInpBox>
 

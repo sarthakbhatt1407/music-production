@@ -320,6 +320,57 @@ const DEFAULT_VALUES = {
   contentType: "single",
 };
 
+const MODEL_FIELDS = new Set([
+  "labelName",
+  "subLabel1",
+  "subLabel2",
+  "subLabel3",
+  "title",
+  "songtitle",
+  "dateOfRelease",
+  "albumType",
+  "language",
+  "thumbnail",
+  "orderDateAndTime",
+  "file",
+  "mood",
+  "contentType",
+  "userId",
+  "description",
+  "singer",
+  "composer",
+  "director",
+  "producer",
+  "starCast",
+  "lyrics",
+  "status",
+  "remark",
+  "deleted",
+  "upc",
+  "isrc",
+  "lyricist",
+  "crbt",
+  "genre",
+  "musicDirector",
+  "singerAppleId",
+  "singerSpotifyId",
+  "singerFacebookUrl",
+  "singerInstagramUrl",
+  "composerAppleId",
+  "composerSpotifyId",
+  "composerFacebookUrl",
+  "composerInstagramUrl",
+  "lyricistAppleId",
+  "lyricistSpotifyId",
+  "lyricistFacebookUrl",
+  "lyricistInstagramUrl",
+  "dateLive",
+  "releaseDate",
+  "subgenre",
+  "youtubeContentId",
+  "youtubeMusic",
+]);
+
 const HEADER_ALIASES = {
   labelname: "labelName",
   label: "labelName",
@@ -427,7 +478,7 @@ const parseExcelRows = async (file) => {
       const normalizedKey = normalizeKey(key);
       const mappedKey = HEADER_ALIASES[normalizedKey] || key.trim();
       const formattedValue = formatCellValue(value);
-      if (formattedValue !== "") {
+      if (formattedValue !== "" && MODEL_FIELDS.has(mappedKey)) {
         normalized[mappedKey] = formattedValue;
       }
     });
@@ -453,12 +504,12 @@ const BulkUpload = () => {
   const audioMap = useMemo(() => buildFileMap(audioFiles), [audioFiles]);
 
   const getRowAssetKey = (row) =>
-    String(row.trackNo || row.songtitle || row.title || "")
+    String(row.songtitle || row.title || "")
       .trim()
       .toLowerCase();
 
   const getRowDisplayTitle = (row) =>
-    String(row.songtitle || row.title || row.trackNo || "").trim();
+    String(row.songtitle || row.title || "").trim();
 
   const handleExcelChange = async ({ fileList }) => {
     const file = fileList[0]?.originFileObj;
@@ -530,7 +581,7 @@ const BulkUpload = () => {
       }
       const assetKey = getRowAssetKey(row);
       if (!assetKey) {
-        return `Row ${row.rowNumber} is missing a track number or song title for file matching.`;
+        return `Row ${row.rowNumber} is missing songtitle or title for file matching.`;
       }
       if (!getMatchingFile(thumbnailMap, assetKey)) {
         return `Row ${row.rowNumber} thumbnail file was not found for: ${assetKey}.`;
@@ -550,7 +601,9 @@ const BulkUpload = () => {
         field === "labelName" && !String(getRowValue(row, field)).trim()
           ? labelNameFromStore || ""
           : getRowValue(row, field);
-      formData.append(field, value);
+      if (MODEL_FIELDS.has(field)) {
+        formData.append(field, value);
+      }
     });
     const assetKey = getRowAssetKey(row);
     formData.append("file", getMatchingFile(audioMap, assetKey));
@@ -560,8 +613,8 @@ const BulkUpload = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Starting bulk upload with rows:", parsedRows);
-    return;
+    console.log(parsedRows);
+
     const validationError = validateRows();
     if (validationError) {
       message.error(validationError);

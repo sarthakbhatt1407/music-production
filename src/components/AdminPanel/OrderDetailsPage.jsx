@@ -483,7 +483,6 @@ const StatusTag = styled(Tag)`
   padding: 2px 12px;
   font-size: 14px;
   border-radius: 4px;
-  text-transform: capitalize;
 `;
 
 // Artist tag styling - similar to Form.jsx
@@ -779,7 +778,7 @@ const OrderDetailsPage = () => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`
+        `${process.env.REACT_APP_BASE_URL}/order/get-order/?id=${id}`,
       );
       const data = await res.json();
 
@@ -798,8 +797,8 @@ const OrderDetailsPage = () => {
           data.order.singerAppleId,
           data.order.singerSpotifyId,
           data.order.singerFacebookUrl,
-          data.order.singerInstagramUrl
-        )
+          data.order.singerInstagramUrl,
+        ),
       );
 
       setParsedComposers(
@@ -808,8 +807,8 @@ const OrderDetailsPage = () => {
           data.order.composerAppleId,
           data.order.composerSpotifyId,
           data.order.composerFacebookUrl,
-          data.order.composerInstagramUrl
-        )
+          data.order.composerInstagramUrl,
+        ),
       );
 
       setParsedLyricists(
@@ -818,8 +817,8 @@ const OrderDetailsPage = () => {
           data.order.lyricistAppleId,
           data.order.lyricistSpotifyId,
           data.order.lyricistFacebookUrl,
-          data.order.lyricistInstagramUrl
-        )
+          data.order.lyricistInstagramUrl,
+        ),
       );
 
       // Process order fields
@@ -861,7 +860,7 @@ const OrderDetailsPage = () => {
         `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=statusAccepted&userId=${userId}`,
         {
           method: "PATCH",
-        }
+        },
       );
       const data = await res.json();
 
@@ -899,7 +898,7 @@ const OrderDetailsPage = () => {
           body: JSON.stringify({
             remark: remark,
           }),
-        }
+        },
       );
       const data = await res.json();
 
@@ -926,7 +925,7 @@ const OrderDetailsPage = () => {
         `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=takedown&userId=${userId}`,
         {
           method: "PATCH",
-        }
+        },
       );
       const data = await res.json();
 
@@ -949,7 +948,7 @@ const OrderDetailsPage = () => {
         `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${order.id}&action=completed&userId=${userId}`,
         {
           method: "PATCH",
-        }
+        },
       );
       const data = await res.json();
 
@@ -997,10 +996,7 @@ const OrderDetailsPage = () => {
     if (field === "starCast") return "Star Cast";
 
     // General formatting
-    return field
-      .replace(/([A-Z])/g, " $1") // Insert space before capital letters
-      .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
-      .trim();
+    return field.replace(/([A-Z])/g, " $1").trim();
   };
 
   // Render field value based on field type
@@ -1037,12 +1033,12 @@ const OrderDetailsPage = () => {
           {fieldLower.includes("apple")
             ? "Apple Music"
             : fieldLower.includes("facebook")
-            ? "Facebook"
-            : fieldLower.includes("instagram")
-            ? "Instagram"
-            : fieldLower.includes("spotify")
-            ? "Spotify"
-            : "Platform"}
+              ? "Facebook"
+              : fieldLower.includes("instagram")
+                ? "Instagram"
+                : fieldLower.includes("spotify")
+                  ? "Spotify"
+                  : "Platform"}
         </Link>
       );
     }
@@ -1071,6 +1067,14 @@ const OrderDetailsPage = () => {
     }
 
     // Default text with copy option
+    if (fieldLower === "lyrics") {
+      return (
+        <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+          {value}
+        </span>
+      );
+    }
+
     return (
       <>
         <span>{value === "completed" ? "Live" : value}</span>
@@ -1182,7 +1186,7 @@ const OrderDetailsPage = () => {
                 onClick={() => {
                   window.open(
                     `${process.env.REACT_APP_BASE_URL}/order/export/${order.id}`,
-                    "_blank"
+                    "_blank",
                   );
                 }}
               >
