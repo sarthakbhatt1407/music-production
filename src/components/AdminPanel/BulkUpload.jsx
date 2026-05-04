@@ -9,13 +9,25 @@ import MusicLoader from "../Loader/MusicLoader";
 const { Dragger } = Upload;
 
 const Page = styled.div`
-  min-height: 100%;
+  height: 80svh;
   overflow: auto;
   padding: 8px;
   background:
-    radial-gradient(circle at top left, rgba(22, 119, 255, 0.08), transparent 32%),
-    radial-gradient(circle at top right, rgba(82, 196, 26, 0.08), transparent 28%),
+    radial-gradient(
+      circle at top left,
+      rgba(22, 119, 255, 0.08),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(82, 196, 26, 0.08),
+      transparent 28%
+    ),
     linear-gradient(180deg, #f7f9fc 0%, #f3f6fb 100%);
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 `;
 
 const Header = styled.div`
@@ -51,9 +63,11 @@ const UploadGrid = styled.div`
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
+  max-height: 400px;
 
   @media only screen and (max-width: 1000px) {
     grid-template-columns: 1fr;
+    max-height: none;
   }
 `;
 
@@ -64,6 +78,9 @@ const UploadCard = styled.div`
   padding: 1rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   h3 {
     margin: 0 0 0.75rem;
@@ -71,10 +88,15 @@ const UploadCard = styled.div`
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: #1f2937;
+    flex-shrink: 0;
   }
 
   .ant-upload-wrapper {
     width: 100%;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .ant-upload,
@@ -84,12 +106,17 @@ const UploadCard = styled.div`
 
   .ant-upload-list {
     margin-top: 0.75rem;
+    max-height: 150px;
+    overflow-y: auto;
+    flex-shrink: 0;
   }
 
   .ant-upload-drag {
     border-radius: 12px;
     border-color: #d8e1ee;
     background: #fbfcfe;
+    flex: 1;
+    overflow: hidden;
   }
 
   .ant-upload-drag:hover {
@@ -109,6 +136,7 @@ const UploadCard = styled.div`
   .ant-upload-hint {
     color: #667085;
     margin-top: 8px;
+    font-size: 0.85rem;
   }
 `;
 
@@ -124,6 +152,11 @@ const Summary = styled.div`
     margin: 0 0 0.75rem;
     color: #475467;
     line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .ant-progress {
+    margin-bottom: 1rem;
   }
 `;
 
@@ -163,6 +196,8 @@ const ResultWrap = styled.div`
   border-radius: 12px;
   padding: 0.5rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  max-height: 500px;
+  overflow-y: auto;
 
   .ant-table {
     background: transparent;
@@ -172,12 +207,24 @@ const ResultWrap = styled.div`
     background: #f8fafc;
     font-weight: 600;
     color: #334155;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .ant-table-wrapper {
+    overflow: hidden;
+  }
+
+  .ant-table-body {
+    overflow: visible !important;
   }
 `;
 
 const REQUIRED_FIELDS = [
   "labelName",
   "title",
+  "songtitle",
   "dateOfRelease",
   "language",
   "mood",
@@ -193,6 +240,7 @@ const FORM_FIELDS = [
   "producer",
   "labelName",
   "title",
+  "songtitle",
   "dateOfRelease",
   "albumType",
   "language",
@@ -230,19 +278,60 @@ const FORM_FIELDS = [
 ];
 
 const DEFAULT_VALUES = {
+  labelName: "",
+  title: "",
+  songtitle: "",
+  dateOfRelease: "",
   albumType: "album",
-  youtubeMusic: "Yes",
-  youtubeContentId: "Yes",
-  contentType: "single",
+  language: "Garhwali",
+  mood: "Romantic",
+  description: "",
+  singer: "",
+  composer: "",
+  director: "",
+  producer: "",
+  starCast: "",
+  lyrics: "",
+  subLabel1: "",
+  subLabel2: "",
+  subLabel3: "",
+  upc: "",
+  isrc: "",
+  lyricist: "",
   crbt: "00:30",
+  genre: "",
+  singerAppleId: "",
+  singerSpotifyId: "",
+  singerFacebookUrl: "",
+  singerInstagramUrl: "",
+  composerAppleId: "",
+  composerSpotifyId: "",
+  composerFacebookUrl: "",
+  composerInstagramUrl: "",
+  lyricistAppleId: "",
+  lyricistSpotifyId: "",
+  lyricistFacebookUrl: "",
+  lyricistInstagramUrl: "",
+  musicDirector: "",
+  subgenre: "",
+  releaseDate: "",
+  youtubeContentId: "Yes",
+  youtubeMusic: "Yes",
+  contentType: "single",
 };
 
 const HEADER_ALIASES = {
   labelname: "labelName",
   label: "labelName",
-  songtitle: "title",
+  songname: "songtitle",
+  songtitle: "songtitle",
+  filmalbumname: "title",
+  albumname: "title",
   releasedate: "dateOfRelease",
+  originalreleasedate: "dateOfRelease",
+  originalreleasedateddmmyyyy: "dateOfRelease",
   dateofrelease: "dateOfRelease",
+  golivedate: "releaseDate",
   albumtype: "albumType",
   contenttype: "contentType",
   youtubemusic: "youtubeMusic",
@@ -264,6 +353,22 @@ const HEADER_ALIASES = {
   lyricistfacebookurl: "lyricistFacebookUrl",
   lyricistinstagramurl: "lyricistInstagramUrl",
   musicdirector: "musicDirector",
+  filmdirector: "director",
+  filmproducer: "producer",
+  filmstarcastactors: "starCast",
+  albumlevelmainartistsinger: "singer",
+  tracklevelmainartistsinger: "singer",
+  composername: "composer",
+  lyricistname: "lyricist",
+  upcid: "upc",
+  genre: "genre",
+  subgenre: "subgenre",
+  mood: "mood",
+  description: "description",
+  language: "language",
+  trackno: "trackNo",
+  crbtcutname: "crbtCutName",
+  timeforcrbtcut: "crbt",
   thumbnailname: "thumbnail",
   imagename: "thumbnail",
   image: "thumbnail",
@@ -277,14 +382,15 @@ const HEADER_ALIASES = {
 const normalizeKey = (key) =>
   String(key || "")
     .trim()
-    .replace(/[\s_-]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "")
     .toLowerCase();
 
 const normalizeFileName = (name) =>
   String(name || "")
     .trim()
     .toLowerCase()
-    .replace(/\.[^/.]+$/, "");
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-z0-9]/g, "");
 
 const getRowValue = (row, field) => {
   if (row[field] !== undefined && row[field] !== null) {
@@ -320,7 +426,10 @@ const parseExcelRows = async (file) => {
     Object.entries(row).forEach(([key, value]) => {
       const normalizedKey = normalizeKey(key);
       const mappedKey = HEADER_ALIASES[normalizedKey] || key.trim();
-      normalized[mappedKey] = formatCellValue(value);
+      const formattedValue = formatCellValue(value);
+      if (formattedValue !== "") {
+        normalized[mappedKey] = formattedValue;
+      }
     });
     return { ...DEFAULT_VALUES, ...normalized };
   });
@@ -328,6 +437,7 @@ const parseExcelRows = async (file) => {
 
 const BulkUpload = () => {
   const userId = useSelector((state) => state.userId);
+  const labelNameFromStore = useSelector((state) => state.labelName);
   const [excelFile, setExcelFile] = useState(null);
   const [thumbnailFiles, setThumbnailFiles] = useState([]);
   const [audioFiles, setAudioFiles] = useState([]);
@@ -338,9 +448,17 @@ const BulkUpload = () => {
 
   const thumbnailMap = useMemo(
     () => buildFileMap(thumbnailFiles),
-    [thumbnailFiles]
+    [thumbnailFiles],
   );
   const audioMap = useMemo(() => buildFileMap(audioFiles), [audioFiles]);
+
+  const getRowAssetKey = (row) =>
+    String(row.trackNo || row.songtitle || row.title || "")
+      .trim()
+      .toLowerCase();
+
+  const getRowDisplayTitle = (row) =>
+    String(row.songtitle || row.title || row.trackNo || "").trim();
 
   const handleExcelChange = async ({ fileList }) => {
     const file = fileList[0]?.originFileObj;
@@ -364,7 +482,9 @@ const BulkUpload = () => {
   };
 
   const handleThumbnailChange = ({ fileList }) => {
-    setThumbnailFiles(fileList.map((item) => item.originFileObj).filter(Boolean));
+    setThumbnailFiles(
+      fileList.map((item) => item.originFileObj).filter(Boolean),
+    );
   };
 
   const handleAudioChange = ({ fileList }) => {
@@ -374,7 +494,9 @@ const BulkUpload = () => {
   const getMatchingFile = (map, name) => {
     const rawName = String(name || "").trim();
     if (!rawName) return null;
-    return map.get(rawName.toLowerCase()) || map.get(normalizeFileName(rawName));
+    return (
+      map.get(rawName.toLowerCase()) || map.get(normalizeFileName(rawName))
+    );
   };
 
   const validateRows = () => {
@@ -385,8 +507,20 @@ const BulkUpload = () => {
     if (audioFiles.length > 10) return "Audio files cannot be more than 10.";
 
     for (const row of parsedRows) {
+      if (!String(getRowValue(row, "songtitle")).trim()) {
+        return `Row ${row.rowNumber} is missing: songtitle.`;
+      }
+
+      const resolvedLabelName = String(
+        getRowValue(row, "labelName") || labelNameFromStore || "",
+      ).trim();
+      if (!resolvedLabelName) {
+        return `Row ${row.rowNumber} is missing: labelName.`;
+      }
+
       const missingFields = REQUIRED_FIELDS.filter(
-        (field) => !String(getRowValue(row, field)).trim()
+        (field) =>
+          field !== "labelName" && !String(getRowValue(row, field)).trim(),
       );
       if (missingFields.length) {
         return `Row ${row.rowNumber} is missing: ${missingFields.join(", ")}.`;
@@ -394,11 +528,15 @@ const BulkUpload = () => {
       if (row.isrc && String(row.isrc).trim().length < 12) {
         return `Row ${row.rowNumber} has an invalid ISRC.`;
       }
-      if (!getMatchingFile(thumbnailMap, row.thumbnail)) {
-        return `Row ${row.rowNumber} thumbnail file was not found: ${row.thumbnail}.`;
+      const assetKey = getRowAssetKey(row);
+      if (!assetKey) {
+        return `Row ${row.rowNumber} is missing a track number or song title for file matching.`;
       }
-      if (!getMatchingFile(audioMap, row.file)) {
-        return `Row ${row.rowNumber} audio file was not found: ${row.file}.`;
+      if (!getMatchingFile(thumbnailMap, assetKey)) {
+        return `Row ${row.rowNumber} thumbnail file was not found for: ${assetKey}.`;
+      }
+      if (!getMatchingFile(audioMap, assetKey)) {
+        return `Row ${row.rowNumber} audio file was not found for: ${assetKey}.`;
       }
     }
 
@@ -408,15 +546,22 @@ const BulkUpload = () => {
   const buildFormData = (row) => {
     const formData = new FormData();
     FORM_FIELDS.forEach((field) => {
-      formData.append(field, getRowValue(row, field));
+      const value =
+        field === "labelName" && !String(getRowValue(row, field)).trim()
+          ? labelNameFromStore || ""
+          : getRowValue(row, field);
+      formData.append(field, value);
     });
-    formData.append("file", getMatchingFile(audioMap, row.file));
-    formData.append("thumbnail", getMatchingFile(thumbnailMap, row.thumbnail));
+    const assetKey = getRowAssetKey(row);
+    formData.append("file", getMatchingFile(audioMap, assetKey));
+    formData.append("thumbnail", getMatchingFile(thumbnailMap, assetKey));
     formData.append("userId", getRowValue(row, "userId") || userId);
     return formData;
   };
 
   const handleSubmit = async () => {
+    console.log("Starting bulk upload with rows:", parsedRows);
+    return;
     const validationError = validateRows();
     if (validationError) {
       message.error(validationError);
@@ -438,7 +583,7 @@ const BulkUpload = () => {
           {
             method: "POST",
             body: buildFormData(row),
-          }
+          },
         );
         const data = await res.json();
 
@@ -446,7 +591,7 @@ const BulkUpload = () => {
           uploadResults.push({
             key: row.rowNumber,
             row: row.rowNumber,
-            title: row.title,
+            title: getRowDisplayTitle(row),
             status: "Success",
             message: "Order created",
           });
@@ -454,7 +599,7 @@ const BulkUpload = () => {
           uploadResults.push({
             key: row.rowNumber,
             row: row.rowNumber,
-            title: row.title,
+            title: getRowDisplayTitle(row),
             status: "Failed",
             message: data.message || "Something went wrong",
           });
@@ -463,7 +608,7 @@ const BulkUpload = () => {
         uploadResults.push({
           key: row.rowNumber,
           row: row.rowNumber,
-          title: row.title,
+          title: getRowDisplayTitle(row),
           status: "Failed",
           message: "Network error",
         });
@@ -528,9 +673,12 @@ const BulkUpload = () => {
             <Button icon={<UploadOutlined />}>Select Excel</Button>
           </Upload>
           <UploadHint>
-            Put the song data in the first sheet. Helpful columns are
-            <code> title</code>, <code>labelName</code>, <code>thumbnail</code>,
-            and <code>file</code>.
+            Put the song data in the first sheet using the same field names as
+            the single-song form. Useful columns include <code>songtitle</code>,{" "}
+            <code>title</code>, <code>labelName</code>,{" "}
+            <code>dateOfRelease</code>, and <code>crbt</code>. Audio and
+            thumbnail files are matched by track number or song name, so{" "}
+            <code>1.mp3</code> pairs with <code>1.jpg</code>.
           </UploadHint>
           {excelFile && (
             <FilePills>
@@ -552,7 +700,8 @@ const BulkUpload = () => {
             </p>
             <p className="ant-upload-text">Drop or select thumbnail files</p>
             <p className="ant-upload-hint">
-              Match Excel values like <code>img1</code> or <code>img1.jpg</code>.
+              Match Excel values like <code>img1</code> or <code>img1.jpg</code>
+              .
             </p>
           </Dragger>
           <UploadHint>{thumbnailCountLabel}</UploadHint>
@@ -578,7 +727,8 @@ const BulkUpload = () => {
             </p>
             <p className="ant-upload-text">Drop or select audio files</p>
             <p className="ant-upload-hint">
-              The sheet should point to one of these filenames for each row.
+              The sheet should point to one of these filenames for each row via
+              the track number or song name.
             </p>
           </Dragger>
           <UploadHint>{audioCountLabel}</UploadHint>
@@ -588,7 +738,8 @@ const BulkUpload = () => {
       <Summary>
         <p>
           Rows: <b>{parsedRows.length}</b> | Thumbnails:{" "}
-          <b>{thumbnailFiles.length}</b> | Audio files: <b>{audioFiles.length}</b>
+          <b>{thumbnailFiles.length}</b> | Audio files:{" "}
+          <b>{audioFiles.length}</b>
         </p>
         {progress.total > 0 && (
           <Progress
