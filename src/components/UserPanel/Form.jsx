@@ -471,6 +471,7 @@ const Form = () => {
     subLabel2: "",
     subLabel3: "",
     thumbnail: null,
+    moviePoster: null,
     file: null,
     upc: "",
     isrc: "",
@@ -1372,29 +1373,30 @@ const Form = () => {
     return "";
   };
 
-  const imgReader = (img) => {
+  const imgReader = (img, boxId) => {
     var reader = new FileReader();
     reader.onload = function (event) {
       var imageData = event.target.result;
       var image = new Image();
       image.src = imageData;
       image.style.width = "5rem";
-      document.querySelector("#imgbox").appendChild(image);
+      const box = document.querySelector(`#${boxId}`);
+      if (box) box.appendChild(image);
     };
     reader.readAsDataURL(img);
   };
 
   const readrr = async (e) => {
     const imgbox = document.getElementById("imgbox");
-    imgbox.innerHTML = "";
+    if (imgbox) imgbox.innerHTML = "";
     const file = e.target.files[0];
     if (!file) return;
     const fileMb = file.size / 1024 ** 2;
     if (fileMb > 10) {
       message.error(`Image size is greater than 10MB.`);
-      imgbox.innerHTML = "";
+      if (imgbox) imgbox.innerHTML = "";
       const thmb = document.getElementById("thmb");
-      thmb.value = "";
+      if (thmb) thmb.value = "";
       return;
     }
     var reader = new FileReader();
@@ -1405,13 +1407,11 @@ const Form = () => {
       file.type === "image/jpg";
     if (!isValid) {
       message.error(`Only png, jpeg, jpg files are allowed.`);
-      setIsloading(false);
       const thmb = document.getElementById("thmb");
-      thmb.value = "";
+      if (thmb) thmb.value = "";
       return;
     }
     reader.onload = function (e) {
-      setIsloading(true);
       var image = new Image();
       image.src = e.target.result;
       image.style.width = "2rem";
@@ -1429,10 +1429,54 @@ const Form = () => {
           message.error(`Only 1600x1600 or 3000x3000 images are allowed`);
           setInpFields({ ...inpFields, thumbnail: null });
         } else {
-          imgReader(file);
+          imgReader(file, "imgbox");
           setInpFields({ ...inpFields, thumbnail: file });
         }
-        setIsloading(false);
+      };
+    };
+  };
+
+  const readMoviePoster = async (e) => {
+    const moviePosterBox = document.getElementById("moviePosterBox");
+    if (moviePosterBox) moviePosterBox.innerHTML = "";
+    const file = e.target.files[0];
+    if (!file) return;
+    const fileMb = file.size / 1024 ** 2;
+    if (fileMb > 10) {
+      message.error(`Image size is greater than 10MB.`);
+      if (moviePosterBox) moviePosterBox.innerHTML = "";
+      const moviePoster = document.getElementById("moviePoster");
+      if (moviePoster) moviePoster.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    const isValid =
+      file.type === "image/png" ||
+      file.type === "image/jpeg" ||
+      file.type === "image/jpg";
+    if (!isValid) {
+      message.error(`Only png, jpeg, jpg files are allowed.`);
+      const moviePoster = document.getElementById("moviePoster");
+      if (moviePoster) moviePoster.value = "";
+      return;
+    }
+    reader.onload = function (e) {
+      const image = new Image();
+      image.src = e.target.result;
+      image.style.width = "2rem";
+      image.onload = function () {
+        const sixteen = this.width === 1600 && this.height === 1600;
+        const three = this.width === 3000 && this.height === 3000;
+        if (sixteen === false && three === false) {
+          const moviePoster = document.getElementById("moviePoster");
+          if (moviePoster) moviePoster.value = "";
+          message.error(`Only 1600x1600 or 3000x3000 images are allowed`);
+          setInpFields({ ...inpFields, moviePoster: null });
+        } else {
+          imgReader(file, "moviePosterBox");
+          setInpFields({ ...inpFields, moviePoster: file });
+        }
       };
     };
   };
@@ -1565,6 +1609,8 @@ const Form = () => {
           )
         : "";
 
+    const requiresMoviePoster = inpFields.albumType === "movie/soundtrack";
+
     if (
       inpFields.labelName.length === 0 ||
       inpFields.title.length === 0 ||
@@ -1573,6 +1619,7 @@ const Form = () => {
       inpFields.mood.length === 0 ||
       inpFields.contentType.length === 0 ||
       inpFields.thumbnail === null ||
+      (requiresMoviePoster && inpFields.moviePoster === null) ||
       invalidSongIndex !== -1
     ) {
       if (inpFields.labelName.length === 0) {
@@ -1645,6 +1692,10 @@ const Form = () => {
         const thumbnail = document.querySelector("#thumbnail");
         thumbnail.style.color = "red";
       }
+      if (requiresMoviePoster && inpFields.moviePoster === null) {
+        const moviePoster = document.querySelector("#moviePosterLabel");
+        if (moviePoster) moviePoster.style.color = "red";
+      }
       setIsloading(false);
       openValidationNotification(
         invalidSongMessage || "Fill all require fields.",
@@ -1689,6 +1740,9 @@ const Form = () => {
         formData.append("subLabel3", inpFields.subLabel3);
         formData.append("genre", inpFields.genre);
         formData.append("starCast", joinNames(section.selectedStarCast));
+        if (requiresMoviePoster && inpFields.moviePoster) {
+          formData.append("movieposter", inpFields.moviePoster);
+        }
 
         formData.append("singerAppleId", joinAppleIds(section.selectedSingers));
         formData.append(
@@ -2783,7 +2837,14 @@ const Form = () => {
                       onChange={(e) => {
                         const ele = document.querySelector(`#${e.target.id}`);
                         const value = ele.options[ele.selectedIndex].value;
-                        setInpFields({ ...inpFields, albumType: value });
+                        setInpFields((prev) => ({
+                          ...prev,
+                          albumType: value,
+                          moviePoster:
+                            value === "movie/soundtrack"
+                              ? prev.moviePoster
+                              : null,
+                        }));
                       }}
                     >
                       {" "}
@@ -2912,6 +2973,22 @@ const Form = () => {
                     />
                     <div id="imgbox" style={{ width: "1rem" }}></div>
                   </LabelInpBox>
+                  {inpFields.albumType === "movie/soundtrack" && (
+                    <LabelInpBox>
+                      <Label htmlFor="moviePoster" id="moviePosterLabel">
+                        Movie Poster (Max. size 10MB)
+                        <span style={{ margin: 0 }}>*</span>
+                      </Label>
+                      <Input
+                        type="file"
+                        name=""
+                        accept="image/png, image/jpeg, image/jpg "
+                        id="moviePoster"
+                        onChange={readMoviePoster}
+                      />
+                      <div id="moviePosterBox" style={{ width: "1rem" }}></div>
+                    </LabelInpBox>
+                  )}
                   <LabelInpBox>
                     <Label htmlFor="description">Album description</Label>
                     <TxtArea

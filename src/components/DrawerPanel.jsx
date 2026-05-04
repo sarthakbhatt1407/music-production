@@ -460,7 +460,7 @@ const DrawerPanel = (props) => {
                   />
                 </Link>
               ),
-              label: "Reports",
+              label: "Legal Documents",
             },
             {
               key: "7",

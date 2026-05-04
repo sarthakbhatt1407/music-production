@@ -805,7 +805,13 @@ const ProfilePage = () => {
     });
 
     // Bank details
-    const bankFields = ["accountNo", "ifsc", "bankName", "upi"];
+    const bankFields = [
+      "accountHolderName",
+      "accountNo",
+      "ifsc",
+      "bankName",
+      "upi",
+    ];
     bankFields.forEach((field) => {
       totalFields++;
       if (
@@ -920,6 +926,10 @@ const ProfilePage = () => {
       errors.accountNo = "Account number must be at least 10 characters";
     }
 
+    if (!inpFields.accountHolderName || inpFields.accountHolderName.length < 3) {
+      errors.accountHolderName = "Account holder name must be at least 3 characters";
+    }
+
     if (!inpFields.ifsc || inpFields.ifsc.length === 0) {
       errors.ifsc = "IFSC code is required";
     }
@@ -973,10 +983,10 @@ const ProfilePage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...inpFields,
-            userId: userId,
-          }),
+      body: JSON.stringify({
+        ...inpFields,
+        userId: userId,
+      }),
         }
       );
       const data = await res.json();
@@ -1203,6 +1213,23 @@ const ProfilePage = () => {
               <h2>Bank Account Details</h2>
             </div>
             <div className="modal-body">
+              <FormGroup>
+                <label htmlFor="accountHolderName">Account Holder Name</label>
+                <Input
+                  type="text"
+                  id="accountHolderName"
+                  onChange={onChangeHandler}
+                  value={inpFields.accountHolderName}
+                  placeholder="Enter account holder name"
+                  className={formErrors.accountHolderName ? "error" : ""}
+                />
+                {formErrors.accountHolderName && (
+                  <div className="error-message">
+                    {formErrors.accountHolderName}
+                  </div>
+                )}
+              </FormGroup>
+
               <FormGroup>
                 <label htmlFor="accountNo">Account Number</label>
                 <Input
@@ -1557,6 +1584,19 @@ const ProfilePage = () => {
                   </div>
 
                   <div className="section-content">
+                    <InfoRow>
+                      <div className="info-label">
+                        <AccountBalanceOutlined />
+                        Account Holder Name
+                      </div>
+                      <div className="info-value">
+                        {userData.bankDetails[0].accountHolderName &&
+                        userData.bankDetails[0].accountHolderName.length > 0
+                          ? userData.bankDetails[0].accountHolderName
+                          : "Not provided"}
+                      </div>
+                    </InfoRow>
+
                     <InfoRow>
                       <div className="info-label">
                         <AccountBalanceOutlined />

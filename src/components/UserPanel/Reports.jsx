@@ -182,7 +182,7 @@ const Reports = () => {
   const fetcher = async () => {
     setIsloading(true);
     const res = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`
+      `${process.env.REACT_APP_BASE_URL}/user/get-user/?id=${userId}`,
     );
     const data = await res.json();
     if (res.ok) {
@@ -221,12 +221,12 @@ const Reports = () => {
             title: "User Panel",
           },
           {
-            title: "Reports",
+            title: "Legal Documents",
           },
         ]}
       />
       <HeaderBox>
-        <h1>Reports</h1>
+        <h1>Legal Documents</h1>
         <Input
           type="text"
           placeholder="search report"

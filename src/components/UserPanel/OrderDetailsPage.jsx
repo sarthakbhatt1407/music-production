@@ -60,6 +60,7 @@ import {
   MdInfo,
   MdContentCopy,
   MdMusicNote,
+  MdImage,
 } from "react-icons/md";
 
 const { Title, Text, Paragraph } = Typography;
@@ -985,11 +986,18 @@ const OrderDetailsPage = () => {
       }
 
       // Determine file URL and name
-      const fileUrl = fileType === "thumbnail" ? order.thumbnail : order.file;
+      const fileUrl =
+        fileType === "thumbnail"
+          ? order.thumbnail
+          : fileType === "moviePoster"
+            ? order.moviePoster
+            : order.file;
       const fileName =
         fileType === "thumbnail"
           ? `${order.title || order.songtitle || "cover"}-art`
-          : `${order.title || order.songtitle || "audio"}`;
+          : fileType === "moviePoster"
+            ? `${order.title || order.songtitle || "movie-poster"}`
+            : `${order.title || order.songtitle || "audio"}`;
       const downloadLink = `${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${fileUrl}&title=${fileName}`;
 
       // Razorpay options
@@ -999,7 +1007,13 @@ const OrderDetailsPage = () => {
         currency: paymentData.currency,
         order_id: paymentData.order_id,
         name: "Music Distribution - Download",
-        description: `Download ${fileType === "thumbnail" ? "Cover Art" : "Audio File"}`,
+        description: `Download ${
+          fileType === "thumbnail"
+            ? "Cover Art"
+            : fileType === "moviePoster"
+              ? "Movie Poster"
+              : "Audio File"
+        }`,
         handler: async function (response) {
           // Direct navigation to download URL (bypasses popup blocker)
           window.location.href = downloadLink;
@@ -1116,14 +1130,19 @@ const OrderDetailsPage = () => {
     }
 
     // File downloads
-    if (field === "thumbnail" || field === "file") {
+    if (field === "thumbnail" || field === "file" || field === "moviePoster") {
+      const label =
+        field === "thumbnail"
+          ? "Cover Art"
+          : field === "moviePoster"
+            ? "Movie Poster"
+            : "Audio File";
       return (
         <Link
           to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${value}`}
           target="_blank"
         >
-          <FaDownload /> Download{" "}
-          {field === "thumbnail" ? "Cover Art" : "Audio File"}
+          <FaDownload /> Download {label}
         </Link>
       );
     }
@@ -1371,6 +1390,7 @@ const OrderDetailsPage = () => {
                     if (
                       field === "file" ||
                       field === "thumbnail" ||
+                      field === "moviePoster" ||
                       field.includes("singer") ||
                       field.includes("composer") ||
                       field.includes("lyricist") ||
@@ -1785,6 +1805,28 @@ const OrderDetailsPage = () => {
                     </Button>
                   </DetailValue>
                 </DetailRow>
+                {order.moviePoster && (
+                  <DetailRow>
+                    <DetailLabel>
+                      <MdImage size={16} style={{ marginRight: "8px" }} />
+                      Movie Poster
+                    </DetailLabel>
+                    <DetailValue>
+                      <Button
+                        type="primary"
+                        icon={<FaDownload />}
+                        onClick={() => handleDownloadPayment("moviePoster")}
+                        loading={
+                          downloadPaymentLoading &&
+                          downloadFileType === "moviePoster"
+                        }
+                        disabled={downloadPaymentLoading}
+                      >
+                        Download Movie Poster (₹5)
+                      </Button>
+                    </DetailValue>
+                  </DetailRow>
+                )}
               </DetailsList>
             </DetailsGroup>
 

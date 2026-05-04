@@ -1325,6 +1325,7 @@ const OrderDetailsPage = () => {
                     if (
                       field === "file" ||
                       field === "thumbnail" ||
+                      field === "moviePoster" ||
                       field === "musicDirector" ||
                       field === "director" ||
                       field === "producer" ||
@@ -1778,6 +1779,22 @@ const OrderDetailsPage = () => {
                     </Link>
                   </DetailValue>
                 </DetailRow>
+                {order.moviePoster && (
+                  <DetailRow>
+                    <DetailLabel>
+                      <FaCloudDownloadAlt />
+                      Cover Art
+                    </DetailLabel>
+                    <DetailValue>
+                      <Link
+                        to={`${process.env.REACT_APP_BASE_URL}/file/download/?filePath=${order.moviePoster}&title=${order.title}`}
+                        target="_blank"
+                      >
+                        <FaDownload /> Download Movie Poster
+                      </Link>
+                    </DetailValue>
+                  </DetailRow>
+                )}
                 <DetailRow>
                   <DetailLabel>
                     <MdMusicNote size={16} style={{ marginRight: "8px" }} />
