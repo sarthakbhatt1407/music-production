@@ -371,6 +371,72 @@ const MODEL_FIELDS = new Set([
   "youtubeMusic",
 ]);
 
+const THUMBNAIL_EXTENSIONS = new Set(["png", "jpg", "jpeg"]);
+const AUDIO_EXTENSIONS = new Set([
+  "mp3",
+  "wav",
+  "m4a",
+  "aac",
+  "flac",
+  "ogg",
+  "wma",
+  "aiff",
+  "alac",
+  "mp4",
+]);
+
+const COMMA_SEPARATED_FIELDS = new Set([
+  "singer",
+  "composer",
+  "lyricist",
+  "musicDirector",
+  "director",
+  "producer",
+  "starCast",
+  "singerAppleId",
+  "singerSpotifyId",
+  "singerFacebookUrl",
+  "singerInstagramUrl",
+  "composerAppleId",
+  "composerSpotifyId",
+  "composerFacebookUrl",
+  "composerInstagramUrl",
+  "lyricistAppleId",
+  "lyricistSpotifyId",
+  "lyricistFacebookUrl",
+  "lyricistInstagramUrl",
+]);
+
+const ARTIST_LINK_GROUPS = [
+  {
+    baseField: "singer",
+    linkFields: [
+      "singerAppleId",
+      "singerSpotifyId",
+      "singerFacebookUrl",
+      "singerInstagramUrl",
+    ],
+  },
+  {
+    baseField: "composer",
+    linkFields: [
+      "composerAppleId",
+      "composerSpotifyId",
+      "composerFacebookUrl",
+      "composerInstagramUrl",
+    ],
+  },
+  {
+    baseField: "lyricist",
+    linkFields: [
+      "lyricistAppleId",
+      "lyricistSpotifyId",
+      "lyricistFacebookUrl",
+      "lyricistInstagramUrl",
+    ],
+  },
+];
+
 const HEADER_ALIASES = {
   labelname: "labelName",
   label: "labelName",
@@ -436,12 +502,80 @@ const normalizeKey = (key) =>
     .replace(/[^a-zA-Z0-9]/g, "")
     .toLowerCase();
 
-const normalizeFileName = (name) =>
+const getFileExtension = (name) => {
+  const match = String(name || "")
+    .trim()
+    .toLowerCase()
+    .match(/\.([^.]+)$/);
+  return match ? match[1] : "";
+};
+
+const getFileStem = (name) =>
   String(name || "")
     .trim()
     .toLowerCase()
-    .replace(/\.[^/.]+$/, "")
-    .replace(/[^a-z0-9]/g, "");
+    .replace(/\.[^/.]+$/, "");
+
+const splitCommaSeparatedValue = (value) =>
+  String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const normalizeCommaSeparatedValue = (value) =>
+  splitCommaSeparatedValue(value).join(", ");
+
+const getLinkedArtistRows = (row, baseField, linkFields) => {
+  const baseValues = splitCommaSeparatedValue(getRowValue(row, baseField));
+  const linkValues = linkFields.reduce((acc, field) => {
+    acc[field] = splitCommaSeparatedValue(getRowValue(row, field));
+    return acc;
+  }, {});
+
+  const maxLength = Math.max(
+    baseValues.length,
+    ...linkFields.map((field) => linkValues[field].length),
+  );
+
+  if (!maxLength) {
+    return [];
+  }
+
+  return Array.from({ length: maxLength }, (_, index) => {
+    const item = {
+      name: baseValues[index] || "",
+    };
+
+    linkFields.forEach((field) => {
+      item[field] = linkValues[field][index] || "";
+    });
+
+    return item;
+  });
+};
+
+const validateLinkedArtistGroup = (row, baseField, linkFields) => {
+  const baseValues = splitCommaSeparatedValue(getRowValue(row, baseField));
+  const linkCounts = linkFields.map(
+    (field) => splitCommaSeparatedValue(getRowValue(row, field)).length,
+  );
+
+  const providedLinkCounts = linkCounts.filter((count) => count > 0);
+
+  if (baseValues.length === 0 && providedLinkCounts.length === 0) {
+    return "";
+  }
+
+  if (baseValues.length === 0 && providedLinkCounts.length > 0) {
+    return `Row ${row.rowNumber} is missing ${baseField} while related social fields are filled.`;
+  }
+
+  if (providedLinkCounts.some((count) => count !== baseValues.length)) {
+    return `Row ${row.rowNumber} has mismatched artist counts for ${baseField}.`;
+  }
+
+  return "";
+};
 
 const getRowValue = (row, field) => {
   if (row[field] !== undefined && row[field] !== null) {
@@ -457,11 +591,19 @@ const formatCellValue = (value) => {
   return String(value ?? "").trim();
 };
 
-const buildFileMap = (files) => {
+const buildExactFileMap = (files, allowedExtensions) => {
   const map = new Map();
   files.forEach((file) => {
-    map.set(file.name.trim().toLowerCase(), file);
-    map.set(normalizeFileName(file.name), file);
+    const extension = getFileExtension(file.name);
+    if (allowedExtensions && !allowedExtensions.has(extension)) {
+      return;
+    }
+
+    const stem = getFileStem(file.name);
+    if (!map.has(stem)) {
+      map.set(stem, []);
+    }
+    map.get(stem).push(file);
   });
   return map;
 };
@@ -487,7 +629,6 @@ const parseExcelRows = async (file) => {
 };
 
 const BulkUpload = () => {
-  const userId = useSelector((state) => state.userId);
   const labelNameFromStore = useSelector((state) => state.labelName);
   const [excelFile, setExcelFile] = useState(null);
   const [thumbnailFiles, setThumbnailFiles] = useState([]);
@@ -498,10 +639,13 @@ const BulkUpload = () => {
   const [results, setResults] = useState([]);
 
   const thumbnailMap = useMemo(
-    () => buildFileMap(thumbnailFiles),
+    () => buildExactFileMap(thumbnailFiles, THUMBNAIL_EXTENSIONS),
     [thumbnailFiles],
   );
-  const audioMap = useMemo(() => buildFileMap(audioFiles), [audioFiles]);
+  const audioMap = useMemo(
+    () => buildExactFileMap(audioFiles, AUDIO_EXTENSIONS),
+    [audioFiles],
+  );
 
   const getRowAssetKey = (row) =>
     String(row.songtitle || row.title || "")
@@ -534,20 +678,32 @@ const BulkUpload = () => {
 
   const handleThumbnailChange = ({ fileList }) => {
     setThumbnailFiles(
-      fileList.map((item) => item.originFileObj).filter(Boolean),
+      fileList
+        .map((item) => item.originFileObj)
+        .filter(Boolean)
+        .filter((file) =>
+          THUMBNAIL_EXTENSIONS.has(getFileExtension(file.name)),
+        ),
     );
   };
 
   const handleAudioChange = ({ fileList }) => {
-    setAudioFiles(fileList.map((item) => item.originFileObj).filter(Boolean));
+    setAudioFiles(
+      fileList
+        .map((item) => item.originFileObj)
+        .filter(Boolean)
+        .filter((file) => AUDIO_EXTENSIONS.has(getFileExtension(file.name))),
+    );
   };
 
   const getMatchingFile = (map, name) => {
-    const rawName = String(name || "").trim();
+    const rawName = String(name || "")
+      .trim()
+      .toLowerCase();
     if (!rawName) return null;
-    return (
-      map.get(rawName.toLowerCase()) || map.get(normalizeFileName(rawName))
-    );
+    const matches = map.get(rawName) || [];
+    if (!matches.length) return null;
+    return matches[0];
   };
 
   const validateRows = () => {
@@ -558,8 +714,11 @@ const BulkUpload = () => {
     if (audioFiles.length > 10) return "Audio files cannot be more than 10.";
 
     for (const row of parsedRows) {
-      if (!String(getRowValue(row, "songtitle")).trim()) {
-        return `Row ${row.rowNumber} is missing: songtitle.`;
+      const songTitle = String(
+        getRowValue(row, "songtitle") || getRowValue(row, "title") || "",
+      ).trim();
+      if (!songTitle) {
+        return `Row ${row.rowNumber} is missing: songtitle or title.`;
       }
 
       const resolvedLabelName = String(
@@ -579,6 +738,18 @@ const BulkUpload = () => {
       if (row.isrc && String(row.isrc).trim().length < 12) {
         return `Row ${row.rowNumber} has an invalid ISRC.`;
       }
+
+      for (const group of ARTIST_LINK_GROUPS) {
+        const artistGroupError = validateLinkedArtistGroup(
+          row,
+          group.baseField,
+          group.linkFields,
+        );
+        if (artistGroupError) {
+          return artistGroupError;
+        }
+      }
+
       const assetKey = getRowAssetKey(row);
       if (!assetKey) {
         return `Row ${row.rowNumber} is missing songtitle or title for file matching.`;
@@ -594,27 +765,52 @@ const BulkUpload = () => {
     return "";
   };
 
-  const buildFormData = (row) => {
-    const formData = new FormData();
-    FORM_FIELDS.forEach((field) => {
-      const value =
-        field === "labelName" && !String(getRowValue(row, field)).trim()
-          ? labelNameFromStore || ""
-          : getRowValue(row, field);
-      if (MODEL_FIELDS.has(field)) {
-        formData.append(field, value);
-      }
-    });
+  const buildSubmissionPayload = (row) => {
     const assetKey = getRowAssetKey(row);
-    formData.append("file", getMatchingFile(audioMap, assetKey));
-    formData.append("thumbnail", getMatchingFile(thumbnailMap, assetKey));
-    formData.append("userId", getRowValue(row, "userId") || userId);
+    const audioFile = getMatchingFile(audioMap, assetKey);
+    const thumbnailFile = getMatchingFile(thumbnailMap, assetKey);
+    const artistGroups = ARTIST_LINK_GROUPS.reduce((acc, group) => {
+      acc[group.baseField] = getLinkedArtistRows(
+        row,
+        group.baseField,
+        group.linkFields,
+      );
+      return acc;
+    }, {});
+
+    return {
+      rowNumber: row.rowNumber,
+      title: getRowDisplayTitle(row),
+      data: FORM_FIELDS.reduce((acc, field) => {
+        const value =
+          field === "labelName" && !String(getRowValue(row, field)).trim()
+            ? labelNameFromStore || ""
+            : getRowValue(row, field);
+        if (MODEL_FIELDS.has(field)) {
+          acc[field] = COMMA_SEPARATED_FIELDS.has(field)
+            ? normalizeCommaSeparatedValue(value)
+            : value;
+        }
+        return acc;
+      }, {}),
+      thumbnail: thumbnailFile || null,
+      file: audioFile || null,
+      artists: artistGroups,
+    };
+  };
+
+  const buildFormData = (payload) => {
+    const formData = new FormData();
+
+    Object.entries(payload.data).forEach(([field, value]) => {
+      formData.append(field, value);
+    });
+    formData.append("file", payload.file);
+    formData.append("thumbnail", payload.thumbnail);
     return formData;
   };
 
   const handleSubmit = async () => {
-    console.log(parsedRows);
-
     const validationError = validateRows();
     if (validationError) {
       message.error(validationError);
@@ -629,16 +825,26 @@ const BulkUpload = () => {
 
     for (let index = 0; index < parsedRows.length; index += 1) {
       const row = parsedRows[index];
+      const payload = buildSubmissionPayload(row);
+      console.log("Submission payload:", {
+        rowNumber: payload.rowNumber,
+        title: payload.title,
+        data: payload.data,
+        artists: payload.artists,
+        file: payload.file,
+        thumbnail: payload.thumbnail,
+      });
 
       try {
         const res = await fetch(
-          `${process.env.REACT_APP_BASE_URL}/order/new-order`,
+          `${process.env.REACT_APP_BASE_URL}/order/bulk-order`,
           {
             method: "POST",
-            body: buildFormData(row),
+            body: buildFormData(payload),
           },
         );
         const data = await res.json();
+        console.log(data);
 
         if (res.ok) {
           uploadResults.push({
@@ -725,14 +931,7 @@ const BulkUpload = () => {
           >
             <Button icon={<UploadOutlined />}>Select Excel</Button>
           </Upload>
-          <UploadHint>
-            Put the song data in the first sheet using the same field names as
-            the single-song form. Useful columns include <code>songtitle</code>,{" "}
-            <code>title</code>, <code>labelName</code>,{" "}
-            <code>dateOfRelease</code>, and <code>crbt</code>. Audio and
-            thumbnail files are matched by track number or song name, so{" "}
-            <code>1.mp3</code> pairs with <code>1.jpg</code>.
-          </UploadHint>
+          <UploadHint>Upload an Excel file.</UploadHint>
           {excelFile && (
             <FilePills>
               <Tag color="blue">{excelFile.name}</Tag>
@@ -743,9 +942,18 @@ const BulkUpload = () => {
         <UploadCard>
           <h3>Thumbnails</h3>
           <Dragger
-            accept="image/*"
+            accept=".png,.jpg,.jpeg"
             multiple
-            beforeUpload={() => false}
+            beforeUpload={(file) => {
+              const extension = getFileExtension(file.name);
+              if (!THUMBNAIL_EXTENSIONS.has(extension)) {
+                message.error(
+                  "Only PNG, JPG, and JPEG thumbnail files are allowed.",
+                );
+                return Upload.LIST_IGNORE;
+              }
+              return false;
+            }}
             onChange={handleThumbnailChange}
           >
             <p className="ant-upload-drag-icon">
@@ -753,8 +961,10 @@ const BulkUpload = () => {
             </p>
             <p className="ant-upload-text">Drop or select thumbnail files</p>
             <p className="ant-upload-hint">
-              Match Excel values like <code>img1</code> or <code>img1.jpg</code>
-              .
+              Match the thumbnail files to the Excel rows by naming them the
+              same as the song title or album title (without extension). For
+              example, if a row has "Song Name" as "My Song", name the thumbnail
+              file "My Song.jpg".
             </p>
           </Dragger>
           <UploadHint>{thumbnailCountLabel}</UploadHint>
@@ -763,10 +973,17 @@ const BulkUpload = () => {
         <UploadCard>
           <h3>Audio Files</h3>
           <Dragger
-            accept="audio/*"
+            accept=".mp3,.wav,.m4a,.aac,.flac,.ogg,.wma,.aiff,.alac,.mp4"
             multiple
             maxCount={10}
             beforeUpload={(file, fileList) => {
+              const extension = getFileExtension(file.name);
+              if (!AUDIO_EXTENSIONS.has(extension)) {
+                message.error(
+                  "Only supported audio files are allowed for bulk upload.",
+                );
+                return Upload.LIST_IGNORE;
+              }
               if (fileList.length > 10) {
                 message.error("Only 10 audio files are allowed.");
                 return Upload.LIST_IGNORE;
@@ -780,8 +997,10 @@ const BulkUpload = () => {
             </p>
             <p className="ant-upload-text">Drop or select audio files</p>
             <p className="ant-upload-hint">
-              The sheet should point to one of these filenames for each row via
-              the track number or song name.
+              Match the audio files to the Excel rows by naming them the same as
+              the song title or album title (without extension). For example, if
+              a row has "Song Name" as "My Song", name the audio file "My
+              Song.mp3".
             </p>
           </Dragger>
           <UploadHint>{audioCountLabel}</UploadHint>
