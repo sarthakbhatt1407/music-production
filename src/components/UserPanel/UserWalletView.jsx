@@ -366,14 +366,34 @@ const UserWalletView = () => {
   };
 
   const handleRequestSubmit = async () => {
+    const requestedAmount = parseFloat(requestFormData.amount);
+    
     if (
       !requestFormData.amount ||
-      isNaN(parseFloat(requestFormData.amount)) ||
-      parseFloat(requestFormData.amount) <= 0
+      isNaN(requestedAmount) ||
+      requestedAmount <= 0
     ) {
       setAlertInfo({
         severity: "error",
         message: "Please enter a valid amount",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
+    if (requestedAmount < 500) {
+      setAlertInfo({
+        severity: "error",
+        message: "Minimum request amount is ₹500",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
+    if (requestedAmount > userData.currentBalance) {
+      setAlertInfo({
+        severity: "error",
+        message: `Amount cannot exceed your wallet balance of ₹${userData.currentBalance}`,
       });
       setAlertOpen(true);
       return;
@@ -484,7 +504,7 @@ const UserWalletView = () => {
               },
             }}
           >
-            Request Payment
+            Request Payments
           </ActionButton>
           <ActionButton
             variant="contained"

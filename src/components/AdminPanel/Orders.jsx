@@ -13,6 +13,7 @@ import {
   FilterOutlined,
   FileExcelOutlined,
 } from "@ant-design/icons";
+import { handleExportAdvanceExcel } from "../../utils/exportAdvanceExcel";
 import MusicLoader from "../Loader/MusicLoader";
 import {
   Breadcrumb,
@@ -457,6 +458,17 @@ const Orders = () => {
             }}
           >
             Export to Excel
+          </Button>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            style={{
+              background: "#1890ff",
+              borderColor: "#1890ff",
+            }}
+            onClick={() => handleExportAdvanceExcel(pendingOrders)}
+          >
+            Export Advance Excel
           </Button>
         </Space>
       </HeaderBox>

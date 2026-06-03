@@ -445,52 +445,64 @@ const SocialMediaLinking = ({
 
         <Descriptions bordered column={2} size="small">
           <Descriptions.Item label="Artist Name">
-            {selectedRecord?.artistName || "-"}
+            {selectedRecord?.artistName ? <Text copyable>{selectedRecord.artistName}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Status">
             {selectedRecord?.status || "-"}
           </Descriptions.Item>
           <Descriptions.Item label="ISRC">
-            {selectedRecord?.isrc || "-"}
+            {selectedRecord?.isrc ? <Text copyable>{selectedRecord.isrc}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Email">
-            {selectedRecord?.email || "-"}
+            {selectedRecord?.email ? <Text copyable>{selectedRecord.email}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Contact">
-            {selectedRecord?.contact || "-"}
+            {selectedRecord?.contact ? <Text copyable>{selectedRecord.contact}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Label Name">
-            {selectedRecord?.labelName || "-"}
+            {selectedRecord?.labelName ? <Text copyable>{selectedRecord.labelName}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Facebook URL">
             {selectedRecord?.facebookUrl ? (
-              <LinkCell
-                href={selectedRecord.facebookUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Space size={6}>
-                  <LinkOutlined />{" "}
-                </Space>
-              </LinkCell>
+              <Space>
+                <Text copyable={{ text: selectedRecord.facebookUrl }} />
+                <LinkCell
+                  href={selectedRecord.facebookUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Space size={6}>
+                    <LinkOutlined />{" "}
+                  </Space>
+                </LinkCell>
+              </Space>
             ) : (
               "-"
             )}
           </Descriptions.Item>
           <Descriptions.Item label="Instagram URL">
             {selectedRecord?.instagramUrl ? (
-              <LinkCell
-                href={selectedRecord.instagramUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Space size={6}>
-                  <LinkOutlined />
-                </Space>
-              </LinkCell>
+              <Space>
+                <Text copyable={{ text: selectedRecord.instagramUrl }} />
+                <LinkCell
+                  href={selectedRecord.instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Space size={6}>
+                    <LinkOutlined />
+                  </Space>
+                </LinkCell>
+              </Space>
             ) : (
               "-"
             )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Date">
+            {selectedRecord?.date ? selectedRecord.date.replace(/\//g, "-") : selectedRecord?.createdAt ? new Date(selectedRecord.createdAt).toLocaleDateString("en-IN", {timeZone: "Asia/Kolkata", day: "2-digit", month: "2-digit", year: "numeric"}).replace(/\//g, "-") : "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Time">
+            {selectedRecord?.time ? selectedRecord.time : selectedRecord?.createdAt ? new Date(selectedRecord.createdAt).toLocaleTimeString("en-IN", {timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit'}) : "-"}
           </Descriptions.Item>
         </Descriptions>
       </Modal>

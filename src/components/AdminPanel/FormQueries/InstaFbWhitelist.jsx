@@ -393,32 +393,41 @@ const InstaFbWhitelist = () => {
 
         <Descriptions bordered column={2} size="small">
           <Descriptions.Item label="Label Info">
-            {selectedRecord?.labelInfo || "-"}
+            {selectedRecord?.labelInfo ? <Text copyable>{selectedRecord.labelInfo}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Status">
             {selectedRecord?.status || "-"}
           </Descriptions.Item>
           <Descriptions.Item label="ISRC">
-            {selectedRecord?.isrc || "-"}
+            {selectedRecord?.isrc ? <Text copyable>{selectedRecord.isrc}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Link">
             {selectedRecord?.instFbUrl ? (
-              <LinkCell
-                href={selectedRecord.instFbUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Space size={6}>
-                  <LinkOutlined />
-                  <span>Open link</span>
-                </Space>
-              </LinkCell>
+              <Space>
+                <Text copyable={{ text: selectedRecord.instFbUrl }} />
+                <LinkCell
+                  href={selectedRecord.instFbUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Space size={6}>
+                    <LinkOutlined />
+                    <span>Open link</span>
+                  </Space>
+                </LinkCell>
+              </Space>
             ) : (
               "-"
             )}
           </Descriptions.Item>
+          <Descriptions.Item label="Date">
+            {selectedRecord?.date ? selectedRecord.date.replace(/\//g, "-") : selectedRecord?.createdAt ? new Date(selectedRecord.createdAt).toLocaleDateString("en-IN", {timeZone: "Asia/Kolkata", day: "2-digit", month: "2-digit", year: "numeric"}).replace(/\//g, "-") : "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Time">
+            {selectedRecord?.time ? selectedRecord.time : selectedRecord?.createdAt ? new Date(selectedRecord.createdAt).toLocaleTimeString("en-IN", {timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit'}) : "-"}
+          </Descriptions.Item>
           <Descriptions.Item label="User ID" span={2}>
-            {selectedRecord?.userId || "-"}
+            {selectedRecord?.userId ? <Text copyable>{selectedRecord.userId}</Text> : "-"}
           </Descriptions.Item>
         </Descriptions>
       </Modal>

@@ -1830,7 +1830,7 @@ const Form = () => {
       lyricist: "Lyricist",
       composer: "Composer",
       musicDirector: "Music Director",
-      director: "Director",
+      director: "Track Feature Artist",
       producer: "Producer",
       starCast: "Star Cast",
     };
@@ -3173,7 +3173,7 @@ const Form = () => {
                         "musicDirector",
                         "music Director",
                       )}
-                      {renderArtistField(section, "director", "director")}
+                      {renderArtistField(section, "director", "Track Feature Artist")}
                       {renderArtistField(section, "producer", "Producer")}
                       {renderArtistField(section, "starCast", "starCast")}
                     </AllInpBox>
@@ -3856,7 +3856,7 @@ const Form = () => {
 
                       {/* DIRECTOR */}
                       <LabelInpBox>
-                        <Label htmlFor="director">director</Label>
+                        <Label htmlFor="director">Track Feature Artist</Label>
                         <AutoComplete
                           id="director"
                           value={inpFields.director}
@@ -3870,7 +3870,7 @@ const Form = () => {
                           onChange={(value) =>
                             setInpFields({ ...inpFields, director: value })
                           }
-                          placeholder="Director name"
+                          placeholder="Track feature artist name"
                           style={{ width: "100%" }}
                           filterOption={false}
                         />
@@ -3884,7 +3884,7 @@ const Form = () => {
                                 padding: "0.2rem 0",
                               }}
                             >
-                              No Director Selected
+                              No Track Feature Artist Selected
                             </div>
                           )}
                           {selectedDirectors.map((s, idx) => (
@@ -3903,7 +3903,7 @@ const Form = () => {
 
                               <RemoveButton
                                 onClick={() => removeDirector(idx)}
-                                title="Remove Director"
+                                title="Remove Track Feature Artist"
                               >
                                 <CloseOutlined />
                               </RemoveButton>

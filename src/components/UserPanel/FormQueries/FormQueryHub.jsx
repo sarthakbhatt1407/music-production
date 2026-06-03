@@ -7,12 +7,20 @@ import {
   YoutubeOutlined,
   GlobalOutlined,
   FormOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
-import QueryShell from "./QueryShell";
+
+const Page = styled.div`
+  padding: 8px;
+  overflow: scroll;
+
+  height: 90svh;
+  padding-bottom: 5rem;
+`;
 
 const CardGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
   gap: 1rem;
 `;
 
@@ -21,9 +29,15 @@ const ToolCard = styled(Card)`
   border: 1px solid #e6ebf3;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   overflow: hidden;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
 
   .ant-card-body {
     padding: 1.1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .ant-card-meta-title {
@@ -33,6 +47,11 @@ const ToolCard = styled(Card)`
 
   .ant-card-meta-description {
     color: #667085;
+    font-size: 0.85rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 `;
 
@@ -52,13 +71,39 @@ const IconBadge = styled.div`
 const Actions = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
 `;
 
 const CardLink = styled(Link)`
   display: block;
   color: inherit;
   text-decoration: none;
+`;
+
+const SectionTitle = styled.h2`
+  margin: 1.5rem 0 1rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #111827;
+`;
+
+const SecondaryGrid = styled(Card)`
+  border: 1px solid #e6ebf3;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  margin-top: 1rem;
+
+  .ant-card-body {
+    padding: 1rem;
+  }
+`;
+
+const QuickGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
 `;
 
 const cards = [
@@ -92,30 +137,53 @@ const cards = [
   },
 ];
 
-const FormQueryHub = ({ basePath = "/user-panel/form-query" }) => {
+const FormQueryHub = ({ basePath = "/user-panel/tools" }) => {
   return (
-    <QueryShell
-      title="Form Query"
-      description="Choose the request type below. Each card opens a dedicated form with the fields needed for that workflow."
-    >
+    <Page>
       <CardGrid>
-        {cards.map((card) => (
-          <CardLink key={card.slug} to={`${basePath}/${card.slug}`}>
-            <ToolCard
-              title={card.title}
-              extra={<Tag color="blue">{card.tag}</Tag>}
-              bordered={false}
-            >
-              <IconBadge>{card.icon}</IconBadge>
-              <Card.Meta title={card.title} description={card.description} />
-              <Actions>
-                <Button type="primary">Open Form</Button>
-              </Actions>
-            </ToolCard>
-          </CardLink>
-        ))}
+        <ToolCard
+          title="Bulk Upload"
+          extra={<Tag color="blue">Primary</Tag>}
+          bordered={false}
+        >
+          <IconBadge>
+            <UploadOutlined />
+          </IconBadge>
+          <Card.Meta
+            title="Bulk Upload"
+            description="Upload multiple songs via Excel sheet with matching thumbnails and audio files."
+          />
+          <Actions>
+            <Link to={`${basePath}/bulk-upload`}>
+              <Button type="primary" icon={<UploadOutlined />}>
+                Open Bulk Upload
+              </Button>
+            </Link>
+          </Actions>
+        </ToolCard>
       </CardGrid>
-    </QueryShell>
+
+      <SectionTitle>Form Queries</SectionTitle>
+      <SecondaryGrid bordered={false}>
+        <QuickGrid>
+          {cards.map((card) => (
+            <CardLink key={card.slug} to={`${basePath}/${card.slug}`}>
+              <ToolCard
+                title={card.title}
+                extra={<Tag color="blue">{card.tag}</Tag>}
+                bordered={false}
+              >
+                <IconBadge>{card.icon}</IconBadge>
+                <Card.Meta title={card.title} description={card.description} />
+                <Actions>
+                  <Button type="primary">Open Form</Button>
+                </Actions>
+              </ToolCard>
+            </CardLink>
+          ))}
+        </QuickGrid>
+      </SecondaryGrid>
+    </Page>
   );
 };
 

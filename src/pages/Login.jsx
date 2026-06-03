@@ -326,7 +326,7 @@ const MobileOtpLogin = () => {
       setMobileError("Please enter a valid 10-digit mobile number");
       return;
     }
-    if (mobile == "7895603314" || mobile == "7088360325") {
+    if (mobile == "1234567890") {
       setGeneratedOTP("0000");
       setStep(2);
       setTimer(60);

@@ -24,6 +24,7 @@ import YoutubeOacRequest from "../components/UserPanel/FormQueries/YoutubeOacReq
 import InstaFbWhitelist from "../components/UserPanel/FormQueries/InstaFbWhitelist";
 import InstaReelCredit from "../components/UserPanel/FormQueries/InstaReelCredit";
 import ManageUsers from "../components/UserPanel/ManageUsers";
+import BulkUpload from "../components/UserPanel/BulkUpload";
 
 const Modal = styled.div`
   width: 100%;
@@ -494,17 +495,18 @@ const UserPanel = () => {
           {page === "profile" && <ProfilePage />}
           {page === "upload" && <Form />}
           {page === "reports" && <Reports />}
-          {page === "form-query" && !subpage && <FormQueryHub />}
-          {page === "form-query" && subpage === "social-media-linking" && (
+          {page === "tools" && !subpage && <FormQueryHub />}
+          {page === "tools" && subpage === "bulk-upload" && <BulkUpload />}
+          {page === "tools" && subpage === "social-media-linking" && (
             <SocialMediaLinking />
           )}
-          {page === "form-query" && subpage === "youtube-oac-request" && (
+          {page === "tools" && subpage === "youtube-oac-request" && (
             <YoutubeOacRequest />
           )}
-          {page === "form-query" && subpage === "insta-fb-whitelist" && (
+          {page === "tools" && subpage === "insta-fb-whitelist" && (
             <InstaFbWhitelist />
           )}
-          {page === "form-query" && subpage === "insta-reel-credit" && (
+          {page === "tools" && subpage === "insta-reel-credit" && (
             <InstaReelCredit />
           )}
           {page === "history" && <History />}

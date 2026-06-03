@@ -30,6 +30,7 @@ import { Badge } from "@mui/material";
 import { FaWallet } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
 import { MdOutlineAssignment } from "react-icons/md";
+import { BsTools } from "react-icons/bs";
 import MusicLoader from "./Loader/MusicLoader";
 const { Header, Sider, Content } = Layout;
 
@@ -299,7 +300,7 @@ const DrawerPanel = (props) => {
     if (page === "wallet") {
       return ["8"];
     }
-    if (page === "form-query") {
+    if (page === "tools") {
       return ["9"];
     }
     if (page === "manage-users") {
@@ -499,13 +500,13 @@ const DrawerPanel = (props) => {
               key: "9",
               icon: (
                 <Link
-                  to={"/user-panel/form-query"}
+                  to={"/user-panel/tools"}
                   onClick={handleMobileMenuClick}
                 >
-                  <MdOutlineAssignment />
+                  <BsTools />
                 </Link>
               ),
-              label: "Form Query",
+              label: "Tools",
             },
             !parentUser && {
               key: "10",

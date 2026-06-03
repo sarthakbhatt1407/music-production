@@ -448,54 +448,66 @@ const YoutubeOacRequest = ({
 
         <Descriptions bordered column={2} size="small">
           <Descriptions.Item label="Artist Name">
-            {selectedRecord?.artistName || "-"}
+            {selectedRecord?.artistName ? <Text copyable>{selectedRecord.artistName}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Status">
             {selectedRecord?.status || "-"}
           </Descriptions.Item>
           <Descriptions.Item label="ISRC 1">
-            {selectedRecord?.isrc1 || "-"}
+            {selectedRecord?.isrc1 ? <Text copyable>{selectedRecord.isrc1}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="ISRC 2">
-            {selectedRecord?.isrc2 || "-"}
+            {selectedRecord?.isrc2 ? <Text copyable>{selectedRecord.isrc2}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="ISRC 3">
-            {selectedRecord?.isrc3 || "-"}
+            {selectedRecord?.isrc3 ? <Text copyable>{selectedRecord.isrc3}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="YouTube URL">
             {selectedRecord?.youtubeUrl ? (
-              <LinkCell
-                href={selectedRecord.youtubeUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <LinkOutlined />
-              </LinkCell>
+              <Space>
+                <Text copyable={{ text: selectedRecord.youtubeUrl }} />
+                <LinkCell
+                  href={selectedRecord.youtubeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <LinkOutlined />
+                </LinkCell>
+              </Space>
             ) : (
               "-"
             )}
           </Descriptions.Item>
           <Descriptions.Item label="Topic Channel URL">
             {selectedRecord?.topicChannelUrl ? (
-              <LinkCell
-                href={selectedRecord.topicChannelUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <LinkOutlined />
-              </LinkCell>
+              <Space>
+                <Text copyable={{ text: selectedRecord.topicChannelUrl }} />
+                <LinkCell
+                  href={selectedRecord.topicChannelUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <LinkOutlined />
+                </LinkCell>
+              </Space>
             ) : (
               "-"
             )}
           </Descriptions.Item>
           <Descriptions.Item label="Email">
-            {selectedRecord?.email || "-"}
+            {selectedRecord?.email ? <Text copyable>{selectedRecord.email}</Text> : "-"}
           </Descriptions.Item>
           <Descriptions.Item label="Contact">
-            {selectedRecord?.contact || "-"}
+            {selectedRecord?.contact ? <Text copyable>{selectedRecord.contact}</Text> : "-"}
           </Descriptions.Item>
-          <Descriptions.Item label="Label Name" span={2}>
-            {selectedRecord?.labelName || "-"}
+          <Descriptions.Item label="Label Name">
+            {selectedRecord?.labelName ? <Text copyable>{selectedRecord.labelName}</Text> : "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Date">
+            {selectedRecord?.date ? selectedRecord.date.replace(/\//g, "-") : selectedRecord?.createdAt ? new Date(selectedRecord.createdAt).toLocaleDateString("en-IN", {timeZone: "Asia/Kolkata", day: "2-digit", month: "2-digit", year: "numeric"}).replace(/\//g, "-") : "-"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Time">
+            {selectedRecord?.time ? selectedRecord.time : selectedRecord?.createdAt ? new Date(selectedRecord.createdAt).toLocaleTimeString("en-IN", {timeZone: "Asia/Kolkata", hour: '2-digit', minute:'2-digit'}) : "-"}
           </Descriptions.Item>
         </Descriptions>
       </Modal>

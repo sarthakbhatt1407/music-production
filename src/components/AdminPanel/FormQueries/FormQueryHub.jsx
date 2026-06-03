@@ -21,9 +21,15 @@ const ToolCard = styled(Card)`
   border: 1px solid #e6ebf3;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   overflow: hidden;
+  height: 230px;
+  display: flex;
+  flex-direction: column;
 
   .ant-card-body {
     padding: 1.1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .ant-card-meta-title {
@@ -33,6 +39,11 @@ const ToolCard = styled(Card)`
 
   .ant-card-meta-description {
     color: #667085;
+    font-size: 0.55rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 `;
 
@@ -52,7 +63,8 @@ const IconBadge = styled.div`
 const Actions = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
 `;
 
 const CardLink = styled(Link)`
@@ -71,7 +83,7 @@ const cards = [
   },
   {
     title: "YouTube OAC Request",
-    description: "Submit channel info and three ISRC references.",
+    // description: "Submit channel info and three ISRC references.",
     icon: <YoutubeOutlined />,
     slug: "youtube-oac-request",
     tag: "YouTube",
