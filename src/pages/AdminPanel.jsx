@@ -30,6 +30,7 @@ import {
   DownloadOutlined,
   DollarOutlined,
   LinkOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import { IoIosAdd } from "react-icons/io";
 import { HiOutlineDocumentReport } from "react-icons/hi";
@@ -64,6 +65,7 @@ const AdminPanel = () => {
   const [paymentForm] = Form.useForm();
  
   const [linkingModalVisible, setLinkingModalVisible] = useState(false);
+  const [analyticsModalVisible, setAnalyticsModalVisible] = useState(false);
   const [linkingForm] = Form.useForm();
 
   const fetchUsers = async () => {
@@ -112,6 +114,16 @@ const AdminPanel = () => {
   const handlePaymentModalCancel = () => {
     setPaymentModalVisible(false);
     paymentForm.resetFields();
+  };
+
+  const handleOpenAnalyticsModal = () => {
+    setAnalyticsModalVisible(true);
+    setOpen(false);
+  };
+
+  const handleAnalyticsModalCancel = () => {
+    setAnalyticsModalVisible(false);
+    setFileList([]);
   };
 
   const handleOpenLinkingModal = () => {
@@ -248,6 +260,47 @@ const AdminPanel = () => {
     setLoading(false);
   };
 
+  const handleGenerateAnalytics = async () => {
+    if (!fileList.length) {
+      message.error("Please upload an Excel or CSV file.");
+      return;
+    }
+    const file = fileList[0].originFileObj;
+    if (!file) {
+      message.error("No file selected.");
+      return;
+    }
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("excel", file);
+    formData.append("year", selectedYear);
+    formData.append("month", getMonthAbbr(selectedMonth));
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/analytics-adder`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await res.json();
+      console.log(data, '=======================================');
+
+      if (res.ok) {
+        message.success("File processed successfully. Analytics report added.");
+        setAnalyticsModalVisible(false);
+        setFileList([]);
+      } else {
+        message.error(data.message || "Failed to process file.");
+      }
+    } catch (err) {
+      message.error("Something went wrong while uploading the file.");
+    }
+    setLoading(false);
+  };
+
   // Handle payment submission
   const handlePaymentSubmit = async (values) => {
     setLoading(true);
@@ -348,7 +401,102 @@ const AdminPanel = () => {
             />
           }
         />
+        <FloatButton
+          onClick={handleOpenAnalyticsModal}
+          tooltip={<div>Analytics Report</div>}
+          icon={
+            <BarChartOutlined
+              style={{
+                color: "#fa8c16",
+              }}
+            />
+          }
+        />
       </FloatButton.Group>
+
+      {/* Analytics Report Modal */}
+      <Modal
+        title="Add Analytics Report"
+        open={analyticsModalVisible}
+        onCancel={handleAnalyticsModalCancel}
+        footer={[
+          <Button key="cancel" onClick={handleAnalyticsModalCancel}>
+            Cancel
+          </Button>,
+          <Button
+            key="generate"
+            type="primary"
+            onClick={handleGenerateAnalytics}
+            icon={<DownloadOutlined />}
+            loading={loading}
+          >
+            Add Analytics Report
+          </Button>,
+        ]}
+        width={600}
+      >
+        <div style={{ padding: "20px 0" }}>
+          <div style={{ marginBottom: 24 }}>
+            <h4 style={{ marginBottom: 12, fontWeight: 500 }}>
+              Select Time Period
+            </h4>
+            <div style={{ display: "flex", gap: 16 }}>
+              <div style={{ flex: 1 }}>
+                <label
+                  style={{ display: "block", marginBottom: 8, color: "#666" }}
+                >
+                  Year
+                </label>
+                <Select
+                  style={{ width: "100%" }}
+                  value={selectedYear}
+                  onChange={(value) => setSelectedYear(value)}
+                >
+                  {getYearOptions().map((year) => (
+                    <Option key={year} value={year}>
+                      {year}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label
+                  style={{ display: "block", marginBottom: 8, color: "#666" }}
+                >
+                  Month
+                </label>
+                <Select
+                  style={{ width: "100%" }}
+                  value={selectedMonth}
+                  onChange={(value) => setSelectedMonth(value)}
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <Option key={i} value={i}>
+                      {getMonthName(i)}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 style={{ marginBottom: 12, fontWeight: 500 }}>Import Data</h4>
+            <Upload
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              showUploadList={true}
+              maxCount={1}
+              fileList={fileList}
+              beforeUpload={() => false}
+              onChange={handleFileUpload}
+            >
+              <Button icon={<UploadOutlined />} style={{ width: "100%" }}>
+                Click to Upload Excel/CSV
+              </Button>
+            </Upload>
+          </div>
+        </div>
+      </Modal>
 
       {/* Financial Report Modal */}
       <Modal

@@ -823,7 +823,7 @@ const UserPanelHome = () => {
 
                 {reportData && reportData.length > 0 ? (
                   <Row gutter={[16, 16]}>
-                    <Col xs={24} lg={16}>
+                    <Col xs={24} lg={24}>
                       <ChartContainer>
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart
@@ -884,6 +884,7 @@ const UserPanelHome = () => {
                             <YAxis
                               axisLine={false}
                               tickLine={false}
+                              tickFormatter={(value) => value.toLocaleString("en-IN")}
                               style={{
                                 fontSize:
                                   window.innerWidth <= 480
@@ -892,6 +893,10 @@ const UserPanelHome = () => {
                               }}
                             />
                             <Tooltip
+                              formatter={(value, name) => [
+                                value.toLocaleString("en-IN"),
+                                name,
+                              ]}
                               cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
                               contentStyle={{
                                 borderRadius: "8px",
@@ -927,63 +932,6 @@ const UserPanelHome = () => {
                               ))}
                             </Bar>
                           </BarChart>
-                        </ResponsiveContainer>
-                      </ChartContainer>
-                    </Col>
-
-                    <Col xs={24} lg={8}>
-                      <ChartContainer>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={reportData}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={window.innerWidth <= 480 ? 40 : 60}
-                              outerRadius={window.innerWidth <= 480 ? 60 : 80}
-                              fill="#8884d8"
-                              paddingAngle={5}
-                              dataKey="views"
-                              nameKey="name"
-                              label={
-                                window.innerWidth <= 480
-                                  ? false
-                                  : ({ name, percent }) =>
-                                      `${name}: ${(percent * 100).toFixed(0)}%`
-                              }
-                              labelLine={false}
-                              animationDuration={1500}
-                            >
-                              {reportData.map((entry, index) => (
-                                <Cell
-                                  key={`cell-${index}`}
-                                  fill={COLORSSTREAM[entry.name]}
-                                />
-                              ))}
-                            </Pie>
-                            <Tooltip
-                              formatter={(value, name) => [
-                                `${value} views`,
-                                name,
-                              ]}
-                              contentStyle={{
-                                borderRadius: "8px",
-                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                                border: "none",
-                                fontSize:
-                                  window.innerWidth <= 480
-                                    ? "0.8rem"
-                                    : "0.9rem",
-                              }}
-                            />
-                            {window.innerWidth <= 480 && (
-                              <Legend
-                                verticalAlign="bottom"
-                                height={36}
-                                wrapperStyle={{ fontSize: "0.7rem" }}
-                              />
-                            )}
-                          </PieChart>
                         </ResponsiveContainer>
                       </ChartContainer>
                     </Col>
