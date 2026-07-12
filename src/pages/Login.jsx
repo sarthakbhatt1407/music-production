@@ -475,7 +475,7 @@ const EmailOtpLogin = () => {
 
     if (otpValue === generatedOTP) {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}/user/check-user`,
+        `${process.env.REACT_APP_BASE_URL}/user/check-user-email`,
         {
           method: "POST",
           headers: {
@@ -492,7 +492,7 @@ const EmailOtpLogin = () => {
 
       if (data.exists) {
         const loginRes = await fetch(
-          `${process.env.REACT_APP_BASE_URL}/user/login`,
+          `${process.env.REACT_APP_BASE_URL}/user/login-by-email`,
           {
             method: "POST",
             headers: {
