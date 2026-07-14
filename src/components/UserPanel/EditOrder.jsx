@@ -2362,7 +2362,7 @@ const EditOrder = () => {
                   </div>
                 </LabelInpBox>
                 <LabelInpBox>
-                  <Label htmlFor="director">director</Label>
+                  <Label htmlFor="director">Track feature artist</Label>
                   <AutoComplete
                     id="director"
                     value={inpFields.director}
@@ -2374,7 +2374,7 @@ const EditOrder = () => {
                     onChange={(value) =>
                       setInpFields({ ...inpFields, director: value })
                     }
-                    placeholder="director name"
+                    placeholder="Track feature artist name"
                     style={{ width: "100%" }}
                     filterOption={false}
                   />
@@ -2403,7 +2403,7 @@ const EditOrder = () => {
                           padding: "0.2rem 0",
                         }}
                       >
-                        No Director Selected
+                        No Track Feature Artist Selected
                       </div>
                     )}
                     {selectedDirectors.map((s, idx) => (

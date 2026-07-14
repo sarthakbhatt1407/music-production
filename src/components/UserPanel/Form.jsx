@@ -906,7 +906,7 @@ const Form = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            amount: 100,
+            amount: 500,
             currency: "INR",
           }),
         },
@@ -1984,6 +1984,19 @@ const Form = () => {
           </PendingBox>
         </>
       )}
+      {!isLoading && userData && userData.status === "disable" && (
+        <>
+          <PendingBox>
+            <PendingTitle>
+              <PendingPill style={{ background: "#fee2e2", color: "#dc2626" }}>Disabled</PendingPill>
+              Profile disabled
+            </PendingTitle>
+            <div>
+              Your profile has been disabled by the admin. You cannot upload content at this time.
+            </div>
+          </PendingBox>
+        </>
+      )}
       {!isLoading && userData && userData.status === "paymentpending" && (
         <>
           <PendingBox>
@@ -2171,6 +2184,7 @@ const Form = () => {
       {!isLoading &&
         userData &&
         userData.status !== "pending" &&
+        userData.status !== "disable" &&
         userData.status !== "paymentpending" && (
           <>
             {showComposerModal && (
@@ -3017,11 +3031,15 @@ const Form = () => {
                 <SectionHeader>
                   <h2>Song Sections</h2>
                   <SectionActions>
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      onClick={addSongSection}
-                    />
+                    {inpFields.contentType === "album" && (
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={addSongSection}
+                      >
+                        Add New Song
+                      </Button>
+                    )}
                   </SectionActions>
                 </SectionHeader>
                 {songSections.map((section, sectionIndex) => (
@@ -3034,7 +3052,9 @@ const Form = () => {
                           danger
                           icon={<CloseOutlined />}
                           onClick={() => removeSongSection(section.id)}
-                        />
+                        >
+                          Remove
+                        </Button>
                       )}
                     </SectionHeader>
 

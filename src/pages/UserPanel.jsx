@@ -25,6 +25,7 @@ import InstaFbWhitelist from "../components/UserPanel/FormQueries/InstaFbWhiteli
 import InstaReelCredit from "../components/UserPanel/FormQueries/InstaReelCredit";
 import ManageUsers from "../components/UserPanel/ManageUsers";
 import BulkUpload from "../components/UserPanel/BulkUpload";
+import ArtistManagement from "../components/UserPanel/ArtistManagement";
 
 const Modal = styled.div`
   width: 100%;
@@ -514,6 +515,7 @@ const UserPanel = () => {
           {page === "manage-users" && <ManageUsers />}
           {page === "notification" && <UserNoti />}
           {page === "copyright" && <CopyRightPage />}
+          {page === "artist-management" && <ArtistManagement />}
           {page === "legal-document" && <LegalDoc />}
           {id && !action && <OrderDetailsPage />}
           {action === "edit" && <EditOrder />}

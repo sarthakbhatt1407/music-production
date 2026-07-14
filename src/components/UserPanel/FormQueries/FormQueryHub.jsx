@@ -8,6 +8,8 @@ import {
   GlobalOutlined,
   FormOutlined,
   UploadOutlined,
+  FileTextOutlined,
+  UsergroupAddOutlined,
 } from "@ant-design/icons";
 
 const Page = styled.div`
@@ -137,6 +139,23 @@ const cards = [
   },
 ];
 
+const managementCards = [
+  {
+    title: "Legal Documents",
+    description: "View and manage legal documents.",
+    icon: <FileTextOutlined />,
+    fullPath: "/user-panel/reports",
+    tag: "Legal",
+  },
+  {
+    title: "Artists",
+    description: "Manage artists.",
+    icon: <UsergroupAddOutlined />,
+    fullPath: "/user-panel/artist-management",
+    tag: "Artists",
+  },
+];
+
 const FormQueryHub = ({ basePath = "/user-panel/tools" }) => {
   return (
     <Page>
@@ -163,11 +182,38 @@ const FormQueryHub = ({ basePath = "/user-panel/tools" }) => {
         </ToolCard>
       </CardGrid>
 
+      <SectionTitle>Management</SectionTitle>
+      <SecondaryGrid bordered={false}>
+        <QuickGrid>
+          {managementCards.map((card) => (
+            <CardLink
+              key={card.fullPath}
+              to={card.fullPath}
+            >
+              <ToolCard
+                title={card.title}
+                extra={<Tag color="blue">{card.tag}</Tag>}
+                bordered={false}
+              >
+                <IconBadge>{card.icon}</IconBadge>
+                <Card.Meta title={card.title} description={card.description} />
+                <Actions>
+                  <Button type="primary">Open</Button>
+                </Actions>
+              </ToolCard>
+            </CardLink>
+          ))}
+        </QuickGrid>
+      </SecondaryGrid>
+
       <SectionTitle>Form Queries</SectionTitle>
       <SecondaryGrid bordered={false}>
         <QuickGrid>
           {cards.map((card) => (
-            <CardLink key={card.slug} to={`${basePath}/${card.slug}`}>
+            <CardLink
+              key={card.slug || card.fullPath}
+              to={card.fullPath ? card.fullPath : `${basePath}/${card.slug}`}
+            >
               <ToolCard
                 title={card.title}
                 extra={<Tag color="blue">{card.tag}</Tag>}

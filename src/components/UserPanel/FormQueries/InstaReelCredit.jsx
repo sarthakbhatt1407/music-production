@@ -99,6 +99,7 @@ const InstaReelCredit = ({
 }) => {
   const [form] = Form.useForm();
   const id = useSelector((state) => state.userId);
+  const labelName = useSelector((state) => state.labelName);
 
   const [tableLoading, setTableLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -144,10 +145,10 @@ const InstaReelCredit = ({
 
   const handleOpenModal = () => {
     form.setFieldsValue({
-      labelInfo: "",
+      labelInfo: labelName,
       singerName: "",
       songName: "",
-      instFbUrl: "",
+
       isrc: "",
       expectedTime: moment("00:30", format),
       reelLink: "",
@@ -380,17 +381,7 @@ const InstaReelCredit = ({
                   <Input placeholder="Song name" />
                 </Form.Item>
               </Col>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="instFbUrl"
-                  label="Insta / Fb URL"
-                  rules={[
-                    { required: true, message: "Please enter Insta/Fb URL" },
-                  ]}
-                >
-                  <Input placeholder="https://instagram.com/..." />
-                </Form.Item>
-              </Col>
+            
               <Col xs={24} md={12}>
                 <Form.Item
                   name="isrc"

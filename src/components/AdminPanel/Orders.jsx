@@ -12,6 +12,7 @@ import {
   ReloadOutlined,
   FilterOutlined,
   FileExcelOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { handleExportAdvanceExcel } from "../../utils/exportAdvanceExcel";
 import MusicLoader from "../Loader/MusicLoader";
@@ -29,6 +30,8 @@ import {
   Col,
   Statistic,
   Empty,
+  Popconfirm,
+  message,
 } from "antd";
 import { PersonOutline } from "@mui/icons-material";
 
@@ -204,6 +207,27 @@ const Orders = () => {
   const handleTableChange = (pagination, filters, sorter) => {
     setFilteredInfo(filters);
     setSortedInfo(sorter);
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${orderId}&action=delete`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      if (res.ok) {
+        message.success("Order deleted successfully");
+        fetcher();
+      } else {
+        message.error("Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      message.error("An error occurred");
+    }
   };
 
   // Get order statistics
@@ -417,13 +441,26 @@ const Orders = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 80,
+      width: 120,
       render: (_, record) => (
-        <Tooltip title="View Order Details">
-          <Link to={`/admin-panel/order/${record.id}`}>
-            <Button type="primary" icon={<EyeOutlined />} size="small" />
-          </Link>
-        </Tooltip>
+        <Space>
+          <Tooltip title="View Order Details">
+            <Link to={`/admin-panel/order/${record.id}`}>
+              <Button type="primary" icon={<EyeOutlined />} size="small" />
+            </Link>
+          </Tooltip>
+          <Tooltip title="Delete Order">
+            <Popconfirm
+              title="Delete the order"
+              description="Are you sure to delete this order?"
+              onConfirm={() => handleDeleteOrder(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="primary" danger icon={<DeleteOutlined />} size="small" />
+            </Popconfirm>
+          </Tooltip>
+        </Space>
       ),
     },
   ];

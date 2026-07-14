@@ -93,6 +93,7 @@ const LinkCell = styled.a`
 const InstaFbWhitelist = () => {
   const [form] = Form.useForm();
   const id = useSelector((state) => state.userId);
+  const labelName = useSelector((state) => state.labelName);
 
   const [tableLoading, setTableLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -137,7 +138,7 @@ const InstaFbWhitelist = () => {
 
   const handleOpenModal = () => {
     form.setFieldsValue({
-      labelInfo: "",
+      labelInfo: labelName,
       instFbUrl: "",
       isrc: "",
       status: "",
@@ -202,7 +203,7 @@ const InstaFbWhitelist = () => {
       ellipsis: true,
     },
     {
-      title: "ISRC",
+      title: "FB Url",
       dataIndex: "isrc",
       key: "isrc",
       width: 140,
@@ -308,7 +309,7 @@ const InstaFbWhitelist = () => {
           <div style={{ marginBottom: "1rem" }}>
             <h2 style={{ margin: 0, fontSize: "1.15rem" }}>Add New Request</h2>
             <p style={{ margin: "0.35rem 0 0", color: "#667085" }}>
-              Fill in the label info, whitelist URL, and ISRC for the request.
+              Fill in the label info, whitelist URL, and Facebook Url for the request.
             </p>
           </div>
 
@@ -329,7 +330,7 @@ const InstaFbWhitelist = () => {
               <Col xs={24} md={12}>
                 <Form.Item
                   name="instFbUrl"
-                  label="Insta / Fb URL"
+                  label="Insta URL"
                   rules={[
                     { required: true, message: "Please enter whitelist URL" },
                   ]}
@@ -341,10 +342,10 @@ const InstaFbWhitelist = () => {
               <Col xs={24}>
                 <Form.Item
                   name="isrc"
-                  label="ISRC"
-                  rules={[{ required: true, message: "Please enter ISRC" }]}
+                  label="FB URL"
+                  rules={[{ required: true, message: "Please enter Facebook Url" }]}
                 >
-                  <Input placeholder="ISRC" />
+                  <Input placeholder="FB URL" />
                 </Form.Item>
               </Col>
             </Row>

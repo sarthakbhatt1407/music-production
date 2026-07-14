@@ -313,6 +313,7 @@ const UserWalletView = () => {
           bonus,
           userName: data.name,
           userAvatar: data.img,
+          status: data.status
         }));
         setRequestFormData({
           amount:
@@ -467,7 +468,31 @@ const UserWalletView = () => {
         style={{ marginBottom: "1rem" }}
       />
 
-      <PageHeader>
+      {!loading && userData && userData.status === "disable" && (
+        <Box sx={{
+          width: "100%", margin: "1rem 0 1.25rem", padding: "1.25rem 1.4rem", borderRadius: "14px",
+          border: "1px solid #d9e6ff", background: "linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%)",
+          boxShadow: "0 10px 24px rgba(15, 23, 42, 0.05)", color: "#334155", display: "flex", flexDirection: "column",
+          gap: "0.9rem", alignItems: "flex-start", fontSize: "1rem", lineHeight: 1.55, letterSpacing: "0.01rem"
+        }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "0.55rem", fontSize: "1.02rem", fontWeight: 700, color: "#0f172a" }}>
+            <Box component="span" sx={{
+              display: "inline-flex", alignItems: "center", padding: "0.28rem 0.7rem", borderRadius: "999px",
+              background: "#fee2e2", color: "#dc2626", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase"
+            }}>
+              Disabled
+            </Box>
+            Profile disabled
+          </Box>
+          <Box>
+            Your profile has been disabled by the admin. You cannot access the wallet at this time.
+          </Box>
+        </Box>
+      )}
+
+      {userData && userData.status != "disable" && (
+        <>
+          <PageHeader>
         <Box display="flex" alignItems="center">
           <Box>
             <Typography variant="h4" fontWeight={600} sx={{ color: "#333333" }}>
@@ -1186,6 +1211,8 @@ const UserWalletView = () => {
           {alertInfo.message}
         </Alert>
       </Snackbar>
+        </>
+      )}
     </Container>
   );
 };

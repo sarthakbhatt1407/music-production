@@ -250,13 +250,29 @@ const InstaFbWhitelist = () => {
       ellipsis: true,
     },
     {
-      title: "ISRC",
+      title: "Facebook Url",
       dataIndex: "isrc",
       key: "isrc",
       width: 140,
+       render: (value) =>
+        value ? (
+          <LinkCell
+            href={value}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Space size={6}>
+              <LinkOutlined />
+              <span>Open link</span>
+            </Space>
+          </LinkCell>
+        ) : (
+          "-"
+        ),
     },
     {
-      title: "Link",
+      title: "Insta Url",
       dataIndex: "instFbUrl",
       key: "instFbUrl",
       render: (value) =>

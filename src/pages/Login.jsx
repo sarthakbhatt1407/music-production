@@ -313,7 +313,7 @@ const EmailOtpLogin = () => {
       setEmailError("Please enter a valid email address");
       return;
     }
-    if (email === "test@demo.com") {
+    if (email === "sarthakbhatt1407@gmail.com") {
       setGeneratedOTP("0000");
       setStep(2);
       setTimer(60);

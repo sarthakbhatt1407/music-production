@@ -2,9 +2,10 @@ import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import * as XLSX from "xlsx";
 import { Button, Empty, Progress, Table, Tag, Upload, message } from "antd";
-import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
+import { InboxOutlined, UploadOutlined, FileExcelOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import MusicLoader from "../Loader/MusicLoader";
+import { handleDownloadTemplate } from "../../utils/exportAdvanceExcel";
 
 const { Dragger } = Upload;
 
@@ -920,6 +921,17 @@ const BulkUpload = () => {
             files, and the page will submit each row as a separate order.
           </p>
         </div>
+        <Button
+          type="primary"
+          icon={<FileExcelOutlined />}
+          style={{
+            background: "#1890ff",
+            borderColor: "#1890ff",
+          }}
+          onClick={handleDownloadTemplate}
+        >
+          Download Template
+        </Button>
       </Header>
 
       <UploadGrid>

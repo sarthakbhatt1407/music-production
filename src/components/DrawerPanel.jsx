@@ -30,7 +30,7 @@ import { Badge } from "@mui/material";
 import { FaWallet } from "react-icons/fa";
 import { IoWalletOutline } from "react-icons/io5";
 import { MdOutlineAssignment } from "react-icons/md";
-import { BsTools } from "react-icons/bs";
+import { BsTools, BsMusicNoteList } from "react-icons/bs";
 import MusicLoader from "./Loader/MusicLoader";
 const { Header, Sider, Content } = Layout;
 
@@ -306,6 +306,9 @@ const DrawerPanel = (props) => {
     if (page === "manage-users") {
       return ["10"];
     }
+    if (page === "artist-management") {
+      return ["11"];
+    }
   };
   const userId = useSelector((state) => state.userId);
   const [collapsed, setCollapsed] = useState(true);
@@ -435,34 +438,8 @@ const DrawerPanel = (props) => {
               label: "Copyright",
             },
 
-            {
-              key: "5",
-              icon: (
-                <Link
-                  to={"/user-panel/profile"}
-                  onClick={handleMobileMenuClick}
-                >
-                  <AccountCircleOutlined />
-                </Link>
-              ),
-              label: "My Account",
-            },
-            {
-              key: "6",
-              icon: (
-                <Link
-                  to={"/user-panel/reports"}
-                  onClick={handleMobileMenuClick}
-                >
-                  <SiMicrosoftexcel
-                    style={{
-                      transform: "scale(1.2)",
-                    }}
-                  />
-                </Link>
-              ),
-              label: "Legal Documents",
-            },
+           
+
             {
               key: "7",
               icon: (
@@ -496,6 +473,7 @@ const DrawerPanel = (props) => {
               ),
               label: "Wallet",
             },
+
             {
               key: "9",
               icon: (
@@ -508,7 +486,7 @@ const DrawerPanel = (props) => {
               ),
               label: "Tools",
             },
-            !parentUser && {
+            {
               key: "10",
               icon: (
                 <Link
@@ -519,6 +497,18 @@ const DrawerPanel = (props) => {
                 </Link>
               ),
               label: "Manage Users",
+            },
+             {
+              key: "5",
+              icon: (
+                <Link
+                  to={"/user-panel/profile"}
+                  onClick={handleMobileMenuClick}
+                >
+                  <AccountCircleOutlined />
+                </Link>
+              ),
+              label: "My Account",
             },
           ]}
         />

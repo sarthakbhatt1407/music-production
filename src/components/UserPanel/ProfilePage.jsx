@@ -708,6 +708,8 @@ const Input = styled.input`
 `;
 
 const ProfilePage = () => {
+    const adminView = useSelector((state) => state.adminView);
+    // alert(adminView)
   const [api, contextHolderNot] = notification.useNotification({
     duration: 2.5,
   });
@@ -770,6 +772,14 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [inpFields, setInpFields] = useState({});
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [addressProfile, setAddressProfile] = useState({
+    address: "",
+    city: "",
+    pincode: "",
+    state: "",
+    country: "",
+  });
   const [totalEarningUser, setTotalEarningUser] = useState(0);
   const [activeTab, setActiveTab] = useState("1");
   const [profileCompletion, setProfileCompletion] = useState(0);
@@ -866,6 +876,13 @@ const ProfilePage = () => {
           email: data.user.email,
           userPic: null,
         });
+        setAddressProfile({
+          address: data.user.address || "",
+          city: data.user.city || "",
+          pincode: data.user.pincode || "",
+          state: data.user.state || "",
+          country: data.user.country || "",
+        });
         totalPaymentReporter(data.user.finacialReport[0]);
         setInpFields(data.user.bankDetails[0]);
         setProfileCompletion(calculateProfileCompletion(data.user));
@@ -917,6 +934,12 @@ const ProfilePage = () => {
     });
 
     setUserProfile({ ...userProfile, [id]: val.trim() });
+  };
+
+  const addressProfileChangerHandler = (e) => {
+    const id = e.target.id;
+    const val = e.target.value;
+    setAddressProfile({ ...addressProfile, [id]: val });
   };
 
   const validateBankForm = () => {
@@ -1053,6 +1076,41 @@ const ProfilePage = () => {
     }
   };
 
+  const onAddressSubmitHandler = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/edit-address`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...addressProfile,
+            userId: userId,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        openNotificationWithIcon("success", data.message);
+        setShowAddressModal(false);
+        setRefresher(refresher + 1);
+      } else {
+        openNotificationWithIcon("error", data.message);
+      }
+    } catch (err) {
+      console.error("Error updating address:", err);
+      openNotificationWithIcon(
+        "error",
+        "Failed to update address. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const copyToClipBoard = async (txt) => {
     try {
       await navigator.clipboard.writeText(txt);
@@ -1111,6 +1169,7 @@ const ProfilePage = () => {
                   value={userProfile.name}
                   placeholder="Enter label name"
                   className={formErrors.name ? "error" : ""}
+                  disabled={!adminView}
                 />
                 {formErrors.name && (
                   <div className="error-message">{formErrors.name}</div>
@@ -1141,6 +1200,7 @@ const ProfilePage = () => {
                   value={userProfile.email}
                   placeholder="Enter email address"
                   className={formErrors.email ? "error" : ""}
+                      disabled={!adminView}
                 />
                 {formErrors.email && (
                   <div className="error-message">{formErrors.email}</div>
@@ -1185,6 +1245,100 @@ const ProfilePage = () => {
               </ActionButton>
               <ActionButton
                 onClick={onProfileSubmitHandler}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <CloudUploadOutlined style={{ fontSize: "1.2rem" }} />
+                Save Changes
+              </ActionButton>
+            </div>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+
+      {/* Edit Address Modal */}
+      {showAddressModal && (
+        <ModalOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <ModalContent
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ type: "spring", damping: 20 }}
+          >
+            <div className="modal-header">
+              <h2>Edit Address</h2>
+            </div>
+            <div className="modal-body">
+              <FormGroup>
+                <label htmlFor="address">Address</label>
+                <Input
+                  type="text"
+                  id="address"
+                  onChange={addressProfileChangerHandler}
+                  value={addressProfile.address}
+                  placeholder="Enter address"
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="city">City</label>
+                <Input
+                  type="text"
+                  id="city"
+                  onChange={addressProfileChangerHandler}
+                  value={addressProfile.city}
+                  placeholder="Enter city"
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="pincode">Pincode</label>
+                <Input
+                  type="text"
+                  id="pincode"
+                  onChange={addressProfileChangerHandler}
+                  value={addressProfile.pincode}
+                  placeholder="Enter pincode"
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="state">State</label>
+                <Input
+                  type="text"
+                  id="state"
+                  onChange={addressProfileChangerHandler}
+                  value={addressProfile.state}
+                  placeholder="Enter state"
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="country">Country</label>
+                <Input
+                  type="text"
+                  id="country"
+                  onChange={addressProfileChangerHandler}
+                  value={addressProfile.country}
+                  placeholder="Enter country"
+                />
+              </FormGroup>
+            </div>
+            <div className="modal-footer">
+              <ActionButton
+                secondary
+                onClick={() => setShowAddressModal(false)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Cancel
+              </ActionButton>
+              <ActionButton
+                onClick={onAddressSubmitHandler}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -1287,6 +1441,21 @@ const ProfilePage = () => {
                 />
                 {formErrors.upi && (
                   <div className="error-message">{formErrors.upi}</div>
+                )}
+              </FormGroup>
+
+              <FormGroup>
+                <label htmlFor="panCard">PAN Card Number</label>
+                <Input
+                  type="text"
+                  id="panCard"
+                  onChange={onChangeHandler}
+                  value={inpFields.panCard || ""}
+                  placeholder="Enter PAN Card number"
+                  className={formErrors.panCard ? "error" : ""}
+                />
+                {formErrors.panCard && (
+                  <div className="error-message">{formErrors.panCard}</div>
                 )}
               </FormGroup>
             </div>
@@ -1498,6 +1667,16 @@ const ProfilePage = () => {
                       <LocationOnOutlined />
                       Address Details
                     </h3>
+                    {adminView && (
+                      <ActionButton
+                        onClick={() => setShowAddressModal(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <EditOutlined />
+                        Edit Address
+                      </ActionButton>
+                    )}
                   </div>
 
                   <div className="section-content">
@@ -1670,6 +1849,28 @@ const ProfilePage = () => {
                               className="copy-icon"
                               onClick={() =>
                                 copyToClipBoard(userData.bankDetails[0].upi)
+                              }
+                            />
+                          </Tooltip>
+                        )}
+                      </div>
+                    </InfoRow>
+
+                    <InfoRow>
+                      <div className="info-label">
+                        <AccountBalanceOutlined />
+                        PAN Card Number
+                      </div>
+                      <div className="info-value">
+                        {!userData.bankDetails[0].panCard || userData.bankDetails[0].panCard.length === 0
+                          ? "Not provided"
+                          : userData.bankDetails[0].panCard}
+                        {userData.bankDetails[0].panCard && userData.bankDetails[0].panCard.length !== 0 && (
+                          <Tooltip title="Copy to clipboard">
+                            <CopyOutlined
+                              className="copy-icon"
+                              onClick={() =>
+                                copyToClipBoard(userData.bankDetails[0].panCard)
                               }
                             />
                           </Tooltip>
