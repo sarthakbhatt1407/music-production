@@ -921,7 +921,7 @@ const Form = () => {
       }
 
       const options = {
-        key: "rzp_test_RAQAuLXpIZAQYQ",
+        key: "rzp_live_TG53Pr9EPozggs",
         amount: paymentData.amount,
         currency: paymentData.currency,
         order_id: paymentData.order_id,

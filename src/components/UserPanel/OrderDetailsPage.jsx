@@ -865,7 +865,7 @@ const OrderDetailsPage = () => {
 
       // Razorpay options
       const options = {
-        key: "rzp_test_RAQAuLXpIZAQYQ", // Replace with your Razorpay test/live key
+        key: "rzp_live_TG53Pr9EPozggs", // Replace with your Razorpay test/live key
         amount: paymentData.amount,
         currency: paymentData.currency,
         order_id: paymentData.order_id,
@@ -1002,7 +1002,7 @@ const OrderDetailsPage = () => {
 
       // Razorpay options
       const options = {
-        key: "rzp_test_RAQAuLXpIZAQYQ", // Replace with your Razorpay test/live key
+        key: "rzp_live_TG53Pr9EPozggs", // Replace with your Razorpay test/live key
         amount: paymentData.amount,
         currency: paymentData.currency,
         order_id: paymentData.order_id,
