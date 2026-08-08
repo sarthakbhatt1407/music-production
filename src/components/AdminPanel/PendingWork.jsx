@@ -7,7 +7,7 @@ import {
   ClockCircleOutlined,
   CheckCircleTwoTone,
   EditOutlined,
-  CloseOutlined,
+  DeleteOutlined,
   SearchOutlined,
   ReloadOutlined,
   FilterOutlined,
@@ -291,6 +291,27 @@ const PendingWork = () => {
     }
   };
 
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/order/update-order/?id=${orderId}&action=delete`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      if (res.ok) {
+        message.success("Order deleted successfully");
+        fetcher();
+      } else {
+        message.error("Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      message.error("An error occurred");
+    }
+  };
+
   // Initial data fetch
   useEffect(() => {
     fetcher();
@@ -531,19 +552,37 @@ const PendingWork = () => {
       ),
     },
     {
-      title: "Complete",
-      key: "complete",
-      width: 100,
+      title: "Action",
+      key: "action",
+      width: 120,
       render: (_, record) => (
-        <Tooltip title="Mark as Completed">
-          <Button
-            type="primary"
-            icon={<CheckOutlined />}
-            size="small"
-            style={{ backgroundColor: "#52c41a" }}
-            onClick={() => showCompletionModal(record)}
-          />
-        </Tooltip>
+        <Space>
+          <Tooltip title="Mark as Completed">
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              size="small"
+              style={{ backgroundColor: "#52c41a" }}
+              onClick={() => showCompletionModal(record)}
+            />
+          </Tooltip>
+          <Popconfirm
+            title="Delete Order"
+            description="Are you sure you want to delete this order?"
+            onConfirm={() => handleDeleteOrder(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Tooltip title="Delete Order">
+              <Button
+                type="primary"
+                danger
+                icon={<DeleteOutlined />}
+                size="small"
+              />
+            </Tooltip>
+          </Popconfirm>
+        </Space>
       ),
     },
   ];

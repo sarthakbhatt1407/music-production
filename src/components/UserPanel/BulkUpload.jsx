@@ -633,8 +633,11 @@ const BulkUpload = () => {
   const labelNameFromStore = useSelector((state) => state.labelName);
   const userId = useSelector((state) => state.userId);
   const [excelFile, setExcelFile] = useState(null);
+  const [excelFileList, setExcelFileList] = useState([]);
   const [thumbnailFiles, setThumbnailFiles] = useState([]);
+  const [thumbnailFileList, setThumbnailFileList] = useState([]);
   const [audioFiles, setAudioFiles] = useState([]);
+  const [audioFileList, setAudioFileList] = useState([]);
   const [parsedRows, setParsedRows] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
@@ -658,6 +661,7 @@ const BulkUpload = () => {
     String(row.songtitle || row.title || "").trim();
 
   const handleExcelChange = async ({ fileList }) => {
+    setExcelFileList(fileList);
     const file = fileList[0]?.originFileObj;
     setExcelFile(file || null);
     setResults([]);
@@ -679,6 +683,7 @@ const BulkUpload = () => {
   };
 
   const handleThumbnailChange = ({ fileList }) => {
+    setThumbnailFileList(fileList);
     setThumbnailFiles(
       fileList
         .map((item) => item.originFileObj)
@@ -690,6 +695,7 @@ const BulkUpload = () => {
   };
 
   const handleAudioChange = ({ fileList }) => {
+    setAudioFileList(fileList);
     setAudioFiles(
       fileList
         .map((item) => item.originFileObj)
@@ -883,10 +889,19 @@ const BulkUpload = () => {
     setIsUploading(false);
 
     if (uploadResults.every((result) => result.status === "Success")) {
-      message.success("All rows uploaded successfully.");
+      message.success("All data uploaded successfully.");
     } else {
-      message.warning("Bulk upload finished with some failed rows.");
+      message.error("Bulk upload finished with some failed rows.");
     }
+
+    setExcelFile(null);
+    setExcelFileList([]);
+    setThumbnailFiles([]);
+    setThumbnailFileList([]);
+    setAudioFiles([]);
+    setAudioFileList([]);
+    setParsedRows([]);
+    setProgress({ done: 0, total: 0 });
   };
 
   const thumbnailCountLabel = thumbnailFiles.length
@@ -942,6 +957,7 @@ const BulkUpload = () => {
             maxCount={1}
             beforeUpload={() => false}
             onChange={handleExcelChange}
+            fileList={excelFileList}
           >
             <Button icon={<UploadOutlined />}>Select Excel</Button>
           </Upload>
@@ -969,6 +985,7 @@ const BulkUpload = () => {
               return false;
             }}
             onChange={handleThumbnailChange}
+            fileList={thumbnailFileList}
           >
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
@@ -1005,6 +1022,7 @@ const BulkUpload = () => {
               return false;
             }}
             onChange={handleAudioChange}
+            fileList={audioFileList}
           >
             <p className="ant-upload-drag-icon">
               <InboxOutlined />

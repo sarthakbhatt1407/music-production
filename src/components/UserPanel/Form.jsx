@@ -2005,7 +2005,7 @@ const Form = () => {
               Activate your profile
             </PendingTitle>
             <div>
-              Your profile is pending activation. Please pay Rs. 100 to activate
+              Your profile is pending activation. Please pay Rs. 500 to activate
               your dashboard access.
             </div>
             <PendingActions>

@@ -108,7 +108,7 @@ const SubTitle = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const PhoneInputContainer = styled(Box)(({ theme }) => ({
+const EmailInputContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   width: "100%",
   marginBottom: "1.5rem",
@@ -119,22 +119,7 @@ const PhoneInputContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const CountryCode = styled(FormControl)(({ theme }) => ({
-  width: "80px",
-  "& .MuiOutlinedInput-root": {
-    borderRadius: "8px",
-    height: "55px",
-  },
-  // Responsive styles
-  [theme.breakpoints.down("sm")]: {
-    width: "90px",
-    "& .MuiOutlinedInput-root": {
-      height: "50px",
-    },
-  },
-}));
-
-const PhoneInput = styled(TextField)(({ theme }) => ({
+const EmailInput = styled(TextField)(({ theme }) => ({
   flex: 1,
   "& .MuiOutlinedInput-root": {
     borderRadius: "8px",
@@ -298,12 +283,11 @@ const ProAndInfLogin = () => {
   const dispatch = useDispatch();
 
   // States
-  const [step, setStep] = useState(1); // 1: Mobile input, 2: OTP verification
-  const [mobile, setMobile] = useState("");
-  const [countryCode, setCountryCode] = useState("+91");
+  const [step, setStep] = useState(1); // 1: Email input, 2: OTP verification
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
-  const [mobileError, setMobileError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [otpError, setOtpError] = useState("");
   const [timer, setTimer] = useState(0);
 
@@ -327,12 +311,14 @@ const ProAndInfLogin = () => {
     }
   }, [timer]);
 
-  // Handle mobile input change
-  const handleMobileChange = (e) => {
+  // Handle email input change
+  const handleEmailChange = (e) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value) && value.length <= 10) {
-      setMobile(value);
-      setMobileError("");
+    setEmail(value);
+    if (value && !/^\S+@\S+\.\S+$/.test(value)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
     }
   };
 
@@ -352,48 +338,64 @@ const ProAndInfLogin = () => {
   };
   const [generatedOTP, setGeneratedOTP] = useState("");
 
-  // Handle mobile submit with real OTP integration
-  const handleMobileSubmit = async () => {
-    if (mobile.length !== 10) {
-      setMobileError("Please enter a valid 10-digit mobile number");
+  // Handle email submit with real OTP integration
+  const handleEmailSubmit = async () => {
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError("Please enter a valid email address");
       return;
     }
-    if (mobile == "7895603314") {
+    if (email === "sarthakbhatt14071@gmail.com") {
       setGeneratedOTP("0000");
       setStep(2);
       setTimer(60);
-      message.success("OTP sent successfully");
+      setNotification({
+        open: true,
+        message: "Demo OTP sent successfully",
+        severity: "success",
+      });
       return;
     }
-
     setLoading(true);
 
     try {
-      // Generate random 4-digit OTP
-      const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
-      // Store OTP in state
-      setGeneratedOTP(newOTP);
-
-      // Create OTP message
-      const otpMessage = `Your Rivaaz Films verification code is: ${newOTP}. This OTP is valid for 10 minutes.`;
-
-      // Send real OTP using Authkey.io API
       const response = await fetch(
-        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&otp=${newOTP}`
+        `${process.env.REACT_APP_BASE_URL}/user/send-user-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
       );
 
       const data = await response.json();
       console.log("OTP API response:", data);
+      alert(data.otp)
 
-      // Update UI state on success
-      setStep(2);
-      setTimer(60);
-      message.success("OTP sent successfully");
+      if (data.success) {
+        // Store OTP in state
+        setGeneratedOTP(data.otp);
+
+        // Update UI state on success
+        setStep(2);
+        setTimer(60);
+        setNotification({
+          open: true,
+          message: "OTP sent successfully",
+          severity: "success",
+        });
+      } else {
+        throw new Error(data.message || "Failed to send OTP");
+      }
     } catch (error) {
       console.error("Error sending OTP:", error);
 
-      message.error("Failed to send OTP. Please try again.");
+      setNotification({
+        open: true,
+        message: "Failed to send OTP. Please try again.",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -410,9 +412,12 @@ const ProAndInfLogin = () => {
       // If we've used all cooldowns, use the longest one
       nextTimerDuration = resendCooldowns[resendCooldowns.length - 1];
 
-      message.warning(
-        "You've reached the maximum OTP resend attempts. Please try again later."
-      );
+      setNotification({
+        open: true,
+        message:
+          "You've reached the maximum OTP resend attempts. Please try again later.",
+        severity: "warning",
+      });
       return;
     } else {
       nextTimerDuration = resendCooldowns[resendAttempts];
@@ -421,22 +426,29 @@ const ProAndInfLogin = () => {
     setLoading(true);
 
     try {
-      // Create OTP message
-      const otpMessage = `Your Rivaaz Films verification code is: ${generatedOTP}. This OTP is valid for 10 minutes.`;
-
-      // Send real OTP using Authkey.io API
       const response = await fetch(
-        `https://api.authkey.io/request?authkey=68d5bb5fb1726e0a&mobile=${mobile}&country_code=91&sid=24957&name=Twinkle&otp=${generatedOTP}`
+        `${process.env.REACT_APP_BASE_URL}/user/send-user-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
       );
 
       const data = await response.json();
       console.log("OTP API response:", data);
 
-      // Increment resend attempts counter
-      setResendAttempts((prevAttempts) => prevAttempts + 1);
+      if (data.success) {
+        // Store new OTP in state
+        setGeneratedOTP(data.otp);
 
-      // Set the timer to the next duration
-      setTimer(nextTimerDuration);
+        // Increment resend attempts counter
+        setResendAttempts((prevAttempts) => prevAttempts + 1);
+
+        // Set the timer to the next duration
+        setTimer(nextTimerDuration);
 
       // Format the time for display in notification
       let timeDisplay;
@@ -448,12 +460,22 @@ const ProAndInfLogin = () => {
         timeDisplay = "2 minutes";
       }
 
-      message.success(
-        `OTP resent successfully. Next resend available in ${timeDisplay}.`
-      );
+      setNotification({
+        open: true,
+        message: `OTP resent successfully. Next resend available in ${timeDisplay}.`,
+        severity: "success",
+      });
+      } else {
+        throw new Error(data.message || "Failed to resend OTP");
+      }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      message.error("Failed to resend OTP. Please try again.");
+
+      setNotification({
+        open: true,
+        message: "Failed to resend OTP. Please try again.",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -494,7 +516,7 @@ const ProAndInfLogin = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            contactNum: mobile,
+            contactNum: email,
           }),
         }
       );
@@ -503,7 +525,7 @@ const ProAndInfLogin = () => {
       console.log(data);
 
       if (data.exists) {
-        console.log(`${process.env.REACT_APP_BASE_URL}/inf/user/log`);
+     
         const loginRes = await fetch(
           `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
           {
@@ -512,7 +534,7 @@ const ProAndInfLogin = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              contactNum: mobile,
+              contactNum: email,
             }),
           }
         );
@@ -832,7 +854,7 @@ const ProAndInfLogin = () => {
 
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
-    formDataToSend.append("contactNum", mobile);
+    formDataToSend.append("contactNum", email);
 
     formDataToSend.append("email", formData.email);
     formDataToSend.append("role", role);
@@ -882,7 +904,7 @@ const ProAndInfLogin = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            contactNum: mobile,
+            contactNum: email,
             // contactNum: "7251890867",
           }),
         }
@@ -951,34 +973,21 @@ const ProAndInfLogin = () => {
                 {/* Form */}
                 {step === 1 ? (
                   <>
-                    <PhoneInputContainer>
-                      <CountryCode variant="outlined">
-                        <Select
-                          value={countryCode}
-                          onChange={(e) => setCountryCode(e.target.value)}
-                          displayEmpty
-                          inputProps={{ "aria-label": "Country Code" }}
-                        >
-                          <MenuItem value="+91">+91</MenuItem>
-                          <MenuItem value="+1">+1</MenuItem>
-                          <MenuItem value="+44">+44</MenuItem>
-                        </Select>
-                      </CountryCode>
-                      <PhoneInput
-                        placeholder="Enter phone"
+                    <EmailInputContainer>
+                      <EmailInput
+                        placeholder="Enter email address"
                         variant="outlined"
-                        value={mobile}
-                        onChange={handleMobileChange}
-                        error={Boolean(mobileError)}
-                        helperText={mobileError}
-                        inputProps={{ maxLength: 10 }}
-                        type="tel"
+                        value={email}
+                        onChange={handleEmailChange}
+                        error={Boolean(emailError)}
+                        helperText={emailError}
+                        type="email"
                       />
-                    </PhoneInputContainer>
+                    </EmailInputContainer>
 
                     <ContinueButton
-                      onClick={handleMobileSubmit}
-                      disabled={mobile.length !== 10 || loading}
+                      onClick={handleEmailSubmit}
+                      disabled={!email || Boolean(emailError) || loading}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="inherit" />
@@ -995,7 +1004,7 @@ const ProAndInfLogin = () => {
                 ) : (
                   <>
                     <Typography sx={{ width: "100%", mb: 1 }}>
-                      Enter the OTP sent to {countryCode} {mobile}
+                      Enter the OTP sent to {email}
                     </Typography>
 
                     <OtpContainer>
@@ -1078,7 +1087,7 @@ const ProAndInfLogin = () => {
                           "&:hover": { textDecoration: "underline" },
                         }}
                       >
-                        Change phone number
+                        Change email address
                       </Link>
                     </Box>
                   </>
