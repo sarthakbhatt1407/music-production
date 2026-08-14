@@ -72,7 +72,7 @@ const OrderDetailsPage = () => {
   const [activeStep, setActiveStep] = useState(0);
   const updatePayment = async (paymentOrderId) => {
     const resPay = await fetch(
-      `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier/${paymentOrderId}`
+      `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier/${paymentOrderId}`,
     );
     const dataPay = await resPay.json();
     console.log(dataPay);
@@ -91,7 +91,7 @@ const OrderDetailsPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ orderId: id, action: "completed" }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -119,7 +119,7 @@ const OrderDetailsPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ orderId: id }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -148,7 +148,7 @@ const OrderDetailsPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ orderId: id }), // Sending ID in the request body
-        }
+        },
       );
 
       if (!response.ok) {
@@ -233,7 +233,7 @@ const OrderDetailsPage = () => {
       setCurrentImage(
         (prev) =>
           (prev - 1 + order.images.split(",").length) %
-          order.images.split(",").length
+          order.images.split(",").length,
       );
     }
   };
@@ -262,7 +262,7 @@ const OrderDetailsPage = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ orderId, paymentOrderId }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -282,12 +282,12 @@ const OrderDetailsPage = () => {
 
   const displayRazorpayPaymentSdk = async () => {
     const res = await loadRazorpayScript(
-      "https://checkout.razorpay.com/v1/checkout.js"
+      "https://checkout.razorpay.com/v1/checkout.js",
     );
 
     if (!res) {
       alert(
-        "Razorpay SDK failed to load. Please check your internet connection."
+        "Razorpay SDK failed to load. Please check your internet connection.",
       );
       return;
     }
@@ -303,7 +303,7 @@ const OrderDetailsPage = () => {
           amount: order.paymentAmount,
           currency: "INR",
         }),
-      }
+      },
     );
 
     const data = await orderRes.json();
@@ -319,7 +319,7 @@ const OrderDetailsPage = () => {
     var options = {
       // key: "rzp_live_Ers1PaVrF4H5gV", // Replace with your Razorpay test/live key
       // secret key: "g2erg42aAKZD0uvXg1WOAbJc", // Replace with your Razorpay test/live key
-      key: "rzp_test_RAQAuLXpIZAQYQ", // Replace with your Razorpay test/live key
+      key: "rzp_live_TG53Pr9EPozggs", // Replace with your Razorpay test/live key
       amount: data.amount, // Amount from backend response
       currency: data.currency, // INR
       order_id: data.order_id, // ✅ Adding order ID here
@@ -330,7 +330,7 @@ const OrderDetailsPage = () => {
 
         // Send the payment details to your server for verification and capturing
         const res = await fetch(
-          `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier/${response.razorpay_order_id}`
+          `${process.env.REACT_APP_BASE_URL}/payment/payment-verifier/${response.razorpay_order_id}`,
         );
         const data = await res.json();
         console.log(data);
@@ -339,7 +339,7 @@ const OrderDetailsPage = () => {
           fetchOrderById();
         } else {
           message.success(
-            "Payment successfully completed. If payment is not updated kindly wait for a while."
+            "Payment successfully completed. If payment is not updated kindly wait for a while.",
           );
         }
         setLoading(false);

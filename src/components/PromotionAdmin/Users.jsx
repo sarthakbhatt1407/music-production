@@ -307,26 +307,18 @@ const Users = () => {
     {
       field: "email",
       headerName: "Email",
-      width: 270,
-      renderCell: (params) => (
-        <Typography fontWeight="600">{params.value}</Typography>
-      ),
-    },
-    {
-      field: "contactNum",
-      headerName: "Contact Number",
-      width: 180,
+      width: 300,
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Typography>{params.value}</Typography>
+          <Typography fontWeight="600">{params.value}</Typography>
           <IconButton
             size="small"
             onClick={(e) => {
               e.stopPropagation(); // Prevent cell click navigation
               if (params.row.userType === "music") {
-                demoHandleVerifyOtp(params.row.contactNum);
+                demoHandleVerifyOtp(params.row.email);
               } else {
-                demoLogin(params.row.contactNum);
+                demoLogin(params.row.email);
               }
             }}
             disabled={isLoading}
@@ -345,6 +337,14 @@ const Users = () => {
             )}
           </IconButton>
         </div>
+      ),
+    },
+    {
+      field: "contactNum",
+      headerName: "Contact Number",
+      width: 180,
+      renderCell: (params) => (
+        <Typography>{params.value}</Typography>
       ),
     },
     {

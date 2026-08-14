@@ -53,7 +53,7 @@ const InfDrawerPanel = (props) => {
   console.log("adminvieww", adminView);
   const [loading, setLoading] = useState(false);
   const demoLogin = async () => {
-    const contactNum = "8126770620";
+    const contactNum = "rivaazfilm@gmail.com";
     setLoading(true);
     try {
       const res = await fetch(

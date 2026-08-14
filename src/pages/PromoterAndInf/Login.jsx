@@ -366,12 +366,12 @@ const ProAndInfLogin = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        }
+        },
       );
 
       const data = await response.json();
       console.log("OTP API response:", data);
-      alert(data.otp)
+      // alert(data.otp);
 
       if (data.success) {
         // Store OTP in state
@@ -434,7 +434,7 @@ const ProAndInfLogin = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -450,21 +450,21 @@ const ProAndInfLogin = () => {
         // Set the timer to the next duration
         setTimer(nextTimerDuration);
 
-      // Format the time for display in notification
-      let timeDisplay;
-      if (nextTimerDuration >= 3600) {
-        timeDisplay = "1 hour";
-      } else if (nextTimerDuration >= 600) {
-        timeDisplay = "10 minutes";
-      } else {
-        timeDisplay = "2 minutes";
-      }
+        // Format the time for display in notification
+        let timeDisplay;
+        if (nextTimerDuration >= 3600) {
+          timeDisplay = "1 hour";
+        } else if (nextTimerDuration >= 600) {
+          timeDisplay = "10 minutes";
+        } else {
+          timeDisplay = "2 minutes";
+        }
 
-      setNotification({
-        open: true,
-        message: `OTP resent successfully. Next resend available in ${timeDisplay}.`,
-        severity: "success",
-      });
+        setNotification({
+          open: true,
+          message: `OTP resent successfully. Next resend available in ${timeDisplay}.`,
+          severity: "success",
+        });
       } else {
         throw new Error(data.message || "Failed to resend OTP");
       }
@@ -518,14 +518,13 @@ const ProAndInfLogin = () => {
           body: JSON.stringify({
             contactNum: email,
           }),
-        }
+        },
       );
 
       const data = await res.json();
       console.log(data);
 
       if (data.exists) {
-     
         const loginRes = await fetch(
           `${process.env.REACT_APP_BASE_URL}/inf/user/login`,
           {
@@ -536,7 +535,7 @@ const ProAndInfLogin = () => {
             body: JSON.stringify({
               contactNum: email,
             }),
-          }
+          },
         );
         const loginData = await loginRes.json();
         console.log(loginData);
@@ -674,7 +673,7 @@ const ProAndInfLogin = () => {
         body: JSON.stringify({
           contactNum: contactNum,
         }),
-      }
+      },
     );
 
     const data = await res.json();
@@ -691,7 +690,7 @@ const ProAndInfLogin = () => {
           body: JSON.stringify({
             contactNum: contactNum,
           }),
-        }
+        },
       );
       const loginData = await loginRes.json();
       console.log(loginData);
@@ -877,7 +876,7 @@ const ProAndInfLogin = () => {
         {
           method: "POST",
           body: formDataToSend,
-        }
+        },
       );
     } else {
       res = await fetch(
@@ -885,7 +884,7 @@ const ProAndInfLogin = () => {
         {
           method: "POST",
           body: formDataToSend,
-        }
+        },
       );
     }
     const data = await res.json();
@@ -907,7 +906,7 @@ const ProAndInfLogin = () => {
             contactNum: email,
             // contactNum: "7251890867",
           }),
-        }
+        },
       );
       const loginData = await loginRes.json();
       console.log("loginData", loginData);

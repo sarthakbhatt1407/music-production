@@ -49,7 +49,7 @@ const BrandDrawerPanel = (props) => {
   const adminView = useSelector((state) => state.adminView);
   console.log("adminviewwe", adminView);
   const demoLogin = async () => {
-    const contactNum = "8126770620";
+    const contactNum = "rivaazfilm@gmail.com";
     setLoading(true);
     try {
       const res = await fetch(
